@@ -16,12 +16,12 @@ const shots = [
   { f: 'p-12', w: 2, alt: 'Autumn canopy from below' },
 ];
 ---
-<section class="photos" id="photos" data-accent="#f25c1f" data-face="(◕‿◕)" data-photos>
+<section class="photos" id="photos" data-dark data-accent="#e8c07a" data-face="(◕‿◕)" data-photos>
   <div class="photos-pin">
     <div class="wrap photos-head">
       <p class="eyebrow reveal">Photos</p>
-      <h2 class="t-display reveal" data-split="lines">Things that <span class="serif grad">hold still.</span></h2>
-      <p class="photos-sub muted reveal">Shot on a Canon, mostly in Michigan. No people, on purpose.</p>
+      <h2 class="t-display reveal" data-split="lines">The other thing I do is take pictures.</h2>
+      <p class="photos-sub reveal">Shot on a Canon, mostly around Michigan. There are no people in any of them, which started as an accident and then turned into a rule.</p>
       <p class="photos-idx mono" aria-hidden="true"><span data-photos-idx>01</span> / {String(shots.length).padStart(2, '0')}</p>
     </div>
     <ul class="rail" data-rail>
@@ -35,10 +35,13 @@ const shots = [
 </section>
 
 <style>
-  .photos { position: relative; height: 320svh; overflow-x: clip; }
-  .photos-pin { position: sticky; top: 0; height: 100svh; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; align-content: start; padding-top: calc(var(--bar-h) + 40px); }
-  .photos-head { display: grid; gap: 10px; position: relative; }
-  .photos-sub { font-size: var(--t-lead); max-width: 40ch; text-wrap: balance; }
+  /* the photo wall is the one room with the lights off. Pictures need a dark
+     ground more than a cream one, and it tells the eye it has moved rooms. */
+  .photos { position: relative; height: 320svh; overflow-x: clip; background: var(--night); --ink: #f2ece2; --ink-2: #b6ada0; --ink-3: #8b8377; --cream-2: #211d18; }
+  .photos-pin { position: sticky; top: 0; height: 100svh; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; align-content: start; padding-top: calc(var(--bar-h) + 46px); }
+  .photos-head { display: grid; gap: 12px; position: relative; }
+  .photos-head h2 { max-width: 16ch; color: var(--ink); }
+  .photos-sub { font-size: var(--t-body); line-height: 1.55; color: var(--ink-2); max-width: 52ch; }
   .photos-idx { position: absolute; right: 0; bottom: 4px; font-size: 12px; color: var(--ink-3); }
   .rail { display: flex; gap: 18px; align-items: center; padding: 36px var(--gut) 0; width: max-content; will-change: transform; }
   .shot { --r: 18px; flex: none; height: min(58svh, 520px); overflow: clip; background: var(--cream-2); box-shadow: var(--shadow-card); }

@@ -33,23 +33,29 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 [hidden] { display: none !important; }
 .num, time, [data-num] { font-variant-numeric: tabular-nums; }
 
-/* ── type roles ──────────────────────────────────────────────────── */
-.t-hero    { font-size: var(--t-hero);    letter-spacing: var(--track-hero);    line-height: .92; font-weight: 700; }
-.t-display { font-size: var(--t-display); letter-spacing: var(--track-display); line-height: .96; font-weight: 650; }
-.t-title   { font-size: var(--t-title);   letter-spacing: var(--track-title);   line-height: 1.02; font-weight: 640; }
-.t-sub     { font-size: var(--t-sub);     letter-spacing: -0.02em; line-height: 1.1; font-weight: 500; }
-.t-card    { font-size: var(--t-card);    letter-spacing: -0.02em; line-height: 1.12; font-weight: 600; }
-.serif     { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+/* ── type roles ──────────────────────────────────────────────────
+   Anything spoken in Peter's own voice is set in the serif, roman. Labels,
+   numbers and controls stay in the system face or in mono. The old pattern
+   (one italic serif word in a gradient, inside a sans headline) is gone: it
+   was the single loudest AI tell on the page. */
+.t-hero    { font-family: var(--serif); font-size: var(--t-hero);    letter-spacing: var(--track-hero);    line-height: 1.03; font-weight: 400; }
+.t-display { font-family: var(--serif); font-size: var(--t-display); letter-spacing: var(--track-display); line-height: 1.06; font-weight: 400; }
+.t-title   { font-family: var(--serif); font-size: var(--t-title);   letter-spacing: var(--track-title);   line-height: 1.08; font-weight: 400; }
+.t-sub     { font-family: var(--serif); font-size: var(--t-sub);     letter-spacing: 0.004em; line-height: 1.2; font-weight: 400; }
+.t-card    { font-size: var(--t-card);    letter-spacing: -0.02em; line-height: 1.16; font-weight: 600; }
+.serif     { font-family: var(--serif); font-weight: 400; letter-spacing: 0.004em; }
 .mono      { font-family: var(--mono); font-weight: 480; letter-spacing: 0; font-feature-settings: 'zero', 'ss02'; }
-.eyebrow   { font-family: var(--mono); font-size: var(--t-fine); font-weight: 520; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); }
+.eyebrow   { font-family: var(--mono); font-size: var(--t-fine); font-weight: 520; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
 .muted     { color: var(--ink-2); }
 .faint     { color: var(--ink-3); }
+.hl { color: var(--accent); }
 
-/* gradient text in the live accent */
-.grad {
-  background: linear-gradient(100deg, var(--accent) 0%, color-mix(in oklab, var(--accent) 55%, var(--ink)) 100%);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
+/* ── prose: the paragraphs that carry the writing ────────────────── */
+.prose { font-size: var(--t-lead); line-height: 1.6; color: var(--ink-2); max-width: 48ch; }
+.prose p + p { margin-top: 1.1em; }
+.prose b, .prose strong { color: var(--ink); font-weight: 600; }
+.prose a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgb(var(--espresso) / .3); }
+.prose a:hover { text-decoration-color: currentColor; }
 
 /* ── layout ──────────────────────────────────────────────────────── */
 .wrap { width: min(100% - 2 * var(--gut), var(--wrap)); margin-inline: auto; }
@@ -140,11 +146,12 @@ a:active, button:active { transition-duration: .12s; }
 /* ── print: the facts, not the theatre ───────────────────────────── */
 @media print {
   body { background: #fff; color: #000; }
-  .bar, .subnav, .mesh, .cue, .demo-pill, .finish, .pos, .rail, .ky-hint, .ms-hint { display: none !important; }
-  .stage-sec, .photos { height: auto !important; }
-  .stage-pin, .photos-pin { position: static !important; height: auto !important; }
-  .copy-slot { position: static !important; opacity: 1 !important; pointer-events: auto !important; margin-bottom: 24px; }
-  .frame { display: none !important; }
+  .bar, .subnav, .thread, .demo-pill, .finish-row, .hint, .rail, .ky-hint, .ms-hint { display: none !important; }
+  .room, .photos { height: auto !important; }
+  .room-pin, .photos-pin { position: static !important; height: auto !important; overflow: visible !important; padding: 24px 0 !important; }
+  .room-in { display: block !important; width: auto !important; padding: 0 !important; }
+  .prose.cols3 { columns: 1 !important; }
+  .stage { display: none !important; }
   .line > .line-in { transform: none !important; }
   .reveal { opacity: 1 !important; transform: none !important; }
   a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .8em; color: #666; }

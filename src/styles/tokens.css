@@ -19,6 +19,11 @@
   --solid-fg:#ffffff;
   --espresso: 68 19 6;            /* rgb triplet; every shadow is tinted with it */
 
+  /* two rooms leave the paper: Rin's section and the photo band */
+  --night:    #14120f;            /* the photo wall, warm black */
+  --night-fg: #efe7db;
+  --night-2:  #221e19;
+
   /* ── the dark objects (each product keeps its own surface) ───────── */
   --slate:    #242a36;            /* Rin's terminal */
   --slate-fg: #dde0e5;
@@ -44,21 +49,29 @@
   --watch: #b06a08;
   --alert: #cf2318;
 
+  /* hairlines. Rooms that leave the paper reassign these instead of
+     hard-coding a second colour at every rule. */
+  --rule:        rgb(var(--espresso) / .14);
+  --rule-strong: rgb(var(--espresso) / .22);
+
   /* the live accent: scroll-driven, registered below so it interpolates */
   --accent: #f25c1f;
   --accent-soft: color-mix(in oklab, var(--accent) 8%, transparent);
   --tint: color-mix(in oklab, var(--accent) 3%, var(--paper));
 
-  /* ── type ─────────────────────────────────────────────────────────── */
+  /* ── type ─────────────────────────────────────────────────────────
+     The display voice is a serif set roman, not an italic accent word
+     dropped into a sans headline. That accent was the AI tell; the serif
+     itself is now the identity. Body is the system face, labels are mono. */
   --ui:    -apple-system, BlinkMacSystemFont, system-ui, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
   --serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
   --mono:  'JetBrains Mono Variable', ui-monospace, 'SF Mono', Menlo, monospace;
 
-  --t-hero:    clamp(64px, 12vw, 176px);
-  --t-display: clamp(48px, 8.4vw, 112px);
-  --t-title:   clamp(34px, 4.6vw, 64px);
-  --t-sub:     clamp(26px, 3.2vw, 40px);
-  --t-card:    clamp(22px, 2.4vw, 30px);
+  --t-hero:    clamp(42px, 5.6vw, 84px);
+  --t-display: clamp(36px, 4.4vw, 64px);
+  --t-title:   clamp(30px, 3.4vw, 50px);
+  --t-sub:     clamp(23px, 2.4vw, 32px);
+  --t-card:    clamp(20px, 1.9vw, 26px);
   --t-lead:    19px;
   --t-body:    17px;
   --t-ui:      15px;
@@ -67,9 +80,9 @@
   --t-tiny:    12px;
   --t-nano:    11px;
 
-  --track-hero:    -0.045em;
-  --track-display: -0.035em;
-  --track-title:   -0.025em;
+  --track-hero:    -0.004em;
+  --track-display: -0.002em;
+  --track-title:   0em;
   --track-ui:      -0.01em;
 
   /* ── radius ──────────────────────────────────────────────────────── */

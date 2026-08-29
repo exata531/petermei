@@ -1,0 +1,308 @@
+---
+/* Four rooms, four shapes. The old page put copy left and a frame right, four
+   times over, which is what made it read as a list. Here each product gets a
+   room with its own geometry: volbase runs off the right edge, Rin turns the
+   lights off and hangs its panel from the ceiling, Kyou sits in the middle with
+   the writing on both sides of it, Market Station spans the whole wall with the
+   words above it. Each room pins for about 1.4 screens so its demo has room to
+   play, and the demo is the same live one in every case. */
+import Volbase from './scenes/Volbase.astro';
+import Rin from './scenes/Rin.astro';
+import Kyou from './scenes/Kyou.astro';
+import Market from './scenes/Market.astro';
+import Thread from './Thread.astro';
+---
+<div id="work">
+
+  <!-- ─────────────────────────── 01 · volbase ─────────────────────────── -->
+  <section class="room r-vb" id="volbase" data-room="volbase" data-stack="row" data-accent="#5c79b8" data-face="(☆_☆)"
+           data-name="volbase" data-note="live at volbase.app" data-cta="Open volbase" data-href="https://volbase.app">
+    <div class="room-pin">
+      <div class="room-in">
+        <div class="say">
+          <p class="eyebrow kick"><b>01</b><span>volbase</span><i>live at volbase.app</i></p>
+          <h2 class="t-title" data-split="lines">Finding volunteer work shouldn&rsquo;t be the hard part.</h2>
+          <div class="prose">
+            <p>
+              volbase is a marketplace for students looking for volunteer work, summer
+              programs and internships. You search a map, you see what&rsquo;s closest, you
+              apply once with one profile, and the organization signs off on your hours
+              so you have a record at the end.
+            </p>
+            <p>
+              I built it for students who don&rsquo;t have a parent with a contact at a
+              hospital. It has been live at volbase.app for a while now, with real
+              people on it.
+            </p>
+            <p>
+              The pages were the easy part. Underneath them there&rsquo;s search that sorts
+              by how far away something actually is, accounts, payments, email, and
+              tests that catch it when I break something. I wrote all of it on my own,
+              and I broke it plenty.
+            </p>
+          </div>
+          <p class="tools">Next.js and Supabase, Stripe for payments, MapLibre for the map.</p>
+          <a class="go" href="https://volbase.app" target="_blank" rel="noopener">Open volbase.app<span aria-hidden="true">&#8599;</span></a>
+        </div>
+
+        <div class="stage">
+          <div class="frame-box" data-frame-box><div class="frame sq grain" data-frame data-w="1060" data-h="640" data-mw="380" data-mh="470" style="--w:1060px;--h:640px;--r:12px">
+            <Volbase />
+            <span class="demo-pill">demo</span>
+          </div></div>
+          <p class="hint mono">the window scrolls with the page, then changes tab</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Thread dir="lr" />
+
+  <!-- ───────────────────────────── 02 · Rin ───────────────────────────── -->
+  <section class="room r-rin" id="rin" data-room="rin" data-stack="col" data-dark data-accent="#f7be00" data-face="(￣ヮ￣)"
+           data-name="Rin" data-note="free and open source" data-cta="Try the terminal" data-href="#rin">
+    <div class="room-pin">
+      <div class="room-in">
+        <div class="stage">
+          <div class="frame-box" data-frame-box><div class="frame sq grain" data-frame data-w="820" data-h="400" data-mw="380" data-mh="400" style="--w:820px;--h:400px;--r:14px">
+            <Rin />
+            <span class="demo-pill">demo</span>
+          </div></div>
+          <div class="under">
+            <p class="hint mono">this terminal takes real typing. try <b>help</b>.</p>
+            <div class="finish-row" data-finish-for="rin">
+              <span class="finish-lbl mono">mood</span>
+              <button class="finish-btn mono is-on" type="button" data-face-val="(｡•ᴗ•｡)">(｡•ᴗ•｡)</button><button class="finish-btn mono" type="button" data-face-val="(￣ヮ￣)">(￣ヮ￣)</button><button class="finish-btn mono" type="button" data-face-val="(¬_¬)">(¬_¬)</button><button class="finish-btn mono" type="button" data-face-val="(&gt;_&lt;)">(&gt;_&lt;)</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="say">
+          <p class="eyebrow kick"><b>02</b><span>Rin</span><i>macOS, free and open source</i></p>
+          <h2 class="t-title" data-split="lines">I wanted a Mac that already knew what my week looked like.</h2>
+          <div class="prose cols3">
+            <p>
+              Rin is a terminal that hangs off the menu bar. Control and backtick and it
+              drops down over whatever you&rsquo;re doing. It has already read the folder
+              where I keep my notes, so the first thing I type can be a real question.
+            </p>
+            <p>
+              It&rsquo;s free and the whole thing is on GitHub. I ship it unsigned, because a
+              certificate costs about a hundred dollars a year and this app doesn&rsquo;t make
+              any money.
+            </p>
+            <p>
+              The part I&rsquo;m proudest of is the boring part. Anything you add gets read,
+              labelled and hash checked before it goes near your notes, and every tab
+              comes back where you left it.
+            </p>
+          </div>
+          <p class="tools">Swift, SwiftUI and AppKit, with SwiftTerm doing the terminal itself.</p>
+          <a class="go" href="https://github.com/exata531/Rin" target="_blank" rel="noopener">Read the source<span aria-hidden="true">&#8599;</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Thread dir="rl" />
+
+  <!-- ──────────────────────────── 03 · Kyou ───────────────────────────── -->
+  <section class="room r-kyou" id="kyou" data-room="kyou" data-stack="row" data-accent="#ff3b30" data-face="(´｡• ω •｡`)"
+           data-name="Kyou" data-note="iPhone, in progress" data-cta="Try quick add" data-href="#kyou">
+    <div class="room-pin">
+      <div class="room-in">
+        <div class="say say-l">
+          <p class="eyebrow kick"><b>03</b><span>Kyou</span><i>iPhone, in progress</i></p>
+          <h2 class="t-title" data-split="lines">My day was in three apps and none of them agreed.</h2>
+          <div class="prose">
+            <p>
+              Kyou puts one day on one screen. Calendar, homework and habits merge into a
+              single list that runs from morning to night, so I stop opening three things
+              to work out what I&rsquo;m supposed to be doing.
+            </p>
+          </div>
+        </div>
+
+        <div class="stage">
+          <div class="frame-box" data-frame-box><div class="frame sq grain" data-frame data-w="300" data-h="620" data-mw="290" data-mh="600" style="--w:300px;--h:620px;--r:54px">
+            <Kyou />
+          </div></div>
+          <div class="under">
+            <p class="hint mono"><span class="demo-tag">demo</span>type into the add field</p>
+            <div class="finish-row" data-finish-for="kyou">
+              <span class="finish-lbl mono">finish</span>
+              <button class="finish-btn is-on" type="button" data-finish-val="light">Light</button><button class="finish-btn" type="button" data-finish-val="dark">Dark</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="say say-r">
+          <div class="prose">
+            <p>
+              I started it in August and it isn&rsquo;t finished. I&rsquo;ve rebuilt the add screen
+              about once a week since.
+            </p>
+            <p>
+              The rule I keep coming back to is that it&rsquo;s not allowed to guess.
+              Type <b>problems 1&nbsp;to&nbsp;10</b> and it files homework, not a meeting from one in the
+              afternoon until ten at night. If you didn&rsquo;t type a time, it doesn&rsquo;t invent
+              one.
+            </p>
+          </div>
+          <p class="tools">Swift 6 and SwiftUI, with EventKit and WidgetKit doing the Apple half.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Thread dir="lr" />
+
+  <!-- ─────────────────────── 04 · Market Station ──────────────────────── -->
+  <section class="room r-ms" id="market" data-room="market" data-stack="col" data-accent="#0e7a70" data-face="(•_•)"
+           data-name="Market Station" data-note="running since August" data-cta="Flip a tile" data-href="#market">
+    <div class="room-pin">
+      <div class="room-in">
+        <div class="say">
+          <p class="eyebrow kick"><b>04</b><span>Market Station</span><i>running since August</i></p>
+          <h2 class="t-title" data-split="lines">A dashboard for one person who doesn&rsquo;t read charts.</h2>
+          <div class="prose cols3">
+            <p>
+              Market Station watches a set of market and economy readings all day and
+              turns each one into a sentence anybody can read. Nobody hands out market
+              breadth for free, so it works that one out itself across five hundred
+              companies.
+            </p>
+            <p>
+              It runs on an old Windows laptop with the lid closed, and it was built for
+              one non technical reader at home, so there is no branding and no jargon
+              anywhere on it.
+            </p>
+            <p>
+              When a reading crosses a line it sends a phone alert, and it has to stay
+              across a while before another goes out, because an alert every ten minutes
+              is the same as no alert.
+            </p>
+          </div>
+          <p class="tools">Python and FastAPI, Chart.js for the graphs, and Claude writing the two daily briefings.</p>
+        </div>
+
+        <div class="stage">
+          <div class="frame-box" data-frame-box><div class="frame sq grain" data-frame data-w="1280" data-h="460" data-mw="380" data-mh="560" style="--w:1280px;--h:460px;--r:14px">
+            <Market />
+            <span class="demo-pill">demo</span>
+          </div></div>
+          <p class="hint mono">hover a tile for the raw reading</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<style>
+  /* ── shared room machinery ─────────────────────────────────────────
+     240svh tall with a 100svh sticky child means the pin travels 140svh,
+     which is the pace Peter asked for: a demo gets about a screen and a
+     half of wheel to play itself out. */
+  .room { position: relative; height: 240svh; }
+  .room-pin { position: sticky; top: 0; height: 100svh; overflow: clip; display: grid; align-items: center; padding-top: calc(var(--bar-h) + var(--sub-h) + 20px); padding-bottom: 30px; }
+  .room-in { width: 100%; height: 100%; display: grid; align-items: center; }
+
+  .say { display: grid; gap: 16px; align-content: center; }
+  .say h2 { font-size: clamp(28px, 3vw, 42px); line-height: 1.1; }
+  .say .prose { font-size: 16.5px; line-height: 1.52; }
+  .say .prose p + p { margin-top: .9em; }
+  .kick { display: flex; align-items: baseline; gap: 10px; color: var(--accent); }
+  .kick b { font-weight: 600; opacity: .75; }
+  .kick span { color: var(--ink); font-weight: 560; }
+  .kick i { font-style: normal; color: var(--ink-3); }
+  .say h2 { max-width: 17ch; color: var(--ink); }
+  .tools { font-size: 13.5px; color: var(--ink-3); max-width: 46ch; line-height: 1.45; }
+  .go { display: inline-flex; align-items: center; gap: 7px; justify-self: start; font-size: var(--t-ui); font-weight: 600; color: var(--ink); border-bottom: 1.5px solid var(--accent); padding-bottom: 3px; }
+  .go:hover { color: var(--accent); }
+
+  .stage { position: relative; display: grid; justify-items: center; align-content: center; gap: 14px; min-width: 0; min-height: 0; }
+  /* the box is what the layout sees; the frame keeps its design pixels and is
+     scaled inside it, so shrinking a device never leaves a hole in the page */
+  .frame-box { position: relative; width: var(--w); height: var(--h); }
+  .frame {
+    position: absolute; top: 0; left: 0; width: var(--w); height: var(--h);
+    background: var(--slate); color: var(--slate-fg);
+    box-shadow: var(--shadow-device); overflow: clip; isolation: isolate;
+    transform: scale(var(--scale, 1)); transform-origin: 0 0;
+  }
+  .js .stage { opacity: 0; }
+  .hint { font-size: 11px; color: var(--ink-3); letter-spacing: .01em; display: inline-flex; align-items: center; gap: 8px; }
+  .demo-tag { font-size: 9.5px; font-weight: 560; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); border: .5px solid var(--rule-strong); border-radius: 999px; padding: 2px 7px; }
+  .hint b { color: var(--accent); font-weight: 600; }
+  .under { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: center; }
+  .finish-row { display: inline-flex; align-items: center; gap: 4px; padding: 3px; border-radius: 999px; background: rgb(var(--espresso) / .06); }
+  .finish-lbl { font-size: 10px; color: var(--ink-3); padding: 0 8px 0 10px; letter-spacing: .06em; text-transform: uppercase; }
+  .finish-btn { height: 24px; padding: 0 11px; border-radius: 999px; font-size: 12px; font-weight: 600; color: var(--ink-2); transition: background-color var(--t-fast) var(--settle), color var(--t-fast) var(--settle); }
+  .finish-btn.is-on { background: var(--paper); color: var(--ink); box-shadow: 0 1px 2px rgb(var(--espresso) / .12); }
+
+  .prose.cols3 { max-width: none; columns: 3; column-gap: clamp(24px, 3vw, 46px); }
+  .prose.cols3 p { break-inside: avoid; margin-top: 0; }
+  @media (max-width: 1180px) { .prose.cols3 { columns: 2; } }
+
+  /* ── 01 volbase: copy low and left, window running off the right edge ── */
+  .r-vb .room-in { grid-template-columns: minmax(320px, 33%) minmax(0, 1fr); gap: clamp(28px, 4vw, 60px); padding-left: max(var(--gut), calc((100vw - var(--wrap)) / 2)); }
+  .r-vb .say { align-content: end; padding-bottom: clamp(12px, 5vh, 56px); }
+  .r-vb .say h2 { max-width: 15ch; }
+  .r-vb .stage { justify-items: start; }
+  .r-vb .hint { justify-self: start; padding-left: 2px; }
+
+  /* ── 02 Rin: lights off, the panel hangs from the ceiling ───────────── */
+  .r-rin { background: var(--night); }
+  .r-rin .room-pin { --ink: #f2ece2; --ink-2: #b6ada0; --ink-3: #8b8377; --rule: rgb(255 255 255 / .13); --paper: #2a251f; }
+  .r-rin .room-in { width: min(100% - 2 * var(--gut), 1060px); margin-inline: auto; grid-template-rows: auto auto; align-content: center; gap: clamp(20px, 3.2vh, 38px); }
+  .r-rin .stage { align-content: start; }
+  .r-rin .frame { box-shadow: 0 0 0 .5px rgb(255 255 255 / .12), 0 40px 80px -24px rgb(0 0 0 / .7); }
+  .r-rin .finish-row { background: rgb(255 255 255 / .07); }
+  .r-rin .say { gap: 12px; }
+  .r-rin .say h2 { max-width: 26ch; }
+  .r-rin .go { color: var(--ink); }
+
+  /* ── 03 Kyou: the phone in the middle, writing either side of it ────── */
+  .r-kyou .room-in { width: min(100% - 2 * var(--gut), var(--wrap)); margin-inline: auto; grid-template-columns: minmax(0, 1fr) clamp(230px, 22vw, 310px) minmax(0, 1fr); gap: clamp(24px, 3.4vw, 56px); align-items: center; }
+  .r-kyou .say-l { align-content: start; padding-top: clamp(0px, 4vh, 40px); }
+  .r-kyou .say-r { align-content: end; padding-bottom: clamp(0px, 5vh, 52px); }
+  .r-kyou .say h2 { max-width: 14ch; }
+  .r-kyou .prose { font-size: var(--t-body); max-width: 34ch; }
+  .r-kyou .under { flex-direction: column; gap: 8px; }
+
+  /* ── 04 Market Station: words on top, the wall underneath ──────────── */
+  .r-ms .room-in { grid-template-rows: auto minmax(0, 1fr); gap: clamp(20px, 3.4vh, 42px); align-content: center; }
+  .r-ms .say { width: min(100% - 2 * var(--gut), 1180px); margin-inline: auto; justify-items: center; text-align: center; }
+  .r-ms .say h2 { max-width: 26ch; }
+  .r-ms .kick { justify-content: center; }
+  .r-ms .tools { max-width: 76ch; text-align: center; }
+  .r-ms .prose.cols3 { text-align: left; }
+  .r-ms .prose.cols3 p { text-align: left; }
+  .r-ms .stage { align-content: start; }
+
+  /* ── phones: every room becomes one honest column ──────────────────── */
+  @media (max-width: 980px) {
+    .room { height: auto; }
+    .room-pin { position: static; height: auto; overflow: visible; padding-top: clamp(56px, 12vh, 110px); padding-bottom: clamp(56px, 12vh, 110px); }
+    .room-in, .r-vb .room-in, .r-rin .room-in, .r-kyou .room-in, .r-ms .room-in {
+      width: min(100% - 2 * var(--gut), var(--wrap)); margin-inline: auto;
+      grid-template-columns: 1fr; grid-template-rows: none; padding-left: 0; gap: 30px;
+    }
+    .r-vb .say, .r-kyou .say-l, .r-kyou .say-r, .r-ms .say { padding: 0; text-align: left; justify-items: start; align-content: start; }
+    .r-ms .kick { justify-content: flex-start; }
+    .kick { flex-wrap: wrap; }
+    .kick i { flex-basis: 100%; }
+    .r-ms .tools { text-align: left; }
+    .prose.cols3 { columns: 1; }
+    .say h2, .r-rin .say h2, .r-kyou .say h2, .r-ms .say h2 { max-width: 20ch; }
+    .stage, .r-vb .stage { justify-items: center; }
+    .frame-box { max-width: 100%; }
+    .r-vb .hint { justify-self: center; }
+    /* the phone room reads better with the device between the two halves */
+    .r-kyou .say-l { order: 1; } .r-kyou .stage { order: 2; } .r-kyou .say-r { order: 3; }
+    .r-kyou .prose { max-width: none; }
+    .js .stage { opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) { .js .stage { opacity: 1; } }
+</style>

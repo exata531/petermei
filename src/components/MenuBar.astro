@@ -1,9 +1,9 @@
 ---
 const projects = [
-  { id: 'volbase', name: 'volbase', accent: 'var(--acc-volbase)', key: '1', note: 'live at volbase.app' },
+  { id: 'volbase', name: 'volbase', accent: 'var(--acc-volbase)', key: '1', note: 'live, with real people on it' },
   { id: 'rin', name: 'Rin', accent: 'var(--acc-rin)', key: '2', note: 'a terminal in the menu bar' },
-  { id: 'kyou', name: 'Kyou', accent: 'var(--acc-kyou)', key: '3', note: 'the whole day on one screen' },
-  { id: 'market', name: 'Market Station', accent: 'var(--acc-market)', key: '4', note: 'macro, watched all day' },
+  { id: 'kyou', name: 'Kyou', accent: 'var(--acc-kyou)', key: '3', note: 'one day on one screen' },
+  { id: 'market', name: 'Market Station', accent: 'var(--acc-market)', key: '4', note: 'watching the market all day' },
 ];
 ---
 <header class="bar" id="bar" data-bar>
@@ -15,7 +15,7 @@ const projects = [
       <a class="name" href="#top">Peter Mei</a>
       <nav class="items" aria-label="Site">
         <button class="item is-menu" type="button" data-menu-toggle aria-haspopup="menu" aria-expanded="false" aria-controls="menu">Work</button>
-        <a class="item" href="#elsewhere">Elsewhere</a>
+        <a class="item" href="#elsewhere">Off screen</a>
         <a class="item" href="#photos">Photos</a>
         <a class="item" href="#about">About</a>
       </nav>
@@ -71,7 +71,7 @@ const projects = [
       ))}
     </ul>
     <ul class="menu-more">
-      <li role="none"><a role="menuitem" class="mi mi-s" href="#elsewhere" data-menu-go>Elsewhere</a></li>
+      <li role="none"><a role="menuitem" class="mi mi-s" href="#elsewhere" data-menu-go>Off screen</a></li>
       <li role="none"><a role="menuitem" class="mi mi-s" href="#photos" data-menu-go>Photos</a></li>
       <li role="none"><a role="menuitem" class="mi mi-s" href="#about" data-menu-go>About</a></li>
     </ul>
@@ -129,7 +129,19 @@ const projects = [
   .wx[data-wx="storm"] .wx-cloud, .wx[data-wx="storm"] .wx-bolt { display: block; }
   .wx[data-wx="rain"] .wx-cloud, .wx[data-wx="snow"] .wx-cloud, .wx[data-wx="storm"] .wx-cloud { transform: translateY(-2px); }
 
-  @media (max-width: 720px) { .menu-foot, .pk, .wx { display: none; } }
+  /* over a dark room the cream strip would read as a seam; the bar goes dark
+     with it and the type flips, so the join disappears */
+  :global(html.on-dark) .bar { background: rgb(20 18 15 / .92); border-bottom-color: rgb(255 255 255 / .1); }
+  :global(html.on-dark) .name, :global(html.on-dark) .item, :global(html.on-dark) .clock, :global(html.on-dark) .face { color: #f2ece2; }
+  :global(html.on-dark) .status, :global(html.on-dark) .wx { color: #b6ada0; }
+  :global(html.on-dark) .wx .wx-i { color: #8b8377; }
+  :global(html.on-dark) .pk { color: #b6ada0; border-color: rgb(255 255 255 / .2); }
+  :global(html.on-dark) .face:hover, :global(html.on-dark) .name:hover, :global(html.on-dark) .item:hover,
+  :global(html.on-dark) .status:hover, :global(html.on-dark) .pk:hover { background: rgb(255 255 255 / .09); color: #fff; }
+  :global(html.on-dark) .face[aria-expanded="true"], :global(html.on-dark) .item[aria-expanded="true"] { background: #f2ece2; color: #14120f; }
+
+  @media (max-width: 900px) { .menu-foot, .pk, .wx, .items, .name { display: none; } }
+  @media (max-width: 420px) { .clock { font-size: 12.5px; padding-inline: 6px 2px; } }
 </style>
 
 <style is:global>

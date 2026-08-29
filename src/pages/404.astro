@@ -2,16 +2,16 @@
 import Base from '../layouts/Base.astro';
 import MenuBar from '../components/MenuBar.astro';
 ---
-<Base title="Not here · Peter Mei" description="That page does not exist.">
+<Base title="Nothing here · Peter Mei" description="There is nothing at this address. The work is on the front page.">
   <MenuBar />
   <main class="nf">
     <div class="wrap nf-in">
       <p class="eyebrow">404</p>
-      <h1 class="t-display" data-split="lines">Nothing here. <span class="serif grad">Checked twice.</span></h1>
-      <p class="muted nf-sub">That page doesn’t exist. The work does.</p>
+      <h1 class="t-display">There&rsquo;s nothing at this address.</h1>
+      <p class="nf-sub">I checked twice. Whatever you were after is almost certainly on the front page, along with four things you can type into.</p>
       <div class="row" style="--gap:12px">
-        <a class="btn btn-solid sq" href="/#work">See the work</a>
-        <a class="btn btn-ghost sq" href="/">Home</a>
+        <a class="btn btn-solid sq" href="/#work">Go to the work</a>
+        <a class="btn btn-ghost sq" href="/">Back to the start</a>
       </div>
       <p class="mono nf-face" aria-hidden="true">(・_・;)</p>
     </div>
@@ -20,7 +20,8 @@ import MenuBar from '../components/MenuBar.astro';
 
 <style>
   .nf { min-height: 100svh; display: grid; place-items: center; padding-top: var(--bar-h); }
-  .nf-in { display: grid; gap: 20px; justify-items: start; }
-  .nf-sub { font-size: var(--t-lead); }
+  .nf-in { display: grid; gap: 20px; justify-items: start; max-width: 44rem; }
+  .nf-in h1 { max-width: 15ch; }
+  .nf-sub { font-size: var(--t-lead); color: var(--ink-2); max-width: 46ch; line-height: 1.55; }
   .nf-face { font-size: 22px; color: var(--ink-3); margin-top: 12px; }
 </style>

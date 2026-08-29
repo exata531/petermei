@@ -29,5 +29,8 @@
     transition: background-color var(--t-slow) var(--settle), transform var(--t-base) var(--spring);
   }
   .sub-cta:hover { transform: translateY(-1px); }
+  :global(html.on-dark) .subnav { background: rgb(20 18 15 / .84); border-bottom-color: rgb(255 255 255 / .1); }
+  :global(html.on-dark) .sub-name { color: #f2ece2; }
+  :global(html.on-dark) .sub-note { color: #8b8377; }
   @media (max-width: 720px) { .sub-note { display: none; } }
 </style>

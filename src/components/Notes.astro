@@ -1,0 +1,75 @@
+---
+/* The parts that are not software. The old version was three identical cards
+   with an animated icon each, which is the shape of a template. This is a
+   pinboard: five notes at different widths, pinned crooked, straightening when
+   you hover one. Everything here is on the record in the brag sheet. */
+const notes = [
+  {
+    tag: 'FIRST Robotics · founder',
+    span: '1 / 7', up: '0px', rot: '-0.55deg',
+    body: 'I started a robotics team in tenth grade. The school gave us a closet, and our robot could not fit through the door of it. We got to Worlds that first season anyway, as Michigan’s second ranked rookie team.',
+  },
+  {
+    tag: 'Climbing',
+    span: '8 / 13', up: '52px', rot: '0.5deg',
+    body: 'Six years at the same gym, four of them on the team. I flash V7 and I’m projecting V10. I went to speed nationals in 2025 and came 29th in my age group, which I have decided to be pleased about.',
+  },
+  {
+    tag: 'Paby LLC',
+    span: '2 / 7', up: '34px', rot: '0.7deg',
+    body: 'I ran the warehouse for a lighting company one summer. Orders, inventory, and getting boxes out the door. It is the least glamorous thing on this page and I probably learned the most from it.',
+  },
+  {
+    tag: 'Cross country',
+    span: '7 / 11', up: '-8px', rot: '-0.45deg',
+    body: 'Two years of varsity cross country and an 18:39 5K, then I gave it up for climbing. I still run. Slower now, and nobody is timing me.',
+  },
+  {
+    tag: 'Henry Ford Hospital',
+    span: '4 / 9', up: '26px', rot: '0.4deg',
+    body: 'A hundred and some hours across two summers, sorting biopsy slides and running medication around the building. What I actually learned there was how a very big place keeps track of very small things.',
+  },
+];
+---
+<section class="section notes" id="elsewhere" data-accent="#f25c1f" data-face="(¬‿¬)">
+  <div class="wrap">
+    <p class="eyebrow reveal">Away from the screen</p>
+    <h2 class="t-display head reveal" data-split="lines">Not all of it happens at a desk.</h2>
+    <ul class="board">
+      {notes.map((n, i) => (
+        <li class="note sq reveal" style={`--span:${n.span};--up:${n.up};--rot:${n.rot};--i:${i}`}>
+          <p class="tag mono">{n.tag}</p>
+          <p class="body">{n.body}</p>
+          <span class="pin" aria-hidden="true"></span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .notes { padding-block: clamp(72px, 10vw, 150px); }
+  .head { max-width: 16ch; margin-top: 10px; }
+  .board { display: grid; grid-template-columns: repeat(12, 1fr); gap: clamp(16px, 2vw, 26px); margin-top: clamp(40px, 5vw, 72px); align-items: start; }
+
+  .note {
+    --r: 14px;
+    grid-column: var(--span); margin-top: var(--up); position: relative;
+    padding: 26px 26px 28px;
+    background: var(--paper); border: .5px solid var(--rule);
+    box-shadow: var(--shadow-card);
+    rotate: var(--rot);
+    transition-delay: calc(var(--i) * 70ms);
+    transition: rotate .45s var(--out-quart), transform .45s var(--out-quart), box-shadow .45s var(--out-quart), border-color .3s var(--ease);
+  }
+  .note:hover { rotate: 0deg; transform: translateY(-3px); box-shadow: var(--shadow-panel); border-color: var(--rule-strong); }
+  .tag { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+  .body { font-size: var(--t-body); line-height: 1.55; color: var(--ink-2); }
+  .pin { position: absolute; top: -5px; left: 26px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 1px 3px rgb(var(--espresso) / .4), inset 0 -1px 2px rgb(0 0 0 / .25); }
+
+  @media (max-width: 900px) {
+    .board { grid-template-columns: 1fr; gap: 16px; }
+    .note { grid-column: 1 / -1 !important; margin-top: 0 !important; rotate: 0deg !important; }
+    .head { max-width: 20ch; }
+  }
+</style>

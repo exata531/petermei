@@ -1,35 +1,55 @@
 ---
-const facts = [
-  ['School', 'the school Kingswood, Class of 2027'],
-  ['Where', 'Detroit area, Michigan'],
-  ['Languages', 'English, Mandarin, Swift, TypeScript, Python'],
-  ['Sport', 'Climbing. Speed and bouldering'],
-  ['Before that', 'Two years of varsity cross country, an 18:39 5K. VEX Worlds as a freshman'],
-  ['Next', 'Business with a CS minor, building the whole way through'],
-];
+/* About, written as writing. The old version was a two column table of key and
+   value, which reads as a form somebody filled in rather than a person talking.
+   The live Detroit clock stays: it is the one honest thing on the page that
+   only exists because you happen to be looking at it right now. */
 ---
 <section class="section about" id="about" data-accent="#f25c1f" data-face="(｡•ᴗ•｡)">
   <div class="wrap about-grid">
-    <div>
+    <div class="about-say">
       <p class="eyebrow reveal">About</p>
-      <h2 class="t-display reveal" data-split="lines">Robotics <span class="serif grad">came first.</span></h2>
-      <ul class="stack-line mono reveal" aria-label="Stack">{["Swift","SwiftUI","AppKit","TypeScript","Next.js","React","Supabase","Stripe","Python","FastAPI"].map((s) => <li>{s}</li>)}</ul>
+      <h2 class="t-display head reveal" data-split="lines">Robotics is where all of this started.</h2>
+      <div class="prose reveal">
+        <p>
+          I did VEX as a freshman and we went to Worlds, and then I left with four
+          other people to start a FIRST team from nothing. That meant teaching myself
+          wiring, computer vision and how to call a stranger and ask them for money,
+          because there was no mentor and no budget and we needed all three.
+        </p>
+        <p>
+          The software came out of that. We kept needing things that did not exist
+          yet, so I started making them, and I have not really stopped. Everything on
+          this page came from the same habit.
+        </p>
+        <p>
+          I am a senior at the school, I speak English and Mandarin, and I am applying
+          to college this fall.
+        </p>
+      </div>
     </div>
-    <dl class="about-facts reveal">
-      {facts.map(([k, v]) => (<div><dt class="mono">{k}</dt><dd>{v}</dd></div>))}
-      <div><dt class="mono">Local time</dt><dd><time class="num" data-clock-long>—</time></dd></div>
-    </dl>
+
+    <aside class="about-side reveal">
+      <p class="eyebrow side-lbl">What I reach for</p>
+      <ul class="stack-line mono" aria-label="Tools">{["Swift","SwiftUI","AppKit","TypeScript","Next.js","React","Supabase","Stripe","Python","FastAPI"].map((s) => <li>{s}</li>)}</ul>
+      <p class="side-note">
+        Right now, where I am, it is <time class="num" data-clock-long>&hellip;</time>.
+      </p>
+    </aside>
   </div>
 </section>
 
 <style>
-  .about-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(32px, 6vw, 96px); align-items: start; }
-  .stack-line { margin-top: 28px; font-size: 12.5px; color: var(--ink-3); line-height: 1.8; max-width: 44ch; display: flex; flex-wrap: wrap; gap: 0 14px; }
-  .stack-line li + li::before { content: '·'; margin-right: 14px; color: var(--hair); }
-  .about-facts { display: grid; margin: 0; }
-  .about-facts div { display: grid; grid-template-columns: 110px 1fr; gap: 16px; padding: 14px 0; border-top: .5px solid rgb(var(--espresso) / .14); font-size: var(--t-ui); }
-  .about-facts div:last-child { border-bottom: .5px solid rgb(var(--espresso) / .14); }
-  .about-facts dt { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); padding-top: 3px; }
-  .about-facts dd { margin: 0; color: var(--ink); }
-  @media (max-width: 820px) { .about-grid { grid-template-columns: 1fr; } }
+  .about { padding-block: clamp(72px, 10vw, 150px); }
+  .about-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(240px, .75fr); gap: clamp(32px, 6vw, 96px); align-items: start; }
+  .about-say { display: grid; gap: 8px; }
+  .head { max-width: 15ch; margin: 6px 0 20px; }
+
+  .about-side { display: grid; gap: 14px; align-content: start; padding-top: 8px; border-top: .5px solid var(--rule); }
+  .side-lbl { padding-top: 18px; }
+  .stack-line { font-size: 12.5px; color: var(--ink-3); line-height: 1.9; display: flex; flex-wrap: wrap; gap: 0 13px; }
+  .stack-line li + li::before { content: '·'; margin-right: 13px; color: var(--hair); }
+  .side-note { font-size: var(--t-small); color: var(--ink-2); line-height: 1.5; padding-top: 6px; border-top: .5px solid var(--rule); }
+  .side-note time { color: var(--ink); font-weight: 600; }
+
+  @media (max-width: 900px) { .about-grid { grid-template-columns: 1fr; gap: 36px; } .head { max-width: 18ch; } }
 </style>

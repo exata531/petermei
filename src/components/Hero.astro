@@ -1,43 +1,98 @@
+---
+/* The opening. Words on the left, the index of the four products on the right,
+   and the two columns deliberately do not start at the same height. Every fact
+   here is on the record. The index is plain HTML with nothing in front of it,
+   so a reader who leaves after one screen still gets the whole map. */
+const index = [
+  { id: 'volbase', n: '01', name: 'volbase', accent: 'var(--acc-volbase)', line: 'Students find volunteer work near them. Live, with real people on it.' },
+  { id: 'rin', n: '02', name: 'Rin', accent: 'var(--acc-rin)', line: 'A terminal that drops out of the menu bar. Free, and the code is public.' },
+  { id: 'kyou', n: '03', name: 'Kyou', accent: 'var(--acc-kyou)', line: 'My whole day on one screen. Still being built, on my own phone.' },
+  { id: 'market', n: '04', name: 'Market Station', accent: 'var(--acc-market)', line: 'Watches the market all day and sends a phone alert when something moves.' },
+];
+---
 <section class="hero" id="top" data-accent="#f25c1f" data-face="(｡•ᴗ•｡)">
-  <div class="mesh" aria-hidden="true">
-    <span class="lobe l1"></span><span class="lobe l2"></span><span class="lobe l3"></span>
-  </div>
-  <div class="wrap hero-in">
-    <p class="eyebrow hero-eye" data-load="eye">Detroit · the school ’27</p>
-    <h1 class="t-hero hero-name" data-split="lines" data-load="name">Peter Mei</h1>
-    <p class="t-sub serif hero-line" data-load="line">Four things I built. All four are running right now.</p>
-    <div class="row hero-cta" style="--gap:12px" data-load="cta">
-      <a class="btn btn-solid sq" href="#work" data-magnet>See the work<span aria-hidden="true">↓</span></a>
-      <a class="btn btn-ghost sq" href="https://github.com/exata531" target="_blank" rel="noopener" data-magnet>GitHub</a>
+  <div class="wrap hero-grid">
+    <div class="hero-say">
+      <p class="eyebrow hero-eye" data-load="eye">Detroit, Michigan</p>
+      <h1 class="t-hero hero-line" data-split="lines" data-load="name">Hi, I&rsquo;m Peter Mei. I build things, and then I keep them running.</h1>
+      <div class="prose hero-p" data-load="p">
+        <p>
+          I&rsquo;m a senior at the school, outside Detroit. I started a robotics team,
+          then a company, and somewhere in there I taught myself to write code because
+          there was nobody around to do it for me.
+        </p>
+        <p>
+          Four of the things I built are further down this page. None of them are
+          screenshots. You can type into them.
+        </p>
+      </div>
+    </div>
+
+    <div class="hero-idx" data-load="idx">
+      <p class="eyebrow idx-lbl">The work</p>
+      <ol class="idx">
+        {index.map((p, i) => (
+          <li style={`--dot:${p.accent};--i:${i}`}>
+            <a href={`#${p.id}`} data-idx-link data-target={p.id}>
+              <span class="idx-n mono">{p.n}</span>
+              <span class="idx-dot" aria-hidden="true"></span>
+              <span class="idx-name">{p.name}</span>
+              <span class="idx-line">{p.line}</span>
+              <span class="idx-go" aria-hidden="true">&darr;</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+      <p class="idx-foot mono">
+        <span class="live" aria-hidden="true"></span>Building Kyou. Running volbase. Applying to college this fall.
+      </p>
     </div>
   </div>
-  <a class="cue" href="#spine" aria-label="Scroll" data-load="cue"><span class="cue-dot"></span></a>
 </section>
 
 <style>
-  .hero { position: relative; min-height: 100svh; display: grid; place-items: center; padding-top: var(--bar-h); overflow: clip; isolation: isolate; }
-  .hero-in { text-align: center; display: grid; justify-items: center; gap: 22px; position: relative; z-index: 1; }
-  .js .hero-eye { opacity: 0; }
-  .hero-name { color: var(--ink); }
-  .hero-line { color: var(--ink-2); font-size: clamp(26px, 3.4vw, 44px); max-width: 24ch; text-wrap: balance; }
-  .js .hero-line, .js .hero-cta, .js .cue, .js .mesh { opacity: 0; }
-  .hero-cta { margin-top: 10px; }
+  .hero { position: relative; min-height: 100svh; display: grid; align-items: end; padding-top: calc(var(--bar-h) + 96px); padding-bottom: clamp(56px, 8vh, 108px); }
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(320px, .88fr); gap: clamp(32px, 6vw, 88px); align-items: end; }
 
-  .mesh { position: absolute; inset: -20% -10%; z-index: 0; pointer-events: none; filter: blur(70px) saturate(1.1); }
-  .lobe { position: absolute; border-radius: 50%; mix-blend-mode: multiply; will-change: transform; }
-  .l1 { width: 46vw; height: 46vw; left: 8%;  top: 18%; background: color-mix(in oklab, var(--acc-me) 26%, transparent);      animation: drift1 22s ease-in-out infinite; }
-  .l2 { width: 40vw; height: 40vw; right: 6%; top: 8%;  background: color-mix(in oklab, var(--acc-volbase) 22%, transparent); animation: drift2 26s ease-in-out infinite; }
-  .l3 { width: 36vw; height: 36vw; left: 34%; bottom: 0; background: color-mix(in oklab, var(--acc-market) 16%, transparent); animation: drift3 30s ease-in-out infinite; }
-  @keyframes drift1 { 50% { transform: translate(6vw, -4vw) scale(1.08); } }
-  @keyframes drift2 { 50% { transform: translate(-5vw, 5vw) scale(.94); } }
-  @keyframes drift3 { 50% { transform: translate(3vw, -6vw) scale(1.06); } }
+  .hero-say { display: grid; gap: 26px; }
+  .hero-line { color: var(--ink); max-width: 15ch; }
+  .hero-p { max-width: 44ch; }
+  .js .hero-eye, .js .hero-line, .js .hero-p, .js .hero-idx { opacity: 0; }
 
-  .cue { position: absolute; bottom: 28px; left: 50%; translate: -50% 0; width: 26px; height: 42px; border: 1.5px solid rgb(var(--espresso) / .25); border-radius: 999px; }
-  .cue-dot { position: absolute; left: 50%; top: 8px; width: 4px; height: 8px; margin-left: -2px; border-radius: 2px; background: var(--ink-2); animation: cue 1.8s var(--out-quart) infinite; }
-  @keyframes cue { 0% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(14px); opacity: 0; } 100% { opacity: 0; } }
+  /* the index: the map of the page, and the only numbers on the first screen */
+  .hero-idx { display: grid; gap: 14px; align-content: end; padding-bottom: 4px; }
+  .idx-lbl { color: var(--ink-3); }
+  .idx { border-top: .5px solid rgb(var(--espresso) / .16); }
+  .idx li { border-bottom: .5px solid rgb(var(--espresso) / .16); }
+  .idx a {
+    display: grid; grid-template-columns: 26px 10px 1fr 16px; column-gap: 12px; row-gap: 3px;
+    align-items: center; padding: 15px 4px 16px; border-radius: 8px;
+  }
+  .idx-n { font-size: 11px; color: var(--ink-3); }
+  .idx-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dot); box-shadow: 0 0 0 3px color-mix(in oklab, var(--dot) 18%, transparent); }
+  .idx-name { font-size: var(--t-ui); font-weight: 640; letter-spacing: -0.015em; }
+  .idx-line { grid-column: 3 / 4; font-size: var(--t-small); color: var(--ink-2); line-height: 1.4; }
+  .idx-go { grid-column: 4; grid-row: 1 / 3; align-self: center; justify-self: end; font-size: 13px; color: var(--ink-3); transition: transform var(--t-base) var(--ease), color var(--t-base) var(--ease); }
+  .idx a:hover { background: rgb(var(--espresso) / .035); }
+  .idx a:hover .idx-name { color: var(--dot); }
+  .idx a:hover .idx-go { transform: translateY(3px); color: var(--dot); }
 
+  .idx-foot { display: flex; align-items: center; gap: 9px; font-size: 11.5px; color: var(--ink-3); padding-top: 2px; }
+  .live { width: 7px; height: 7px; border-radius: 50%; flex: none; background: var(--acc-me); box-shadow: 0 0 0 0 color-mix(in oklab, var(--acc-me) 45%, transparent); animation: live 2.6s var(--out-quart) infinite; }
+  @keyframes live { 0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--acc-me) 45%, transparent); } 70% { box-shadow: 0 0 0 8px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+
+  @media (max-width: 980px) {
+    .hero { align-items: center; padding-top: calc(var(--bar-h) + 72px); }
+    .hero-grid { grid-template-columns: 1fr; gap: 42px; align-items: start; }
+    .hero-line { max-width: 18ch; }
+  }
+  @media (max-width: 560px) {
+    .idx a { grid-template-columns: 24px 8px 1fr; column-gap: 10px; }
+    .idx-line { grid-column: 3 / 4; }
+    .idx-go { display: none; }
+  }
   @media (prefers-reduced-motion: reduce) {
-    .hero-eye, .hero-line, .hero-cta, .cue, .mesh { opacity: 1; }
-    .lobe, .cue-dot { animation: none; }
+    .hero-eye, .hero-line, .hero-p, .hero-idx { opacity: 1; }
+    .live { animation: none; }
   }
 </style>
