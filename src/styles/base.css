@@ -22,7 +22,7 @@ body {
   transition: background-color var(--t-slow) var(--settle);
 }
 
-::selection { background: rgb(var(--espresso) / .12); color: var(--ink); }
+::selection { background: color-mix(in oklab, var(--accent) 22%, transparent); color: var(--ink); }
 
 h1, h2, h3, h4 { margin: 0; font-weight: 600; letter-spacing: var(--track-title); line-height: 1.02; text-wrap: balance; }
 p { margin: 0; }
@@ -61,6 +61,12 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .sq { border-radius: var(--r, var(--r-card)); }
 @supports (corner-shape: squircle) { .sq { corner-shape: squircle; } }
 
+/* ── interactive states: one easing, one speed band, everywhere ───
+   hover changes colour in 180 ms and position in 260 ms on the house
+   curve; press is a 120 ms settle; focus is the accent ring. */
+a, button, .tile, .chip, .copy, .shot { transition: color .18s var(--ease), background-color .18s var(--ease), border-color .18s var(--ease), box-shadow .26s var(--ease), transform .26s var(--ease); }
+a:active, button:active { transition-duration: .12s; }
+
 /* ── buttons ─────────────────────────────────────────────────────── */
 .btn {
   --r: var(--r-btn);
@@ -68,10 +74,10 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   height: 48px; padding-inline: 22px;
   font-size: var(--t-ui); font-weight: 600; letter-spacing: -0.005em;
   border-radius: var(--r); position: relative; isolation: isolate;
-  transition: transform var(--t-base) var(--spring), box-shadow var(--t-base) var(--settle), background-color var(--t-base) var(--settle);
   will-change: transform;
 }
-.btn:active { transform: scale(.97); }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0) scale(.98); }
 .btn-solid { background: var(--solid); color: var(--solid-fg); box-shadow: var(--shadow-btn), var(--inset-hi); }
 .btn-solid:hover { box-shadow: 0 4px 8px rgb(var(--espresso) / .14), 0 18px 34px -12px rgb(var(--espresso) / .45), var(--inset-hi); }
 .btn-ghost { background: rgb(var(--espresso) / .05); color: var(--ink); }
@@ -85,7 +91,6 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   display: inline-flex; align-items: center; gap: 6px; height: 28px; padding-inline: 10px;
   font-family: var(--mono); font-size: var(--t-tiny); font-weight: 520; letter-spacing: .01em;
   color: var(--ink-2); background: rgb(var(--espresso) / .06); border-radius: var(--r);
-  transition: background-color var(--t-fast) var(--settle), color var(--t-fast) var(--settle), transform var(--t-base) var(--spring);
 }
 .chip:hover { background: var(--accent-soft); color: var(--accent); transform: translateY(-1px); }
 
@@ -101,11 +106,20 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
   padding: 3px 7px; border-radius: 999px; backdrop-filter: blur(6px); pointer-events: none;
 }
 
-/* ── reveal primitives (JS splits headlines into lines) ──────────── */
+/* ── reveal primitives, typed by element (JS splits headlines into lines).
+   Only the JS page hides anything; without it the whole page is simply there. */
 .line { display: block; overflow: clip; }
-.line > .line-in { display: block; transform: translateY(110%); }
-.reveal { opacity: 0; transform: translateY(18px); }
-.is-in .reveal, .reveal.is-in { opacity: 1; transform: none; transition: opacity .7s var(--out-quart), transform .9s var(--out-quart); }
+.js .line > .line-in { display: block; transform: translateY(110%); }
+.js .reveal { opacity: 0; transform: translateY(18px); }
+.js .reveal.lift { transform: translateY(28px) scale(.97); }
+.js .is-in .reveal, .js .reveal.is-in { opacity: 1; transform: none; transition: opacity .6s var(--settle), transform .9s var(--ease); }
+.js .reveal.lift.is-in { transition: opacity .5s var(--settle), transform .8s var(--boing); }
+.js [data-wipe] { clip-path: inset(0 100% 0 0 round var(--r, 18px)); }
+.js [data-wipe].is-in { clip-path: inset(0 0 0 0 round var(--r, 18px)); transition: clip-path .9s var(--ease) calc(var(--i, 0) * 70ms); }
+
+/* ── cursors say what a thing does ───────────────────────────────── */
+.term, .ky-field { cursor: text; }
+.shot { cursor: default; }
 
 /* ── grain: static, low, on the dark devices only ────────────────── */
 .grain::after {
@@ -118,8 +132,8 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .line > .line-in { transform: none; }
-  .reveal { opacity: 1; transform: none; }
+  .js .line > .line-in { transform: none; }
+  .js .reveal, .js [data-wipe] { opacity: 1; transform: none; clip-path: none; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
 

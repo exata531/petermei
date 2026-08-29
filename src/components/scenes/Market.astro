@@ -26,7 +26,7 @@ const tiles = [
             <svg class="ms-spark" viewBox="0 0 100 28" preserveAspectRatio="none" aria-hidden="true"><polyline data-ms-spark points="" /></svg>
             <span class="ms-note"><i></i>{t.note}</span>
           </span>
-          <span class="ms-back mono"><span>raw</span><b class="num" data-ms-raw>{t.v}</b><span>state</span><b data-ms-state>{t.state}</b><span>hysteresis</span><b>armed → fired → easing</b></span>
+          <span class="ms-back mono"><span class="ms-name ms-back-name">{t.name}</span><span>raw</span><b class="num" data-ms-raw>{t.v}</b><span>state</span><b data-ms-state>{t.state}</b><span>hysteresis</span><b>armed → fired → easing</b></span>
         </button>
       ))}
     </div>
@@ -68,6 +68,7 @@ const tiles = [
   .ms-front, .ms-back { position: absolute; inset: 0; padding: 12px 13px; display: grid; align-content: start; gap: 4px; backface-visibility: hidden; border-radius: 14px; transition: transform .6s var(--out-quart); }
   .ms-back { transform: rotateY(180deg); background: #2a2d33; font-size: 10px; grid-template-columns: auto 1fr; column-gap: 8px; align-content: center; color: rgb(236 238 242 / .6); }
   .ms-back b { color: #eceef2; font-weight: 600; }
+  .ms-back-name { grid-column: 1 / -1; margin-bottom: 4px; }
   .ms-tile:hover .ms-front, .ms-tile:focus-visible .ms-front { transform: rotateY(180deg); }
   .ms-tile:hover .ms-back, .ms-tile:focus-visible .ms-back { transform: rotateY(360deg); }
   .ms-name { font-size: 11px; color: rgb(236 238 242 / .6); font-weight: 500; }
@@ -85,11 +86,13 @@ const tiles = [
   .ms-curve.is-in path { stroke-dashoffset: 0; transition: stroke-dashoffset 1.6s var(--out-quart) .2s; }
   .ms-zero { stroke: rgb(255 255 255 / .18); stroke-dasharray: 3 4; }
   .ms-brief-txt { font-size: 12px; line-height: 1.45; color: rgb(236 238 242 / .85); min-height: 3.2em; }
+  :global(.is-narrow) .ms-brief-txt { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  :global(.is-narrow) .ms-card { min-height: 0; }
   .ms-src { font-size: 9.5px; color: rgb(236 238 242 / .45); margin-top: auto; }
   .ms-hint { position: absolute; right: 108px; top: 15px; font-size: 10px; color: rgb(236 238 242 / .4); opacity: 0; }
   .ms-hint.is-in { opacity: 1; transition: opacity .4s var(--settle) 1.2s; }
   :global(.is-narrow) .ms-grid { grid-template-columns: 1fr; grid-template-rows: auto auto; gap: 8px; padding: 8px; }
-  :global(.is-narrow) .ms-tiles { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 118px; gap: 6px; }
+  :global(.is-narrow) .ms-tiles { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 104px; gap: 6px; }
   :global(.is-narrow) .ms-val { font-size: 18px; }
   :global(.is-narrow) .ms-side { grid-template-rows: auto auto; }
   :global(.is-narrow) .ms-sub, :global(.is-narrow) .ms-hint { display: none; }

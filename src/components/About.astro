@@ -4,7 +4,7 @@ const facts = [
   ['Where', 'Detroit area, Michigan'],
   ['Languages', 'English, Mandarin, Swift, TypeScript, Python'],
   ['Sport', 'Climbing. Speed and bouldering'],
-  ['Before that', 'Two years of varsity cross country. VEX Worlds as a freshman'],
+  ['Before that', 'Two years of varsity cross country, an 18:39 5K. VEX Worlds as a freshman'],
   ['Next', 'Business with a CS minor, building the whole way through'],
 ];
 ---
@@ -13,7 +13,7 @@ const facts = [
     <div>
       <p class="eyebrow reveal">About</p>
       <h2 class="t-display reveal" data-split="lines">Robotics <span class="serif grad">came first.</span></h2>
-      <p class="stack-line mono reveal">Swift · SwiftUI · AppKit · TypeScript · Next.js · React · Supabase · Stripe · Python · FastAPI</p>
+      <ul class="stack-line mono reveal" aria-label="Stack">{["Swift","SwiftUI","AppKit","TypeScript","Next.js","React","Supabase","Stripe","Python","FastAPI"].map((s) => <li>{s}</li>)}</ul>
     </div>
     <dl class="about-facts reveal">
       {facts.map(([k, v]) => (<div><dt class="mono">{k}</dt><dd>{v}</dd></div>))}
@@ -24,7 +24,8 @@ const facts = [
 
 <style>
   .about-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(32px, 6vw, 96px); align-items: start; }
-  .stack-line { margin-top: 28px; font-size: 12.5px; color: var(--ink-3); line-height: 1.8; max-width: 44ch; }
+  .stack-line { margin-top: 28px; font-size: 12.5px; color: var(--ink-3); line-height: 1.8; max-width: 44ch; display: flex; flex-wrap: wrap; gap: 0 14px; }
+  .stack-line li + li::before { content: '·'; margin-right: 14px; color: var(--hair); }
   .about-facts { display: grid; margin: 0; }
   .about-facts div { display: grid; grid-template-columns: 110px 1fr; gap: 16px; padding: 14px 0; border-top: .5px solid rgb(var(--espresso) / .14); font-size: var(--t-ui); }
   .about-facts div:last-child { border-bottom: .5px solid rgb(var(--espresso) / .14); }

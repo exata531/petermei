@@ -3,9 +3,9 @@
     <span class="lobe l1"></span><span class="lobe l2"></span><span class="lobe l3"></span>
   </div>
   <div class="wrap hero-in">
-    <p class="eyebrow hero-eye" data-load="eye">Detroit · the school ’27 · self-taught</p>
+    <p class="eyebrow hero-eye" data-load="eye">Detroit · the school ’27</p>
     <h1 class="t-hero hero-name" data-split="lines" data-load="name">Peter Mei</h1>
-    <p class="t-sub serif hero-line" data-load="line">Four products. All real, all running below.</p>
+    <p class="t-sub serif hero-line" data-load="line">Four things I built. All four are running right now.</p>
     <div class="row hero-cta" style="--gap:12px" data-load="cta">
       <a class="btn btn-solid sq" href="#work" data-magnet>See the work<span aria-hidden="true">↓</span></a>
       <a class="btn btn-ghost sq" href="https://github.com/exata531" target="_blank" rel="noopener" data-magnet>GitHub</a>
@@ -17,12 +17,13 @@
 <style>
   .hero { position: relative; min-height: 100svh; display: grid; place-items: center; padding-top: var(--bar-h); overflow: clip; isolation: isolate; }
   .hero-in { text-align: center; display: grid; justify-items: center; gap: 22px; position: relative; z-index: 1; }
-  .hero-eye { opacity: 0; }
+  .js .hero-eye { opacity: 0; }
   .hero-name { color: var(--ink); }
-  .hero-line { color: var(--ink-2); font-size: clamp(26px, 3.4vw, 44px); opacity: 0; max-width: 24ch; }
-  .hero-cta { margin-top: 10px; opacity: 0; }
+  .hero-line { color: var(--ink-2); font-size: clamp(26px, 3.4vw, 44px); max-width: 24ch; text-wrap: balance; }
+  .js .hero-line, .js .hero-cta, .js .cue, .js .mesh { opacity: 0; }
+  .hero-cta { margin-top: 10px; }
 
-  .mesh { position: absolute; inset: -20% -10%; z-index: 0; pointer-events: none; filter: blur(70px) saturate(1.1); opacity: 0; }
+  .mesh { position: absolute; inset: -20% -10%; z-index: 0; pointer-events: none; filter: blur(70px) saturate(1.1); }
   .lobe { position: absolute; border-radius: 50%; mix-blend-mode: multiply; will-change: transform; }
   .l1 { width: 46vw; height: 46vw; left: 8%;  top: 18%; background: color-mix(in oklab, var(--acc-me) 26%, transparent);      animation: drift1 22s ease-in-out infinite; }
   .l2 { width: 40vw; height: 40vw; right: 6%; top: 8%;  background: color-mix(in oklab, var(--acc-volbase) 22%, transparent); animation: drift2 26s ease-in-out infinite; }
@@ -31,7 +32,7 @@
   @keyframes drift2 { 50% { transform: translate(-5vw, 5vw) scale(.94); } }
   @keyframes drift3 { 50% { transform: translate(3vw, -6vw) scale(1.06); } }
 
-  .cue { position: absolute; bottom: 28px; left: 50%; translate: -50% 0; width: 26px; height: 42px; border: 1.5px solid rgb(var(--espresso) / .25); border-radius: 999px; opacity: 0; }
+  .cue { position: absolute; bottom: 28px; left: 50%; translate: -50% 0; width: 26px; height: 42px; border: 1.5px solid rgb(var(--espresso) / .25); border-radius: 999px; }
   .cue-dot { position: absolute; left: 50%; top: 8px; width: 4px; height: 8px; margin-left: -2px; border-radius: 2px; background: var(--ink-2); animation: cue 1.8s var(--out-quart) infinite; }
   @keyframes cue { 0% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(14px); opacity: 0; } 100% { opacity: 0; } }
 

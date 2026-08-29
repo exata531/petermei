@@ -10,7 +10,8 @@ export function initMenu(scrollTo: (t: string | number, o?: number) => void) {
     else { menu.classList.remove('is-open'); setTimeout(() => { if (!open) menu.hidden = true; }, 240); }
     toggles.forEach((t) => t.setAttribute('aria-expanded', String(v)));
   };
-  toggles.forEach((t) => t.addEventListener('click', (e) => { e.stopPropagation(); set(!open); }));
+  toggles.forEach((t) => t.addEventListener('click', (e) => { e.stopPropagation(); menu.style.left = `${Math.max(10, t.offsetLeft - 6)}px`; menu.style.transformOrigin = '24px 0'; set(!open); }));
+  menu.querySelectorAll<HTMLAnchorElement>('[data-menu-go]').forEach((a) => a.addEventListener('click', () => set(false)));
   document.addEventListener('click', (e) => { if (open && !menu.contains(e.target as Node)) set(false); });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && open) set(false);

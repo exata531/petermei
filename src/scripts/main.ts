@@ -5,7 +5,9 @@ import Lenis from 'lenis';
 import { initStage } from './stage';
 import { initMenu } from './menu';
 import { startClocks } from './clock';
-import { setFace } from './face';
+import { setFace, hourFace } from './face';
+import { initPalette } from './palette';
+import { startWeather } from './weather';
 import { initPhotos } from './photos';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
@@ -60,6 +62,10 @@ document.querySelectorAll<HTMLElement>('[data-count]').forEach((el) => {
   });
 });
 
+/* ── late at night the hero's face is sleepy, whatever the hour says elsewhere ── */
+const late = hourFace();
+if (late) { const hero = document.querySelector<HTMLElement>('.hero'); if (hero) hero.dataset.face = late; }
+
 /* ── the live accent: one colour, cross-faded per section ───────── */
 document.querySelectorAll<HTMLElement>('[data-accent]').forEach((sec) => {
   const paint = () => {
@@ -95,9 +101,24 @@ document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((b) => {
 
 /* ── boot ───────────────────────────────────────────────────────── */
 startClocks();
+startWeather();
 initMenu(scrollTo);
 const stage = initStage({ scrollTo, reduce });
 initPhotos(reduce);
+const jump = (i: number) => document.dispatchEvent(new CustomEvent('stage:go', { detail: i }));
+initPalette([
+  { id: 'volbase', name: 'volbase', note: 'live at volbase.app', kbd: '⌘1', dot: 'var(--acc-volbase)', go: () => jump(0) },
+  { id: 'rin', name: 'Rin', note: 'a terminal in the menu bar', kbd: '⌘2', dot: 'var(--acc-rin)', go: () => jump(1) },
+  { id: 'kyou', name: 'Kyou', note: 'the whole day on one screen', kbd: '⌘3', dot: 'var(--acc-kyou)', go: () => jump(2) },
+  { id: 'market', name: 'Market Station', note: 'macro, watched all day', kbd: '⌘4', dot: 'var(--acc-market)', go: () => jump(3) },
+  { id: 'elsewhere', name: 'Elsewhere', note: 'robotics, climbing, a warehouse', go: () => scrollTo('#elsewhere', -44) },
+  { id: 'photos', name: 'Photos', note: 'things that hold still', go: () => scrollTo('#photos', -44) },
+  { id: 'about', name: 'About', note: 'the facts, and the local time', go: () => scrollTo('#about', -44) },
+  { id: 'top', name: 'Top', note: 'back to the name', go: () => scrollTo(0) },
+  { id: 'github', name: 'GitHub', note: 'github.com/exata531', dot: 'var(--ink)', go: () => window.open('https://github.com/exata531', '_blank', 'noopener') },
+  { id: 'open-volbase', name: 'Open volbase.app', note: 'the real thing, in a new tab', dot: 'var(--acc-volbase)', go: () => window.open('https://volbase.app', '_blank', 'noopener') },
+  { id: 'rin-source', name: 'Rin on GitHub', note: 'free and open source', dot: 'var(--acc-rin)', go: () => window.open('https://github.com/exata531/Rin', '_blank', 'noopener') },
+]);
 
 const heroSplit = splits.find((s) => (s.elements[0] as HTMLElement).closest('.hero'));
 const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.1 });

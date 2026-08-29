@@ -11,7 +11,7 @@ const tiles = [
     <h2 class="t-display reveal" data-split="lines">The parts <span class="serif grad">without a keyboard.</span></h2>
     <ul class="tiles">
       {tiles.map((t, i) => (
-        <li class="tile sq reveal" style={`--i:${i}`} data-glyph={t.glyph}>
+        <li class="tile sq reveal lift" style={`--i:${i}`} data-glyph={t.glyph}>
           <div class="glyph" aria-hidden="true"><span></span><span></span><span></span></div>
           <p class="eyebrow">{t.k}</p>
           <h3 class="t-card">{t.t}</h3>
@@ -25,7 +25,7 @@ const tiles = [
 <style>
   .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 40px; }
   .tile { --r: var(--r-card); position: relative; padding: 28px 26px 30px; background: rgb(255 255 255 / .55); border: .5px solid rgb(var(--espresso) / .12); box-shadow: var(--shadow-card); display: grid; gap: 10px; transition-delay: calc(var(--i) * 90ms); }
-  .tile:hover { border-color: rgb(var(--espresso) / .22); }
+  .tile:hover { border-color: rgb(var(--espresso) / .22); transform: translateY(-3px); box-shadow: var(--shadow-panel); }
   .tile-s { font-size: var(--t-small); line-height: 1.45; }
   .glyph { height: 64px; margin-bottom: 8px; position: relative; }
   .glyph span { position: absolute; background: var(--accent); border-radius: 6px; transition: transform var(--t-slow) var(--boing), background-color var(--t-slow) var(--settle); }

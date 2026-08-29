@@ -26,10 +26,10 @@ export function initMarket(root: HTMLElement) {
 
   let live = false, timer: number | null = null, t0 = 0;
   const tick = () => {
-    for (const s of series) { const last = s.pts[s.pts.length - 1]; const next = last + (Math.random() - 0.5) * s.base * 0.012 + (s.base - last) * 0.06; s.pts.push(next); s.pts.shift(); draw(s); }
+    for (const s of series) { const last = s.pts[s.pts.length - 1]; const next = last + (Math.random() - 0.5) * s.base * 0.003 + (s.base - last) * 0.03; s.pts.push(next); s.pts.shift(); draw(s); }
     if (clock) { const d = new Date(); clock.textContent = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' }); }
   };
-  const start = () => { if (!live) { live = true; timer = window.setInterval(tick, 900); } };
+  const start = () => { if (!live) { live = true; timer = window.setInterval(tick, 1600); } };
   const stop = () => { if (live) { live = false; if (timer) clearInterval(timer); } };
 
   const states = ['armed', 'fired', 'easing', 'recovered'];

@@ -1,14 +1,14 @@
 ---
 const facts = [
-  { n: '4', label: 'products, every one running below' },
+  { n: '4', label: 'products, all running on this page' },
   { n: '1', label: 'startup with real users' },
-  { n: '2', label: 'Apple apps, written in Swift' },
-  { n: '0', label: 'mentors. the docs did the teaching' },
+  { n: '2', label: 'native Apple apps, in Swift' },
+  { n: '1', label: 'warehouse run, one summer' },
 ];
 ---
 <section class="spine section" id="spine" data-accent="#f25c1f">
   <div class="wrap spine-in">
-    <p class="t-title spine-line reveal" data-split="lines">A senior at the school, outside Detroit, who taught himself from the docs. Everything below is <span class="serif grad">real and running.</span></p>
+    <p class="t-title spine-line reveal" data-split="lines">I’m a senior at the school, outside Detroit. Nobody taught me this; I read <span class="serif grad">the docs.</span></p>
     <ul class="facts">
       {facts.map((f, i) => (
         <li class="fact reveal" style={`--i:${i}`}>

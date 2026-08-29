@@ -7,9 +7,9 @@ import Kyou from './scenes/Kyou.astro';
 import Market from './scenes/Market.astro';
 export const products = [
   { id: 'volbase', name: 'volbase', accent: '#5c79b8', face: '(☆_☆)', kicker: 'Live · volbase.app', title: 'Find it, apply once, <span class="serif grad">keep the proof.</span>', what: 'Students find volunteer programs near them, apply with one profile, and keep a record the organization signed.', hard: 'Nearest-first search on a live map, sign-in, payments, email, and end-to-end tests, built alone.', chips: ['Next.js', 'Supabase', 'Stripe', 'MapLibre', 'AI SDK'], cta: 'Open volbase', href: 'https://volbase.app', w: 960, h: 600, r: 12 },
-  { id: 'rin', name: 'Rin', accent: '#f7be00', face: '(￣ヮ￣)', kicker: 'macOS · lives in the menu bar', title: 'Give your Mac <span class="serif grad">a memory.</span>', what: 'A terminal that drops down from the menu bar with an assistant that already knows your notes, your week, and your deadlines.', hard: 'Extensions get inspected, labelled, and hash-checked before they can touch anything, and the tabs survive a quit.', chips: ['Swift', 'SwiftUI', 'AppKit', 'SwiftTerm', 'Claude Code'], cta: 'Try the terminal', href: '#rin', w: 720, h: 470, r: 14 },
-  { id: 'kyou', name: 'Kyou', accent: '#ff3b30', face: '(´｡• ω •｡`)', kicker: 'iOS · in progress', title: 'The whole day, <span class="serif grad">one scroll.</span>', what: 'Calendar, homework, and habits merged into a single timeline for today.', hard: 'A quick-add that refuses to guess. No time typed, no time invented.', chips: ['Swift 6', 'SwiftUI', 'EventKit', 'WidgetKit'], cta: 'Try quick-add', href: '#kyou', w: 300, h: 620, r: 54 },
-  { id: 'market', name: 'Market Station', accent: '#0e7a70', face: '(•_•)', kicker: 'Python · running since August', title: 'Macro, watched <span class="serif grad">around the clock.</span>', what: 'Twelve market signals watched all day, with phone alerts that don’t flap and two briefings that write themselves.', hard: 'S&P breadth computed by hand across 500 tickers, because no free API has it.', chips: ['Python', 'FastAPI', 'Chart.js', 'Cloudflare Tunnel', 'Claude'], cta: 'Flip a tile', href: '#market', w: 960, h: 600, r: 14 },
+  { id: 'rin', name: 'Rin', accent: '#f7be00', face: '(￣ヮ￣)', kicker: 'macOS · free and open source', title: 'Give your Mac <span class="serif grad">a memory.</span>', what: 'A terminal that drops down from the menu bar with an assistant that already knows your notes, your week, and your deadlines.', hard: 'Extensions get inspected, labelled, and hash-checked before they can touch anything, and the tabs survive a quit.', chips: ['Swift', 'SwiftUI', 'AppKit', 'SwiftTerm', 'Claude Code'], cta: 'Try the terminal', href: '#rin', w: 720, h: 470, r: 14 },
+  { id: 'kyou', name: 'Kyou', accent: '#ff3b30', face: '(´｡• ω •｡`)', kicker: 'iOS · in progress since August', title: 'The whole day, <span class="serif grad">one scroll.</span>', what: 'Calendar, homework, and habits merged into a single timeline for today.', hard: 'A quick-add that refuses to guess. No time typed, no time invented.', chips: ['Swift 6', 'SwiftUI', 'EventKit', 'WidgetKit'], cta: 'Try quick-add', href: '#kyou', w: 300, h: 620, r: 54 },
+  { id: 'market', name: 'Market Station', accent: '#0e7a70', face: '(•_•)', kicker: 'Python · running since August 19', title: 'Macro, watched <span class="serif grad">around the clock.</span>', what: 'Market signals watched all day for one reader at home, with phone alerts that don’t flap and two briefings that write themselves.', hard: 'S&P breadth computed by hand across 500 tickers, because no free API has it.', chips: ['Python', 'FastAPI', 'Chart.js', 'Cloudflare Tunnel', 'Claude'], cta: 'Flip a tile', href: '#market', w: 960, h: 600, r: 14 },
 ];
 ---
 <section class="stage-sec" id="work" data-stage>
@@ -63,10 +63,10 @@ export const products = [
   /* each product owns 140 hundredths of a screen of scroll, so a scene plays at reading pace */
   .stage-sec { position: relative; height: calc(var(--n, 4) * 140svh + 20svh); }
   .stage-pin { position: sticky; top: 0; height: 100svh; padding-top: calc(var(--bar-h) + var(--sub-h)); display: grid; align-items: center; overflow: clip; }
-  .stage-grid { display: grid; grid-template-columns: minmax(280px, .72fr) minmax(0, 1.6fr); gap: clamp(24px, 4vw, 56px); align-items: center; height: min(760px, calc(100svh - var(--bar-h) - var(--sub-h) - 48px)); }
+  .stage-grid { display: grid; grid-template-columns: minmax(280px, .72fr) minmax(0, 1.6fr); gap: clamp(24px, 4vw, 56px); align-items: start; height: min(760px, calc(100svh - var(--bar-h) - var(--sub-h) - 48px)); padding-top: 12px; }
 
   .stage-copy { position: relative; min-height: 360px; }
-  .copy-slot { position: absolute; inset: 0; display: grid; align-content: center; gap: 18px; opacity: 0; pointer-events: none; }
+  .copy-slot { position: absolute; inset: 0; display: grid; align-content: start; gap: 18px; opacity: 0; pointer-events: none; padding-top: 6px; }
   .copy-slot.is-on { opacity: 1; pointer-events: auto; }
   .ck { color: var(--accent); transition: color var(--t-slow) var(--settle); }
   .ct { font-size: clamp(30px, 3.3vw, 48px); max-width: 13ch; }
@@ -76,15 +76,16 @@ export const products = [
   .facts-3 dd { margin: 0; font-size: var(--t-small); line-height: 1.4; color: var(--ink-2); }
   .facts-3 dd.chips { gap: 6px; }
 
-  .stage-frame-wrap { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: center; gap: 14px; min-height: 0; min-width: 0; }
+  .stage-frame-wrap { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: start; gap: 14px; min-height: 0; min-width: 0; }
   .frame {
     position: relative; width: var(--w); height: var(--h); max-width: 100%; max-height: min(720px, calc(100svh - var(--bar-h) - var(--sub-h) - 64px));
     background: var(--slate); color: var(--slate-fg);
     box-shadow: var(--shadow-device); overflow: clip; isolation: isolate;
     will-change: width, height, border-radius;
-    transform: scale(var(--scale, 1)); transform-origin: 50% 50%;
+    transform: scale(var(--scale, 1)); transform-origin: 50% 0;
   }
   .slot { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+  .frame.is-phone .demo-pill, .frame.is-narrow .demo-pill { display: none; }
   .slot.is-on { opacity: 1; pointer-events: auto; }
   .finish { min-height: 30px; display: grid; place-items: center; }
   .finish-row { display: inline-flex; align-items: center; gap: 4px; padding: 3px; border-radius: 999px; background: rgb(var(--espresso) / .06); }

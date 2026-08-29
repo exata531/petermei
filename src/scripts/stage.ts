@@ -53,9 +53,9 @@ export function initStage({ scrollTo, reduce }: { scrollTo: (t: string | number,
   // geometry + faces + ctas come from the component's data, mirrored here
   const geo: Record<string, Partial<Product>> = {
     volbase: { w: 960, h: 580, r: 12, face: '(☆_☆)', cta: 'Open volbase', href: 'https://volbase.app' },
-    rin:     { w: 720, h: 470, r: 14, face: '(￣ヮ￣)', cta: 'Try the terminal', href: '#work' },
+    rin:     { w: 720, h: 400, r: 14, face: '(￣ヮ￣)', cta: 'Try the terminal', href: '#work' },
     kyou:    { w: 300, h: 620, r: 54, face: '(´｡• ω •｡`)', cta: 'Try quick-add', href: '#work' },
-    market:  { w: 960, h: 580, r: 14, face: '(•_•)', cta: 'Flip a tile', href: '#work' },
+    market:  { w: 960, h: 480, r: 14, face: '(•_•)', cta: 'Flip a tile', href: '#work' },
   };
   products.forEach((p) => Object.assign(p, geo[p.id]));
   // phones get hand-sized frames, not shrunken desktops
@@ -80,7 +80,9 @@ export function initStage({ scrollTo, reduce }: { scrollTo: (t: string | number,
     const availW = wrap.clientWidth, availH = narrow() ? 1e6 : Math.max(320, window.innerHeight - 96 - 64 - 60);
     const s = Math.min(1, availW / p.w, availH / p.h);
     frame.style.setProperty('--scale', s.toFixed(3));
+    wrap.style.height = `${Math.round(p.h * s)}px`;
     frame.classList.toggle('is-narrow', narrow());
+    frame.classList.toggle('is-phone', p.id === 'kyou');
   }
   window.addEventListener('resize', () => { if (current >= 0) { fit(products[current]); const g = geoFor(products[current]); gsap.set(frame, { '--w': g.w + 'px', '--h': g.h + 'px', '--r': g.r + 'px' }); } });
   function show(i: number) {
@@ -110,6 +112,9 @@ export function initStage({ scrollTo, reduce }: { scrollTo: (t: string | number,
     document.dispatchEvent(new CustomEvent('stage:change', { detail: p.id }));
   }
 
+  // the frame's first entrance: once, from below, on the house curve
+  if (!reduce) { const wrapEl = frame.parentElement!; gsap.set(wrapEl, { opacity: 0, y: 32 }); ScrollTrigger.create({ trigger: sec, start: 'top 80%', once: true, onEnter: () => gsap.to(wrapEl, { opacity: 1, y: 0, duration: 1, ease: 'expo.out' }) }); }
+  window.addEventListener('resize', () => { if (current >= 0) fit(products[current]); });
   const st = ScrollTrigger.create({
     trigger: sec, start: 'top top', end: 'bottom bottom',
     onUpdate: (self) => {
