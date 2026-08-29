@@ -6,6 +6,7 @@ import { initStage } from './stage';
 import { initMenu } from './menu';
 import { startClocks } from './clock';
 import { setFace } from './face';
+import { initPhotos } from './photos';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -96,6 +97,7 @@ document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((b) => {
 startClocks();
 initMenu(scrollTo);
 const stage = initStage({ scrollTo, reduce });
+initPhotos(reduce);
 
 const heroSplit = splits.find((s) => (s.elements[0] as HTMLElement).closest('.hero'));
 const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.1 });

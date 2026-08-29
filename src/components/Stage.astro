@@ -75,9 +75,8 @@ export const products = [
   .facts-3 dd { margin: 0; font-size: var(--t-small); line-height: 1.4; color: var(--ink-2); }
   .facts-3 dd.chips { gap: 6px; }
 
-  .stage-frame-wrap { position: relative; display: grid; justify-items: center; align-content: center; gap: 14px; min-height: 0; min-width: 0; }
+  .stage-frame-wrap { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: center; gap: 14px; min-height: 0; min-width: 0; }
   .frame {
-    --r: var(--r, 12px);
     position: relative; width: var(--w); height: var(--h); max-width: 100%; max-height: min(720px, calc(100svh - var(--bar-h) - var(--sub-h) - 64px));
     background: var(--slate); color: var(--slate-fg);
     box-shadow: var(--shadow-device); overflow: clip; isolation: isolate;
