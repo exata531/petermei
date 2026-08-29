@@ -1,16 +1,15 @@
 /* Spotlight.
 
    The real one is a single rounded field that grows a result list under it as
-   you type, keyboard first, mouse optional. Command and Space opens it, and so
-   does Command K, because half the people who will try this are used to that
-   instead. */
+   you type, keyboard first, mouse optional. Command K opens it; Command Space
+   is bound too, though on a real Mac the system takes that one first. */
 import { reduced } from './motion';
 
 export type Hit = {
   id: string;
   label: string;
   kind: string;
-  glyph?: string;
+  icon?: string;         // an SVG string for the row
   run: () => void;
 };
 
@@ -29,13 +28,13 @@ export function initSpotlight(
     const all = source();
     hits = q
       ? all.filter((h) => h.label.toLowerCase().includes(q) || h.kind.toLowerCase().includes(q))
-      : all.slice(0, 8);
+      : [];
     sel = 0;
     list.innerHTML = hits
       .map(
         (h, i) =>
           `<li><button type="button" class="sp-row${i === 0 ? ' is-sel' : ''}" data-i="${i}">
-             <span class="sp-glyph" aria-hidden="true">${h.glyph ?? ''}</span>
+             <span class="sp-glyph" aria-hidden="true">${h.icon ?? ''}</span>
              <span class="sp-label">${h.label}</span>
              <span class="sp-kind">${h.kind}</span>
            </button></li>`,
@@ -69,13 +68,13 @@ export function initSpotlight(
     el.classList.remove('is-open');
     const done = () => { el.hidden = true; };
     if (reduced()) done();
-    else setTimeout(done, 180);
+    else setTimeout(done, 150);
   };
 
   const fire = (i: number) => {
     const h = hits[i];
     hide();
-    if (h) setTimeout(() => h.run(), reduced() ? 0 : 120);
+    if (h) setTimeout(() => h.run(), reduced() ? 0 : 100);
   };
 
   field.addEventListener('input', render);
@@ -83,7 +82,6 @@ export function initSpotlight(
     if (e.key === 'ArrowDown') { e.preventDefault(); sel = Math.min(hits.length - 1, sel + 1); mark(); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); sel = Math.max(0, sel - 1); mark(); }
     else if (e.key === 'Enter') { e.preventDefault(); fire(sel); }
-    /* the desk closes its front window on Escape, so this one stops here */
     else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); hide(); }
   });
   list.addEventListener('click', (e) => {
@@ -94,7 +92,7 @@ export function initSpotlight(
 
   addEventListener('keydown', (e) => {
     const k = e.key.toLowerCase();
-    if ((e.metaKey || e.ctrlKey) && (k === 'k' || e.code === 'Space')) {
+    if ((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && (k === 'k' || e.code === 'Space')) {
       e.preventDefault();
       show();
     }

@@ -4,8 +4,7 @@
    Windows do not clone these; they move them. A demo therefore mounts a single
    time and keeps whatever you typed into it when you close its window and open
    it again. With JavaScript off nothing moves anywhere and this file is the
-   whole site: real headings, real links, four working screenshots of nothing
-   pretending to be a desktop. */
+   whole site: real headings, real links, no desktop. */
 import Volbase from '../scenes/Volbase.astro';
 import Rin from '../scenes/Rin.astro';
 import Kyou from '../scenes/Kyou.astro';
@@ -15,6 +14,15 @@ import { apps, finder, readme, links } from '../../data/apps';
 
 const photos = Array.from({ length: 12 }, (_, i) => `/img/photos/p-${String(i + 1).padStart(2, '0')}.webp`);
 const scenes = { volbase: Volbase, rin: Rin, kyou: Kyou, market: Market };
+const glyphs: Record<string, string> = {
+  person: '<circle cx="8" cy="5.2" r="2.8"/><path d="M2.8 13.6c.6-2.8 2.6-4.2 5.2-4.2s4.6 1.4 5.2 4.2"/>',
+  hammer: '<path d="M9.5 3.5 12.5 6.5 5 14l-3-3Z"/><path d="M8 5 11 2l3 3-3 3"/>',
+  star: '<path d="M8 1.8l1.9 4 4.4.6-3.2 3 .8 4.4L8 11.7l-3.9 2.1.8-4.4-3.2-3 4.4-.6Z"/>',
+  chevrons: '<path d="M5.5 4 2 8l3.5 4M10.5 4 14 8l-3.5 4"/>',
+  built: '<path d="M2.5 11.5 8 14l5.5-2.5v-7L8 2 2.5 4.5Z"/><path d="M2.5 4.5 8 7l5.5-2.5M8 7v7"/>',
+  state: '<circle cx="8" cy="8" r="5.5"/><path d="M8 4.8V8l2.2 1.4"/>',
+};
+const doc = `<svg class="fnd-doc" viewBox="0 0 48 58" aria-hidden="true"><path class="pg" d="M4 3h26l14 14v38H4z"/><path d="M30 3v14h14"/><path d="M12 30h24M12 37h24M12 44h16" stroke-linecap="round"/></svg>`;
 ---
 <div class="stash" data-stash>
   <div class="stash-head">
@@ -36,7 +44,7 @@ const scenes = { volbase: Volbase, rin: Rin, kyou: Kyou, market: Market };
             <figure class="sfig" data-scene={a.scene} data-w={a.sw} data-h={a.sh}
                     data-mw={a.mw} data-mh={a.mh}
                     style={`--w:${a.sw}px;--h:${a.sh}px`}>
-              <div class="sframe" data-scene-root role="img" aria-label={`A working demo of ${a.name}`}>
+              <div class="sframe" data-scene-root role="group" aria-label={`A working demo of ${a.name}`}>
                 <Scene />
               </div>
             </figure>
@@ -48,26 +56,34 @@ const scenes = { volbase: Volbase, rin: Rin, kyou: Kyou, market: Market };
 
   <section class="stash-app" data-body="finder" aria-label="About Peter">
     <h2 class="stash-h">About</h2>
-    <div class="fnd">
-      <nav class="fnd-side" aria-label="Places">
+    <div class="fnd is-list">
+      <nav class="fnd-side" aria-label="Sidebar">
+        <span class="fnd-h">Favorites</span>
         {finder.map((s, i) => (
           <button class:list={['fnd-tab', { 'is-on': i === 0 }]} type="button" data-fnd={s.id}>
-            <span class="fnd-ico"><Icon id="folder" /></span>{s.label}
+            <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs[s.glyph]} />{s.label}
           </button>
         ))}
+        <span class="fnd-h">Locations</span>
+        <a class="fnd-tab" href={links.github} rel="me noopener" target="_blank">
+          <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="9" rx="1.5"/><path d="M5.5 14h5M8 12v2"/></svg>GitHub
+        </a>
       </nav>
       <div class="fnd-main">
         {finder.map((s, i) => (
-          <ul class:list={['fnd-grid', { 'is-on': i === 0 }]} data-fnd-pane={s.id}>
-            {s.items.map((f) => (
-              <li class="fnd-item">
-                <span class="fnd-doc" aria-hidden="true"></span>
-                <b>{f.label}</b>
-                <small>{f.value}</small>
-              </li>
-            ))}
-          </ul>
+          <div class:list={['fnd-pane', { 'is-on': i === 0 }]} data-fnd-pane={s.id}>
+            <div class="fnd-head" aria-hidden="true"><span>Name</span><span>Notes</span></div>
+            <ul class="fnd-rows">
+              {s.items.map((f) => (
+                <li class="fnd-row">
+                  <span class="fnd-name"><Fragment set:html={doc} /><b>{f.label}</b></span>
+                  <small>{f.value}</small>
+                </li>
+              ))}
+            </ul>
+          </div>
         ))}
+        <div class="fnd-status" data-fnd-status>4 items</div>
       </div>
     </div>
   </section>
@@ -77,15 +93,15 @@ const scenes = { volbase: Volbase, rin: Rin, kyou: Kyou, market: Market };
     <div class="pho">
       <ul class="pho-grid" data-pho-grid>
         {photos.map((p, i) => (
-          <li><button class="pho-cell" type="button" data-pho={i}>
-            <img src={p} width="1086" height="724" alt="" loading="lazy" decoding="async" />
+          <li><button class="pho-cell" type="button" data-pho={i} aria-label={`Photo ${i + 1} of 12`}>
+            <img src={p} width="1086" height="724" alt={`Photograph ${i + 1}, by Peter`} loading="lazy" decoding="async" />
           </button></li>
         ))}
       </ul>
       <div class="pho-big" data-pho-big hidden>
-        <button class="pho-nav pho-prev" type="button" aria-label="Previous photo">&#8249;</button>
+        <button class="pho-nav pho-prev" type="button" aria-label="Previous photo"><svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5"/></svg></button>
         <img data-pho-img src={photos[0]} width="1086" height="724" alt="" decoding="async" />
-        <button class="pho-nav pho-next" type="button" aria-label="Next photo">&#8250;</button>
+        <button class="pho-nav pho-next" type="button" aria-label="Next photo"><svg viewBox="0 0 14 14"><path d="M5 2l5 5-5 5"/></svg></button>
         <button class="pho-close" type="button" aria-label="Back to the grid">Done</button>
       </div>
     </div>
@@ -100,61 +116,63 @@ const scenes = { volbase: Volbase, rin: Rin, kyou: Kyou, market: Market };
 
   <section class="stash-app" data-body="trash" aria-label="Trash">
     <h2 class="stash-h">Trash</h2>
-    <div class="empty"><p>Nothing here.</p></div>
-  </section>
-
-  <section class="stash-app" data-body="play" aria-label="Playground">
-    <h2 class="stash-h">Playground</h2>
-    <div class="play">
-      <p class="play-out mono" data-play-out>(｡•ᴗ•｡)</p>
-      <div class="play-row" data-play-row>
-        {['(｡•ᴗ•｡)', '(￣ヮ￣)', '(≧◡≦)', '(¬_¬)', '(ﾉ´ヮ`)ﾉ', '(T_T)', '(ง •̀_•́)ง', '(´♡‿♡`)'].map((f) => (
-          <button class="play-chip mono" type="button" data-face={f}>{f}</button>
-        ))}
+    <div class="fnd">
+      <nav class="fnd-side" aria-label="Sidebar">
+        <span class="fnd-h">Favorites</span>
+        <button class="fnd-tab" type="button" data-open="finder">
+          <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.person} />Peter
+        </button>
+        <span class="fnd-h">Locations</span>
+        <span class="fnd-tab is-on"><svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 4.5h10M6.5 4.5v-1h3v1M4 4.5l.8 9h6.4l.8-9"/></svg>Trash</span>
+      </nav>
+      <div class="fnd-main">
+        <div class="fnd-pane is-on"><div class="fnd-empty">No Items</div></div>
+        <div class="fnd-status">0 items</div>
       </div>
-      <p class="play-hint">Drag the window. Throw it.</p>
     </div>
   </section>
 
   {apps.filter((a) => a.about).map((a) => (
     <section class="stash-app" data-body={`about-${a.id}`} aria-label={`About ${a.name}`}>
-      <div class="abt">
+      <div class:list={['abt', `abt-${a.id}`]}>
         <span class="abt-ico"><Icon id={a.id} /></span>
         <h3 class="abt-name">{a.about!.name}</h3>
         <p class="abt-line">{a.about!.line}</p>
-        <dl class="abt-facts">
-          <dt>Built with</dt><dd>{a.about!.built}</dd>
-          <dt>State</dt><dd>{a.about!.state}</dd>
-        </dl>
-        {a.about!.link && (
-          <a class="abt-link" href={a.about!.link.href} rel="noopener">{a.about!.link.label}</a>
-        )}
+        <div class="abt-facts">
+          <span><svg viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.built} />Built with {a.about!.built}</span>
+          <span><svg viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.state} />{a.about!.state}</span>
+        </div>
+        <a class="abt-link" href={a.about!.link.href} rel="noopener" target="_blank">{a.about!.link.label}</a>
       </div>
     </section>
   ))}
 
   <section class="stash-app" data-body="about-peter" aria-label="About Peter">
-    <div class="abt">
-      <span class="abt-ico abt-face mono">(｡•ᴗ•｡)</span>
+    <div class="abt abt-peter">
+      <span class="abt-ico"><Icon id="peter" /></span>
       <h3 class="abt-name">Peter Mei</h3>
-      <p class="abt-line">A senior at the school, outside Detroit. I taught myself all of this from the docs.</p>
-      <dl class="abt-facts">
-        <dt>Made</dt><dd>volbase, Rin, Kyou, Market Station</dd>
-        <dt>Now</dt><dd>Applying to college this fall</dd>
-      </dl>
-      <a class="abt-link" href={links.github} rel="me noopener">github.com/exata531</a>
+      <p class="abt-line">I am a senior at the school, outside Detroit. I taught myself all of this from the docs.</p>
+      <div class="abt-facts">
+        <span><svg viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.hammer} />volbase, Rin, Kyou, Market Station</span>
+        <span><svg viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.state} />Applying to college this fall</span>
+      </div>
+      <a class="abt-link" href={links.github} rel="me noopener" target="_blank">github.com/exata531</a>
     </div>
   </section>
+
+  {/* icons the scripts clone into Spotlight rows and notifications */}
+  {['finder', 'volbase', 'rin', 'kyou', 'market', 'photos', 'textedit', 'trash', 'github', 'settings'].map((id) => (
+    <template data-icon={id}><Icon id={id} /></template>
+  ))}
 </div>
 
 <style is:global>
-  /* ── the scene box: a demo at its own pixels, scaled into the window ──── */
   /* the demo is pinned to the centre rather than aligned there: a grid item
      wider than its track falls back to start alignment to avoid clipping the
      far edge, which parks a scaled-down demo off to one side */
   .sbox { position: relative; width: 100%; height: 100%; overflow: hidden; }
   .sfig {
-    position: absolute; left: 50%; top: 50%;
+    position: absolute; left: 50%; top: 50%; margin: 0;
     width: var(--w); height: var(--h);
     transform: translate(-50%, -50%) scale(var(--s, 1));
   }

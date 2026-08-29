@@ -5,15 +5,16 @@ import MenuBar from '../components/mac/MenuBar.astro';
 import Dock from '../components/mac/Dock.astro';
 import Stash from '../components/mac/Stash.astro';
 import Icon from '../components/mac/Icon.astro';
+import { readme } from '../data/apps';
 
 const padApps = [
   { id: 'volbase', label: 'volbase' },
   { id: 'rin', label: 'Rin' },
   { id: 'kyou', label: 'Kyou' },
-  { id: 'market', label: 'Market' },
+  { id: 'market', label: 'Market Station' },
+  { id: 'finder', label: 'About Peter' },
   { id: 'photos', label: 'Photos' },
   { id: 'textedit', label: 'Read me' },
-  { id: 'play', label: 'Playground' },
   { id: 'trash', label: 'Trash' },
 ];
 ---
@@ -21,19 +22,11 @@ const padApps = [
   title="Peter Mei"
   desc="Peter Mei builds software outside Detroit. This portfolio is a Mac desktop: volbase, Rin, Kyou and Market Station open as apps on it."
 >
-  <!-- the boot, once per session -->
-  <div class="boot" data-boot hidden>
-    <div class="boot-in">
-      <span class="boot-face mono">(｡•ᴗ•｡)</span>
-      <span class="boot-bar"><i data-boot-fill></i></span>
-    </div>
-  </div>
-
   <!-- the desktop -->
   <div class="desk" data-desk>
     <Wallpaper />
 
-    <ul class="items">
+    <ul class="items" aria-label="Desktop">
       <li>
         <button class="item" type="button" data-open="textedit">
           <span class="item-ico"><Icon id="textedit" /></span>
@@ -43,12 +36,12 @@ const padApps = [
       <li>
         <button class="item" type="button" data-open="photos">
           <span class="item-ico"><Icon id="folder" /></span>
-          <span class="item-lbl">Photos</span>
+          <span class="item-lbl">Pictures</span>
         </button>
       </li>
       <li>
         <button class="item" type="button" data-open="finder">
-          <span class="item-ico"><Icon id="finder" /></span>
+          <span class="item-ico"><Icon id="folder" /></span>
           <span class="item-lbl">About Peter</span>
         </button>
       </li>
@@ -59,25 +52,22 @@ const padApps = [
 
   <!-- the phone: a home screen instead of a desktop -->
   <div class="home" data-home>
-    <div class="home-bar">
-      <span class="hb-t" data-clock-s>9:41</span>
-      <span class="hb-r" aria-hidden="true">
-        <svg class="hb-sig" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="6" rx="1"/><rect x="10" y="3.5" width="3" height="8.5" rx="1"/><rect x="15" y="1" width="3" height="11" rx="1"/></svg>
-        <svg class="hb-wifi" viewBox="0 0 16 12"><path d="M8 10.9l2-2.4a3 3 0 0 0-4 0Z"/><path d="M2.6 4.6a8 8 0 0 1 10.8 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4.9 7.1a5 5 0 0 1 6.2 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        <svg class="hb-bat" viewBox="0 0 28 13"><rect x=".8" y="1.6" width="22" height="9.8" rx="3.2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M25.2 4.6v3.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><rect x="2.6" y="3.4" width="13" height="6.2" rx="1.8"/></svg>
-      </span>
+    <div class="home-pad">
+      <div class="widget" aria-label="Read me">
+        <span class="widget-h"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2.5h10v11H3z"/><path d="M5.5 6h5M5.5 9h5"/></svg>Read me</span>
+        {readme.map((l) => <p>{l}</p>)}
+      </div>
+      <ul class="pad">
+        {padApps.map((a) => (
+          <li>
+            <button class="pad-i" type="button" data-open={a.id}>
+              <span class="pad-tile"><Icon id={a.id} /></span>
+              <span class="pad-lbl">{a.label}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
-
-    <ul class="pad">
-      {padApps.map((a) => (
-        <li>
-          <button class="pad-i" type="button" data-open={a.id}>
-            <span class="pad-tile"><Icon id={a.id} /></span>
-            <span class="pad-lbl">{a.label}</span>
-          </button>
-        </li>
-      ))}
-    </ul>
 
     <nav class="pdock" aria-label="Dock">
       <button class="pad-i" type="button" data-open="finder">
@@ -97,23 +87,26 @@ const padApps = [
     <span class="home-ind" aria-hidden="true"></span>
 
     <div class="sheet" data-sheet hidden>
-      <div class="sheet-top">
+      <div class="sheet-top" data-sheet-top>
+        <span class="sheet-grab" aria-hidden="true"></span>
         <span class="sheet-name" data-sheet-name></span>
         <button class="sheet-x" type="button" data-sheet-close aria-label="Close">Done</button>
       </div>
       <div class="sheet-body" data-sheet-body></div>
-      <span class="grab" aria-hidden="true"></span>
     </div>
   </div>
 
   <MenuBar />
   <Dock />
 
+  <div class="notifs" data-notifs aria-live="polite"></div>
+  <div class="menu" data-ctx hidden role="menu"></div>
+
   <!-- Spotlight, at the body level so no transform can trap it -->
   <div class="spot" data-spot hidden>
     <div class="spot-box">
       <div class="spot-field">
-        <svg class="spot-ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.8" cy="8.8" r="5.2"/><path d="M12.7 12.7L17 17"/></svg>
+        <svg class="spot-ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.6" cy="8.6" r="5.4"/><path d="M12.6 12.6L17.4 17.4"/></svg>
         <input data-sp-in type="text" placeholder="Spotlight Search" aria-label="Spotlight Search"
                autocomplete="off" autocapitalize="off" spellcheck="false" />
       </div>

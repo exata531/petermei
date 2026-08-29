@@ -1,6 +1,7 @@
 ---
-/* Market Station: a dashboard that ticks. Tiles random-walk, the yield curve
-   draws itself, the alert chip walks its state machine, the briefing types. */
+/* Market Station: a dashboard at rest. Six readings with sparklines, the
+   yield curve, the morning briefing. The sparklines tick while the window is
+   open; the alert chip walks its state machine when you press it. */
 const tiles = [
   { id: 'vix', name: 'VIX', v: '16.8', unit: '', state: 'ok', note: 'calm · below 20' },
   { id: 'fg', name: 'Fear & Greed', v: '62', unit: '', state: 'watch', note: 'greed · CNN' },
@@ -11,10 +12,10 @@ const tiles = [
 ];
 ---
 <div class="ms" data-ms>
-  <div class="ms-bar">
+  <div class="ms-bar" data-drag>
     <span class="ms-title"><i class="ms-live" aria-hidden="true"></i>Market Station</span>
-    <span class="ms-sub mono">macro · always on · <span data-ms-clock>9:41:07</span></span>
-    <span class="ms-alert mono" data-ms-alert data-state="armed"><b></b><span data-ms-alert-txt>armed</span></span>
+    <span class="ms-sub mono">demo data · macro · <span data-ms-clock>9:41:07</span></span>
+    <button class="ms-alert mono" type="button" data-ms-alert data-state="armed" aria-label="Alert state: armed. Press to test the alert."><b></b><span data-ms-alert-txt>armed</span><span class="ms-alert-hint">test</span></button>
   </div>
   <div class="ms-grid">
     <div class="ms-tiles">
@@ -41,31 +42,31 @@ const tiles = [
       </div>
       <div class="ms-card ms-brief">
         <span class="ms-name">Briefing <span class="mono">7:00 AM</span></span>
-        <p class="ms-brief-txt" data-ms-brief></p>
+        <p class="ms-brief-txt" data-ms-brief>Volatility is asleep and breadth is thinning: 58% of the S&amp;P is above its 50-day, down from 71% a month ago. Credit is calm. Nothing fires today; the watch is on breadth.</p>
         <span class="ms-src mono">Sources: FRED, CNN, Yahoo Finance</span>
       </div>
     </div>
   </div>
-  <p class="ms-hint mono" data-ms-hint>hover a tile for the raw reading.</p>
 </div>
 
 <style>
   .ms { position: absolute; inset: 0; display: grid; grid-template-rows: 44px 1fr; background: var(--tool); color: #eceef2; font-family: var(--ui); }
-  .ms-bar { display: flex; align-items: center; gap: 16px; padding: 0 16px; border-bottom: .5px solid rgb(255 255 255 / .08); font-size: 13px; }
+  .ms-bar { display: flex; align-items: center; gap: 16px; padding: 0 16px; box-shadow: 0 .5px 0 rgb(255 255 255 / .08); font-size: 13px; }
   .ms-title { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; }
-  .ms-live { width: 8px; height: 8px; border-radius: 50%; background: #43b25b; box-shadow: 0 0 0 0 rgb(67 178 91 / .5); animation: mslive 2s var(--out-quart) infinite; }
-  @keyframes mslive { 70% { box-shadow: 0 0 0 8px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+  .ms-live { width: 8px; height: 8px; border-radius: 50%; background: #43b25b; }
   .ms-sub { font-size: 11px; color: rgb(236 238 242 / .55); }
-  .ms-alert { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; font-size: 11px; padding: 4px 10px; border-radius: 999px; background: rgb(255 255 255 / .06); text-transform: uppercase; letter-spacing: .06em; }
+  .ms-alert { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; font-size: 11px; padding: 4px 10px; border-radius: 999px; background: rgb(255 255 255 / .06); text-transform: uppercase; letter-spacing: .06em; color: inherit; cursor: pointer; transition: background-color var(--t-fast) var(--soft); }
+  .ms-alert:hover { background: rgb(255 255 255 / .1); }
   .ms-alert b { width: 8px; height: 8px; border-radius: 50%; background: #8b8f97; transition: background-color .3s, box-shadow .3s; }
   .ms-alert[data-state="fired"] b { background: #fb4b3d; box-shadow: 0 0 8px #fb4b3d; }
   .ms-alert[data-state="easing"] b { background: #dd9a18; }
   .ms-alert[data-state="recovered"] b { background: #43b25b; }
+  .ms-alert-hint { color: rgb(236 238 242 / .4); padding-left: 4px; }
+  .ms-alert:not([data-state="armed"]) .ms-alert-hint { display: none; }
   .ms-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 12px; padding: 12px; min-height: 0; }
   .ms-tiles { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; gap: 10px; }
-  .ms-tile { position: relative; border-radius: 14px; background: var(--tool-2); text-align: left; padding: 0; perspective: 800px; opacity: 0; transform: translateY(10px); }
-  .ms-tile.is-in { opacity: 1; transform: none; transition: opacity .4s var(--settle), transform .5s var(--out-quart); transition-delay: calc(var(--i) * 60ms); }
-  .ms-front, .ms-back { position: absolute; inset: 0; padding: 12px 13px; display: grid; align-content: start; gap: 4px; backface-visibility: hidden; border-radius: 14px; transition: transform .6s var(--out-quart); }
+  .ms-tile { position: relative; border-radius: 14px; background: var(--tool-2); text-align: left; padding: 0; perspective: 800px; cursor: default; }
+  .ms-front, .ms-back { position: absolute; inset: 0; padding: 12px 13px; display: grid; align-content: start; gap: 4px; backface-visibility: hidden; border-radius: 14px; transition: transform .5s var(--out); }
   .ms-back { transform: rotateY(180deg); background: #2a2d33; font-size: 10px; grid-template-columns: auto 1fr; column-gap: 8px; align-content: center; color: rgb(236 238 242 / .6); }
   .ms-back b { color: #eceef2; font-weight: 600; }
   .ms-back-name { grid-column: 1 / -1; margin-bottom: 4px; }
@@ -82,19 +83,16 @@ const tiles = [
   .ms-side { display: grid; grid-template-rows: auto 1fr; gap: 10px; min-height: 0; }
   .ms-card { border-radius: 14px; background: var(--tool-2); padding: 12px 13px; display: grid; gap: 6px; align-content: start; }
   .ms-curve { width: 100%; height: 90px; }
-  .ms-curve path { fill: none; stroke: #20a496; stroke-width: 2; stroke-linecap: round; stroke-dasharray: 400; stroke-dashoffset: 400; }
-  .ms-curve.is-in path { stroke-dashoffset: 0; transition: stroke-dashoffset 1.6s var(--out-quart) .2s; }
+  .ms-curve path { fill: none; stroke: #20a496; stroke-width: 2; stroke-linecap: round; }
   .ms-zero { stroke: rgb(255 255 255 / .18); stroke-dasharray: 3 4; }
-  .ms-brief-txt { font-size: 12px; line-height: 1.45; color: rgb(236 238 242 / .85); min-height: 3.2em; }
+  .ms-brief-txt { font-size: 12px; line-height: 1.45; color: rgb(236 238 242 / .85); }
+  .ms-src { font-size: 9.5px; color: rgb(236 238 242 / .45); margin-top: auto; }
   :global(.is-narrow) .ms-brief-txt { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   :global(.is-narrow) .ms-card { min-height: 0; }
-  .ms-src { font-size: 9.5px; color: rgb(236 238 242 / .45); margin-top: auto; }
-  .ms-hint { position: absolute; right: 108px; top: 15px; font-size: 10px; color: rgb(236 238 242 / .4); opacity: 0; }
-  .ms-hint.is-in { opacity: 1; transition: opacity .4s var(--settle) 1.2s; }
   :global(.is-narrow) .ms-grid { grid-template-columns: 1fr; grid-template-rows: auto auto; gap: 8px; padding: 8px; }
-  :global(.is-narrow) .ms-tiles { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 104px; gap: 6px; }
-  :global(.is-narrow) .ms-val { font-size: 18px; }
+  :global(.is-narrow) .ms-tiles { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 110px; gap: 8px; }
+  :global(.is-narrow) .ms-val { font-size: 20px; }
   :global(.is-narrow) .ms-side { grid-template-rows: auto auto; }
-  :global(.is-narrow) .ms-sub, :global(.is-narrow) .ms-hint { display: none; }
-  :global(.is-narrow) .ms-front, :global(.is-narrow) .ms-back { padding: 9px 10px; }
+  :global(.is-narrow) .ms-sub { display: none; }
+  :global(.is-narrow) .ms-front, :global(.is-narrow) .ms-back { padding: 10px 11px; }
 </style>

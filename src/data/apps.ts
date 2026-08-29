@@ -13,15 +13,17 @@ export type About = {
   line: string;          // one sentence, first person where it fits
   built: string;         // what it is made of
   state: string;         // where it is
-  link?: { label: string; href: string };
+  link: { label: string; href: string };
 };
+
+export type MenuItem = { label: string; action?: string; key?: string; sep?: boolean; dis?: boolean; check?: boolean };
+export type Menu = { label: string; items: MenuItem[] };
 
 export type App = {
   id: AppId;
-  name: string;          // the name in the menu bar and the window title
+  name: string;          // the name in the menu bar
   title: string;         // the window's title bar text
   kind: 'window' | 'panel' | 'sim';
-  accent: string;        // the product's own colour, used only by its icon
   w: number; h: number;  // the window's opening size, in CSS px
   min?: number;          // minimum width
   scene?: 'volbase' | 'rin' | 'kyou' | 'market';
@@ -29,30 +31,53 @@ export type App = {
   mw?: number; mh?: number;   // and the hand-sized one it uses on a phone
   toolbar?: { label: string; href?: string; action?: string }[];
   about?: About;
-  menus: { label: string; items: { label: string; action?: string; sep?: boolean }[] }[];
+  menus: Menu[];
 };
 
-const std = (name: string) => ([
+/* the menus every Mac app carries, greyed where this desktop has nothing
+   behind them, because grey items are how a Mac looks */
+export const EDIT: Menu = {
+  label: 'Edit',
+  items: [
+    { label: 'Undo', key: '⌘Z', dis: true },
+    { label: 'Redo', key: '⇧⌘Z', dis: true },
+    { label: '', sep: true },
+    { label: 'Cut', key: '⌘X', dis: true },
+    { label: 'Copy', key: '⌘C', dis: true },
+    { label: 'Paste', key: '⌘V', dis: true },
+    { label: 'Select All', key: '⌘A', dis: true },
+  ],
+};
+export const VIEW: Menu = {
+  label: 'View',
+  items: [
+    { label: 'Show Toolbar', dis: true },
+    { label: 'Customize Toolbar…', dis: true },
+    { label: '', sep: true },
+    { label: 'Enter Full Screen', key: '⌃⌘F', action: 'zoom' },
+  ],
+};
+export const WINDOW: Menu = {
+  label: 'Window',
+  items: [
+    { label: 'Minimize', key: '⌘M', action: 'min' },
+    { label: 'Zoom', action: 'zoom' },
+    { label: 'Cycle Through Windows', key: '⌘`', action: 'cycle' },
+    { label: '', sep: true },
+    { label: 'Bring All to Front', action: 'front' },
+  ],
+};
+const std = (name: string): Menu[] => ([
   {
     label: 'File',
     items: [
       { label: `About ${name}`, action: 'about' },
       { label: '', sep: true },
-      { label: 'Close Window', action: 'close' },
-      { label: 'Minimize', action: 'min' },
+      { label: 'Close Window', key: '⌘W', action: 'close' },
     ],
   },
-  {
-    label: 'Window',
-    items: [
-      { label: 'Zoom', action: 'zoom' },
-      { label: 'Bring All to Front', action: 'front' },
-    ],
-  },
-  {
-    label: 'Help',
-    items: [{ label: `${name} Help`, action: 'about' }],
-  },
+  EDIT, VIEW, WINDOW,
+  { label: 'Help', items: [{ label: `${name} Help`, action: 'about' }] },
 ]);
 
 export const apps: App[] = [
@@ -61,9 +86,8 @@ export const apps: App[] = [
     name: 'volbase',
     title: 'volbase.app',
     kind: 'window',
-    accent: '#4F7FD4',
-    w: 940, h: 598, min: 520,
-    scene: 'volbase', sw: 1060, sh: 640, mw: 380, mh: 620,
+    w: 960, h: 620, min: 560,
+    scene: 'volbase', sw: 1060, sh: 640, mw: 390, mh: 620,
     toolbar: [{ label: 'Open volbase.app', href: 'https://volbase.app' }],
     about: {
       name: 'volbase',
@@ -79,9 +103,8 @@ export const apps: App[] = [
     name: 'Rin',
     title: 'Rin',
     kind: 'panel',
-    accent: '#F7BE00',
     w: 760, h: 372,
-    scene: 'rin', sw: 820, sh: 400, mw: 380, mh: 400,
+    scene: 'rin', sw: 820, sh: 400, mw: 390, mh: 400,
     toolbar: [{ label: 'Source on GitHub', href: 'https://github.com/exata531/Rin' }],
     about: {
       name: 'Rin',
@@ -96,21 +119,21 @@ export const apps: App[] = [
         items: [
           { label: 'About Rin', action: 'about' },
           { label: '', sep: true },
-          { label: 'Close Panel', action: 'close' },
+          { label: 'Close Panel', key: '⌘W', action: 'close' },
         ],
       },
+      EDIT,
       { label: 'Window', items: [{ label: 'Drop Panel', action: 'front' }] },
-      { label: 'Help', items: [{ label: 'Type help in the panel', action: 'about' }] },
+      { label: 'Help', items: [{ label: 'Rin Help', action: 'about' }] },
     ],
   },
   {
     id: 'kyou',
     name: 'Kyou',
-    title: 'Kyou, iPhone',
+    title: 'iPhone 17 Pro',
     kind: 'sim',
-    accent: '#FF3B30',
-    w: 330, h: 712,
-    scene: 'kyou', sw: 300, sh: 620, mw: 290, mh: 600,
+    w: 330, h: 700,
+    scene: 'kyou', sw: 300, sh: 620, mw: 390, mh: 700,
     toolbar: [
       { label: 'Light', action: 'kyou-light' },
       { label: 'Dark', action: 'kyou-dark' },
@@ -120,6 +143,7 @@ export const apps: App[] = [
       line: 'My calendar, my homework and my habits on one timeline, so the day reads as one thing instead of three apps.',
       built: 'Swift, SwiftUI, EventKit',
       state: 'In progress, aimed at the App Store',
+      link: { label: 'github.com/exata531', href: 'https://github.com/exata531' },
     },
     menus: std('Kyou'),
   },
@@ -128,14 +152,14 @@ export const apps: App[] = [
     name: 'Market Station',
     title: 'Market Station',
     kind: 'window',
-    accent: '#20A496',
-    w: 900, h: 353, min: 480,
-    scene: 'market', sw: 1280, sh: 460, mw: 380, mh: 560,
+    w: 920, h: 400, min: 520,
+    scene: 'market', sw: 1280, sh: 460, mw: 390, mh: 600,
     about: {
       name: 'Market Station',
       line: 'It watches eight readings all day and sends a phone alert when one crosses a line. Built for one non-technical reader at home, so every reading says what it means in plain English.',
       built: 'Python, public data feeds',
       state: 'Running since August',
+      link: { label: 'github.com/exata531', href: 'https://github.com/exata531' },
     },
     menus: std('Market Station'),
   },
@@ -143,13 +167,13 @@ export const apps: App[] = [
 
 export const byId = (id: string) => apps.find((a) => a.id === id);
 
-/* ── the Finder's About window: facts, as icon-and-label items ─────────── */
+/* ── the Finder's About window: facts, as rows in list view ─────────── */
 export type Fact = { label: string; value: string };
-export type FinderSection = { id: string; label: string; items: Fact[] };
+export type FinderSection = { id: string; label: string; glyph: string; items: Fact[] };
 
 export const finder: FinderSection[] = [
   {
-    id: 'peter', label: 'Peter',
+    id: 'peter', label: 'Peter', glyph: 'person',
     items: [
       { label: 'School', value: 'the school, outside Detroit' },
       { label: 'Year', value: 'Senior, class of 2027' },
@@ -158,7 +182,7 @@ export const finder: FinderSection[] = [
     ],
   },
   {
-    id: 'made', label: 'Made',
+    id: 'made', label: 'Made', glyph: 'hammer',
     items: [
       { label: 'volbase', value: 'Marketplace, live' },
       { label: 'Rin', value: 'Mac app, open source' },
@@ -167,7 +191,7 @@ export const finder: FinderSection[] = [
     ],
   },
   {
-    id: 'else', label: 'Elsewhere',
+    id: 'else', label: 'Elsewhere', glyph: 'star',
     items: [
       { label: 'Robotics', value: 'Founded the FRC team, Worlds as a rookie' },
       { label: 'Climbing', value: 'Six years, boulder and speed' },
@@ -176,7 +200,7 @@ export const finder: FinderSection[] = [
     ],
   },
   {
-    id: 'stack', label: 'Stack',
+    id: 'stack', label: 'Stack', glyph: 'chevrons',
     items: [
       { label: 'Web', value: 'Next.js, Astro' },
       { label: 'Apple', value: 'Swift, SwiftUI, AppKit' },

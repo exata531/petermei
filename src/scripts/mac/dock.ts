@@ -6,17 +6,17 @@
    a growing icon PUSHES its neighbours apart instead of covering them.
 
    ryOS ships a 48px tile, a 2.3x peak and a 140px radius; those are the
-   numbers below, adjusted for this dock's slightly larger tile. Per frame each
-   icon gets two custom properties and nothing else is touched, so the whole
-   row updates without a single layout. */
+   numbers below. Per frame each icon gets two custom properties and nothing
+   else is touched, so the whole row updates without a single layout, and the
+   loop stops the moment everything has settled. */
 import { onFrame, damp, reduced } from './motion';
 
-const MAX = 2.15;     // the biggest an icon gets, right under the pointer
-const FALL = 150;     // how far, in pixels, the growth reaches
+const MAX = 2.1;      // the biggest an icon gets, right under the pointer
+const FALL = 140;     // how far, in pixels, the growth reaches
 
 export function initDock(dock: HTMLElement) {
   const items = [...dock.querySelectorAll<HTMLElement>('.dock-i')];
-  const noop = { bounce() {}, running() {}, rect: () => undefined };
+  const noop = { bounce() {}, settle() {}, running() {}, rect: () => undefined, top: () => innerHeight };
   if (!items.length) return noop;
 
   let px = 0;          // the pointer, in page pixels
@@ -39,15 +39,14 @@ export function initDock(dock: HTMLElement) {
 
   const paint = () => {
     const lift = (MAX - 1) * amt;
-    /* first pass: how big is each icon */
     const scale = centers.map((c) => {
       const d = Math.abs(c - cur) / FALL;
       /* a raised cosine: peak under the pointer, flat where it runs out, and
          no corner at either end because its slope is zero at both */
       return d >= 1 ? 1 : 1 + lift * (0.5 + 0.5 * Math.cos(d * Math.PI));
     });
-    /* second pass: lay the row out again at the new widths and keep it centred,
-       so a big icon opens a gap rather than sitting on top of its neighbour */
+    /* lay the row out again at the new widths and keep it centred, so a big
+       icon opens a gap rather than sitting on top of its neighbour */
     let acc = 0;
     const grown: number[] = [];
     for (let i = 0; i < items.length; i++) {
@@ -72,6 +71,7 @@ export function initDock(dock: HTMLElement) {
     stop = onFrame((dt) => {
       cur = damp(cur, px, 0.026, dt);
       amt = damp(amt, want, 0.055, dt);
+      const settled = Math.abs(cur - px) < 0.1 && Math.abs(amt - want) < 0.002;
       if (want === 0 && amt < 0.004) {
         amt = 0; paint();
         dock.classList.remove('is-mag');
@@ -79,6 +79,7 @@ export function initDock(dock: HTMLElement) {
         return;
       }
       paint();
+      if (settled) { stop?.(); stop = null; }
     });
   };
 
@@ -99,8 +100,7 @@ export function initDock(dock: HTMLElement) {
   }
 
   return {
-    /* the launch bounce: three shrinking hops, about as long as the window
-       takes to arrive, so the two moves read as one event */
+    /* the launch bounce: hops until the app says it has arrived */
     bounce(id: string) {
       if (reduced()) return;
       const el = dock.querySelector<HTMLElement>(`[data-dock="${id}"]`);
@@ -108,7 +108,14 @@ export function initDock(dock: HTMLElement) {
       el.classList.remove('is-bounce');
       void el.offsetWidth;
       el.classList.add('is-bounce');
-      setTimeout(() => el.classList.remove('is-bounce'), 900);
+    },
+    settle(id: string) {
+      const el = dock.querySelector<HTMLElement>(`[data-dock="${id}"]`);
+      if (!el) return;
+      /* let the current hop finish so the icon never stops mid-air */
+      const done = () => el.classList.remove('is-bounce');
+      el.addEventListener('animationiteration', done, { once: true });
+      setTimeout(done, 700);
     },
     /* the dot under an app that is open */
     running(ids: string[]) {
@@ -120,6 +127,10 @@ export function initDock(dock: HTMLElement) {
       return dock
         .querySelector<HTMLElement>(`[data-dock="${id}"] .dock-tile`)
         ?.getBoundingClientRect();
+    },
+    /* where the dock begins, for a window that must stop above it */
+    top() {
+      return dock.getBoundingClientRect().top;
     },
   };
 }

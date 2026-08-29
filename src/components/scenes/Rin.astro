@@ -1,10 +1,11 @@
 ---
 /* Rin: a menu bar with the face, and the panel that drops out of it holding a
-   terminal. The terminal types its own opening line, then hands you the keys. */
+   terminal. The terminal waits with a prompt; Enter on an empty line plays
+   the one scripted command, anything else is answered from a small honest set. */
 ---
 <div class="rin" data-rin>
   <div class="rin-bar">
-    <span class="rin-face mono" data-rin-face>(｡•ᴗ•｡)</span>
+    <span class="rin-face" data-rin-face>(｡•ᴗ•｡)</span>
     <b class="rin-app">Rin</b>
     <span class="rin-menu">brain</span><span class="rin-menu">school</span><span class="rin-menu">help</span>
     <span class="rin-right mono"><i class="rin-light" data-rin-light></i>Sat 9:41 AM</span>
@@ -12,11 +13,11 @@
   <div class="rin-panel" data-rin-panel>
     <div class="rin-tabs">
       <span class="rin-tab is-on"><i></i>brain</span><span class="rin-tab"><i></i>school</span><span class="rin-tab rin-tab-add">+</span>
-      <span class="rin-hint mono" data-rin-hint>a real prompt. type help.</span>
+      <span class="rin-demo mono">demo</span>
     </div>
     <div class="term mono" data-term tabindex="0" role="log" aria-label="A demo terminal. Type help.">
       <div class="term-out" data-term-out></div>
-      <div class="term-line"><span class="term-ps">❯</span><span class="term-in" data-term-in></span><span class="caret" data-term-caret aria-hidden="true"></span></div>
+      <div class="term-line"><span class="term-ps">❯</span><span class="term-in" data-term-in></span><span class="caret" data-term-caret aria-hidden="true"></span><button class="term-hint" type="button" data-rin-hint>press return, or type help</button></div>
       <input class="sr term-real" data-sim-input data-term-real aria-label="Demo terminal input" autocomplete="off" autocapitalize="off" spellcheck="false" />
     </div>
   </div>
@@ -24,22 +25,21 @@
 
 <style>
   .rin { position: absolute; inset: 0; display: grid; grid-template-rows: 28px 1fr; background: var(--slate); color: var(--slate-fg); }
-  .rin-bar { display: flex; align-items: center; gap: 14px; padding: 0 12px; background: var(--slate-2); font-size: 12px; border-bottom: .5px solid rgb(255 255 255 / .08); position: relative; z-index: 2; }
+  .rin-bar { display: flex; align-items: center; gap: 14px; padding: 0 12px; background: var(--slate-2); font-size: 12px; box-shadow: 0 .5px 0 rgb(255 255 255 / .08); position: relative; z-index: 2; }
   .rin-face { font-size: 12px; letter-spacing: -0.04em; }
   .rin-app { font-weight: 700; }
   .rin-menu { color: rgb(221 224 229 / .7); }
   .rin-right { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; font-size: 11px; color: rgb(221 224 229 / .8); }
   .rin-light { width: 7px; height: 7px; border-radius: 50%; background: #7ee787; box-shadow: 0 0 6px #7ee787; transition: background-color .3s, box-shadow .3s; }
   .rin-light.is-amber { background: #f7be00; box-shadow: 0 0 6px #f7be00; }
-  .rin-panel { display: grid; grid-template-rows: 32px 1fr; transform: translateY(-104%); will-change: transform; background: var(--slate); min-height: 0; }
-  .rin-tabs { display: flex; align-items: center; gap: 4px; padding: 0 10px; border-bottom: .5px solid rgb(255 255 255 / .08); font-size: 11.5px; }
+  .rin-panel { display: grid; grid-template-rows: 32px 1fr; background: var(--slate); min-height: 0; }
+  .rin-tabs { display: flex; align-items: center; gap: 4px; padding: 0 10px; box-shadow: 0 .5px 0 rgb(255 255 255 / .08); font-size: 11.5px; }
   .rin-tab { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 6px; color: rgb(221 224 229 / .6); }
   .rin-tab i { width: 6px; height: 6px; border-radius: 50%; background: rgb(221 224 229 / .35); }
   .rin-tab.is-on { background: rgb(255 255 255 / .08); color: var(--slate-fg); }
   .rin-tab.is-on i { background: #7ee787; }
   .rin-tab-add { padding: 0 8px; }
-  .rin-hint { margin-left: auto; font-size: 10px; color: rgb(221 224 229 / .45); transition: opacity .3s; }
-  .rin-hint.is-off { opacity: 0; }
+  .rin-demo { margin-left: auto; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: rgb(221 224 229 / .5); padding: 2px 7px; border-radius: 4px; box-shadow: inset 0 0 0 .5px rgb(221 224 229 / .25); }
   .term { position: relative; padding: 14px 16px; font-size: 13px; line-height: 1.65; overflow: clip; outline: none; cursor: text; }
   .term:focus-within { box-shadow: inset 0 0 0 1px rgb(126 231 135 / .35); }
   .term-out { white-space: pre-wrap; color: rgb(221 224 229 / .92); }
@@ -50,9 +50,13 @@
   .term-line { display: flex; align-items: baseline; gap: 8px; }
   .term-ps { color: #7ee787; font-weight: 600; }
   .term-in { white-space: pre; color: #5dd8ff; }
-  .caret { display: inline-block; width: 7px; height: 14px; background: var(--slate-fg); transform: translateY(2px); animation: blink 1.05s step-end infinite; }
+  .caret { display: inline-block; width: 7px; height: 14px; background: var(--slate-fg); transform: translateY(2px); }
+  .term:focus-within .caret { animation: blink 1.05s step-end infinite; }
   @keyframes blink { 50% { opacity: 0; } }
+  .term-hint { margin-left: 6px; font: inherit; font-size: 11px; color: rgb(221 224 229 / .4); cursor: pointer; }
+  .term-hint:hover { color: rgb(221 224 229 / .7); }
+  .term-hint.is-off { display: none; }
   .term-real { pointer-events: none; }
-  :global(.is-narrow) .rin-menu, :global(.is-narrow) .rin-hint { display: none; }
+  :global(.is-narrow) .rin-menu { display: none; }
   :global(.is-narrow) .term { font-size: 11.5px; padding: 12px; }
 </style>
