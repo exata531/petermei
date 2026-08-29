@@ -72,10 +72,10 @@ const pins = [
   .vb-sort { position: absolute; right: 14px; top: 14px; font-size: 11px; padding: 6px 10px; border-radius: 999px; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / .1); color: #4b4640; opacity: 0; transform: translateY(6px); }
   .vb-sort.is-in { opacity: 1; transform: none; transition: all .4s var(--out-quart) .7s; }
   .vb-sort b { color: #5c79b8; }
-  .is-narrow .sf-bar { grid-template-columns: 62px 1fr; gap: 8px; }
-  .is-narrow .sf-url { display: none; }
-  .is-narrow .sf-tab { padding: 0 8px; font-size: 11px; }
-  .is-narrow .vb-list { width: 160px; }
-  .is-narrow .vb-card { grid-template-columns: 40px 1fr; padding: 7px 9px; font-size: 10.5px; }
-  .is-narrow .vb-sort { display: none; }
+  :global(.is-narrow) .sf-bar { grid-template-columns: 62px 1fr; gap: 8px; }
+  :global(.is-narrow) .sf-url { display: none; }
+  :global(.is-narrow) .sf-tab { padding: 0 8px; font-size: 11px; }
+  :global(.is-narrow) .vb-list { width: 160px; }
+  :global(.is-narrow) .vb-card { grid-template-columns: 40px 1fr; padding: 7px 9px; font-size: 10.5px; }
+  :global(.is-narrow) .vb-sort { display: none; }
 </style>

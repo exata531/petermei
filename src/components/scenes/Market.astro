@@ -88,10 +88,10 @@ const tiles = [
   .ms-src { font-size: 9.5px; color: rgb(236 238 242 / .45); margin-top: auto; }
   .ms-hint { position: absolute; left: 16px; bottom: 10px; font-size: 10px; color: rgb(236 238 242 / .4); opacity: 0; }
   .ms-hint.is-in { opacity: 1; transition: opacity .4s var(--settle) 1.2s; }
-  .is-narrow .ms-grid { grid-template-columns: 1fr; grid-template-rows: auto auto; gap: 8px; padding: 8px; }
-  .is-narrow .ms-tiles { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 118px; gap: 6px; }
-  .is-narrow .ms-val { font-size: 18px; }
-  .is-narrow .ms-side { grid-template-rows: auto auto; }
-  .is-narrow .ms-sub, .is-narrow .ms-hint { display: none; }
-  .is-narrow .ms-front, .is-narrow .ms-back { padding: 9px 10px; }
+  :global(.is-narrow) .ms-grid { grid-template-columns: 1fr; grid-template-rows: auto auto; gap: 8px; padding: 8px; }
+  :global(.is-narrow) .ms-tiles { grid-template-columns: repeat(3, 1fr); grid-auto-rows: 118px; gap: 6px; }
+  :global(.is-narrow) .ms-val { font-size: 18px; }
+  :global(.is-narrow) .ms-side { grid-template-rows: auto auto; }
+  :global(.is-narrow) .ms-sub, :global(.is-narrow) .ms-hint { display: none; }
+  :global(.is-narrow) .ms-front, :global(.is-narrow) .ms-back { padding: 9px 10px; }
 </style>
