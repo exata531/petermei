@@ -1,14 +1,14 @@
 ---
 const facts = [
-  { n: '4', label: 'products shipped or in flight' },
-  { n: '1', label: 'live startup, volbase.app' },
-  { n: '2', label: 'native Apple apps, Swift' },
-  { n: '0', label: 'technical mentors. self-taught' },
+  { n: '4', label: 'things built, shipped, or shipping' },
+  { n: '1', label: 'startup with real users, volbase.app' },
+  { n: '2', label: 'native Apple apps, written in Swift' },
+  { n: '0', label: 'mentors. figured it out from the docs' },
 ];
 ---
 <section class="spine section" id="spine" data-accent="#f25c1f">
   <div class="wrap spine-in">
-    <p class="t-title spine-line reveal" data-split="lines">A high-school senior near Detroit who ships real software, <span class="serif grad">not demos.</span></p>
+    <p class="t-title spine-line reveal" data-split="lines">High-school senior near Detroit. Taught myself. Everything below is <span class="serif grad">real and running.</span></p>
     <ul class="facts">
       {facts.map((f, i) => (
         <li class="fact reveal" style={`--i:${i}`}>
@@ -23,7 +23,7 @@ const facts = [
         <a class="copy sq" href="/Peter-Mei-Resume.pdf" data-resume hidden>Resume<span class="copy-hint mono">pdf</span></a>
         <a class="copy sq" href="https://github.com/exata531" target="_blank" rel="noopener">GitHub<span class="copy-hint mono">↗</span></a>
       </div>
-      <p class="status mono"><span class="live" aria-hidden="true"></span>building Kyou · running volbase · applying fall 2026</p>
+      <p class="status mono"><span class="live" aria-hidden="true"></span>shipping Kyou · running volbase · applying to college this fall</p>
     </div>
   </div>
 </section>
@@ -31,7 +31,7 @@ const facts = [
 <style>
   .spine { padding-block: clamp(48px, 8vw, 120px) var(--sec); }
   .spine-in { display: grid; gap: clamp(36px, 5vw, 64px); }
-  .spine-line { max-width: 18ch; }
+  .spine-line { max-width: 22ch; }
   .facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; border-top: .5px solid rgb(var(--espresso) / .18); padding-top: 28px; }
   .fact { display: grid; gap: 6px; transition-delay: calc(var(--i) * 70ms); }
   .fact-n { font-size: clamp(44px, 6vw, 84px); line-height: 1; letter-spacing: -0.04em; color: var(--ink); }

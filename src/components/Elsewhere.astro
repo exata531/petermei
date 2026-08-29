@@ -1,14 +1,14 @@
 ---
 const tiles = [
-  { k: 'FIRST Robotics', t: 'Founded the team.', s: 'Rookie All-Star at the World Championship, first year.', glyph: 'robot' },
-  { k: 'Climbing', t: 'V7 flash. V10 project.', s: 'Speed climbing at USA Climbing nationals. Belay and lead certified.', glyph: 'climb' },
-  { k: 'Paby LLC', t: 'Ran the warehouse.', s: 'Ordering, inventory, and fulfilment for a lighting company, one summer.', glyph: 'box' },
+  { k: 'FIRST Robotics', t: 'Started the team.', s: 'Rookie All-Star at Worlds, first season out.', glyph: 'robot' },
+  { k: 'Climbing', t: 'Flashes V7. Projecting V10.', s: 'Speed nationals with USA Climbing. Belay and lead certified.', glyph: 'climb' },
+  { k: 'Paby LLC', t: 'Ran the warehouse.', s: 'Ordering, inventory, fulfilment. One summer, one lighting company.', glyph: 'box' },
 ];
 ---
 <section class="section" id="elsewhere" data-accent="#f25c1f" data-face="(¬‿¬)">
   <div class="wrap">
     <p class="eyebrow reveal">Elsewhere</p>
-    <h2 class="t-display reveal" data-split="lines">Not everything I make <span class="serif grad">is software.</span></h2>
+    <h2 class="t-display reveal" data-split="lines">Also: the parts <span class="serif grad">without a keyboard.</span></h2>
     <ul class="tiles">
       {tiles.map((t, i) => (
         <li class="tile sq reveal" style={`--i:${i}`} data-glyph={t.glyph}>

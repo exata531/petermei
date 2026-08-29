@@ -1,11 +1,15 @@
 ---
 /* One frame, four products. The section is tall; the pin is CSS sticky; the
    script reads scroll progress and swaps what is inside the frame. */
+import Volbase from './scenes/Volbase.astro';
+import Rin from './scenes/Rin.astro';
+import Kyou from './scenes/Kyou.astro';
+import Market from './scenes/Market.astro';
 export const products = [
-  { id: 'volbase', name: 'volbase', accent: '#5c79b8', face: '(☆_☆)', kicker: 'Live at volbase.app', title: 'Students, meet <span class="serif grad">opportunities.</span>', what: 'A marketplace that matches students to volunteer work, summer programs, and internships.', hard: 'Nearest-first search over a live map, with auth, payments, and email, shipped solo.', chips: ['Next.js', 'Supabase', 'Stripe', 'MapLibre', 'AI SDK'], cta: 'See it live', href: 'https://volbase.app', w: 960, h: 600, r: 12 },
-  { id: 'rin', name: 'Rin', accent: '#f7be00', face: '(￣ヮ￣)', kicker: 'macOS · menu bar', title: 'A terminal that <span class="serif grad">remembers.</span>', what: 'A menu-bar app that drops down an AI assistant already pointed at your own notes.', hard: 'A module system where every extension is inspected, labelled, and hash-checked before install.', chips: ['Swift', 'SwiftUI', 'AppKit', 'SwiftTerm', 'Claude Code'], cta: 'Try it', href: '#rin', w: 720, h: 470, r: 14 },
-  { id: 'kyou', name: 'Kyou', accent: '#ff3b30', face: '(´｡• ω •｡`)', kicker: 'iOS · in progress', title: 'Your day, <span class="serif grad">one timeline.</span>', what: 'Calendar, assignments, and habits merged into a single scroll for one day.', hard: 'A hand-built quick-add grammar that refuses to assume anything you did not type.', chips: ['Swift 6', 'SwiftUI', 'EventKit', 'WidgetKit'], cta: 'Try it', href: '#kyou', w: 300, h: 620, r: 54 },
-  { id: 'market', name: 'Market Station', accent: '#0e7a70', face: '(•_•)', kicker: 'Python · always on', title: 'A dashboard that <span class="serif grad">never sleeps.</span>', what: 'A 24/7 macro monitor with phone alerts and twice-daily written briefings.', hard: 'S&amp;P 500 breadth computed from scratch across 500 tickers, because no free API has it.', chips: ['Python', 'FastAPI', 'Chart.js', 'Cloudflare Tunnel', 'Claude'], cta: 'How it works', href: '#market', w: 960, h: 600, r: 14 },
+  { id: 'volbase', name: 'volbase', accent: '#5c79b8', face: '(☆_☆)', kicker: 'Live · volbase.app', title: 'Find it. Apply once. <span class="serif grad">Leave with proof.</span>', what: 'One place for students to find programs, apply once, and keep proof the organization signed.', hard: 'Nearest-first search on a live map, sign-in, payments, email, and end-to-end tests. All of it solo.', chips: ['Next.js', 'Supabase', 'Stripe', 'MapLibre', 'AI SDK'], cta: 'Open volbase', href: 'https://volbase.app', w: 960, h: 600, r: 12 },
+  { id: 'rin', name: 'Rin', accent: '#f7be00', face: '(￣ヮ￣)', kicker: 'macOS · lives in the menu bar', title: 'Give your Mac <span class="serif grad">a memory.</span>', what: 'A dropdown terminal running an assistant that already knows your notes, your week, and your deadlines.', hard: 'Extensions get inspected, labelled, and hash-checked before they can touch anything.', chips: ['Swift', 'SwiftUI', 'AppKit', 'SwiftTerm', 'Claude Code'], cta: 'Type something', href: '#rin', w: 720, h: 470, r: 14 },
+  { id: 'kyou', name: 'Kyou', accent: '#ff3b30', face: '(´｡• ω •｡`)', kicker: 'iOS · in progress', title: 'The whole day, <span class="serif grad">one scroll.</span>', what: 'Calendar, homework, and habits, merged into a single timeline for today.', hard: 'A quick-add grammar that refuses to guess. No time typed, no time invented.', chips: ['Swift 6', 'SwiftUI', 'EventKit', 'WidgetKit'], cta: 'Try the quick-add', href: '#kyou', w: 300, h: 620, r: 54 },
+  { id: 'market', name: 'Market Station', accent: '#0e7a70', face: '(•_•)', kicker: 'Python · running since August', title: 'Macro, watched <span class="serif grad">around the clock.</span>', what: 'A 24/7 monitor for twelve market signals, with phone alerts and two written briefings a day.', hard: 'S&P breadth computed by hand across 500 tickers, because no free API has it.', chips: ['Python', 'FastAPI', 'Chart.js', 'Cloudflare Tunnel', 'Claude'], cta: 'Watch it tick', href: '#market', w: 960, h: 600, r: 14 },
 ];
 ---
 <section class="stage-sec" id="work" data-stage>
@@ -28,13 +32,24 @@ export const products = [
       <div class="stage-frame-wrap">
         <div class="frame sq grain" data-frame style="--w:960px;--h:600px;--r:12px">
           {products.map((p, i) => (
-            <div class="slot" data-slot={p.id} data-i={i} aria-hidden={i !== 0}>
-              <div class="slot-ph mono" style={`--c:${p.accent}`}>
-                <span class="ph-dot"></span>{p.name}
-              </div>
+            <div class="slot" data-slot={p.id} data-i={i} aria-hidden={i !== 0} data-accent-value={p.accent}>
+              {p.id === 'volbase' && <Volbase />}
+              {p.id === 'rin' && <Rin />}
+              {p.id === 'kyou' && <Kyou />}
+              {p.id === 'market' && <Market />}
             </div>
           ))}
           <span class="demo-pill">demo</span>
+        </div>
+        <div class="finish" data-finish>
+          <div class="finish-row" data-finish-for="kyou" hidden>
+            <span class="finish-lbl mono">finish</span>
+            <button class="finish-btn is-on" type="button" data-finish-val="light">Light</button><button class="finish-btn" type="button" data-finish-val="dark">Dark</button>
+          </div>
+          <div class="finish-row" data-finish-for="rin" hidden>
+            <span class="finish-lbl mono">mood</span>
+            <button class="finish-btn mono is-on" type="button" data-face-val="(｡•ᴗ•｡)">(｡•ᴗ•｡)</button><button class="finish-btn mono" type="button" data-face-val="(￣ヮ￣)">(￣ヮ￣)</button><button class="finish-btn mono" type="button" data-face-val="(¬_¬)">(¬_¬)</button><button class="finish-btn mono" type="button" data-face-val="(>_<)">(&gt;_&lt;)</button>
+          </div>
         </div>
         <ol class="pos mono" aria-label="Which product is in frame">
           {products.map((p, i) => (<li data-pos={i} class={i === 0 ? 'is-on' : ''}><span>0{i + 1}</span><em>{p.name}</em></li>))}
@@ -47,31 +62,36 @@ export const products = [
 <style>
   .stage-sec { position: relative; height: calc(var(--n, 4) * 90svh + 30svh); }
   .stage-pin { position: sticky; top: 0; height: 100svh; padding-top: calc(var(--bar-h) + var(--sub-h)); display: grid; align-items: center; overflow: clip; }
-  .stage-grid { display: grid; grid-template-columns: minmax(300px, .9fr) minmax(0, 1.5fr); gap: clamp(24px, 4vw, 56px); align-items: center; height: min(760px, calc(100svh - var(--bar-h) - var(--sub-h) - 48px)); }
+  .stage-grid { display: grid; grid-template-columns: minmax(280px, .72fr) minmax(0, 1.6fr); gap: clamp(24px, 4vw, 56px); align-items: center; height: min(760px, calc(100svh - var(--bar-h) - var(--sub-h) - 48px)); }
 
   .stage-copy { position: relative; min-height: 360px; }
   .copy-slot { position: absolute; inset: 0; display: grid; align-content: center; gap: 18px; opacity: 0; pointer-events: none; }
   .copy-slot.is-on { opacity: 1; pointer-events: auto; }
   .ck { color: var(--accent); transition: color var(--t-slow) var(--settle); }
-  .ct { font-size: clamp(32px, 3.6vw, 52px); max-width: 12ch; }
+  .ct { font-size: clamp(30px, 3.3vw, 48px); max-width: 13ch; }
   .facts-3 { display: grid; gap: 12px; margin: 6px 0 0; }
   .facts-3 div { display: grid; grid-template-columns: 76px 1fr; gap: 12px; align-items: baseline; border-top: .5px solid rgb(var(--espresso) / .14); padding-top: 10px; }
   .facts-3 dt { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
   .facts-3 dd { margin: 0; font-size: var(--t-small); line-height: 1.4; color: var(--ink-2); }
   .facts-3 dd.chips { gap: 6px; }
 
-  .stage-frame-wrap { position: relative; display: grid; justify-items: center; align-content: center; gap: 14px; min-height: 0; }
+  .stage-frame-wrap { position: relative; display: grid; justify-items: center; align-content: center; gap: 14px; min-height: 0; min-width: 0; }
   .frame {
     --r: var(--r, 12px);
     position: relative; width: var(--w); height: var(--h); max-width: 100%; max-height: min(720px, calc(100svh - var(--bar-h) - var(--sub-h) - 64px));
     background: var(--slate); color: var(--slate-fg);
     box-shadow: var(--shadow-device); overflow: clip; isolation: isolate;
     will-change: width, height, border-radius;
+    transform: scale(var(--scale, 1)); transform-origin: 50% 50%;
   }
   .slot { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
   .slot.is-on { opacity: 1; pointer-events: auto; }
-  .slot-ph { position: absolute; inset: 0; display: grid; place-items: center; gap: 10px; font-size: 13px; color: rgb(255 255 255 / .6); }
-  .ph-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 4px color-mix(in oklab, var(--c) 25%, transparent); }
+  .finish { min-height: 30px; display: grid; place-items: center; }
+  .finish-row { display: inline-flex; align-items: center; gap: 4px; padding: 3px; border-radius: 999px; background: rgb(var(--espresso) / .06); }
+  .finish-row[hidden] { display: none; }
+  .finish-lbl { font-size: 10px; color: var(--ink-3); padding: 0 8px 0 10px; letter-spacing: .06em; text-transform: uppercase; }
+  .finish-btn { height: 24px; padding: 0 11px; border-radius: 999px; font-size: 12px; font-weight: 600; color: var(--ink-2); transition: background-color var(--t-fast) var(--settle), color var(--t-fast) var(--settle); }
+  .finish-btn.is-on { background: var(--paper); color: var(--ink); box-shadow: 0 1px 2px rgb(var(--espresso) / .12); }
 
   .pos { display: flex; gap: 16px; font-size: 11px; color: var(--ink-3); }
   .pos li { display: inline-flex; gap: 6px; align-items: baseline; transition: color var(--t-base) var(--settle); }

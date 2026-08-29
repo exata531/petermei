@@ -1,0 +1,133 @@
+---
+/* Kyou in an iPhone: the real app's shape (black hero, week strip, light
+   curtain with the day's timeline, red now-dot, red plus). The screen is DOM. */
+const week = [['W', 26], ['T', 27], ['F', 28], ['S', 29], ['S', 30], ['M', 31], ['T', 1]];
+const items = [
+  { t: '8:00', kind: 'event', title: 'Calculus', sub: 'Room 214', len: 50 },
+  { t: '10:15', kind: 'task', title: 'Physics set', sub: 'due Monday', len: 0 },
+  { t: '12:30', kind: 'event', title: 'Lunch with Roman', sub: 'the usual', len: 45 },
+  { t: '4:00', kind: 'event', title: 'Climbing', sub: 'Planet Rock · 2 hr', len: 120 },
+  { t: 'tonight', kind: 'habit', title: 'Read 20 pages', sub: 'streak 6', len: 0 },
+];
+---
+<div class="phone" data-kyou>
+  <div class="ph-screen" data-kyou-screen>
+    <div class="ph-status mono"><span class="ph-time">9:41</span><span class="ph-icons" aria-hidden="true"><i class="sig"></i><i class="wifi"></i><i class="bat"></i></span></div>
+    <div class="island" aria-hidden="true"></div>
+
+    <div class="ky-hero">
+      <div class="ky-day"><span class="ky-dayname">Sat</span><i class="ky-now"></i><span class="ky-date">August 29, 2026</span></div>
+      <div class="ky-face mono" data-kyou-face>(≧∪≦)</div>
+      <p class="ky-next"><b>Physics set</b> in <b>5 hr 41 min</b>.<br /><span>clear after <b>4 PM</b>.</span></p>
+      <ul class="ky-week">
+        {week.map(([d, n], i) => (<li class={i === 3 ? 'is-today' : ''}><span>{d}</span><b class="num">{n}</b><i></i></li>))}
+      </ul>
+    </div>
+
+    <div class="ky-curtain">
+      <ul class="ky-tl" data-kyou-tl>
+        {items.map((it, i) => (
+          <li class={`ky-item is-${it.kind}`} style={`--i:${i};--len:${Math.max(40, it.len * 0.5)}px`} data-kyou-item>
+            <span class="ky-t num">{it.t}</span>
+            <span class="ky-mark"></span>
+            <span class="ky-body"><b>{it.title}</b><small>{it.sub}</small></span>
+          </li>
+        ))}
+      </ul>
+      <div class="ky-add" data-kyou-add>
+        <div class="ky-field" data-kyou-field>
+          <span class="ky-field-txt" data-kyou-txt></span>
+          <span class="caret" data-kyou-caret aria-hidden="true"></span>
+          <input class="sr" data-sim-input data-kyou-real aria-label="Demo quick-add. Type something like: read chapter 4 tomorrow 7pm" autocomplete="off" autocapitalize="off" spellcheck="false" />
+        </div>
+        <div class="ky-tokens mono" data-kyou-tokens></div>
+      </div>
+      <button class="ky-fab" type="button" aria-label="Quick add" data-kyou-fab>+</button>
+    </div>
+
+    <div class="ky-notif" data-kyou-notif aria-hidden="true">
+      <img src="/img/kyou-icon.png" width="28" height="28" alt="" />
+      <div><b>Kyou</b><span class="mono">now</span><p>Physics set clears after 4 PM. Two hours on the wall first, then it's yours.</p></div>
+    </div>
+    <div class="ky-close" data-kyou-close aria-hidden="true"><span class="mono">day closed</span><b>3 of 4 done.</b><i class="mono">(´ω｀) otsukare</i></div>
+    <p class="ky-hint mono" data-kyou-hint>psst, tap the box. it reads what you type.</p>
+  </div>
+</div>
+
+<style>
+  .phone { position: absolute; inset: 0; background: #0b0b0d; padding: 11px; }
+  .ph-screen { position: relative; width: 100%; height: 100%; border-radius: 44px; overflow: clip; background: #000; color: #fff; font-family: var(--ui); display: grid; grid-template-rows: auto 1fr; isolation: isolate; }
+  @supports (corner-shape: squircle) { .ph-screen { corner-shape: squircle; } }
+  .ph-status { position: absolute; top: 12px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 28px; font-size: 13px; font-weight: 600; z-index: 3; font-family: var(--ui); }
+  .ph-icons { display: inline-flex; gap: 5px; align-items: center; }
+  .ph-icons i { display: inline-block; background: #fff; }
+  .sig { width: 14px; height: 9px; -webkit-mask: linear-gradient(90deg, #000 0 20%, transparent 20% 27%, #000 27% 47%, transparent 47% 54%, #000 54% 74%, transparent 74% 81%, #000 81%); mask: linear-gradient(90deg, #000 0 20%, transparent 20% 27%, #000 27% 47%, transparent 47% 54%, #000 54% 74%, transparent 74% 81%, #000 81%); clip-path: polygon(0 60%, 100% 0, 100% 100%, 0 100%); }
+  .wifi { width: 13px; height: 10px; border-radius: 50% 50% 0 0; }
+  .bat { width: 22px; height: 10px; border-radius: 3px; box-shadow: inset 0 0 0 1.5px #fff; background: linear-gradient(90deg, #fff 0 78%, transparent 78%); }
+  .island { position: absolute; top: 10px; left: 50%; width: 92px; height: 26px; margin-left: -46px; border-radius: 999px; background: #000; z-index: 4; }
+
+  .ky-hero { padding: 50px 18px 0; background: #0e0e12; }
+  .ky-day { display: flex; align-items: baseline; gap: 6px; }
+  .ky-dayname { font-size: 44px; font-weight: 800; letter-spacing: -0.04em; line-height: 1; }
+  .ky-now { width: 10px; height: 10px; border-radius: 50%; background: #ff3b30; margin-left: 2px; align-self: center; }
+  .ky-date { margin-left: auto; font-size: 11.5px; color: rgb(255 255 255 / .6); }
+  .ky-face { font-size: 13px; color: rgb(255 255 255 / .8); margin: 8px 0 8px; }
+  .ky-next { font-size: 12.5px; line-height: 1.35; color: rgb(255 255 255 / .8); }
+  .ky-next b { color: #fff; font-weight: 600; }
+  .ky-next span { color: rgb(255 255 255 / .6); }
+  .ky-week { display: grid; grid-template-columns: repeat(7, 1fr); margin: 10px -4px 0; }
+  .ky-week li { display: grid; justify-items: center; gap: 4px; padding: 8px 0 10px; border-radius: 16px; font-size: 10px; color: rgb(255 255 255 / .55); }
+  .ky-week li b { font-size: 13px; color: #fff; }
+  .ky-week li i { width: 4px; height: 4px; border-radius: 50%; background: transparent; }
+  .ky-week li.is-today { background: rgb(255 255 255 / .06); box-shadow: inset 0 0 0 1px rgb(255 59 48 / .7); }
+  .ky-week li.is-today b { color: #ff3b30; }
+  .ky-week li.is-today i { background: #ff9f0a; }
+
+  .ky-curtain { position: relative; margin-top: 12px; background: #f2f2f7; color: #1c1c1e; border-radius: 26px 26px 0 0; padding: 14px 14px 0; overflow: clip; }
+  .ky-tl { display: grid; gap: 6px; }
+  .ky-item { display: grid; grid-template-columns: 44px 14px 1fr; gap: 8px; align-items: start; min-height: var(--len); opacity: 0; transform: translateY(10px); }
+  .ky-item.is-in { opacity: 1; transform: none; transition: opacity .4s var(--settle), transform .5s var(--out-quart); transition-delay: calc(var(--i) * 70ms); }
+  .ky-t { font-size: 10.5px; color: #8e8e93; padding-top: 3px; }
+  .ky-mark { width: 12px; height: 12px; border-radius: 50%; margin-top: 3px; box-shadow: inset 0 0 0 2px #ff9f0a; }
+  .is-event .ky-mark { border-radius: 4px; background: #0a84ff; box-shadow: none; width: 4px; height: 100%; min-height: 24px; margin-left: 4px; margin-top: 2px; }
+  .is-habit .ky-mark { box-shadow: inset 0 0 0 2px #30d158; }
+  .ky-body { display: grid; line-height: 1.25; }
+  .ky-body b { font-size: 13px; font-weight: 600; }
+  .ky-body small { font-size: 11px; color: #8e8e93; }
+  .is-event .ky-body { background: rgb(10 132 255 / .1); border-radius: 10px; padding: 6px 10px; min-height: var(--len); }
+
+  .ky-add { position: absolute; left: 12px; right: 12px; bottom: 14px; opacity: 0; transform: translateY(14px); }
+  .ky-add.is-in { opacity: 1; transform: none; transition: opacity .35s var(--settle), transform .5s var(--out-quart); }
+  .ky-field { display: flex; align-items: center; gap: 2px; min-height: 42px; padding: 9px 14px; border-radius: 14px; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / .1), 0 10px 24px -12px rgb(0 0 0 / .35); font-size: 13px; cursor: text; }
+  .ky-field-txt { white-space: pre-wrap; min-height: 18px; }
+  .ky-field-txt .tk { border-radius: 5px; padding: 0 3px; margin: 0 -1px; }
+  .tk-when { background: rgb(255 59 48 / .15); color: #c8261c; }
+  .tk-time { background: rgb(10 132 255 / .15); color: #0a5fc2; }
+  .tk-rep { background: rgb(48 209 88 / .18); color: #1f7a3a; }
+  .ky-field .caret { background: #ff3b30; height: 16px; }
+  .ky-tokens { display: flex; gap: 6px; margin-top: 8px; font-size: 10px; color: #8e8e93; flex-wrap: wrap; }
+  .ky-tokens span { background: #fff; border-radius: 6px; padding: 3px 7px; box-shadow: 0 1px 2px rgb(0 0 0 / .08); }
+  .ky-fab { position: absolute; right: 16px; bottom: 16px; width: 48px; height: 48px; border-radius: 50%; background: #ff3b30; color: #fff; font-size: 26px; font-weight: 400; line-height: 1; box-shadow: 0 8px 20px -8px rgb(255 59 48 / .8); transition: transform var(--t-base) var(--boing); }
+  .ky-fab:active { transform: scale(.92); }
+  .ky-fab.is-hidden { opacity: 0; pointer-events: none; }
+
+  .ky-notif { position: absolute; top: 46px; left: 10px; right: 10px; display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; padding: 10px 12px; border-radius: 18px; background: rgb(255 255 255 / .92); color: #1c1c1e; box-shadow: 0 10px 30px -10px rgb(0 0 0 / .5); font-size: 11.5px; line-height: 1.3; transform: translateY(-130%); z-index: 5; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+  .ky-notif.is-in { transform: none; transition: transform .7s var(--boing); }
+  .ky-notif img { border-radius: 7px; }
+  .ky-notif b { font-size: 11px; }
+  .ky-notif span { margin-left: 6px; font-size: 10px; color: #8e8e93; }
+  .ky-notif p { margin-top: 2px; }
+  .ky-close { position: absolute; inset: 0; z-index: 6; display: grid; place-content: center; text-align: center; gap: 6px; background: rgb(14 14 18 / .9); opacity: 0; pointer-events: none; }
+  .ky-close.is-in { opacity: 1; transition: opacity .6s var(--settle); }
+  .ky-close span { font-size: 11px; color: rgb(255 255 255 / .55); letter-spacing: .08em; text-transform: uppercase; }
+  .ky-close b { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
+  .ky-close i { font-style: normal; font-size: 12px; color: rgb(255 255 255 / .7); margin-top: 6px; }
+  .ky-hint { position: absolute; left: 0; right: 0; bottom: 74px; text-align: center; font-size: 9.5px; color: #8e8e93; opacity: 0; z-index: 2; }
+  .ky-hint.is-in { opacity: 1; transition: opacity .4s var(--settle) .6s; }
+
+  .ph-screen.is-light .ky-curtain { background: #f2f2f7; }
+  .ph-screen.is-dark .ky-curtain { background: #1c1c1e; color: #fff; }
+  .ph-screen.is-dark .ky-field { background: #2c2c2e; color: #fff; }
+  .ph-screen.is-dark .ky-tokens span { background: #2c2c2e; color: #aeaeb2; }
+  .ph-screen.is-dark .ky-body small, .ph-screen.is-dark .ky-t { color: #8e8e93; }
+</style>

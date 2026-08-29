@@ -1,0 +1,91 @@
+---
+/* Market Station: a dashboard that ticks. Tiles random-walk, the yield curve
+   draws itself, the alert chip walks its state machine, the briefing types. */
+const tiles = [
+  { id: 'vix', name: 'VIX', v: '16.8', unit: '', state: 'ok', note: 'calm · below 20' },
+  { id: 'fg', name: 'Fear & Greed', v: '62', unit: '', state: 'watch', note: 'greed · CNN' },
+  { id: 'hy', name: 'HY spread', v: '3.12', unit: '%', state: 'ok', note: 'credit · FRED' },
+  { id: 'sahm', name: 'Sahm rule', v: '0.33', unit: '', state: 'ok', note: 'below the 0.50 trigger' },
+  { id: 'breadth', name: 'S&P breadth', v: '58', unit: '%', state: 'watch', note: 'above 50-day · computed' },
+  { id: 'cape', name: 'CAPE', v: '34.1', unit: '', state: 'watch', note: 'rich · multpl' },
+];
+---
+<div class="ms" data-ms>
+  <div class="ms-bar">
+    <span class="ms-title"><i class="ms-live" aria-hidden="true"></i>Market Station</span>
+    <span class="ms-sub mono">macro · always on · <span data-ms-clock>9:41:07</span></span>
+    <span class="ms-alert mono" data-ms-alert data-state="armed"><b></b><span data-ms-alert-txt>armed</span></span>
+  </div>
+  <div class="ms-grid">
+    <div class="ms-tiles">
+      {tiles.map((t, i) => (
+        <button class="ms-tile" type="button" data-ms-tile={t.id} data-state={t.state} style={`--i:${i}`} aria-label={`${t.name} ${t.v}${t.unit}, ${t.note}`}>
+          <span class="ms-front">
+            <span class="ms-name">{t.name}</span>
+            <span class="ms-val num"><span data-ms-val data-base={t.v}>{t.v}</span>{t.unit}</span>
+            <svg class="ms-spark" viewBox="0 0 100 28" preserveAspectRatio="none" aria-hidden="true"><polyline data-ms-spark points="" /></svg>
+            <span class="ms-note"><i></i>{t.note}</span>
+          </span>
+          <span class="ms-back mono"><span>raw</span><b class="num" data-ms-raw>{t.v}</b><span>state</span><b data-ms-state>{t.state}</b><span>hysteresis</span><b>armed → fired → easing</b></span>
+        </button>
+      ))}
+    </div>
+    <div class="ms-side">
+      <div class="ms-card">
+        <span class="ms-name">Yield curve <span class="mono">10Y − 2Y</span></span>
+        <svg class="ms-curve" viewBox="0 0 220 90" aria-hidden="true">
+          <line x1="0" y1="62" x2="220" y2="62" class="ms-zero" />
+          <path data-ms-curve d="M0 78 C 30 74, 50 70, 70 66 S 110 60, 130 56 S 170 44, 200 40 L 220 38" />
+        </svg>
+        <span class="ms-note"><i></i>un-inverted · <b class="num">+0.42</b></span>
+      </div>
+      <div class="ms-card ms-brief">
+        <span class="ms-name">Briefing <span class="mono">7:00 AM</span></span>
+        <p class="ms-brief-txt" data-ms-brief></p>
+        <span class="ms-src mono">Sources: FRED, CNN, Yahoo Finance</span>
+      </div>
+    </div>
+  </div>
+  <p class="ms-hint mono" data-ms-hint>psst, hover a tile. they flip.</p>
+</div>
+
+<style>
+  .ms { position: absolute; inset: 0; display: grid; grid-template-rows: 44px 1fr; background: var(--tool); color: #eceef2; font-family: var(--ui); }
+  .ms-bar { display: flex; align-items: center; gap: 16px; padding: 0 16px; border-bottom: .5px solid rgb(255 255 255 / .08); font-size: 13px; }
+  .ms-title { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; }
+  .ms-live { width: 8px; height: 8px; border-radius: 50%; background: #43b25b; box-shadow: 0 0 0 0 rgb(67 178 91 / .5); animation: mslive 2s var(--out-quart) infinite; }
+  @keyframes mslive { 70% { box-shadow: 0 0 0 8px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+  .ms-sub { font-size: 11px; color: rgb(236 238 242 / .55); }
+  .ms-alert { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; font-size: 11px; padding: 4px 10px; border-radius: 999px; background: rgb(255 255 255 / .06); text-transform: uppercase; letter-spacing: .06em; }
+  .ms-alert b { width: 8px; height: 8px; border-radius: 50%; background: #8b8f97; transition: background-color .3s, box-shadow .3s; }
+  .ms-alert[data-state="fired"] b { background: #fb4b3d; box-shadow: 0 0 8px #fb4b3d; }
+  .ms-alert[data-state="easing"] b { background: #dd9a18; }
+  .ms-alert[data-state="recovered"] b { background: #43b25b; }
+  .ms-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 12px; padding: 12px; min-height: 0; }
+  .ms-tiles { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; gap: 10px; }
+  .ms-tile { position: relative; border-radius: 14px; background: var(--tool-2); text-align: left; padding: 0; perspective: 800px; opacity: 0; transform: translateY(10px); }
+  .ms-tile.is-in { opacity: 1; transform: none; transition: opacity .4s var(--settle), transform .5s var(--out-quart); transition-delay: calc(var(--i) * 60ms); }
+  .ms-front, .ms-back { position: absolute; inset: 0; padding: 12px 13px; display: grid; align-content: start; gap: 4px; backface-visibility: hidden; border-radius: 14px; transition: transform .6s var(--out-quart); }
+  .ms-back { transform: rotateY(180deg); background: #2a2d33; font-size: 10px; grid-template-columns: auto 1fr; column-gap: 8px; align-content: center; color: rgb(236 238 242 / .6); }
+  .ms-back b { color: #eceef2; font-weight: 600; }
+  .ms-tile:hover .ms-front, .ms-tile:focus-visible .ms-front { transform: rotateY(180deg); }
+  .ms-tile:hover .ms-back, .ms-tile:focus-visible .ms-back { transform: rotateY(360deg); }
+  .ms-name { font-size: 11px; color: rgb(236 238 242 / .6); font-weight: 500; }
+  .ms-name .mono { font-size: 10px; margin-left: 6px; opacity: .7; }
+  .ms-val { font-size: 24px; font-weight: 650; letter-spacing: -0.02em; line-height: 1.1; }
+  .ms-spark { width: 100%; height: 28px; margin-top: 4px; }
+  .ms-spark polyline { fill: none; stroke: #20a496; stroke-width: 1.6; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+  .ms-note { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; color: rgb(236 238 242 / .55); }
+  .ms-note i { width: 6px; height: 6px; border-radius: 50%; background: #43b25b; }
+  [data-state="watch"] .ms-note i { background: #dd9a18; } [data-state="alert"] .ms-note i { background: #fb4b3d; }
+  .ms-side { display: grid; grid-template-rows: auto 1fr; gap: 10px; min-height: 0; }
+  .ms-card { border-radius: 14px; background: var(--tool-2); padding: 12px 13px; display: grid; gap: 6px; align-content: start; }
+  .ms-curve { width: 100%; height: 90px; }
+  .ms-curve path { fill: none; stroke: #20a496; stroke-width: 2; stroke-linecap: round; stroke-dasharray: 400; stroke-dashoffset: 400; }
+  .ms-curve.is-in path { stroke-dashoffset: 0; transition: stroke-dashoffset 1.6s var(--out-quart) .2s; }
+  .ms-zero { stroke: rgb(255 255 255 / .18); stroke-dasharray: 3 4; }
+  .ms-brief-txt { font-size: 12px; line-height: 1.45; color: rgb(236 238 242 / .85); min-height: 3.2em; }
+  .ms-src { font-size: 9.5px; color: rgb(236 238 242 / .45); margin-top: auto; }
+  .ms-hint { position: absolute; left: 16px; bottom: 10px; font-size: 10px; color: rgb(236 238 242 / .4); opacity: 0; }
+  .ms-hint.is-in { opacity: 1; transition: opacity .4s var(--settle) 1.2s; }
+</style>
