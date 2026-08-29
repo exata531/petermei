@@ -1,0 +1,23 @@
+---
+const year = new Date().getFullYear();
+---
+<footer class="foot">
+  <div class="foot-in wrap">
+    <span class="meta">Peter Mei · Detroit area · {year}</span>
+    <nav class="foot-links meta" aria-label="Elsewhere">
+      <a class="lnk" href="https://github.com/exata531" rel="me noopener">GitHub</a>
+      <a class="lnk" href="https://volbase.app" rel="noopener">volbase</a>
+      <a class="lnk" href="https://github.com/exata531/Rin" rel="noopener">Rin</a>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .foot { border-top: 1px solid var(--hair); }
+  .foot-in {
+    display: flex; flex-wrap: wrap; gap: 16px 28px;
+    align-items: center; justify-content: space-between;
+    padding: 26px var(--pad);
+  }
+  .foot-links { display: flex; gap: 22px; }
+</style>

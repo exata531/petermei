@@ -1,25 +1,120 @@
 ---
-import Base from '../layouts/Base.astro';
-import MenuBar from '../components/MenuBar.astro';
-import SubNav from '../components/SubNav.astro';
-import Hero from '../components/Hero.astro';
-import Thread from '../components/Thread.astro';
-import Rooms from '../components/Rooms.astro';
-import Notes from '../components/Notes.astro';
-import Photos from '../components/Photos.astro';
-import About from '../components/About.astro';
-import Footer from '../components/Footer.astro';
+import Site from '../layouts/Site.astro';
+import { work } from '../data/work';
 ---
-<Base>
-  <MenuBar />
-  <SubNav />
-  <main>
-    <Hero />
-    <Thread dir="rl" />
-    <Rooms />
-    <Notes />
-    <Photos />
-    <About />
-  </main>
-  <Footer />
-</Base>
+<Site
+  title="Peter Mei"
+  desc="Peter Mei builds software outside Detroit: volbase, Rin, Kyou and Market Station."
+>
+  <section class="band">
+    <div class="wrap hero pad">
+      <p class="label"><i class="sq"></i>Detroit, Michigan</p>
+      <h1 class="display">Peter Mei</h1>
+      <p class="sub open">I am a senior at the school, outside Detroit. I build software and I ship it.</p>
+      <p class="meta">Class of 2027 · applying to college this fall</p>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="work-h">
+    <div class="wrap">
+      <p class="label pad hd" id="work-h"><i class="sq"></i>Selected work · {work.length}</p>
+
+      {work.map((w, i) => (
+        <a class:list={['row', { flip: i % 2 === 1 }]} href={`/work/${w.slug}`}>
+          <div class="row-in">
+            <div class="say pad rise">
+              <p class="label"><i class="sq"></i>{w.n} · {w.status}</p>
+              <h2 class="title">{w.name}</h2>
+              <p class="lead">{w.line}</p>
+              <span class="go mono" aria-hidden="true">Open <i>&#8627;</i></span>
+            </div>
+            <div class="shot rise">
+              <img
+                src={w.still.src} width={w.still.w} height={w.still.h}
+                alt={`${w.name}, running`} loading={i < 1 ? 'eager' : 'lazy'}
+                decoding="async" transition:name={`shot-${w.slug}`}
+              />
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap cells two">
+      <a class="tile pad rise" href="/playground">
+        <p class="label"><i class="sq"></i>Playground</p>
+        <p class="sub">Everything on this site that you can actually touch, on one page.</p>
+        <span class="go mono" aria-hidden="true">Open <i>&#8627;</i></span>
+      </a>
+      <a class="tile pad rise" href="/about">
+        <p class="label"><i class="sq"></i>About</p>
+        <p class="sub">Who I am, what I use, and where I have been climbing.</p>
+        <span class="go mono" aria-hidden="true">Open <i>&#8627;</i></span>
+      </a>
+    </div>
+  </section>
+</Site>
+
+<style>
+  .hero { padding-block: clamp(64px, 11vw, 150px); display: grid; gap: 22px; }
+  .hero .display { margin-block: 4px; }
+  .open { max-width: 22ch; color: var(--ink); }
+  .hero .meta { margin-top: 6px; }
+
+  .hd { border-bottom: 1px solid var(--hair); }
+
+  .row { display: block; border-bottom: 1px solid var(--hair); }
+  .row:last-of-type { border-bottom: 0; }
+  .row-in {
+    display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: stretch;
+  }
+  /* the visual keeps the wide column whichever side it sits on */
+  .row.flip .row-in { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+  .row.flip .row-in > .say { order: 2; border-left: 1px solid var(--hair); }
+  .row.flip .row-in > .shot { order: 1; }
+  .row:not(.flip) .shot { border-left: 1px solid var(--hair); }
+
+  .say {
+    display: grid; align-content: center; gap: 16px;
+    padding-block: clamp(36px, 5vw, 64px);
+  }
+  .say .lead { color: var(--dim); }
+
+  .shot {
+    display: grid; place-items: center; overflow: clip;
+    background: var(--paper-2); padding: clamp(24px, 3.4vw, 52px);
+  }
+  /* a wide dashboard and a tall phone both have to sit calmly in the same
+     row, so the picture is capped on both axes and centred */
+  .shot img {
+    width: auto; height: auto;
+    max-width: 100%; max-height: clamp(300px, 40vw, 560px);
+    transition: transform var(--t-slow) var(--ease);
+  }
+  .row:hover .shot img { transform: scale(1.028); }
+
+  .go {
+    display: inline-flex; align-items: center; gap: 8px; width: fit-content;
+    font-size: var(--t-label); text-transform: uppercase;
+    letter-spacing: var(--track-label); color: var(--accent);
+  }
+  .go i { font-style: normal; transition: transform var(--t-base) var(--ease); }
+  .row:hover .go i, .tile:hover .go i { transform: translate(4px, 2px); }
+
+  .two { grid-template-columns: 1fr 1fr; }
+  .tile { display: grid; gap: 18px; align-content: start; padding-block: clamp(36px, 4vw, 56px); }
+  .tile .sub { max-width: 20ch; }
+  .tile:hover { background: var(--paper-2); }
+
+  @media (max-width: 860px) {
+    .row-in, .row.flip .row-in { grid-template-columns: minmax(0, 1fr); }
+    .row.flip .row-in > .say { order: 2; border-left: 0; border-top: 1px solid var(--hair); }
+    .row.flip .row-in > .shot { order: 1; }
+    .row:not(.flip) .shot { border-left: 0; border-top: 1px solid var(--hair); }
+    .two { grid-template-columns: 1fr; }
+    .open { max-width: none; }
+  }
+</style>

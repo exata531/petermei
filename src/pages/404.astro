@@ -1,27 +1,34 @@
 ---
-import Base from '../layouts/Base.astro';
-import MenuBar from '../components/MenuBar.astro';
+import Site from '../layouts/Site.astro';
+import { work } from '../data/work';
 ---
-<Base title="Nothing here · Peter Mei" description="There is nothing at this address. The work is on the front page.">
-  <MenuBar />
-  <main class="nf">
-    <div class="wrap nf-in">
-      <p class="eyebrow">404</p>
-      <h1 class="t-display">There&rsquo;s nothing at this address.</h1>
-      <p class="nf-sub">I checked twice. Whatever you were after is almost certainly on the front page, along with four things you can type into.</p>
-      <div class="row" style="--gap:12px">
-        <a class="btn btn-solid sq" href="/#work">Go to the work</a>
-        <a class="btn btn-ghost sq" href="/">Back to the start</a>
-      </div>
-      <p class="mono nf-face" aria-hidden="true">(・_・;)</p>
+<Site title="Not here — Peter Mei" desc="That page does not exist.">
+  <section class="band">
+    <div class="wrap lost pad">
+      <p class="label"><i class="sq"></i>404</p>
+      <h1 class="display">Not here</h1>
+      <p class="sub">That page does not exist. The work does.</p>
+      <a class="btn" href="/">Go to the work</a>
     </div>
-  </main>
-</Base>
+  </section>
+
+  <section class="band">
+    <div class="wrap cells four">
+      {work.map((w) => (
+        <a class="pick pad" href={`/work/${w.slug}`}>
+          <span class="label"><i class="sq"></i>{w.n}</span>
+          <span class="sub">{w.name}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+</Site>
 
 <style>
-  .nf { min-height: 100svh; display: grid; place-items: center; padding-top: var(--bar-h); }
-  .nf-in { display: grid; gap: 20px; justify-items: start; max-width: 44rem; }
-  .nf-in h1 { max-width: 15ch; }
-  .nf-sub { font-size: var(--t-lead); color: var(--ink-2); max-width: 46ch; line-height: 1.55; }
-  .nf-face { font-size: 22px; color: var(--ink-3); margin-top: 12px; }
+  .lost { padding-block: clamp(70px, 13vw, 170px); display: grid; gap: 22px; justify-items: start; }
+  .lost .btn { margin-top: 12px; }
+  .four { grid-template-columns: repeat(4, 1fr); }
+  .pick { display: grid; gap: 12px; padding-block: 34px; align-content: start; }
+  .pick:hover { background: var(--paper-2); }
+  @media (max-width: 860px) { .four { grid-template-columns: 1fr 1fr; } }
 </style>

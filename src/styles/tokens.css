@@ -1,130 +1,87 @@
 /* petermei.com — design tokens.
-   Paper page, dark objects. Every value here is lifted from one of Peter's own
-   codebases (the Rin site, volbase, Kyou, Market Station) so the portfolio reads
-   as the same hand that built the products. One file owns every number. */
+
+   One ground, one ink, one accent. Everything structural is a hairline on a
+   grid; radius is reserved for things that are round in life (device screens,
+   photo corners). The per-product colours below belong to the product demos
+   only and never touch the page chrome. */
 
 :root {
   color-scheme: light;
 
-  /* ── paper (the Rin site's cream family) ─────────────────────────── */
-  --paper:   #fffdf8;
-  --cream:   #fff7ed;
-  --cream-2: #f7ecdc;
-  --line:    #eee0cc;
-  --hair:    #cfc5b8;
-  --ink:     #292524;
-  --ink-2:   #6b6560;
-  --ink-3:   #78716c;
-  --solid:   #1c1917;
-  --solid-fg:#ffffff;
-  --espresso: 68 19 6;            /* rgb triplet; every shadow is tinted with it */
+  /* ── ground ──────────────────────────────────────────────────────── */
+  --paper:    #efeeea;
+  --paper-2:  #e7e5e0;          /* a cell that needs to sit back */
+  --ink:      #131211;
+  --dim:      #6d6862;
+  --dim-2:    #948e86;
+  --dark:     #141312;
+  --dark-2:   #1c1a18;
+  --dark-fg:  #e9e6e0;
+  --dark-dim: #97918a;
+  --accent:   #f04e1a;
+  --accent-2: #d13d0e;
 
-  /* two rooms leave the paper: Rin's section and the photo band */
-  --night:    #14120f;            /* the photo wall, warm black */
-  --night-fg: #efe7db;
-  --night-2:  #221e19;
+  --hair:      rgb(19 18 17 / .15);
+  --hair-soft: rgb(19 18 17 / .08);
+  --hair-dark: rgb(233 230 224 / .16);
 
-  /* ── the dark objects (each product keeps its own surface) ───────── */
-  --slate:    #242a36;            /* Rin's terminal */
+  /* ── the product demos keep their own surfaces ───────────────────── */
+  --slate:    #242a36;          /* Rin's terminal */
   --slate-fg: #dde0e5;
-  --slate-2:  #2e3543;            /* Rin's bar */
-  --void:     #0e0e12;            /* Kyou's hero black */
-  --deep:     #0f141a;            /* volbase dark canvas */
-  --deep-2:   #1e2630;            /* volbase elevated */
-  --tool:     #1a1b1f;            /* Market Station dark */
+  --slate-2:  #2e3543;
+  --void:     #0e0e12;          /* Kyou's hero black */
+  --deep:     #0f141a;          /* volbase dark canvas */
+  --deep-2:   #1e2630;
+  --tool:     #1a1b1f;          /* Market Station dark */
   --tool-2:   #232529;
-
-  /* ── accents, one per product ────────────────────────────────────── */
   --acc-volbase:   #5c79b8;
   --acc-volbase-2: #7e99d6;
   --acc-rin:       #f7be00;
-  --acc-rin-2:     #7ee787;       /* phosphor */
-  --acc-kyou:      #ff3b30;       /* iOS red, Kyou's "now" */
+  --acc-rin-2:     #7ee787;
+  --acc-kyou:      #ff3b30;
   --acc-kyou-2:    #fff3e0;
   --acc-market:    #0e7a70;
   --acc-market-2:  #20a496;
-  --acc-me:        #f25c1f;       /* the site's own ember; no product owns orange */
-  --acc-me-2:      #ff8a4c;
   --ok:    #2e7d3b;
   --watch: #b06a08;
   --alert: #cf2318;
 
-  /* hairlines. Rooms that leave the paper reassign these instead of
-     hard-coding a second colour at every rule. */
-  --rule:        rgb(var(--espresso) / .14);
-  --rule-strong: rgb(var(--espresso) / .22);
-
-  /* the live accent: scroll-driven, registered below so it interpolates */
-  --accent: #f25c1f;
-  --accent-soft: color-mix(in oklab, var(--accent) 8%, transparent);
-  --tint: color-mix(in oklab, var(--accent) 3%, var(--paper));
-
   /* ── type ─────────────────────────────────────────────────────────
-     The display voice is a serif set roman, not an italic accent word
-     dropped into a sans headline. That accent was the AI tell; the serif
-     itself is now the identity. Body is the system face, labels are mono. */
-  --ui:    -apple-system, BlinkMacSystemFont, system-ui, 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
-  --serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
-  --mono:  'JetBrains Mono Variable', ui-monospace, 'SF Mono', Menlo, monospace;
+     One family. Two of the three sites this one answers to are sans-only,
+     and a serif display paired with a sans body is the template tell. */
+  --sans: 'Geist Variable', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  --mono: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', Menlo, monospace;
 
-  --t-hero:    clamp(42px, 5.6vw, 84px);
-  --t-display: clamp(36px, 4.4vw, 64px);
-  --t-title:   clamp(30px, 3.4vw, 50px);
-  --t-sub:     clamp(23px, 2.4vw, 32px);
-  --t-card:    clamp(20px, 1.9vw, 26px);
+  --t-display: clamp(38px, 7.2vw, 92px);
+  --t-title:   clamp(28px, 3.4vw, 46px);
+  --t-sub:     clamp(21px, 2.2vw, 28px);
   --t-lead:    19px;
-  --t-body:    17px;
-  --t-ui:      15px;
+  --t-body:    16px;
   --t-small:   14px;
-  --t-fine:    13px;
-  --t-tiny:    12px;
-  --t-nano:    11px;
+  --t-meta:    12px;
+  --t-label:   11px;
 
-  --track-hero:    -0.004em;
-  --track-display: -0.002em;
-  --track-title:   0em;
-  --track-ui:      -0.01em;
-
-  /* ── radius ──────────────────────────────────────────────────────── */
-  --r-code:  6px;
-  --r-chip:  8px;
-  --r-tile:  12px;
-  --r-btn:   14px;
-  --r-card:  22px;
-  --r-stage: 28px;
-  --r-pill:  999px;
+  --track-display: -0.035em;
+  --track-title:   -0.028em;
+  --track-label:   0.14em;
 
   /* ── frame ───────────────────────────────────────────────────────── */
-  --gut:    clamp(20px, 4vw, 40px);
-  --wrap:   1280px;
-  --bar-h:  44px;
-  --sub-h:  52px;
-  --sec:    clamp(80px, 9vw, 150px);
+  --gut:  clamp(18px, 4vw, 56px);
+  --wrap: 1360px;
+  --nav:  56px;
+  --pad:  clamp(20px, 2.6vw, 32px);      /* inside a grid cell */
+  --sec:  clamp(56px, 7vw, 104px);       /* between sections */
+
+  /* ── radius: only where the world is round ───────────────────────── */
+  --r-screen: 14px;
+  --r-photo:  2px;
+  --cut:      10px;                       /* the chamfered corner */
 
   /* ── motion ──────────────────────────────────────────────────────── */
-  --boing:    cubic-bezier(.34, 1.56, .64, 1);
-  --spring:   cubic-bezier(.34, 1.2, .64, 1);
-  --settle:   cubic-bezier(0, 0, .2, 1);
-  --out-expo: cubic-bezier(.16, 1, .3, 1);
-  --ease:     var(--out-expo);        /* the house curve: every hover, press, and settle */
-  --out-quart:cubic-bezier(.22, 1, .36, 1);
-  --t-fast: 120ms;
-  --t-base: 240ms;
-  --t-slow: 600ms;
-  --t-scene: 900ms;
+  --ease: cubic-bezier(.16, 1, .3, 1);
+  --t-fast: 140ms;
+  --t-base: 320ms;
+  --t-slow: 620ms;
 
-  /* ── shadows, always espresso, always two layers ─────────────────── */
-  --shadow-btn:   0 2px 4px rgb(var(--espresso) / .12), 0 12px 24px -10px rgb(var(--espresso) / .35);
-  --shadow-card:  0 1px 2px rgb(var(--espresso) / .05), 0 18px 40px -28px rgb(var(--espresso) / .30);
-  --shadow-panel: 0 2px 10px rgb(var(--espresso) / .10), 0 40px 70px -34px rgb(var(--espresso) / .45);
-  --shadow-stage: 0 2px 10px rgb(var(--espresso) / .10), 0 50px 90px -40px rgb(var(--espresso) / .50);
-  --shadow-device:0 0 0 .5px rgb(0 0 0 / .35), 0 30px 60px -20px rgb(var(--espresso) / .55), 0 4px 12px rgb(0 0 0 / .18);
-  --inset-hi:     inset 0 .5px 0 rgb(255 255 255 / .14);
-}
-
-/* the accent is a real registered colour so scroll can interpolate it */
-@property --accent {
-  syntax: '<color>';
-  inherits: true;
-  initial-value: #f25c1f;
+  --shadow-screen: 0 1px 2px rgb(19 18 17 / .10), 0 30px 60px -30px rgb(19 18 17 / .45);
 }
