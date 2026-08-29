@@ -99,8 +99,14 @@ export const products = [
   .pos li.is-on em { display: inline; }
 
   @media (max-width: 900px) {
-    .stage-grid { grid-template-columns: 1fr; gap: 20px; align-content: start; height: auto; }
-    .stage-copy { min-height: 250px; }
+    .stage-sec { height: calc(var(--n, 4) * 100svh + 20svh); }
+    .stage-pin { height: auto; min-height: 100svh; padding-top: calc(var(--bar-h) + var(--sub-h) + 12px); padding-bottom: 24px; align-items: start; }
+    .stage-grid { grid-template-columns: 1fr; gap: 18px; align-content: start; height: auto; }
+    .stage-copy { min-height: 0; }
+    .copy-slot { position: static; display: none; }
+    .copy-slot.is-on { display: grid; }
     .ct { font-size: clamp(28px, 7vw, 40px); }
+    .facts-3 div { grid-template-columns: 64px 1fr; }
+    .frame { max-height: none; }
   }
 </style>

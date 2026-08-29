@@ -58,6 +58,12 @@ export function initStage({ scrollTo, reduce }: { scrollTo: (t: string | number,
     market:  { w: 960, h: 580, r: 14, face: '(•_•)', cta: 'Watch it tick', href: '#work' },
   };
   products.forEach((p) => Object.assign(p, geo[p.id]));
+  // phones get hand-sized frames, not shrunken desktops
+  const narrow = () => window.innerWidth < 900;
+  const mobileGeo: Record<string, Partial<Product>> = {
+    volbase: { w: 360, h: 460, r: 12 }, rin: { w: 360, h: 400, r: 14 }, kyou: { w: 280, h: 580, r: 50 }, market: { w: 360, h: 560, r: 14 },
+  };
+  const geoFor = (p: Product) => (narrow() ? { ...p, ...mobileGeo[p.id] } : p);
 
   const n = products.length;
   sec.style.setProperty('--n', String(n));
@@ -69,12 +75,14 @@ export function initStage({ scrollTo, reduce }: { scrollTo: (t: string | number,
   const subCta = sub?.querySelector<HTMLAnchorElement>('[data-subnav-cta]');
 
   const wrap = frame.parentElement as HTMLElement;
-  function fit(p: Product) {
-    const availW = wrap.clientWidth, availH = Math.max(320, window.innerHeight - 96 - 64 - 60);
+  function fit(p0: Product) {
+    const p = geoFor(p0);
+    const availW = wrap.clientWidth, availH = narrow() ? 1e6 : Math.max(320, window.innerHeight - 96 - 64 - 60);
     const s = Math.min(1, availW / p.w, availH / p.h);
     frame.style.setProperty('--scale', s.toFixed(3));
+    frame.classList.toggle('is-narrow', narrow());
   }
-  window.addEventListener('resize', () => { if (current >= 0) fit(products[current]); });
+  window.addEventListener('resize', () => { if (current >= 0) { fit(products[current]); const g = geoFor(products[current]); gsap.set(frame, { '--w': g.w + 'px', '--h': g.h + 'px', '--r': g.r + 'px' }); } });
   function show(i: number) {
     if (i === current) return;
     const prev = current; current = i;
@@ -91,7 +99,8 @@ export function initStage({ scrollTo, reduce }: { scrollTo: (t: string | number,
     });
     // chrome morph
     fit(p);
-    gsap.to(frame, { '--w': p.w + 'px', '--h': p.h + 'px', '--r': p.r + 'px', duration: reduce ? 0 : 0.9, ease: 'expo.inOut', overwrite: 'auto' });
+    const g = geoFor(p);
+    gsap.to(frame, { '--w': g.w + 'px', '--h': g.h + 'px', '--r': g.r + 'px', duration: reduce ? 0 : 0.9, ease: 'expo.inOut', overwrite: 'auto' });
     gsap.to(html, { '--accent': p.accent, duration: 0.8, ease: 'power2.out', overwrite: 'auto' });
     setFace(p.face);
     if (subName) subName.textContent = p.name;

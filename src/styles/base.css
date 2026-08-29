@@ -121,3 +121,16 @@ ul { margin: 0; padding: 0; list-style: none; }
   .reveal { opacity: 1; transform: none; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* ── print: the facts, not the theatre ───────────────────────────── */
+@media print {
+  body { background: #fff; color: #000; }
+  .bar, .subnav, .mesh, .cue, .demo-pill, .finish, .pos, .rail, .ky-hint, .ms-hint { display: none !important; }
+  .stage-sec, .photos { height: auto !important; }
+  .stage-pin, .photos-pin { position: static !important; height: auto !important; }
+  .copy-slot { position: static !important; opacity: 1 !important; pointer-events: auto !important; margin-bottom: 24px; }
+  .frame { display: none !important; }
+  .line > .line-in { transform: none !important; }
+  .reveal { opacity: 1 !important; transform: none !important; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .8em; color: #666; }
+}
