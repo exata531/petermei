@@ -7,7 +7,13 @@ export function initPhotos(reduce: boolean) {
   const sec = document.querySelector<HTMLElement>('[data-photos]');
   const rail = sec?.querySelector<HTMLElement>('[data-rail]');
   const idx = sec?.querySelector<HTMLElement>('[data-photos-idx]');
-  if (!sec || !rail || reduce || matchMedia('(max-width: 820px)').matches) return;
+  if (!sec || !rail) return;
+  // the headline sits inside a sticky box, which IntersectionObserver misjudges;
+  // the section itself is tall and honest, so the section trigger reveals the head
+  const head = [...sec.querySelectorAll<HTMLElement>('.photos-head .reveal')];
+  const showHead = () => head.forEach((h) => h.classList.add('is-in'));
+  if (reduce || matchMedia('(max-width: 820px)').matches) { showHead(); return; }
+  ScrollTrigger.create({ trigger: sec, start: 'top 70%', once: true, onEnter: showHead });
   const shots = [...rail.querySelectorAll<HTMLElement>('[data-shot]')];
   const dist = () => rail.scrollWidth - window.innerWidth + 40;
   gsap.to(rail, {

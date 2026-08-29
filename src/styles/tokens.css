@@ -86,7 +86,7 @@
   --wrap:   1280px;
   --bar-h:  44px;
   --sub-h:  52px;
-  --sec:    clamp(96px, 12vw, 200px);
+  --sec:    clamp(80px, 9vw, 150px);
 
   /* ── motion ──────────────────────────────────────────────────────── */
   --boing:    cubic-bezier(.34, 1.56, .64, 1);
