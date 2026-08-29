@@ -1,87 +1,197 @@
-/* petermei.com — design tokens.
+/* petermei.com — the two appearances.
 
-   One ground, one ink, one accent. Everything structural is a hairline on a
-   grid; radius is reserved for things that are round in life (device screens,
-   photo corners). The per-product colours below belong to the product demos
-   only and never touch the page chrome. */
+   The desktop has a Light and a Dark, the way the machine it is imitating
+   does, and every colour on the page is named here. Nothing else in the
+   project carries a colour literal except the three traffic lights, which are
+   Apple's and are not ours to restyle, and the four product demos, which keep
+   their own surfaces because each one is a picture of a real app.
+
+   The raw palette is Zainab Kabira's, taken from her shipped CSS: cream and
+   sand by day, night and navy after dark, with gold and coral as the only two
+   accents. Craft supplies the geometry and the four-layer shadow. Every pair
+   below is written once with light-dark(): the first value is the day desktop,
+   the second is the same desktop after the sun has gone down. */
 
 :root {
-  color-scheme: light;
+  color-scheme: light dark;
 
-  /* ── ground ──────────────────────────────────────────────────────── */
-  --paper:    #efeeea;
-  --paper-2:  #e7e5e0;          /* a cell that needs to sit back */
-  --ink:      #131211;
-  --dim:      #6d6862;
-  --dim-2:    #948e86;
-  --dark:     #141312;
-  --dark-2:   #1c1a18;
-  --dark-fg:  #e9e6e0;
-  --dark-dim: #97918a;
-  --accent:   #f04e1a;
-  --accent-2: #d13d0e;
+  /* ── the raw palette ────────────────────────────────────────────── */
+  --c-cream:  #fff9f1;
+  --c-cream-2:#fff9e9;
+  --c-sand:   #eee8d2;
+  --c-ink:    #060606;
+  --c-gold:   #ffda3f;
+  --c-coral:  #fc9073;
+  --c-night:  #0a0a0f;
+  --c-navy:   #111c36;
+  --c-navy-1: #1f3b6d;
+  --c-navy-2: #031835;
+  --c-day-1:  rgb(113 183 244);
+  --c-day-2:  rgb(87 136 179);
 
-  --hair:      rgb(19 18 17 / .15);
-  --hair-soft: rgb(19 18 17 / .08);
-  --hair-dark: rgb(233 230 224 / .16);
+  /* ── the ground ─────────────────────────────────────────────────── */
+  --paper:     light-dark(#fff9f1, #111c36);
+  --paper-2:   light-dark(#eee8d2, #16203a);
+  --surface:   light-dark(#fff9f1, #111c36);
+  --paper-app: light-dark(#fffdf8, #16203a);   /* a document's own white */
+  --side:      light-dark(#eee8d2, #0d1628);   /* a sidebar sits back */
+  --well:      light-dark(#e4dcc4, #0a0a0f);   /* the pit a demo sits in */
+  --chrome:    light-dark(#f6efe1, #16203a);   /* a title bar */
 
-  /* ── the product demos keep their own surfaces ───────────────────── */
-  --slate:    #242a36;          /* Rin's terminal */
+  --ink:    light-dark(#060606, #fff9f1);
+  --dim:    light-dark(rgb(6 6 6 / .58), rgb(255 249 241 / .62));
+  --dim-2:  light-dark(rgb(6 6 6 / .38), rgb(255 249 241 / .42));
+  --line:   light-dark(rgb(6 6 6 / .12), rgb(255 249 241 / .13));
+  --chip:   light-dark(rgb(6 6 6 / .06), rgb(255 249 241 / .08));
+  --chip-2: light-dark(rgb(6 6 6 / .11), rgb(255 249 241 / .15));
+
+  /* ── the sky ────────────────────────────────────────────────────── */
+  --sky-1: light-dark(rgb(113 183 244), #1f3b6d);
+  --sky-2: light-dark(rgb(87 136 179), #031835);
+  --wall: linear-gradient(178deg, var(--sky-1) 0%, var(--sky-2) 100%);
+  --wall-flat: light-dark(#6f9ec8, #0d2444);
+  --wall-glow: light-dark(rgb(255 249 241 / .5), rgb(120 160 220 / .16));
+  --wall-ink:  light-dark(#06131f, #fff9f1);
+  --wall-chip: light-dark(rgb(255 249 241 / .48), rgb(6 6 15 / .4));
+  --cloud:     light-dark(#fff9f1, #2a3c62);
+  --cloud-a:   light-dark(.5, .3);
+  --hill-1:    light-dark(rgb(255 249 241 / .26), rgb(255 249 241 / .05));
+  --hill-2:    light-dark(rgb(255 249 241 / .5), rgb(10 14 28 / .5));
+  --hill-3:    light-dark(#fff9f1, #070a14);
+  --sun:       light-dark(#ffda3f, #fff9f1);
+  --sun-halo:  light-dark(rgb(255 218 63 / .42), rgb(255 249 241 / .2));
+  --star:      #fff9f1;
+  --plane:     #fc9073;
+  --trail:     light-dark(rgb(6 6 6 / .5), rgb(255 249 241 / .5));
+
+  /* ── glass: the material off her floating nav pill ──────────────── */
+  --glass-bar:   light-dark(rgb(255 249 241 / .5), rgb(10 10 15 / .48));
+  --glass-menu:  light-dark(rgb(255 249 241 / .84), rgb(17 28 54 / .84));
+  --glass-dock:  light-dark(rgb(255 255 255 / .22), rgb(255 255 255 / .1));
+  --glass-edge:  light-dark(rgb(255 255 255 / .5), rgb(255 255 255 / .16));
+  --glass-lip:   inset 0 4px 6px rgb(255 255 255 / .25);
+  --bar-ink:     light-dark(#060606, #fff9f1);
+  --veil:        light-dark(rgb(6 6 6 / .2), rgb(6 6 15 / .48));
+  --dim-veil:    light-dark(rgb(6 6 6 / .58), rgb(6 6 15 / .78));
+
+  /* ── selection, focus, links ────────────────────────────────────── */
+  --sel:      light-dark(#5788b3, #71b7f4);
+  --sel-fg:   light-dark(#fff9f1, #031835);
+  --sel-soft: light-dark(rgb(87 136 179 / .16), rgb(113 183 244 / .2));
+  --focus:    light-dark(#060606, #fff9f1);
+  --link:     light-dark(#a8583c, #fc9073);
+  --gold:     #ffda3f;
+  --coral:    #fc9073;
+
+  /* one pastel per product, mixed the way a tint is made, base plus white, so
+     four windows on one desktop never read as four copies of the same grey */
+  --tint-volbase: light-dark(#dfe8f7, #1b2843);
+  --tint-rin:     light-dark(#f7edd2, #2b2a24);
+  --tint-kyou:    light-dark(#ffe4e0, #332122);
+  --tint-market:  light-dark(#d8f0ec, #17302e);
+
+  --lt-off: light-dark(#d6d0bd, #38415a);
+  --doc-1:  light-dark(#fffdf8, #2a3453);
+  --doc-2:  light-dark(#e4dcc4, #1b2540);
+
+  /* ── the product demos keep their own surfaces ──────────────────── */
+  --slate:    #242a36;
   --slate-fg: #dde0e5;
   --slate-2:  #2e3543;
-  --void:     #0e0e12;          /* Kyou's hero black */
-  --deep:     #0f141a;          /* volbase dark canvas */
-  --deep-2:   #1e2630;
-  --tool:     #1a1b1f;          /* Market Station dark */
+  --tool:     #1a1b1f;
   --tool-2:   #232529;
-  --acc-volbase:   #5c79b8;
-  --acc-volbase-2: #7e99d6;
-  --acc-rin:       #f7be00;
-  --acc-rin-2:     #7ee787;
-  --acc-kyou:      #ff3b30;
-  --acc-kyou-2:    #fff3e0;
-  --acc-market:    #0e7a70;
-  --acc-market-2:  #20a496;
-  --ok:    #2e7d3b;
-  --watch: #b06a08;
-  --alert: #cf2318;
 
-  /* ── type ─────────────────────────────────────────────────────────
-     One family. Two of the three sites this one answers to are sans-only,
-     and a serif display paired with a sans body is the template tell. */
-  --sans: 'Geist Variable', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  /* ── boot ───────────────────────────────────────────────────────── */
+  --boot-bg:    light-dark(#eee8d2, #0a0a0f);
+  --boot-fg:    light-dark(#060606, #fff9f1);
+  --boot-track: light-dark(rgb(6 6 6 / .14), rgb(255 249 241 / .16));
+
+  /* ── shadows ────────────────────────────────────────────────────
+     Her elevation rule: a large blur with a negative spread, so the
+     shadow stays tight to the object instead of muddying what it sits
+     on, and anything CTA-shaped gets it tinted blue rather than grey. */
+  --sh-menu: light-dark(
+    0 22px 48px -18px rgb(6 6 6 / .34), 0 26px 54px -18px rgb(0 0 0 / .62));
+  --sh-dock: light-dark(
+    0 18px 40px -16px rgb(30 58 95 / .45), 0 20px 44px -16px rgb(0 0 0 / .6));
+  --sh-spot: light-dark(
+    0 40px 90px -30px rgb(6 6 6 / .5), 0 44px 100px -30px rgb(0 0 0 / .8));
+  --sh-icon: light-dark(
+    drop-shadow(0 6px 10px rgb(30 58 95 / .32)),
+    drop-shadow(0 6px 12px rgb(0 0 0 / .5)));
+
+  /* ── type ───────────────────────────────────────────────────────
+     Two systems on purpose. The machine speaks in the system font,
+     because a Mac window set in anything else is a costume. Whatever
+     Peter actually wrote is set in her stack: a display serif with
+     tight tracking, a workhorse sans, and mono for microcopy with the
+     tracking opened up. */
+  --ui: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
+  --sans: 'Space Grotesk Variable', var(--ui);
+  --serif: 'DM Serif Display', 'Iowan Old Style', Georgia, serif;
   --mono: 'JetBrains Mono Variable', ui-monospace, 'SF Mono', Menlo, monospace;
 
-  --t-display: clamp(38px, 7.2vw, 92px);
-  --t-title:   clamp(28px, 3.4vw, 46px);
-  --t-sub:     clamp(21px, 2.2vw, 28px);
-  --t-lead:    19px;
-  --t-body:    16px;
-  --t-small:   14px;
-  --t-meta:    12px;
-  --t-label:   11px;
+  /* ── geometry, measured off a Mac ───────────────────────────────── */
+  --bar:    25px;    /* the menu bar: 24 on a Mac, one more so 13px sits calmly */
+  --tbar:   30px;    /* a window's title bar */
+  --r-win:  11px;    /* Big Sur onward */
+  --dock-i: 54px;
 
-  --track-display: -0.035em;
-  --track-title:   -0.028em;
-  --track-label:   0.14em;
+  /* ── motion: her curves, by the counts in her own CSS ───────────── */
+  --ease:   cubic-bezier(.22, 1, .36, 1);      /* 42 uses: arrive and settle */
+  --soft:   cubic-bezier(.3, 1.25, .4, 1);     /* 32 uses: hover and press */
+  --boing:  cubic-bezier(.34, 1.56, .64, 1);   /* 18 uses: tap and it bounces */
+  --settle: cubic-bezier(.4, 0, .2, 1);
+  --spring: cubic-bezier(.34, 1.4, .5, 1);     /* the toggle's travel */
+  --out-quart: cubic-bezier(.25, 1, .5, 1);
+  --in-fast: cubic-bezier(.7, 0, .84, 0);      /* closing is quicker than opening */
+  --t-press: 180ms;
+  --t-fast: 250ms;
+  --t-base: 400ms;
+  --t-slow: 550ms;
+  --t-open: 900ms;
+}
 
-  /* ── frame ───────────────────────────────────────────────────────── */
-  --gut:  clamp(18px, 4vw, 56px);
-  --wrap: 1360px;
-  --nav:  56px;
-  --pad:  clamp(20px, 2.6vw, 32px);      /* inside a grid cell */
-  --sec:  clamp(56px, 7vw, 104px);       /* between sections */
+/* the toggle writes one of these onto the root and the whole palette follows */
+:root[data-theme='light'] { color-scheme: light; }
+:root[data-theme='dark']  { color-scheme: dark; }
 
-  /* ── radius: only where the world is round ───────────────────────── */
-  --r-screen: 14px;
-  --r-photo:  2px;
-  --cut:      10px;                       /* the chamfered corner */
+/* lengths cannot ride inside light-dark(), so the handful that change with the
+   appearance are written out. The moon sits higher and smaller than the sun. */
+:root, :root[data-theme='light'] { --sun-x: 80%; --sun-y: 24%; --sun-d: 132px; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) { --sun-x: 76%; --sun-y: 18%; --sun-d: 88px; }
+}
+:root[data-theme='dark'] { --sun-x: 76%; --sun-y: 18%; --sun-d: 88px; }
 
-  /* ── motion ──────────────────────────────────────────────────────── */
-  --ease: cubic-bezier(.16, 1, .3, 1);
-  --t-fast: 140ms;
-  --t-base: 320ms;
-  --t-slow: 620ms;
-
-  --shadow-screen: 0 1px 2px rgb(19 18 17 / .10), 0 30px 60px -30px rgb(19 18 17 / .45);
+/* the window shadows, too long to stay readable inside light-dark() */
+:root {
+  --sh-win:
+    0 50px 40px -30px rgb(30 58 95 / .16),
+    0 22px 48px -20px rgb(6 6 6 / .3),
+    0 4px 12px -4px rgb(6 6 6 / .16),
+    0 0 0 .5px rgb(6 6 6 / .14);
+  --sh-win-back:
+    0 26px 40px -24px rgb(6 6 6 / .22),
+    0 0 0 .5px rgb(6 6 6 / .1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --sh-win:
+      0 50px 60px -30px rgb(0 0 0 / .74),
+      0 22px 48px -20px rgb(0 0 0 / .55),
+      0 0 0 .5px rgb(255 249 241 / .12);
+    --sh-win-back:
+      0 26px 44px -24px rgb(0 0 0 / .5),
+      0 0 0 .5px rgb(255 249 241 / .07);
+  }
+}
+:root[data-theme='dark'] {
+  --sh-win:
+    0 50px 60px -30px rgb(0 0 0 / .74),
+    0 22px 48px -20px rgb(0 0 0 / .55),
+    0 0 0 .5px rgb(255 249 241 / .12);
+  --sh-win-back:
+    0 26px 44px -24px rgb(0 0 0 / .5),
+    0 0 0 .5px rgb(255 249 241 / .07);
 }

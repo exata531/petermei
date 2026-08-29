@@ -1,0 +1,165 @@
+---
+/* Everything that can end up inside a window, rendered once, up front.
+
+   Windows do not clone these; they move them. A demo therefore mounts a single
+   time and keeps whatever you typed into it when you close its window and open
+   it again. With JavaScript off nothing moves anywhere and this file is the
+   whole site: real headings, real links, four working screenshots of nothing
+   pretending to be a desktop. */
+import Volbase from '../scenes/Volbase.astro';
+import Rin from '../scenes/Rin.astro';
+import Kyou from '../scenes/Kyou.astro';
+import Market from '../scenes/Market.astro';
+import Icon from './Icon.astro';
+import { apps, finder, readme, links } from '../../data/apps';
+
+const photos = Array.from({ length: 12 }, (_, i) => `/img/photos/p-${String(i + 1).padStart(2, '0')}.webp`);
+const scenes = { volbase: Volbase, rin: Rin, kyou: Kyou, market: Market };
+---
+<div class="stash" data-stash>
+  <div class="stash-head">
+    <h1>Peter Mei</h1>
+    <p>I am a senior at the school, outside Detroit. I build software and I ship it.</p>
+    <p class="stash-note">This page is a Mac desktop you can use. It needs JavaScript. Below is everything that would be on it.</p>
+  </div>
+
+  {apps.map((a) => {
+    const Scene = a.scene ? scenes[a.scene] : null;
+    return (
+      <section class="stash-app" data-body={a.id} aria-label={a.name}>
+        <h2 class="stash-h">{a.name}</h2>
+        {a.about && <p class="stash-p">{a.about.line}</p>}
+        {a.about && <p class="stash-meta">{a.about.built} · {a.about.state}</p>}
+        {a.about?.link && <p><a href={a.about.link.href} rel="noopener">{a.about.link.label}</a></p>}
+        {Scene && (
+          <div class="sbox" data-fitbox>
+            <figure class="sfig" data-scene={a.scene} data-w={a.sw} data-h={a.sh}
+                    data-mw={a.mw} data-mh={a.mh}
+                    style={`--w:${a.sw}px;--h:${a.sh}px`}>
+              <div class="sframe" data-scene-root role="img" aria-label={`A working demo of ${a.name}`}>
+                <Scene />
+              </div>
+            </figure>
+          </div>
+        )}
+      </section>
+    );
+  })}
+
+  <section class="stash-app" data-body="finder" aria-label="About Peter">
+    <h2 class="stash-h">About</h2>
+    <div class="fnd">
+      <nav class="fnd-side" aria-label="Places">
+        {finder.map((s, i) => (
+          <button class:list={['fnd-tab', { 'is-on': i === 0 }]} type="button" data-fnd={s.id}>
+            <span class="fnd-ico"><Icon id="folder" /></span>{s.label}
+          </button>
+        ))}
+      </nav>
+      <div class="fnd-main">
+        {finder.map((s, i) => (
+          <ul class:list={['fnd-grid', { 'is-on': i === 0 }]} data-fnd-pane={s.id}>
+            {s.items.map((f) => (
+              <li class="fnd-item">
+                <span class="fnd-doc" aria-hidden="true"></span>
+                <b>{f.label}</b>
+                <small>{f.value}</small>
+              </li>
+            ))}
+          </ul>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="stash-app" data-body="photos" aria-label="Photos">
+    <h2 class="stash-h">Photos</h2>
+    <div class="pho">
+      <ul class="pho-grid" data-pho-grid>
+        {photos.map((p, i) => (
+          <li><button class="pho-cell" type="button" data-pho={i}>
+            <img src={p} width="1086" height="724" alt="" loading="lazy" decoding="async" />
+          </button></li>
+        ))}
+      </ul>
+      <div class="pho-big" data-pho-big hidden>
+        <button class="pho-nav pho-prev" type="button" aria-label="Previous photo">&#8249;</button>
+        <img data-pho-img src={photos[0]} width="1086" height="724" alt="" decoding="async" />
+        <button class="pho-nav pho-next" type="button" aria-label="Next photo">&#8250;</button>
+        <button class="pho-close" type="button" aria-label="Back to the grid">Done</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="stash-app" data-body="textedit" aria-label="Read me">
+    <h2 class="stash-h">Read me</h2>
+    <div class="txt">
+      {readme.map((l) => <p>{l}</p>)}
+    </div>
+  </section>
+
+  <section class="stash-app" data-body="trash" aria-label="Trash">
+    <h2 class="stash-h">Trash</h2>
+    <div class="empty"><p>Nothing here.</p></div>
+  </section>
+
+  <section class="stash-app" data-body="play" aria-label="Playground">
+    <h2 class="stash-h">Playground</h2>
+    <div class="play">
+      <p class="play-out mono" data-play-out>(｡•ᴗ•｡)</p>
+      <div class="play-row" data-play-row>
+        {['(｡•ᴗ•｡)', '(￣ヮ￣)', '(≧◡≦)', '(¬_¬)', '(ﾉ´ヮ`)ﾉ', '(T_T)', '(ง •̀_•́)ง', '(´♡‿♡`)'].map((f) => (
+          <button class="play-chip mono" type="button" data-face={f}>{f}</button>
+        ))}
+      </div>
+      <p class="play-hint">Drag the window. Throw it.</p>
+    </div>
+  </section>
+
+  {apps.filter((a) => a.about).map((a) => (
+    <section class="stash-app" data-body={`about-${a.id}`} aria-label={`About ${a.name}`}>
+      <div class="abt">
+        <span class="abt-ico"><Icon id={a.id} /></span>
+        <h3 class="abt-name">{a.about!.name}</h3>
+        <p class="abt-line">{a.about!.line}</p>
+        <dl class="abt-facts">
+          <dt>Built with</dt><dd>{a.about!.built}</dd>
+          <dt>State</dt><dd>{a.about!.state}</dd>
+        </dl>
+        {a.about!.link && (
+          <a class="abt-link" href={a.about!.link.href} rel="noopener">{a.about!.link.label}</a>
+        )}
+      </div>
+    </section>
+  ))}
+
+  <section class="stash-app" data-body="about-peter" aria-label="About Peter">
+    <div class="abt">
+      <span class="abt-ico abt-face mono">(｡•ᴗ•｡)</span>
+      <h3 class="abt-name">Peter Mei</h3>
+      <p class="abt-line">A senior at the school, outside Detroit. I taught myself all of this from the docs.</p>
+      <dl class="abt-facts">
+        <dt>Made</dt><dd>volbase, Rin, Kyou, Market Station</dd>
+        <dt>Now</dt><dd>Applying to college this fall</dd>
+      </dl>
+      <a class="abt-link" href={links.github} rel="me noopener">github.com/exata531</a>
+    </div>
+  </section>
+</div>
+
+<style is:global>
+  /* ── the scene box: a demo at its own pixels, scaled into the window ──── */
+  /* the demo is pinned to the centre rather than aligned there: a grid item
+     wider than its track falls back to start alignment to avoid clipping the
+     far edge, which parks a scaled-down demo off to one side */
+  .sbox { position: relative; width: 100%; height: 100%; overflow: hidden; }
+  .sfig {
+    position: absolute; left: 50%; top: 50%;
+    width: var(--w); height: var(--h);
+    transform: translate(-50%, -50%) scale(var(--s, 1));
+  }
+  .sframe {
+    position: absolute; inset: 0; overflow: hidden; isolation: isolate;
+    background: var(--slate); color: var(--slate-fg);
+  }
+</style>

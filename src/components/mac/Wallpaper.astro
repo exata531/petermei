@@ -1,0 +1,170 @@
+---
+/* The wallpaper, drawn rather than photographed.
+
+   Zainab Kabira's sky, borrowed whole: her day gradient over her hatched sun,
+   her night gradient with the same disc turned into a moon, and the two things
+   she only lets happen once, a shooting star that crosses at a random moment
+   after dark and a gust of wind that clears the sky when the sun comes back.
+   The paper plane is hers too. On her site it flies as you scroll; there is no
+   scroll here, so it flies on a long loop instead and lays the same dashed
+   trail behind it.
+
+   All of it is gradients and paths, so the whole background costs no image
+   requests and stays sharp on any screen. */
+---
+<div class="wall" aria-hidden="true">
+  <div class="wall-sky"></div>
+  <div class="wall-glow"></div>
+
+  <!-- the disc: hatched by day, the same hatching by night -->
+  <div class="orb">
+    <svg viewBox="0 0 100 100">
+      <defs>
+        <clipPath id="orb-clip"><circle cx="50" cy="50" r="50"/></clipPath>
+      </defs>
+      <circle cx="50" cy="50" r="50" class="orb-fill"/>
+      <g clip-path="url(#orb-clip)" class="orb-hatch">
+        <path d="M-10 22h120M-10 34h120M-10 46h120M-10 58h120M-10 70h120M-10 82h120"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- the night's own scatter, and one meteor at a random moment, never a loop -->
+  <svg class="stars" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+    <g fill="var(--star)">
+      <circle cx="118" cy="96" r="1.5"/><circle cx="332" cy="58" r="1"/>
+      <circle cx="486" cy="148" r="1.7"/><circle cx="640" cy="72" r="1.1"/>
+      <circle cx="812" cy="132" r="1.3"/><circle cx="968" cy="46" r="1.6"/>
+      <circle cx="1124" cy="118" r="1"/><circle cx="1298" cy="64" r="1.5"/>
+      <circle cx="1448" cy="140" r="1.2"/><circle cx="228" cy="212" r="1.1"/>
+      <circle cx="566" cy="256" r="1.4"/><circle cx="880" cy="228" r="1"/>
+      <circle cx="1210" cy="268" r="1.3"/><circle cx="1516" cy="216" r="1.6"/>
+      <circle cx="72" cy="322" r="1"/><circle cx="742" cy="344" r="1.2"/>
+      <circle cx="1392" cy="330" r="1.1"/><circle cx="404" cy="392" r="1"/>
+    </g>
+  </svg>
+  <span class="star" data-star></span>
+
+  <!-- three cloud banks, each a cluster of soft shapes on its own long drift -->
+  <div class="sky-clouds" data-gust>
+    <div class="cloud c1"><svg viewBox="0 0 320 120"><g><ellipse cx="110" cy="76" rx="88" ry="34"/><ellipse cx="176" cy="60" rx="60" ry="42"/><ellipse cx="230" cy="80" rx="64" ry="28"/><ellipse cx="66" cy="86" rx="56" ry="24"/></g></svg></div>
+    <div class="cloud c2"><svg viewBox="0 0 320 120"><g><ellipse cx="120" cy="70" rx="78" ry="30"/><ellipse cx="184" cy="56" rx="54" ry="38"/><ellipse cx="238" cy="76" rx="56" ry="24"/></g></svg></div>
+    <div class="cloud c3"><svg viewBox="0 0 320 120"><g><ellipse cx="140" cy="74" rx="94" ry="32"/><ellipse cx="198" cy="58" rx="50" ry="36"/><ellipse cx="76" cy="82" rx="54" ry="22"/></g></svg></div>
+  </div>
+
+  <!-- the paper plane, and the dashed line it leaves behind it -->
+  <svg class="flight" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <mask id="trail-mask">
+        <path data-trail-mask
+              d="M-120 300 C 180 170, 420 380, 700 300 S 1180 120, 1460 260 S 1720 420, 1900 340"
+              fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+      </mask>
+    </defs>
+    <path data-motion class="motion"
+          d="M-120 300 C 180 170, 420 380, 700 300 S 1180 120, 1460 260 S 1720 420, 1900 340"
+          fill="none"/>
+    <path class="trail" data-trail mask="url(#trail-mask)"
+          d="M-120 300 C 180 170, 420 380, 700 300 S 1180 120, 1460 260 S 1720 420, 1900 340"
+          fill="none" stroke-dasharray="10 8" stroke-width="2" stroke-linecap="round"/>
+    <g data-plane class="plane">
+      <path d="M0 -7 L13 0 L0 7 L3 0 Z"/>
+    </g>
+  </svg>
+
+  <!-- the hills, so the sky has a floor -->
+  <svg class="hills" viewBox="0 0 1600 420" preserveAspectRatio="none">
+    <path class="hill hill-far"  d="M0 240 C 220 172, 380 226, 560 202 S 940 140, 1140 186 S 1440 240, 1600 206 L1600 420 L0 420 Z"/>
+    <path class="hill hill-mid"  d="M0 306 C 260 256, 430 298, 640 284 S 1020 228, 1240 274 S 1480 314, 1600 292 L1600 420 L0 420 Z"/>
+    <path class="hill hill-near" d="M0 366 C 300 328, 520 360, 760 350 S 1180 310, 1420 344 S 1560 362, 1600 352 L1600 420 L0 420 Z"/>
+  </svg>
+</div>
+
+<style is:global>
+  .wall {
+    position: fixed; inset: 0; z-index: 0; overflow: hidden;
+    pointer-events: none; contain: strict;
+  }
+  .wall-sky { position: absolute; inset: 0; background: var(--wall); }
+  .wall-glow {
+    position: absolute; inset: 0;
+    background: radial-gradient(62% 50% at var(--sun-x) var(--sun-y), var(--wall-glow) 0%, transparent 70%);
+  }
+
+  /* the disc, and the hatching that makes it hers rather than a circle */
+  .orb {
+    position: absolute; left: var(--sun-x); top: var(--sun-y);
+    width: var(--sun-d); height: var(--sun-d); margin: calc(var(--sun-d) / -2);
+    filter: drop-shadow(0 0 60px var(--sun-halo));
+    transition: left var(--t-slow) var(--spring), top var(--t-slow) var(--spring),
+                width var(--t-base) var(--ease), height var(--t-base) var(--ease);
+  }
+  .orb svg { width: 100%; height: 100%; }
+  .stars {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    opacity: 0; transition: opacity var(--t-slow) var(--ease);
+  }
+  :root[data-theme='dark'] .stars { opacity: .55; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) .stars { opacity: .55; }
+  }
+  .orb-fill { fill: var(--sun); }
+  .orb-hatch path {
+    stroke: var(--wall-flat); stroke-width: 3.4; opacity: .3;
+    stroke-linecap: round; fill: none;
+  }
+
+  /* the meteor. It has no animation until the script gives it one, so it
+     costs the compositor nothing between passes. */
+  .star {
+    position: absolute; left: -18%; top: var(--m-top, 12%);
+    width: 130px; height: 2px; border-radius: 2px;
+    background: linear-gradient(90deg, transparent, var(--star));
+    opacity: 0; transform: rotate(var(--m-angle, 10deg));
+  }
+  @keyframes meteor {
+    0%   { opacity: 0; transform: translate3d(0, 0, 0) rotate(var(--m-angle, 10deg)); }
+    12%  { opacity: .9; }
+    88%  { opacity: .9; }
+    100% { opacity: 0; transform: translate3d(var(--m-run, 90vw), calc(var(--m-run, 90vw) * .2), 0) rotate(var(--m-angle, 10deg)); }
+  }
+
+  .sky-clouds { position: absolute; inset: 0; }
+  /* wispy rather than solid, so the disc still reads when one drifts over it */
+  .cloud {
+    position: absolute; opacity: var(--cloud-a);
+    filter: blur(7px); will-change: transform;
+  }
+  .cloud svg { width: 100%; height: auto; display: block; }
+  .cloud g { fill: var(--cloud); }
+  .c1 { width: 32vw; left: -34vw; top: 17vh; animation: drift 150s linear infinite; }
+  .c2 { width: 21vw; left: -23vw; top: 35vh; animation: drift 220s linear infinite; animation-delay: -70s; }
+  .c3 { width: 42vw; left: -44vw; top: 7vh;  animation: drift 300s linear infinite; animation-delay: -190s; }
+  @keyframes drift { to { transform: translate3d(146vw, 0, 0); } }
+
+  /* one shot when the night lifts, so the switch lands as a gust of wind */
+  @keyframes gust {
+    0%   { transform: translate3d(-6%, 0, 0); opacity: .3; }
+    55%  { opacity: .8; }
+    100% { transform: translate3d(0, 0, 0); opacity: 1; }
+  }
+  .sky-clouds.is-gust { animation: gust 3s cubic-bezier(.2, .7, .3, 1); }
+
+  .flight { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .motion { visibility: hidden; }
+  .trail { stroke: var(--trail); }  /* the fade is the script's, not a second dimmer */
+  .plane { fill: var(--plane); opacity: 0; }
+
+  .hills { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 44vh; }
+  .hill-far  { fill: var(--hill-1); }
+  .hill-mid  { fill: var(--hill-2); }
+  .hill-near { fill: var(--hill-3); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cloud { animation: none !important; }
+    .c1 { left: 10vw; } .c2 { left: 54vw; } .c3 { left: 26vw; }
+    .star { display: none; }
+    .plane { display: none; }
+    .trail { opacity: .5; }
+  }
+</style>

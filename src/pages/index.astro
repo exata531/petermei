@@ -1,120 +1,127 @@
 ---
-import Site from '../layouts/Site.astro';
-import { work } from '../data/work';
+import Mac from '../layouts/Mac.astro';
+import Wallpaper from '../components/mac/Wallpaper.astro';
+import MenuBar from '../components/mac/MenuBar.astro';
+import Dock from '../components/mac/Dock.astro';
+import Stash from '../components/mac/Stash.astro';
+import Icon from '../components/mac/Icon.astro';
+
+const padApps = [
+  { id: 'volbase', label: 'volbase' },
+  { id: 'rin', label: 'Rin' },
+  { id: 'kyou', label: 'Kyou' },
+  { id: 'market', label: 'Market' },
+  { id: 'photos', label: 'Photos' },
+  { id: 'textedit', label: 'Read me' },
+  { id: 'play', label: 'Playground' },
+  { id: 'trash', label: 'Trash' },
+];
 ---
-<Site
+<Mac
   title="Peter Mei"
-  desc="Peter Mei builds software outside Detroit: volbase, Rin, Kyou and Market Station."
+  desc="Peter Mei builds software outside Detroit. This portfolio is a Mac desktop: volbase, Rin, Kyou and Market Station open as apps on it."
 >
-  <section class="band">
-    <div class="wrap hero pad">
-      <p class="label"><i class="sq"></i>Detroit, Michigan</p>
-      <h1 class="display">Peter Mei</h1>
-      <p class="sub open">I am a senior at the school, outside Detroit. I build software and I ship it.</p>
-      <p class="meta">Class of 2027 · applying to college this fall</p>
+  <!-- the boot, once per session -->
+  <div class="boot" data-boot hidden>
+    <div class="boot-in">
+      <span class="boot-face mono">(｡•ᴗ•｡)</span>
+      <span class="boot-bar"><i data-boot-fill></i></span>
     </div>
-  </section>
+  </div>
 
-  <section class="band" aria-labelledby="work-h">
-    <div class="wrap">
-      <p class="label pad hd" id="work-h"><i class="sq"></i>Selected work · {work.length}</p>
+  <!-- the desktop -->
+  <div class="desk" data-desk>
+    <Wallpaper />
 
-      {work.map((w, i) => (
-        <a class:list={['row', { flip: i % 2 === 1 }]} href={`/work/${w.slug}`}>
-          <div class="row-in">
-            <div class="say pad rise">
-              <p class="label"><i class="sq"></i>{w.n} · {w.status}</p>
-              <h2 class="title">{w.name}</h2>
-              <p class="lead">{w.line}</p>
-              <span class="go mono" aria-hidden="true">Open <i>&#8627;</i></span>
-            </div>
-            <div class="shot rise">
-              <img
-                src={w.still.src} width={w.still.w} height={w.still.h}
-                alt={`${w.name}, running`} loading={i < 1 ? 'eager' : 'lazy'}
-                decoding="async" transition:name={`shot-${w.slug}`}
-              />
-            </div>
-          </div>
-        </a>
+    <ul class="items">
+      <li>
+        <button class="item" type="button" data-open="textedit">
+          <span class="item-ico"><Icon id="textedit" /></span>
+          <span class="item-lbl">Read me</span>
+        </button>
+      </li>
+      <li>
+        <button class="item" type="button" data-open="photos">
+          <span class="item-ico"><Icon id="folder" /></span>
+          <span class="item-lbl">Photos</span>
+        </button>
+      </li>
+      <li>
+        <button class="item" type="button" data-open="finder">
+          <span class="item-ico"><Icon id="finder" /></span>
+          <span class="item-lbl">About Peter</span>
+        </button>
+      </li>
+    </ul>
+
+    <div class="wins" data-wins></div>
+  </div>
+
+  <!-- the phone: a home screen instead of a desktop -->
+  <div class="home" data-home>
+    <div class="home-bar">
+      <span class="hb-t" data-clock-s>9:41</span>
+      <span class="hb-r" aria-hidden="true">
+        <svg class="hb-sig" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="6" rx="1"/><rect x="10" y="3.5" width="3" height="8.5" rx="1"/><rect x="15" y="1" width="3" height="11" rx="1"/></svg>
+        <svg class="hb-wifi" viewBox="0 0 16 12"><path d="M8 10.9l2-2.4a3 3 0 0 0-4 0Z"/><path d="M2.6 4.6a8 8 0 0 1 10.8 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4.9 7.1a5 5 0 0 1 6.2 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg class="hb-bat" viewBox="0 0 28 13"><rect x=".8" y="1.6" width="22" height="9.8" rx="3.2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M25.2 4.6v3.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><rect x="2.6" y="3.4" width="13" height="6.2" rx="1.8"/></svg>
+      </span>
+    </div>
+
+    <ul class="pad">
+      {padApps.map((a) => (
+        <li>
+          <button class="pad-i" type="button" data-open={a.id}>
+            <span class="pad-tile"><Icon id={a.id} /></span>
+            <span class="pad-lbl">{a.label}</span>
+          </button>
+        </li>
       ))}
-    </div>
-  </section>
+    </ul>
 
-  <section class="band">
-    <div class="wrap cells two">
-      <a class="tile pad rise" href="/playground">
-        <p class="label"><i class="sq"></i>Playground</p>
-        <p class="sub">Everything on this site that you can actually touch, on one page.</p>
-        <span class="go mono" aria-hidden="true">Open <i>&#8627;</i></span>
+    <nav class="pdock" aria-label="Dock">
+      <button class="pad-i" type="button" data-open="finder">
+        <span class="pad-tile"><Icon id="finder" /></span><span class="sr">About Peter</span>
+      </button>
+      <button class="pad-i" type="button" data-open="volbase">
+        <span class="pad-tile"><Icon id="volbase" /></span><span class="sr">volbase</span>
+      </button>
+      <button class="pad-i" type="button" data-open="rin">
+        <span class="pad-tile"><Icon id="rin" /></span><span class="sr">Rin</span>
+      </button>
+      <a class="pad-i" href="https://github.com/exata531" rel="me noopener" target="_blank">
+        <span class="pad-tile"><Icon id="github" /></span><span class="sr">GitHub</span>
       </a>
-      <a class="tile pad rise" href="/about">
-        <p class="label"><i class="sq"></i>About</p>
-        <p class="sub">Who I am, what I use, and where I have been climbing.</p>
-        <span class="go mono" aria-hidden="true">Open <i>&#8627;</i></span>
-      </a>
+    </nav>
+
+    <span class="home-ind" aria-hidden="true"></span>
+
+    <div class="sheet" data-sheet hidden>
+      <div class="sheet-top">
+        <span class="sheet-name" data-sheet-name></span>
+        <button class="sheet-x" type="button" data-sheet-close aria-label="Close">Done</button>
+      </div>
+      <div class="sheet-body" data-sheet-body></div>
+      <span class="grab" aria-hidden="true"></span>
     </div>
-  </section>
-</Site>
+  </div>
 
-<style>
-  .hero { padding-block: clamp(64px, 11vw, 150px); display: grid; gap: 22px; }
-  .hero .display { margin-block: 4px; }
-  .open { max-width: 22ch; color: var(--ink); }
-  .hero .meta { margin-top: 6px; }
+  <MenuBar />
+  <Dock />
 
-  .hd { border-bottom: 1px solid var(--hair); }
+  <!-- Spotlight, at the body level so no transform can trap it -->
+  <div class="spot" data-spot hidden>
+    <div class="spot-box">
+      <div class="spot-field">
+        <svg class="spot-ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.8" cy="8.8" r="5.2"/><path d="M12.7 12.7L17 17"/></svg>
+        <input data-sp-in type="text" placeholder="Spotlight Search" aria-label="Spotlight Search"
+               autocomplete="off" autocapitalize="off" spellcheck="false" />
+      </div>
+      <ul class="spot-list" data-sp-list></ul>
+    </div>
+  </div>
 
-  .row { display: block; border-bottom: 1px solid var(--hair); }
-  .row:last-of-type { border-bottom: 0; }
-  .row-in {
-    display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    align-items: stretch;
-  }
-  /* the visual keeps the wide column whichever side it sits on */
-  .row.flip .row-in { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
-  .row.flip .row-in > .say { order: 2; border-left: 1px solid var(--hair); }
-  .row.flip .row-in > .shot { order: 1; }
-  .row:not(.flip) .shot { border-left: 1px solid var(--hair); }
+  <button class="sleep" data-sleep hidden aria-label="Wake"></button>
 
-  .say {
-    display: grid; align-content: center; gap: 16px;
-    padding-block: clamp(36px, 5vw, 64px);
-  }
-  .say .lead { color: var(--dim); }
-
-  .shot {
-    display: grid; place-items: center; overflow: clip;
-    background: var(--paper-2); padding: clamp(24px, 3.4vw, 52px);
-  }
-  /* a wide dashboard and a tall phone both have to sit calmly in the same
-     row, so the picture is capped on both axes and centred */
-  .shot img {
-    width: auto; height: auto;
-    max-width: 100%; max-height: clamp(300px, 40vw, 560px);
-    transition: transform var(--t-slow) var(--ease);
-  }
-  .row:hover .shot img { transform: scale(1.028); }
-
-  .go {
-    display: inline-flex; align-items: center; gap: 8px; width: fit-content;
-    font-size: var(--t-label); text-transform: uppercase;
-    letter-spacing: var(--track-label); color: var(--accent);
-  }
-  .go i { font-style: normal; transition: transform var(--t-base) var(--ease); }
-  .row:hover .go i, .tile:hover .go i { transform: translate(4px, 2px); }
-
-  .two { grid-template-columns: 1fr 1fr; }
-  .tile { display: grid; gap: 18px; align-content: start; padding-block: clamp(36px, 4vw, 56px); }
-  .tile .sub { max-width: 20ch; }
-  .tile:hover { background: var(--paper-2); }
-
-  @media (max-width: 860px) {
-    .row-in, .row.flip .row-in { grid-template-columns: minmax(0, 1fr); }
-    .row.flip .row-in > .say { order: 2; border-left: 0; border-top: 1px solid var(--hair); }
-    .row.flip .row-in > .shot { order: 1; }
-    .row:not(.flip) .shot { border-left: 0; border-top: 1px solid var(--hair); }
-    .two { grid-template-columns: 1fr; }
-    .open { max-width: none; }
-  }
-</style>
+  <Stash />
+</Mac>

@@ -1,0 +1,129 @@
+---
+/* One app icon, drawn.
+
+   Every tile is the same superellipse, the shape Apple has used for app icons
+   since Big Sur: a rounded rectangle whose corners never quite stop turning.
+   The four products wear their own colour and their own mark; the system icons
+   borrow the shape and the house pastels so the dock reads as one set. */
+import { uid } from './uid';
+interface Props { id: string; class?: string }
+const { id, class: cls } = Astro.props;
+const u = uid();
+const g = `g-${u}`;
+const sheen = `s-${u}`;
+const sq = 'M50 0C8.5 0 0 8.5 0 50s8.5 50 50 50 50-8.5 50-50S91.5 0 50 0Z';
+---
+<svg class:list={['ico', cls]} viewBox="0 0 100 100" role="img" aria-hidden="true">
+  <defs>
+    <linearGradient id={g} x1="0" y1="0" x2="0" y2="1">
+      {id === 'volbase' && <><stop offset="0" stop-color="#7FA6EA"/><stop offset="1" stop-color="#2D5FAA"/></>}
+      {id === 'rin' && <><stop offset="0" stop-color="#3A4152"/><stop offset="1" stop-color="#20242E"/></>}
+      {id === 'kyou' && <><stop offset="0" stop-color="#FFFDF8"/><stop offset="1" stop-color="#F0EAE0"/></>}
+      {id === 'market' && <><stop offset="0" stop-color="#3FC9BA"/><stop offset="1" stop-color="#12796F"/></>}
+      {id === 'finder' && <><stop offset="0" stop-color="#BFE0F5"/><stop offset="1" stop-color="#7FB6E4"/></>}
+      {id === 'photos' && <><stop offset="0" stop-color="#FFFEFC"/><stop offset="1" stop-color="#F3EDE4"/></>}
+      {id === 'textedit' && <><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#EFE9DE"/></>}
+      {id === 'github' && <><stop offset="0" stop-color="#33383F"/><stop offset="1" stop-color="#1B1F24"/></>}
+      {id === 'trash' && <><stop offset="0" stop-color="#E7EDF2"/><stop offset="1" stop-color="#C6D2DB"/></>}
+      {id === 'folder' && <><stop offset="0" stop-color="#9FD0EE"/><stop offset="1" stop-color="#69A9DA"/></>}
+      {id === 'play' && <><stop offset="0" stop-color="#FFD9A8"/><stop offset="1" stop-color="#F2A25C"/></>}
+    </linearGradient>
+    <linearGradient id={sheen} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".38"/>
+      <stop offset=".55" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <path d={sq} fill={`url(#${g})`} />
+
+  {id === 'volbase' && (
+    <g>
+      <path d="M28 34l12 32h4l12-32" fill="none" stroke="#fff" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="70" cy="60" r="7" fill="#fff"/>
+    </g>
+  )}
+
+  {id === 'rin' && (
+    <text x="50" y="50" text-anchor="middle" dominant-baseline="central"
+          fill="#FFF7ED" font-size="58" font-family="'Hiragino Sans','Noto Sans JP',system-ui,sans-serif">凛</text>
+  )}
+
+  {id === 'kyou' && (
+    <g>
+      <text x="50" y="56" text-anchor="middle" dominant-baseline="central"
+            fill="#1C1917" font-size="26" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+            letter-spacing="-1">(￣ワ￣)</text>
+      <circle cx="50" cy="26" r="5" fill="#FF3B30"/>
+    </g>
+  )}
+
+  {id === 'market' && (
+    <g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M24 68l14-16 12 9 24-27" stroke-width="7.5"/>
+      <path d="M64 34h12v12" stroke-width="7.5"/>
+    </g>
+  )}
+
+  {id === 'finder' && (
+    <g>
+      <path d="M50 0C8.5 0 0 8.5 0 50s8.5 50 50 50V0Z" fill="#EAF4FC"/>
+      <g stroke="#1F3B52" stroke-width="4.5" stroke-linecap="round" fill="none">
+        <path d="M30 36v9"/><path d="M70 36v9"/>
+        <path d="M34 68c5 4 27 4 32 0"/>
+      </g>
+    </g>
+  )}
+
+  {id === 'photos' && (
+    <g>
+      {[0, 45, 90, 135, 180, 225, 270, 315].map((a, i) => (
+        <ellipse cx="50" cy="32" rx="9" ry="17" transform={`rotate(${a} 50 50)`}
+                 fill={['#F4A3A0','#F6C58B','#F3E08C','#B9DE9A','#93D6D0','#8FBBEE','#B3A6E8','#E9A3D2'][i]} opacity=".92"/>
+      ))}
+      <circle cx="50" cy="50" r="7" fill="#FFFDF8"/>
+    </g>
+  )}
+
+  {id === 'textedit' && (
+    <g>
+      <rect x="24" y="18" width="52" height="64" rx="6" fill="#FFFDF8" stroke="#D9D0C2" stroke-width="2"/>
+      <g stroke="#B9AF9F" stroke-width="3.4" stroke-linecap="round">
+        <path d="M34 34h30"/><path d="M34 44h30"/><path d="M34 54h22"/><path d="M34 64h16"/>
+      </g>
+      <path d="M62 70l14-14 6 6-14 14-8 2z" fill="#F2A25C" stroke="#C97B34" stroke-width="2" stroke-linejoin="round"/>
+    </g>
+  )}
+
+  {id === 'github' && (
+    <path fill="#fff" d="M50 20c-16.6 0-30 13.4-30 30 0 13.3 8.6 24.5 20.5 28.5 1.5.3 2-.7 2-1.4v-5.3c-8.3 1.8-10.1-4-10.1-4-1.4-3.5-3.3-4.4-3.3-4.4-2.7-1.9.2-1.8.2-1.8 3 .2 4.6 3.1 4.6 3.1 2.7 4.6 7 3.3 8.7 2.5.3-1.9 1-3.3 1.9-4-6.6-.8-13.6-3.3-13.6-14.8 0-3.3 1.2-6 3.1-8.1-.3-.8-1.3-3.8.3-8 0 0 2.5-.8 8.3 3.1 2.4-.7 5-1 7.5-1s5.1.3 7.5 1c5.7-3.9 8.2-3.1 8.2-3.1 1.6 4.2.6 7.2.3 8 2 2.1 3.1 4.8 3.1 8.1 0 11.6-7 14-13.7 14.8 1.1.9 2 2.8 2 5.6v8.3c0 .8.5 1.7 2 1.4C71.4 74.5 80 63.3 80 50c0-16.6-13.4-30-30-30Z"/>
+  )}
+
+  {id === 'trash' && (
+    <g fill="none" stroke="#4A5A66" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M30 34h40"/><path d="M42 34v-5h16v5"/>
+      <path d="M35 34l3 38h24l3-38"/>
+      <path d="M45 44v20"/><path d="M55 44v20"/>
+    </g>
+  )}
+
+  {id === 'folder' && (
+    <g>
+      <path d="M20 32h22l6 7h32v33H20z" fill="#fff" opacity=".28"/>
+      <path d="M20 39h60v33H20z" fill="#fff" opacity=".22"/>
+    </g>
+  )}
+
+  {id === 'play' && (
+    <g fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round">
+      <path d="M30 62c8-24 32-24 40 0"/>
+      <circle cx="50" cy="72" r="4.5" fill="#fff" stroke="none"/>
+    </g>
+  )}
+
+  <path d={sq} fill={`url(#${sheen})`} />
+  <path d={sq} fill="none" stroke="rgb(0 0 0 / .10)" stroke-width="1.2" />
+</svg>
+
+<style>
+  .ico { width: 100%; height: 100%; display: block; }
+</style>

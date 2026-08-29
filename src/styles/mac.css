@@ -1,0 +1,616 @@
+/* petermei.com — the machine.
+
+   The whole site is one desktop. This file draws it: the strip at the top, the
+   glass at the bottom, the windows in between, and the phone's home screen for
+   anything too small to hold a desktop. Every colour comes from tokens.css and
+   there is no literal here that is not part of a material (a glass tint, a
+   traffic light, a shadow). */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; height: 100%; }
+body {
+  margin: 0; min-height: 100%;
+  background: var(--wall-flat);
+  color: var(--ink);
+  font-family: var(--ui);
+  font-size: 13.5px; line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+img, svg, video { display: block; max-width: 100%; }
+img { height: auto; }
+[hidden] { display: none !important; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+h1, h2, h3, p, figure, ul, ol, dl, dd { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+::selection { background: var(--sel); color: var(--sel-fg); }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.mono { font-family: var(--mono); }
+/* microcopy takes her wide mono tracking; the display serif takes her tight
+   negative tracking. The contrast between the two is most of the voice. */
+.stash, .txt, .abt, .fnd-item, .play, .empty, .sp-label { font-family: var(--sans); }
+.stash-head h1, .stash-h, .abt-name, .lost-h { font-family: var(--serif); font-weight: 400; }
+body.is-fading, body.is-fading * {
+  transition: background-color var(--t-slow) ease, color var(--t-slow) ease,
+              border-color var(--t-slow) ease, fill var(--t-slow) ease,
+              stroke var(--t-slow) ease, box-shadow var(--t-slow) ease;
+}
+::view-transition-old(root), ::view-transition-new(root) {
+  animation-duration: 450ms; animation-timing-function: ease;
+}
+
+.sr {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ══ with JavaScript off, the stash is the whole site ═══════════════════ */
+.js .stash { display: none; }
+html:not(.js) .desk,
+html:not(.js) .home,
+html:not(.js) .mbar,
+html:not(.js) .dock-wrap,
+html:not(.js) .boot,
+html:not(.js) .spot { display: none !important; }
+/* the demos are live software scaled to fit by script; with no script there is
+   nothing to scale them and a cropped corner of one tells a reader nothing, so
+   the page is words and links and says so */
+html:not(.js) .sbox { display: none; }
+html:not(.js) body { background: var(--paper); }
+
+.stash { max-width: 760px; margin: 0 auto; padding: 48px 22px 90px; }
+.stash-head h1 { font-size: 40px; font-weight: 600; letter-spacing: -.03em; }
+.stash-head p { margin-top: 12px; max-width: 46ch; color: var(--dim); }
+.stash-note { font-size: 13px; }
+.stash-app { margin-top: 46px; padding-top: 26px; border-top: 1px solid var(--line); }
+.stash-h { font-size: 22px; font-weight: 600; letter-spacing: -.02em; }
+.stash-p { margin-top: 8px; max-width: 52ch; }
+.stash-meta { margin-top: 6px; font-size: 13px; color: var(--dim); }
+.stash a { text-decoration: underline; text-underline-offset: 3px; }
+.stash .sbox { height: 320px; margin-top: 18px; }
+
+/* ══ the desktop ═══════════════════════════════════════════════════════ */
+.desk {
+  position: fixed; inset: 0; overflow: hidden;
+  opacity: 0; transition: opacity 620ms var(--ease);
+}
+body.is-up .desk { opacity: 1; }
+
+.wins { position: fixed; inset: 0; z-index: 5; pointer-events: none; }
+.wins > * { pointer-events: auto; }
+
+/* ── desktop items ─────────────────────────────────────────────────── */
+.items {
+  position: absolute; top: calc(var(--bar) + 14px); right: 18px; z-index: 2;
+  display: grid; gap: 6px; justify-items: center;
+}
+.item {
+  display: grid; justify-items: center; gap: 5px;
+  width: 92px; padding: 8px 4px 6px; border-radius: 10px;
+  transition: background 160ms var(--ease);
+}
+.item:hover { background: var(--sel-soft); }
+.item-ico { width: 54px; height: 54px; filter: drop-shadow(0 6px 10px rgb(0 0 0 / .18)); }
+.item-lbl {
+  font-size: 12px; line-height: 1.25; text-align: center;
+  padding: 1px 6px; border-radius: 5px;
+  color: var(--wall-ink); background: var(--wall-chip);
+  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+}
+.item:hover .item-lbl { background: var(--sel); color: var(--sel-fg); }
+
+/* ══ the menu bar ══════════════════════════════════════════════════════ */
+.mbar {
+  position: fixed; inset: 0 0 auto; z-index: 60;
+  height: var(--bar); display: flex; align-items: stretch;
+  justify-content: space-between; gap: 10px;
+  padding: 0 8px;
+  background: var(--glass-bar);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border-bottom: .5px solid var(--glass-edge);
+  color: var(--bar-ink);
+  font-size: 13px;
+  opacity: 0; transition: opacity 500ms var(--ease) 120ms;
+}
+body.is-up .mbar { opacity: 1; }
+.mbar-l, .mbar-r { display: flex; align-items: stretch; }
+.mbar-r { gap: 0; }
+.mb-menus { display: flex; align-items: stretch; }
+.mb-item {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 0 10px; border-radius: 5px; margin: 2px 0;
+  white-space: nowrap; color: inherit;
+  transition: background 110ms var(--ease);
+}
+.mb-item:hover, .mb-item[aria-expanded='true'] { background: var(--sel); color: var(--sel-fg); }
+.mb-face { font-size: 12px; letter-spacing: -.05em; padding: 0 9px; }
+.mb-app { font-weight: 650; }
+.mb-item svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+/* her toggle: the sun drops out of the bottom of a circular window and the
+   moon rises into it from above, rather than one icon swapping for another */
+.mb-theme { position: relative; width: 30px; padding: 0; overflow: hidden; }
+.mb-theme svg {
+  position: absolute; left: 50%; top: 50%; width: 15px; height: 15px;
+  transition: transform var(--t-slow) var(--spring);
+}
+.mb-theme .th-sun { fill: currentColor; stroke: none; transform: translate(-50%, -50%); }
+.mb-theme .th-sun .th-rays { fill: none; stroke: currentColor; stroke-width: 1.7; }
+.mb-theme .th-moon { fill: currentColor; stroke: none; transform: translate(-50%, -230%); }
+:root[data-theme='dark'] .mb-theme .th-sun { transform: translate(-50%, 130%); }
+:root[data-theme='dark'] .mb-theme .th-moon { transform: translate(-50%, -50%); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .mb-theme .th-sun { transform: translate(-50%, 130%); }
+  :root:not([data-theme='light']) .mb-theme .th-moon { transform: translate(-50%, -50%); }
+}
+.mb-bat svg { width: 26px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.1; }
+.mb-bat .bat-fill { fill: currentColor; stroke: none; }
+.mb-wx { gap: 5px; font-variant-numeric: tabular-nums; }
+.wx-mark { width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: .55; }
+.mb-clock { font-variant-numeric: tabular-nums; letter-spacing: .01em; }
+
+/* Rin, once launched, sits in the bar the way it does on a real Mac */
+.mbar::after {
+  content: '凛'; order: 1;
+  display: none; align-items: center; padding: 0 8px;
+  font-size: 15px; line-height: 1;
+}
+.mbar.has-rin::after { display: flex; }
+
+/* ── the drop-down ─────────────────────────────────────────────────── */
+.menu {
+  position: fixed; top: calc(var(--bar) + 4px); z-index: 70;
+  min-width: 216px; padding: 5px;
+  border-radius: 9px;
+  background: var(--glass-menu);
+  backdrop-filter: blur(34px) saturate(180%);
+  -webkit-backdrop-filter: blur(34px) saturate(180%);
+  box-shadow: var(--sh-menu);
+  border: .5px solid var(--glass-edge);
+  transform-origin: top left;
+  opacity: 0; transform: scale(.96) translateY(-4px);
+  transition: opacity 130ms var(--ease), transform 130ms var(--ease);
+}
+.menu.is-open { opacity: 1; transform: none; }
+.menu-row {
+  display: block; width: 100%; text-align: left;
+  padding: 5px 10px; border-radius: 5px; font-size: 13.5px;
+}
+.menu-row:hover { background: var(--sel); color: var(--sel-fg); }
+.menu-sep { height: 0; margin: 5px 8px; border: 0; border-top: .5px solid var(--line); }
+
+/* ══ windows ═══════════════════════════════════════════════════════════ */
+.win {
+  position: absolute; top: 0; left: 0;
+  display: grid; grid-template-rows: var(--tbar) 1fr;
+  border-radius: var(--r-win);
+  background: var(--surface);
+  box-shadow: var(--sh-win-back);
+  overflow: hidden;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  contain: paint;
+}
+.win.is-front { box-shadow: var(--sh-win); }
+.win.is-min { pointer-events: none; }
+
+.win-bar {
+  position: relative; display: flex; align-items: center; gap: 10px;
+  padding: 0 12px; cursor: default; user-select: none;
+  background: var(--chrome);
+  border-bottom: .5px solid var(--line);
+  touch-action: none;
+}
+.win.is-drag .win-bar { cursor: grabbing; }
+.lights { display: flex; gap: 8px; }
+.lt {
+  width: 12px; height: 12px; border-radius: 50%;
+  display: grid; place-items: center;
+  box-shadow: inset 0 0 0 .5px rgb(0 0 0 / .16);
+  background: var(--lt-off);
+  transition: background 160ms var(--ease);
+}
+.win.is-front .lt-c { background: #ff5f57; }
+.win.is-front .lt-m { background: #febc2e; }
+.win.is-front .lt-z { background: #28c840; }
+.lt svg { width: 12px; height: 12px; fill: none; stroke: rgb(0 0 0 / .55); stroke-width: 1.4; stroke-linecap: round; opacity: 0; }
+.lights:hover .lt svg { opacity: 1; }
+.win-title {
+  flex: 1; min-width: 0; text-align: center;
+  font-size: 13px; font-weight: 600; color: var(--dim);
+  pointer-events: none;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.win.is-front .win-title { color: var(--ink); }
+.win-pad { display: flex; align-items: center; gap: 6px; flex: none; }
+/* the lights and the toolbar are the same width, so the title stays centred
+   over the window rather than over the space left between them */
+.lights, .win-pad { min-width: 52px; }
+.win-pad { justify-content: flex-end; }
+.win-act {
+  font-size: 11.5px; padding: 3px 9px; border-radius: 6px;
+  background: var(--chip); color: var(--ink);
+  transition: background 140ms var(--ease);
+}
+.win-act:hover { background: var(--chip-2); }
+.win-body { position: relative; overflow: hidden; }
+
+/* the same element is the whole no-JS page and the inside of a window, so the
+   plain-page headings step aside the moment it is carried into one */
+.win-body > [data-body],
+.sheet-body > [data-body],
+.panel > [data-body] { height: 100%; margin: 0; padding: 0; border: 0; }
+.win-body .stash-h, .win-body .stash-p, .win-body .stash-meta, .win-body .stash-app > p,
+.sheet-body .stash-h, .sheet-body .stash-p, .sheet-body .stash-meta, .sheet-body .stash-app > p,
+.panel .stash-h, .panel .stash-p, .panel .stash-meta, .panel .stash-app > p { display: none; }
+.win-body .sbox, .sheet-body .sbox, .panel .sbox { height: 100%; margin: 0; }
+
+/* the product windows hold a scaled demo and nothing else, and each one wears
+   its own pastel on the chrome so the desktop is four things, not four greys */
+.win-volbase .win-body,
+.win-kyou .win-body,
+.win-market .win-body { background: var(--well); }
+.win-volbase .win-bar { background: var(--tint-volbase); }
+.win-kyou .win-bar    { background: var(--tint-kyou); }
+.win-market .win-bar  { background: var(--tint-market); }
+.win-volbase .win-body, .win-kyou .win-body, .win-market .win-body { background: var(--well); }
+.win-volbase .sframe { border-radius: 0; }
+/* the window already carries a title bar with traffic lights in it, so the
+   Safari mock inside drops its own set and keeps only the tabs and the field */
+.win-volbase .safari .lights { display: none; }
+.win-volbase .safari .sf-bar { grid-template-columns: 1fr 260px; }
+.win-kyou .sframe { background: transparent; }
+
+/* ── About: the small panel that is the whole case study ───────────── */
+.win-about { grid-template-rows: 22px 1fr; }
+.win-about .win-title { display: none; }
+.win-about .win-bar { background: transparent; border-bottom: 0; }
+.abt {
+  display: grid; justify-items: center; text-align: center;
+  gap: 10px; padding: 4px 26px 26px;
+}
+.abt-ico { width: 76px; height: 76px; filter: drop-shadow(0 8px 16px rgb(0 0 0 / .16)); }
+.abt-face { display: grid; place-items: center; font-size: 20px; letter-spacing: -.04em; }
+.abt-name { font-size: 20px; font-weight: 600; letter-spacing: -.02em; }
+.abt-line { font-size: 13px; color: var(--dim); max-width: 30ch; }
+.abt-facts {
+  display: grid; grid-template-columns: auto 1fr; gap: 3px 12px;
+  font-size: 12px; text-align: left; margin-top: 2px;
+}
+.abt-facts dt { color: var(--dim); }
+.abt-link {
+  margin-top: 6px; font-size: 12.5px; padding: 5px 12px;
+  border-radius: 999px; background: var(--chip);
+}
+.abt-link:hover { background: var(--chip-2); }
+
+/* ── Finder ────────────────────────────────────────────────────────── */
+.win-finder .win-body { display: block; }
+.fnd { display: grid; grid-template-columns: 168px 1fr; height: 100%; }
+.fnd-side {
+  display: grid; align-content: start; gap: 1px; padding: 10px 8px;
+  background: var(--side); border-right: .5px solid var(--line);
+}
+.fnd-tab {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 8px; border-radius: 6px; font-size: 13px; text-align: left;
+  color: var(--ink);
+}
+.fnd-tab:hover { background: var(--chip); }
+.fnd-tab.is-on { background: var(--sel); color: var(--sel-fg); }
+.fnd-ico { width: 17px; height: 17px; flex: none; display: block; }
+.fnd-main { overflow: auto; padding: 16px; }
+.fnd-grid { display: none; grid-template-columns: repeat(auto-fill, minmax(126px, 1fr)); gap: 14px 6px; }
+.fnd-grid.is-on { display: grid; }
+.fnd-item { display: grid; justify-items: center; gap: 5px; text-align: center; padding: 6px 4px; border-radius: 8px; }
+.fnd-item:hover { background: var(--chip); }
+.fnd-doc {
+  width: 40px; height: 50px; border-radius: 4px 4px 4px 4px;
+  background: linear-gradient(160deg, var(--doc-1), var(--doc-2));
+  box-shadow: 0 2px 5px rgb(0 0 0 / .12), inset 0 0 0 .5px rgb(0 0 0 / .08);
+  clip-path: polygon(0 0, 72% 0, 100% 20%, 100% 100%, 0 100%);
+}
+.fnd-item b { font-size: 12.5px; font-weight: 600; }
+.fnd-item small { font-size: 11.5px; color: var(--dim); line-height: 1.3; }
+
+/* ── Photos ────────────────────────────────────────────────────────── */
+.win-photos .win-body { background: var(--surface); }
+.pho { position: relative; height: 100%; }
+.pho-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 3px; padding: 3px; height: 100%; overflow: auto; align-content: start;
+}
+.pho-cell { display: block; width: 100%; aspect-ratio: 3 / 2; overflow: hidden; border-radius: 2px; }
+.pho-cell img { width: 100%; height: 100%; object-fit: cover; transition: transform 420ms var(--ease); }
+.pho-cell:hover img { transform: scale(1.05); }
+.pho-big {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  background: var(--dim-veil); opacity: 0; transition: opacity 180ms var(--ease);
+}
+.pho-big.is-on { opacity: 1; }
+.pho-big img { max-width: 88%; max-height: 84%; border-radius: 4px; box-shadow: var(--sh-win); }
+.pho-nav {
+  position: absolute; top: 50%; translate: 0 -50%;
+  width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 20px;
+  background: var(--glass-menu); color: var(--ink);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.pho-prev { left: 10px; } .pho-next { right: 10px; }
+.pho-close {
+  position: absolute; right: 10px; top: 10px;
+  padding: 5px 12px; border-radius: 999px; font-size: 12px;
+  background: var(--glass-menu); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+
+/* ── TextEdit, Trash, Playground ───────────────────────────────────── */
+.win-text .win-body { background: var(--paper-app); }
+.txt { padding: 22px 24px; display: grid; gap: 12px; font-size: 14.5px; line-height: 1.5; max-width: 46ch; }
+.empty { display: grid; place-items: center; height: 100%; color: var(--dim); }
+.play { display: grid; justify-items: center; align-content: center; gap: 14px; height: 100%; padding: 18px; }
+.play-out { font-size: 30px; letter-spacing: -.04em; }
+.play-row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.play-chip {
+  font-size: 13px; padding: 5px 9px; border-radius: 8px; background: var(--chip);
+  transition: background 140ms var(--ease), transform 140ms var(--ease);
+}
+.play-chip:hover { background: var(--chip-2); transform: translateY(-1px); }
+.play-chip[aria-pressed='true'] { background: var(--sel); color: var(--sel-fg); }
+.play-hint { font-size: 12px; color: var(--dim); }
+
+/* ══ Rin's panel: it drops out of the menu bar, because that is where it lives ══ */
+.panel {
+  position: fixed; top: calc(var(--bar) + 4px); left: 0; right: 0;
+  width: min(760px, calc(100vw - 40px)); height: 372px;
+  margin-inline: auto;
+  z-index: 40;      /* it floats over every window, the way the real one does */
+  border-radius: 11px; overflow: hidden;
+  background: var(--slate);
+  box-shadow: var(--sh-win);
+  transform-origin: top center;
+  transform: scaleY(max(.02, var(--drop, 0))) translateY(calc((var(--drop, 0) - 1) * 8px));
+  opacity: clamp(0, calc(var(--drop, 0) * 6), 1);
+  will-change: transform;
+}
+/* the real menu bar above is the app's menu bar now, so the mock inside the
+   panel drops its own. Three classes deep on purpose: the component's own rule
+   carries the same weight, and the later of two equal rules wins. */
+.panel .sframe .rin, .sheet[data-app='rin'] .sframe .rin { grid-template-rows: 0 1fr; }
+.panel .rin .rin-bar, .sheet[data-app='rin'] .rin .rin-bar { display: none; }
+.panel .sbox { background: var(--slate); }
+
+/* ══ the dock ══════════════════════════════════════════════════════════ */
+.dock-wrap {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+  display: grid; place-items: end center;
+  padding: 0 12px 10px; pointer-events: none;
+  opacity: 0; transform: translateY(18px);
+  transition: opacity 620ms var(--ease) 200ms, transform 700ms var(--ease) 200ms;
+}
+body.is-up .dock-wrap { opacity: 1; transform: none; }
+.dock {
+  pointer-events: auto;
+  display: flex; align-items: flex-end; gap: 6px;
+  padding: 6px calc(7px + var(--grow, 0px)); border-radius: 20px;
+  background: var(--glass-dock);
+  backdrop-filter: blur(26px) saturate(180%);
+  -webkit-backdrop-filter: blur(26px) saturate(180%);
+  border: 1px solid var(--glass-edge);
+  box-shadow: var(--sh-dock), var(--glass-lip);
+  max-width: 100%;
+}
+.dock-i {
+  position: relative; flex: none;
+  width: var(--dock-i); height: var(--dock-i);
+  display: block;
+}
+.dock-tile {
+  display: block; width: 100%; height: 100%;
+  transform: translateX(var(--dx, 0)) scale(var(--s, 1));
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 5px 9px rgb(0 0 0 / .22));
+}
+.dock:not(.is-mag) .dock-tile { transition: transform var(--t-fast) var(--soft); }
+.dock-i:active .dock-tile { transform: translateX(var(--dx, 0)) scale(calc(var(--s, 1) * .9)); }
+.dock-name {
+  position: absolute; left: 50%; bottom: calc(100% + 14px);
+  margin-left: var(--dx, 0);
+  translate: -50% 0; white-space: nowrap;
+  padding: 4px 10px; border-radius: 7px; font-size: 12.5px;
+  background: var(--glass-menu); color: var(--ink);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--sh-menu);
+  opacity: 0; transform: translateY(4px) scale(.96);
+  transition: opacity 130ms var(--ease), transform 130ms var(--ease);
+  pointer-events: none;
+}
+.dock-i:hover .dock-name, .dock-i:focus-visible .dock-name { opacity: 1; transform: none; }
+.dock-dot {
+  position: absolute; left: 50%; bottom: -6px; translate: -50% 0;
+  margin-left: var(--dx, 0);
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--bar-ink); opacity: 0;
+  transition: opacity 200ms var(--ease);
+}
+.dock-i.is-run .dock-dot { opacity: .8; }
+.dock-sep {
+  width: 0; height: calc(var(--dock-i) * .78); align-self: center;
+  border-left: 1px solid var(--glass-edge); margin: 0 5px;
+}
+@keyframes dock-bounce {
+  0%   { transform: translateX(var(--dx, 0)) scale(var(--s, 1)) translateY(0); }
+  26%  { transform: translateX(var(--dx, 0)) scale(var(--s, 1)) translateY(-26px); }
+  48%  { transform: translateX(var(--dx, 0)) scale(var(--s, 1)) translateY(0); }
+  66%  { transform: translateX(var(--dx, 0)) scale(var(--s, 1)) translateY(-12px); }
+  82%  { transform: translateX(var(--dx, 0)) scale(var(--s, 1)) translateY(0); }
+  92%  { transform: translateX(var(--dx, 0)) scale(var(--s, 1)) translateY(-4px); }
+  100% { transform: translateX(var(--dx, 0)) scale(var(--s, 1)) translateY(0); }
+}
+.dock-i.is-bounce .dock-tile { animation: dock-bounce 880ms cubic-bezier(.3, .1, .3, 1); }
+
+/* ══ Spotlight ═════════════════════════════════════════════════════════ */
+.spot {
+  position: fixed; inset: 0; z-index: 80;
+  display: grid; justify-items: center; align-content: start;
+  padding-top: 17vh;
+  background: var(--veil);
+  opacity: 0; transition: opacity 170ms var(--ease);
+}
+.spot.is-open { opacity: 1; }
+.spot-box {
+  width: min(640px, calc(100vw - 32px));
+  border-radius: 13px; overflow: hidden;
+  background: var(--glass-menu);
+  backdrop-filter: blur(38px) saturate(180%);
+  -webkit-backdrop-filter: blur(38px) saturate(180%);
+  box-shadow: var(--sh-spot);
+  border: .5px solid var(--glass-edge);
+  transform: scale(.97) translateY(-8px);
+  transition: transform 200ms var(--ease);
+}
+.spot.is-open .spot-box { transform: none; }
+.spot-field { display: flex; align-items: center; gap: 12px; padding: 0 16px; height: 58px; }
+.spot-ico { width: 21px; height: 21px; flex: none; fill: none; stroke: var(--dim); stroke-width: 1.8; stroke-linecap: round; }
+.spot-field input {
+  flex: 1; min-width: 0; border: 0; background: none; outline: none;
+  font: inherit; font-size: 22px; letter-spacing: -.01em; color: var(--ink);
+}
+.spot-field input::placeholder { color: var(--dim-2); }
+.spot-list { max-height: 46vh; overflow: auto; }
+.spot.has-hits .spot-list { border-top: .5px solid var(--line); padding: 5px; }
+.sp-row {
+  display: grid; grid-template-columns: 22px 1fr auto; align-items: center; gap: 10px;
+  width: 100%; text-align: left; padding: 7px 10px; border-radius: 7px; font-size: 13.5px;
+}
+.sp-row.is-sel { background: var(--sel); color: var(--sel-fg); }
+.sp-kind { font-size: 11.5px; opacity: .65; }
+
+/* ══ boot and sleep ════════════════════════════════════════════════════ */
+.boot {
+  position: fixed; inset: 0; z-index: 90;
+  display: grid; place-items: center;
+  background: var(--boot-bg); color: var(--boot-fg);
+  opacity: 0; transition: opacity 480ms var(--ease);
+}
+.boot.is-on { opacity: 1; }
+.boot-in { display: grid; justify-items: center; gap: 34px; }
+.boot-face { font-size: 26px; letter-spacing: -.05em; }
+.boot-bar { display: block; width: 200px; height: 4px; border-radius: 999px; background: var(--boot-track); overflow: hidden; }
+.boot-bar i { display: block; height: 100%; background: var(--boot-fg); transform-origin: 0 50%; transform: scaleX(0); }
+
+.sleep {
+  position: fixed; inset: 0; z-index: 95; width: 100%; height: 100%;
+  background: #000; opacity: 0; transition: opacity 420ms var(--ease);
+}
+.sleep.is-on { opacity: .94; }
+
+/* ══ the phone ═════════════════════════════════════════════════════════ */
+.home { display: none; }
+
+@media (max-width: 900px), (pointer: coarse) and (max-width: 1100px) {
+  .desk .items, .desk .wins, .dock-wrap, .mbar { display: none !important; }
+  .desk { position: fixed; }
+  .home {
+    position: fixed; inset: 0; z-index: 6; display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: 0 0 max(14px, env(safe-area-inset-bottom));
+    opacity: 0; transition: opacity 500ms var(--ease);
+  }
+  body.is-up .home { opacity: 1; }
+
+  .home-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: max(12px, env(safe-area-inset-top)) 26px 4px;
+    font-size: 15px; font-weight: 600; color: var(--wall-ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .hb-r { display: inline-flex; align-items: center; gap: 5px; color: var(--wall-ink); }
+  .hb-r svg { fill: currentColor; }
+  .hb-sig { width: 18px; height: 12px; }
+  .hb-wifi { width: 16px; height: 12px; }
+  .hb-bat { width: 28px; height: 13px; }
+
+  .pad {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 20px 4px; align-content: start;
+    padding: 26px 14px 0;
+  }
+  .pad-i { display: grid; justify-items: center; gap: 6px; width: 100%; }
+  .pad-tile {
+    width: 62px; height: 62px; display: block;
+    filter: drop-shadow(0 6px 12px rgb(0 0 0 / .22));
+    transition: transform 220ms var(--ease);
+  }
+  .pad-i:active .pad-tile { transform: scale(.9); }
+  .pad-lbl { font-size: 11.5px; color: var(--wall-ink); text-shadow: 0 1px 3px rgb(0 0 0 / .35); }
+
+  /* the disc drops into the empty middle of a home screen instead of sitting
+     behind the app grid */
+  :root { --sun-x: 74%; --sun-y: 52%; --sun-d: 104px; }
+  .home-ind {
+    position: absolute; left: 50%; translate: -50% 0;
+    bottom: max(6px, env(safe-area-inset-bottom));
+    width: 134px; height: 5px; border-radius: 999px;
+    background: var(--wall-ink); opacity: .4;
+  }
+  .pdock {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+    margin: 0 12px; padding: 12px 8px; border-radius: 30px;
+    background: var(--glass-dock);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    box-shadow: inset 0 0 0 .5px var(--glass-edge);
+  }
+
+  .sheet {
+    position: fixed; inset: 0; z-index: 12;
+    display: grid; grid-template-rows: auto 1fr auto;
+    background: var(--surface);
+    transform: translateY(3%) scale(.94); opacity: 0;
+    transform-origin: 50% 60%;
+    transition: transform 340ms var(--spring), opacity 220ms var(--ease);
+  }
+  .sheet.is-on { transform: none; opacity: 1; }
+  .sheet-top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: max(12px, env(safe-area-inset-top)) 18px 8px;
+    font-size: 15px; font-weight: 600;
+  }
+  .sheet-x { font-size: 15px; color: var(--link); min-height: 44px; padding: 0 4px; }
+  .sheet-body { position: relative; overflow: auto; }
+  .sheet-body > * { min-height: 100%; }
+  .sheet-body .sbox { height: 100%; min-height: 62vh; }
+  .sheet-body .fnd { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .sheet-body .fnd-side { display: flex; overflow: auto; border-right: 0; border-bottom: .5px solid var(--line); }
+  .sheet-body .fnd-tab { white-space: nowrap; }
+  .sheet-body .abt { padding: 24px; }
+  .sheet-body .stash-h, .sheet-body .stash-p, .sheet-body .stash-meta { display: none; }
+  .grab {
+    justify-self: center; width: 134px; height: 5px; border-radius: 999px;
+    background: var(--ink); opacity: .35; margin: 8px 0 max(6px, env(safe-area-inset-bottom));
+  }
+  /* on a phone a demo hangs from the top of the screen instead of floating in
+     the middle of it, which is where Rin's panel belongs anyway */
+  .sheet-body .sfig {
+    top: 0; transform-origin: top center;
+    transform: translate(-50%, 0) scale(var(--s, 1));
+  }
+  .sheet-body .sbox { background: var(--well); }
+  .sheet[data-app='rin'] .sbox { background: var(--slate); }
+}
+
+@media (min-width: 901px) {
+  .home { display: none !important; }
+}
+
+/* ══ reduced motion: every move becomes a fade ═════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 120ms !important;
+    scroll-behavior: auto !important;
+  }
+  .desk, .mbar, .dock-wrap, .home { opacity: 1 !important; transform: none !important; }
+}

@@ -1,11 +1,9 @@
 ---
-import { ClientRouter } from 'astro:transitions';
-import '@fontsource-variable/geist';
+import '@fontsource-variable/space-grotesk';
+import '@fontsource/dm-serif-display/400.css';
 import '@fontsource-variable/jetbrains-mono';
 import '../styles/tokens.css';
-import '../styles/base.css';
-import Nav from '../components/Nav.astro';
-import Foot from '../components/Foot.astro';
+import '../styles/mac.css';
 
 interface Props { title: string; desc: string; }
 const { title, desc } = Astro.props;
@@ -15,7 +13,7 @@ const url = new URL(Astro.url.pathname, Astro.site ?? 'https://petermei.com');
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={desc} />
     <link rel="canonical" href={url.href} />
@@ -23,21 +21,28 @@ const url = new URL(Astro.url.pathname, Astro.site ?? 'https://petermei.com');
     <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#efeeea" />
+    <meta name="theme-color" content="#dceaf6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#171b26" media="(prefers-color-scheme: dark)" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={desc} />
     <meta property="og:url" content={url.href} />
     <meta property="og:image" content={new URL('/og.png', url).href} />
     <meta name="twitter:card" content="summary_large_image" />
-    <ClientRouter />
-    <script is:inline>document.documentElement.classList.add('js');</script>
+    <script is:inline>
+      /* before the first paint, so the desktop never flashes the wrong sky */
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('js');
+        try {
+          var t = localStorage.getItem('appearance');
+          if (t === 'light' || t === 'dark') d.dataset.theme = t;
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
-    <a class="skip" href="#main">Skip to content</a>
-    <Nav />
-    <main id="main"><slot /></main>
-    <Foot />
-    <script>import '../scripts/site';</script>
+    <slot />
+    <script>import '../scripts/mac/desk';</script>
   </body>
 </html>

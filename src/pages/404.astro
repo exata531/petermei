@@ -1,34 +1,44 @@
 ---
-import Site from '../layouts/Site.astro';
-import { work } from '../data/work';
+import Mac from '../layouts/Mac.astro';
+import Wallpaper from '../components/mac/Wallpaper.astro';
 ---
-<Site title="Not here — Peter Mei" desc="That page does not exist.">
-  <section class="band">
-    <div class="wrap lost pad">
-      <p class="label"><i class="sq"></i>404</p>
-      <h1 class="display">Not here</h1>
-      <p class="sub">That page does not exist. The work does.</p>
-      <a class="btn" href="/">Go to the work</a>
-    </div>
-  </section>
+<Mac title="Not here — Peter Mei" desc="That page does not exist on this desktop.">
+  <div class="desk lost-desk">
+    <Wallpaper />
+  </div>
 
-  <section class="band">
-    <div class="wrap cells four">
-      {work.map((w) => (
-        <a class="pick pad" href={`/work/${w.slug}`}>
-          <span class="label"><i class="sq"></i>{w.n}</span>
-          <span class="sub">{w.name}</span>
-        </a>
-      ))}
-    </div>
-  </section>
-</Site>
+  <div class="lost">
+    <section class="win is-front lost-win">
+      <header class="win-bar">
+        <span class="lights">
+          <span class="lt lt-c"></span><span class="lt lt-m"></span><span class="lt lt-z"></span>
+        </span>
+        <span class="win-title">Finder</span>
+        <span class="win-pad"></span>
+      </header>
+      <div class="win-body lost-body">
+        <p class="lost-face mono">(・_・;)</p>
+        <h1 class="lost-h">The item can’t be found.</h1>
+        <p class="lost-p">There is no such thing on this desktop.</p>
+        <a class="lost-btn" href="/">Go to the desktop</a>
+      </div>
+    </section>
+  </div>
+</Mac>
 
-<style>
-  .lost { padding-block: clamp(70px, 13vw, 170px); display: grid; gap: 22px; justify-items: start; }
-  .lost .btn { margin-top: 12px; }
-  .four { grid-template-columns: repeat(4, 1fr); }
-  .pick { display: grid; gap: 12px; padding-block: 34px; align-content: start; }
-  .pick:hover { background: var(--paper-2); }
-  @media (max-width: 860px) { .four { grid-template-columns: 1fr 1fr; } }
+<style is:global>
+  .lost-desk { opacity: 1; }
+  .lost {
+    position: fixed; inset: 0; z-index: 5;
+    display: grid; place-items: center; padding: 20px;
+  }
+  .lost-win { position: relative; width: min(420px, 100%); height: auto; }
+  .lost-body { display: grid; justify-items: center; gap: 10px; padding: 30px 26px 30px; text-align: center; }
+  .lost-face { font-size: 26px; letter-spacing: -.04em; }
+  .lost-h { font-size: 19px; font-weight: 600; letter-spacing: -.02em; }
+  .lost-p { font-size: 13.5px; color: var(--dim); }
+  .lost-btn {
+    margin-top: 8px; padding: 7px 16px; border-radius: 999px;
+    background: var(--sel); color: var(--sel-fg); font-size: 13px;
+  }
 </style>

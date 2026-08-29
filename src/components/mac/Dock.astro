@@ -1,0 +1,59 @@
+---
+/* The dock.
+
+   Glass, centred, with the four products first, the system apps after a
+   separator, and the trash on its own at the end, the way a Mac orders them.
+   The tile scale is a custom property so the magnification loop can write one
+   number per icon per frame and touch nothing else. */
+import Icon from './Icon.astro';
+
+const products = [
+  { id: 'volbase', label: 'volbase' },
+  { id: 'rin', label: 'Rin' },
+  { id: 'kyou', label: 'Kyou' },
+  { id: 'market', label: 'Market Station' },
+];
+const system = [
+  { id: 'finder', label: 'About Peter' },
+  { id: 'photos', label: 'Photos' },
+  { id: 'textedit', label: 'Read me' },
+  { id: 'github', label: 'GitHub', href: 'https://github.com/exata531' },
+];
+---
+<div class="dock-wrap">
+  <nav class="dock" data-dock-root aria-label="Dock">
+    {products.map((a) => (
+      <button class="dock-i" type="button" data-dock={a.id} aria-label={a.label}>
+        <span class="dock-tile"><Icon id={a.id} /></span>
+        <span class="dock-name">{a.label}</span>
+        <span class="dock-dot" aria-hidden="true"></span>
+      </button>
+    ))}
+
+    <span class="dock-sep" aria-hidden="true"></span>
+
+    {system.map((a) => (
+      a.href ? (
+        <a class="dock-i" href={a.href} rel="me noopener" target="_blank" data-dock={a.id} aria-label={a.label}>
+          <span class="dock-tile"><Icon id={a.id} /></span>
+          <span class="dock-name">{a.label}</span>
+          <span class="dock-dot" aria-hidden="true"></span>
+        </a>
+      ) : (
+        <button class="dock-i" type="button" data-dock={a.id} aria-label={a.label}>
+          <span class="dock-tile"><Icon id={a.id} /></span>
+          <span class="dock-name">{a.label}</span>
+          <span class="dock-dot" aria-hidden="true"></span>
+        </button>
+      )
+    ))}
+
+    <span class="dock-sep" aria-hidden="true"></span>
+
+    <button class="dock-i" type="button" data-dock="trash" aria-label="Trash">
+      <span class="dock-tile"><Icon id="trash" /></span>
+      <span class="dock-name">Trash</span>
+      <span class="dock-dot" aria-hidden="true"></span>
+    </button>
+  </nav>
+</div>
