@@ -1,90 +1,42 @@
----
-/* One huge left-aligned line with a highlighted word, a paragraph, the
-   buttons, three badges. Beside it, three cards drifting at different rates:
-   real commit lines, a day, and the four products' state. */
-const commits = [
-  ['a443a58', 'The ask moves out of the first ninety seconds'],
-  ['6f6103e', '1.0.1: the working light learns the new engine'],
-  ['0292429', 'Phone alerts really point at the domain now'],
-];
----
-<header class="hero" id="top">
-  <div class="wrap hero-wrap">
-    <div class="hero-art" aria-hidden="true" data-hero-art>
-      <div class="leaf leaf--log" data-leaf="0">
-        <div class="file">git log --oneline</div>
-        {commits.map(([h, m]) => (<div class="r"><b class="mono">{h}</b> <span class="m">{m}</span></div>))}
-      </div>
-      <div class="leaf leaf--day" data-leaf="1">
-        <div class="file">daily/today.md</div>
-        <div class="r done"><span class="box done"></span><b>physics set</b></div>
-        <div class="r"><span class="box"></span><b>essay to 650 words</b></div>
-        <div class="r"><span class="box"></span><b>climbing 4pm</b></div>
-      </div>
-      <div class="leaf leaf--live" data-leaf="2">
-        <div class="s"><span class="dot" style="--c:var(--acc-volbase)"></span> volbase <em>live</em></div>
-        <div class="s"><span class="dot" style="--c:var(--acc-rin)"></span> Rin <em>shipped</em></div>
-        <div class="s"><span class="dot" style="--c:var(--acc-kyou)"></span> Kyou <em>building</em></div>
-        <div class="s"><span class="dot" style="--c:var(--acc-market)"></span> Market Station <em>running</em></div>
-      </div>
-    </div>
-
-    <div class="hero-in">
-      <h1 class="rise">I build software that <span class="hl">ships</span></h1>
-      <p class="sub rise d2">
-        Senior at the school, outside Detroit. Everything on this page is real and running:
-        a volunteering platform with users, a terminal that lives in the Mac menu bar, an
-        iPhone day planner, and a market monitor that hasn’t stopped since August. Scroll,
-        and each one runs as a demo you can touch.
-      </p>
-      <div class="cta-row rise d3">
-        <a class="btn btn--black" href="#work">See the work</a>
-        <a class="btn btn--beige" href="https://github.com/exata531" target="_blank" rel="noopener">GitHub</a>
-        <button class="btn btn--beige" type="button" data-copy="mailto" data-copy-value="" hidden>Email <span class="chip copy-hint">copy</span></button>
-        <div class="badges">
-          <span class="badge"><b>the school ’27</b> Detroit area</span>
-          <span class="badge"><b>Self-taught</b> from the docs</span>
-          <span class="badge"><b>Four products</b> all running below</span>
-        </div>
-      </div>
+<section class="hero" id="top" data-accent="#f25c1f" data-face="(｡•ᴗ•｡)">
+  <div class="mesh" aria-hidden="true">
+    <span class="lobe l1"></span><span class="lobe l2"></span><span class="lobe l3"></span>
+  </div>
+  <div class="wrap hero-in">
+    <p class="eyebrow hero-eye" data-load="eye">Detroit · the school ’27 · self-taught</p>
+    <h1 class="t-hero hero-name" data-split="lines" data-load="name">Peter Mei</h1>
+    <p class="t-sub serif hero-line" data-load="line">Four products. All real, all running below.</p>
+    <div class="row hero-cta" style="--gap:12px" data-load="cta">
+      <a class="btn btn-solid sq" href="#work" data-magnet>See the work<span aria-hidden="true">↓</span></a>
+      <a class="btn btn-ghost sq" href="https://github.com/exata531" target="_blank" rel="noopener" data-magnet>GitHub</a>
     </div>
   </div>
-</header>
+  <a class="cue" href="#spine" aria-label="Scroll" data-load="cue"><span class="cue-dot"></span></a>
+</section>
 
 <style>
-  .hero { position: relative; padding: clamp(104px, 15vh, 168px) 0 0; }
-  .hero-wrap { position: relative; }
-  .hero-in { position: relative; z-index: 2; }
-  .hero h1 { font-size: var(--t-display); font-weight: 800; line-height: .98; letter-spacing: -.042em; max-width: 12ch; text-wrap: balance; }
-  .hl { position: relative; white-space: nowrap; }
-  .hl::before { content: ""; position: absolute; inset: .08em -.09em -.02em; background: var(--mark); border-radius: .09em; z-index: -1; transform: skewY(-.5deg); }
-  .sub { margin-top: 28px; max-width: 33em; font-size: clamp(17px, 1.6vw, 20px); color: var(--ink-2); }
-  .cta-row { display: flex; flex-wrap: wrap; align-items: center; gap: 15px 18px; margin-top: 36px; }
-  .badges { display: flex; align-items: center; gap: 26px; margin-left: 10px; }
-  .badge { font-size: var(--t-small); font-weight: 600; color: var(--ink-3); line-height: 1.35; }
-  .badge b { display: block; font-weight: 800; color: var(--ink-2); }
-  @media (max-width: 660px) { .badges { margin-left: 0; } }
+  .hero { position: relative; min-height: 100svh; display: grid; place-items: center; padding-top: var(--bar-h); overflow: clip; isolation: isolate; }
+  .hero-in { text-align: center; display: grid; justify-items: center; gap: 22px; position: relative; z-index: 1; }
+  .hero-eye { opacity: 0; }
+  .hero-name { color: var(--ink); }
+  .hero-line { color: var(--ink-2); font-size: clamp(26px, 3.4vw, 44px); opacity: 0; max-width: 24ch; }
+  .hero-cta { margin-top: 10px; opacity: 0; }
 
-  .hero-art { position: absolute; right: calc(var(--gut) - 60px); top: 0; width: 380px; height: 440px; z-index: 1; pointer-events: none; }
-  @media (max-width: 1279px) and (min-width: 1000px) { .hero-art { transform: scale(.76); transform-origin: top right; right: calc(var(--gut) - 22px); top: -10px; } }
-  @media (max-width: 999px) { .hero-art { display: none; } }
-  .leaf {
-    position: absolute; border-radius: var(--r-card); background: var(--paper); border: 1px solid var(--line);
-    box-shadow: var(--shadow-card); padding: 17px 19px; will-change: transform;
-    transform: translateY(var(--ly, 0px)) rotate(var(--rot, 0deg));
+  .mesh { position: absolute; inset: -20% -10%; z-index: 0; pointer-events: none; filter: blur(70px) saturate(1.1); opacity: 0; }
+  .lobe { position: absolute; border-radius: 50%; mix-blend-mode: multiply; will-change: transform; }
+  .l1 { width: 46vw; height: 46vw; left: 8%;  top: 18%; background: color-mix(in oklab, var(--acc-me) 26%, transparent);      animation: drift1 22s ease-in-out infinite; }
+  .l2 { width: 40vw; height: 40vw; right: 6%; top: 8%;  background: color-mix(in oklab, var(--acc-volbase) 22%, transparent); animation: drift2 26s ease-in-out infinite; }
+  .l3 { width: 36vw; height: 36vw; left: 34%; bottom: 0; background: color-mix(in oklab, var(--acc-market) 16%, transparent); animation: drift3 30s ease-in-out infinite; }
+  @keyframes drift1 { 50% { transform: translate(6vw, -4vw) scale(1.08); } }
+  @keyframes drift2 { 50% { transform: translate(-5vw, 5vw) scale(.94); } }
+  @keyframes drift3 { 50% { transform: translate(3vw, -6vw) scale(1.06); } }
+
+  .cue { position: absolute; bottom: 28px; left: 50%; translate: -50% 0; width: 26px; height: 42px; border: 1.5px solid rgb(var(--espresso) / .25); border-radius: 999px; opacity: 0; }
+  .cue-dot { position: absolute; left: 50%; top: 8px; width: 4px; height: 8px; margin-left: -2px; border-radius: 2px; background: var(--ink-2); animation: cue 1.8s var(--out-quart) infinite; }
+  @keyframes cue { 0% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(14px); opacity: 0; } 100% { opacity: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-eye, .hero-line, .hero-cta, .cue, .mesh { opacity: 1; }
+    .lobe, .cue-dot { animation: none; }
   }
-  .leaf .file { font-family: var(--mono); font-size: var(--t-nano); font-weight: 600; color: var(--ink-3); letter-spacing: .02em; padding-bottom: 11px; margin-bottom: 12px; border-bottom: 1px solid var(--line); }
-  .leaf .r { display: flex; align-items: baseline; gap: 9px; font-size: var(--t-fine); line-height: 1.9; color: var(--ink-2); }
-  .leaf .r b { font-weight: 700; color: var(--ink); }
-  .leaf .r .m { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .leaf .box { width: 13px; height: 13px; flex: none; border-radius: 4px; border: 1.5px solid var(--hair); align-self: center; }
-  .leaf .box.done { border-color: var(--ink-3); background: var(--ink-3); }
-  .leaf .r.done b { color: var(--ink-3); text-decoration: line-through; }
-  .leaf--log  { top: 0; left: 40px; width: 300px; --rot: -3.5deg; }
-  .leaf--log .r b { font-size: var(--t-nano); font-weight: 600; color: var(--ink-3); }
-  .leaf--day  { top: 172px; left: 0; width: 236px; --rot: 2.5deg; }
-  .leaf--live { top: 304px; left: 154px; width: 230px; --rot: -1.5deg; padding: 14px 16px; }
-  .leaf--live .s { display: flex; align-items: center; gap: 9px; font-size: var(--t-tiny); color: var(--ink-2); line-height: 2; }
-  .leaf--live .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
-  .leaf--live .s em { font-style: normal; margin-left: auto; font-family: var(--mono); font-size: var(--t-nano); color: var(--ink-3); }
 </style>

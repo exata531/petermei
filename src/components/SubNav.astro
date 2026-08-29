@@ -1,0 +1,33 @@
+<div class="subnav" id="subnav" data-subnav aria-hidden="true">
+  <div class="wrap subnav-in">
+    <div class="row" style="--gap:10px">
+      <span class="sub-dot" data-subnav-dot aria-hidden="true"></span>
+      <strong class="sub-name" data-subnav-name>volbase</strong>
+      <span class="sub-note faint" data-subnav-note></span>
+    </div>
+    <a class="sub-cta sq" data-subnav-cta href="#">See it live</a>
+  </div>
+</div>
+
+<style>
+  .subnav {
+    position: fixed; top: var(--bar-h); left: 0; right: 0; z-index: 90; height: var(--sub-h);
+    background: rgb(255 253 248 / .78);
+    -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: .5px solid rgb(var(--espresso) / .1);
+    transform: translateY(-110%); opacity: 0;
+    transition: transform var(--t-slow) var(--out-quart), opacity var(--t-base) var(--settle);
+  }
+  .subnav.is-in { transform: none; opacity: 1; }
+  .subnav-in { height: 100%; display: flex; align-items: center; justify-content: space-between; }
+  .sub-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); transition: background-color var(--t-slow) var(--settle); }
+  .sub-name { font-size: 15px; letter-spacing: -0.015em; }
+  .sub-note { font-size: 13px; }
+  .sub-cta {
+    --r: 999px; height: 32px; padding-inline: 14px; display: inline-flex; align-items: center;
+    font-size: 13px; font-weight: 600; color: #fff; background: var(--accent);
+    transition: background-color var(--t-slow) var(--settle), transform var(--t-base) var(--spring);
+  }
+  .sub-cta:hover { transform: translateY(-1px); }
+  @media (max-width: 720px) { .sub-note { display: none; } }
+</style>

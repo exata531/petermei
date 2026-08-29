@@ -1,29 +1,26 @@
 ---
 import Base from '../layouts/Base.astro';
-import Nav from '../components/Nav.astro';
+import MenuBar from '../components/MenuBar.astro';
 ---
 <Base title="Not here · Peter Mei" description="That page does not exist.">
-  <Nav />
-  <main class="nf" id="top">
+  <MenuBar />
+  <main class="nf">
     <div class="wrap nf-in">
-      <p class="eyebrow rise">404</p>
-      <h1 class="rise d2">Nothing <span class="hl">here</span></h1>
-      <p class="sub rise d3">That page doesn’t exist. The work does.</p>
-      <div class="row rise d4" style="--gap:14px">
-        <a class="btn btn--black" href="/#work">See the work</a>
-        <a class="btn btn--beige" href="/">Home</a>
+      <p class="eyebrow">404</p>
+      <h1 class="t-display" data-split="lines">Nothing here. <span class="serif grad">Checked twice.</span></h1>
+      <p class="muted nf-sub">That page doesn’t exist. The work does.</p>
+      <div class="row" style="--gap:12px">
+        <a class="btn btn-solid sq" href="/#work">See the work</a>
+        <a class="btn btn-ghost sq" href="/">Home</a>
       </div>
-      <p class="mono nf-face rise d4" aria-hidden="true">(・_・;)</p>
+      <p class="mono nf-face" aria-hidden="true">(・_・;)</p>
     </div>
   </main>
 </Base>
 
 <style>
-  .nf { min-height: 100svh; display: grid; align-items: center; padding-top: var(--nav-h); }
-  .nf-in { display: grid; gap: 22px; justify-items: start; }
-  .nf h1 { font-size: var(--t-display); font-weight: 800; line-height: .98; letter-spacing: -.042em; }
-  .hl { position: relative; white-space: nowrap; }
-  .hl::before { content: ""; position: absolute; inset: .08em -.09em -.02em; background: var(--mark); border-radius: .09em; z-index: -1; transform: skewY(-.5deg); }
-  .sub { font-size: clamp(17px, 1.6vw, 20px); color: var(--ink-2); }
-  .nf-face { font-size: 20px; color: var(--ink-3); }
+  .nf { min-height: 100svh; display: grid; place-items: center; padding-top: var(--bar-h); }
+  .nf-in { display: grid; gap: 20px; justify-items: start; }
+  .nf-sub { font-size: var(--t-lead); }
+  .nf-face { font-size: 22px; color: var(--ink-3); margin-top: 12px; }
 </style>

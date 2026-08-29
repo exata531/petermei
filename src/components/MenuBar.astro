@@ -1,0 +1,119 @@
+---
+const projects = [
+  { id: 'volbase', name: 'volbase', accent: 'var(--acc-volbase)', key: '1', note: 'live at volbase.app' },
+  { id: 'rin', name: 'Rin', accent: 'var(--acc-rin)', key: '2', note: 'a terminal in the menu bar' },
+  { id: 'kyou', name: 'Kyou', accent: 'var(--acc-kyou)', key: '3', note: 'the whole day on one screen' },
+  { id: 'market', name: 'Market Station', accent: 'var(--acc-market)', key: '4', note: 'twelve signals, all day' },
+];
+---
+<header class="bar" id="bar" data-bar>
+  <div class="bar-in">
+    <div class="left">
+      <button class="face" id="face" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="menu" title="Work">
+        <span class="face-txt" data-face>(｡•ᴗ•｡)</span>
+      </button>
+      <a class="name" href="#top">Peter Mei</a>
+      <nav class="items" aria-label="Site">
+        <button class="item is-menu" type="button" data-menu-toggle aria-haspopup="menu" aria-expanded="false" aria-controls="menu">Work</button>
+        <a class="item" href="#elsewhere">Elsewhere</a>
+        <a class="item" href="#photos">Photos</a>
+        <a class="item" href="#about">About</a>
+      </nav>
+    </div>
+    <div class="right">
+      <a class="status" href="https://github.com/exata531" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.6 7.6 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.8-3.6 4 .3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2Z"/></svg>
+      </a>
+      <a class="status" href="#about" aria-label="Email" data-mail>
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="3.5" width="13" height="9" rx="2"/><path d="m2 4.5 6 4.5 6-4.5"/></svg>
+      </a>
+      <time class="clock num" id="clock" data-clock datetime="">Sat Aug 29 &nbsp;9:41 AM</time>
+    </div>
+  </div>
+
+  <div class="menu sq" id="menu" role="menu" hidden data-menu>
+    <ul>
+      {projects.map((p) => (
+        <li role="none">
+          <a role="menuitem" class="mi" href={`#${p.id}`} data-menu-item data-target={p.id} style={`--dot:${p.accent}`}>
+            <span class="dot" aria-hidden="true"></span>
+            <span class="mi-name">{p.name}</span>
+            <span class="mi-note">{p.note}</span>
+            <kbd class="mono">⌘{p.key}</kbd>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <div class="menu-foot mono">four products, every one running</div>
+  </div>
+</header>
+
+<style>
+  .bar {
+    position: fixed; inset: 0 0 auto 0; z-index: 100; height: var(--bar-h);
+    background: rgb(255 253 248 / .72);
+    -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: .5px solid rgb(var(--espresso) / .12);
+    transform: translateY(-100%);
+    transition: background-color var(--t-slow) var(--settle);
+  }
+  .bar.is-in { transform: none; }
+  .bar-in { height: 100%; display: flex; align-items: center; justify-content: space-between; padding-inline: 14px; gap: 12px; }
+  .left, .right { display: flex; align-items: center; gap: 4px; min-width: 0; }
+
+  .face {
+    height: 30px; padding-inline: 8px; border-radius: 8px; display: inline-flex; align-items: center;
+    font-family: var(--mono); font-size: 13px; font-weight: 560; letter-spacing: -0.02em; color: var(--ink);
+    transition: background-color var(--t-fast) var(--settle), transform var(--t-base) var(--boing);
+  }
+  .face:hover { background: rgb(var(--espresso) / .07); }
+  .face:active { transform: scale(.94); }
+  .face[aria-expanded="true"] { background: var(--ink); color: var(--paper); }
+  .face-txt { display: inline-block; transform-origin: 50% 60%; }
+
+  .name { font-weight: 700; font-size: 13.5px; letter-spacing: -0.015em; padding: 0 8px; height: 30px; display: inline-flex; align-items: center; border-radius: 8px; }
+  .name:hover { background: rgb(var(--espresso) / .07); }
+  .items { display: flex; align-items: center; gap: 2px; }
+  .item {
+    height: 30px; padding-inline: 10px; border-radius: 8px; display: inline-flex; align-items: center;
+    font-size: 13.5px; font-weight: 500; color: var(--ink); transition: background-color var(--t-fast) var(--settle);
+  }
+  .item:hover, .item[aria-expanded="true"] { background: rgb(var(--espresso) / .07); }
+  .item[aria-expanded="true"] { background: var(--ink); color: var(--paper); }
+
+  .status { width: 30px; height: 30px; display: inline-grid; place-items: center; border-radius: 8px; color: var(--ink-2); transition: background-color var(--t-fast) var(--settle), color var(--t-fast) var(--settle); }
+  .status:hover { background: rgb(var(--espresso) / .07); color: var(--ink); }
+  .clock { font-size: 13.5px; font-weight: 500; letter-spacing: -0.01em; padding-inline: 10px 4px; white-space: nowrap; color: var(--ink); }
+
+  .menu {
+    --r: 14px;
+    position: absolute; top: calc(var(--bar-h) + 6px); left: 10px; width: 340px; padding: 6px;
+    background: rgb(255 253 248 / .86);
+    -webkit-backdrop-filter: saturate(180%) blur(28px); backdrop-filter: saturate(180%) blur(28px);
+    border: .5px solid rgb(var(--espresso) / .14);
+    box-shadow: var(--shadow-panel), var(--inset-hi);
+    transform-origin: 24px 0;
+    transform: scale(.96) translateY(-6px); opacity: 0;
+    transition: transform var(--t-base) var(--spring), opacity var(--t-fast) var(--settle);
+  }
+  .menu.is-open { transform: none; opacity: 1; }
+  .menu[hidden] { display: none; }
+  .mi {
+    display: grid; grid-template-columns: 14px 1fr auto; grid-template-rows: auto auto; column-gap: 10px; align-items: center;
+    padding: 8px 10px; border-radius: 9px; font-size: 13.5px;
+    transition: background-color var(--t-fast) var(--settle), color var(--t-fast) var(--settle);
+  }
+  .mi:hover, .mi:focus-visible { background: var(--ink); color: var(--paper); outline: none; }
+  .mi:hover .mi-note, .mi:hover kbd { color: rgb(255 253 248 / .6); }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--dot); grid-row: 1 / 3; box-shadow: 0 0 0 2px color-mix(in oklab, var(--dot) 25%, transparent); }
+  .mi-name { font-weight: 600; letter-spacing: -0.01em; }
+  .mi-note { grid-column: 2; font-size: 12px; color: var(--ink-3); }
+  kbd { grid-column: 3; grid-row: 1 / 3; font-size: 11px; color: var(--ink-3); }
+  .menu-foot { padding: 8px 10px 4px; font-size: 11px; color: var(--ink-3); border-top: .5px solid rgb(var(--espresso) / .1); margin-top: 4px; }
+
+  @media (max-width: 720px) {
+    .items, .name { display: none; }
+    .clock { font-size: 13px; }
+    .menu { width: min(340px, calc(100vw - 20px)); }
+  }
+</style>

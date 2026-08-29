@@ -1,83 +1,25 @@
----
-/* The closing ask, then the giant fading wordmark and four quiet columns. */
----
-<section class="cta2" aria-labelledby="cta-title">
-  <h2 id="cta-title">Say hi</h2>
-  <div class="row" style="--gap:14px">
-    <a class="btn btn--black" href="https://github.com/exata531" target="_blank" rel="noopener">GitHub</a>
-    <button class="btn btn--beige" type="button" data-copy="mailto" data-copy-value="" hidden>Email <span class="chip copy-hint">copy</span></button>
-  </div>
-  <div class="chips">
-    <a class="chip-link" href="https://volbase.app" target="_blank" rel="noopener" aria-label="volbase"><img src="/img/volbase-icon.svg" width="20" height="20" alt="" /></a>
-    <a class="chip-link" href="https://github.com/exata531/Rin" target="_blank" rel="noopener" aria-label="Rin on GitHub"><span class="mono">凛</span></a>
-  </div>
-</section>
-
-<footer class="foot">
-  <div class="wrap">
-    <div class="giant" aria-hidden="true">Mei</div>
-    <div class="cols">
-      <div class="about">
-        <a class="mark" href="#top"><span class="mk">P</span> Peter Mei</a>
-        <p>Built on school nights, outside Detroit. Everything here is real, and every demo says so.</p>
-      </div>
-      <div>
-        <h2>The work</h2>
-        <ul>
-          <li><a href="#work" data-go="0">volbase</a></li>
-          <li><a href="#work" data-go="1">Rin</a></li>
-          <li><a href="#work" data-go="2">Kyou</a></li>
-          <li><a href="#work" data-go="3">Market Station</a></li>
-        </ul>
-      </div>
-      <div>
-        <h2>Elsewhere</h2>
-        <ul>
-          <li><a href="#elsewhere">Off the keyboard</a></li>
-          <li><a href="#photos">Photos</a></li>
-          <li><a href="#about">About</a></li>
-        </ul>
-      </div>
-      <div>
-        <h2>Say hi</h2>
-        <ul>
-          <li><a href="https://github.com/exata531" target="_blank" rel="noopener">GitHub</a></li>
-          <li><a href="https://volbase.app" target="_blank" rel="noopener">volbase.app</a></li>
-          <li><a href="#about" data-mail-link hidden>Email</a></li>
-        </ul>
-      </div>
+<footer class="foot" data-accent="#f25c1f" data-face="(´｡• ᵕ •｡`)">
+  <div class="wrap foot-in">
+    <div class="foot-l">
+      <p class="t-card">Peter Mei</p>
+      <p class="muted foot-s">Say hi.</p>
     </div>
-    <div class="fine">
-      <span>Built with Astro and GSAP. No tracking.</span>
-      <span>the school Kingswood, Class of 2027.</span>
-    </div>
+    <ul class="foot-links">
+      <li><a href="https://github.com/exata531" target="_blank" rel="noopener">GitHub ↗</a></li>
+      <li><a href="#about" data-mail-link hidden>Email ↗</a></li>
+      <li><a href="https://volbase.app" target="_blank" rel="noopener">volbase ↗</a></li>
+    </ul>
+    <p class="colophon mono">Built with Astro and GSAP. Set in SF Pro, Instrument Serif, and JetBrains Mono. No tracking.</p>
   </div>
 </footer>
 
 <style>
-  .cta2 { display: flex; flex-direction: column; align-items: center; gap: 24px; padding: var(--sec) var(--gut) 10px; text-align: center; }
-  .cta2 h2 { font-size: var(--t-title); font-weight: 800; letter-spacing: -.035em; line-height: 1.03; max-width: 14ch; text-wrap: balance; }
-  .cta2 .btn { padding: 17px 32px; font-size: var(--t-body); }
-  .chips { display: flex; gap: 12px; }
-  .chip-link { width: 44px; height: 44px; border-radius: var(--r-tile); display: grid; place-items: center; background: var(--cream-2); color: var(--ink-2); font-size: 18px; transition: transform .55s var(--boing), color .2s var(--settle); }
-  .chip-link:hover { transform: translateY(-2px) scale(1.06); color: var(--ink); }
-
-  .foot { position: relative; overflow: hidden; text-align: center; padding-top: clamp(48px, 6vw, 82px); }
-  .giant {
-    font-size: clamp(150px, 26vw, 340px); font-weight: 800; letter-spacing: -.05em; line-height: 1.1;
-    user-select: none; pointer-events: none; margin-bottom: -.22em;
-    background: linear-gradient(180deg, var(--wordmark) 6%, transparent 90%);
-    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
-  }
-  .cols { position: relative; display: grid; gap: 34px 24px; grid-template-columns: 1.4fr repeat(3, 1fr); text-align: left; padding: 44px 0; border-top: 1px solid var(--line); }
-  @media (max-width: 760px) { .cols { grid-template-columns: 1fr 1fr; } }
-  .about { max-width: 30ch; }
-  .about .mark { margin-bottom: 14px; display: inline-flex; align-items: center; gap: var(--mark-gap); font-size: var(--mark-text); font-weight: 800; letter-spacing: -.4px; }
-  .mk { flex: none; width: var(--mark-tile); height: var(--mark-tile); border-radius: var(--r-tile); background: var(--solid); color: var(--solid-fg); display: grid; place-items: center; font-size: var(--mark-glyph); font-weight: 800; box-shadow: var(--shadow-mark); }
-  .about p { font-size: var(--t-small); color: var(--ink-3); line-height: 1.6; }
-  .foot h2 { font-size: var(--t-tiny); font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 14px; }
-  .foot ul { display: grid; gap: 10px; }
-  .foot ul a { font-size: var(--t-ui); font-weight: 600; color: var(--ink-2); }
-  .foot ul a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
-  .fine { position: relative; display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between; padding: 0 0 40px; font-size: var(--t-fine); color: var(--ink-3); text-align: left; }
+  .foot { border-top: .5px solid rgb(var(--espresso) / .14); padding: 48px 0 40px; }
+  .foot-in { display: grid; grid-template-columns: 1fr auto; gap: 24px 48px; align-items: start; }
+  .foot-s { font-size: var(--t-small); margin-top: 4px; }
+  .foot-links { display: flex; gap: 22px; font-size: var(--t-ui); font-weight: 600; }
+  .foot-links a { transition: color var(--t-fast) var(--settle); }
+  .foot-links a:hover { color: var(--accent); }
+  .colophon { grid-column: 1 / -1; font-size: 11.5px; color: var(--ink-3); max-width: 64ch; line-height: 1.7; }
+  @media (max-width: 720px) { .foot-in { grid-template-columns: 1fr; } }
 </style>

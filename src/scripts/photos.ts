@@ -13,8 +13,8 @@ export function initPhotos(reduce: boolean) {
   if (!sec || !rail) return;
   // the headline sits inside a sticky box, which IntersectionObserver misjudges;
   // the section itself is tall and honest, so the section trigger reveals the head
-  const head = [...sec.querySelectorAll<HTMLElement>('.photos-head .up')];
-  const showHead = () => head.forEach((h) => h.classList.add('in'));
+  const head = [...sec.querySelectorAll<HTMLElement>('.photos-head .reveal')];
+  const showHead = () => head.forEach((h) => h.classList.add('is-in'));
   if (reduce || matchMedia('(max-width: 820px)').matches) { showHead(); return; }
   ScrollTrigger.create({ trigger: sec, start: 'top 70%', once: true, onEnter: showHead });
   const shots = [...rail.querySelectorAll<HTMLElement>('[data-shot]')];

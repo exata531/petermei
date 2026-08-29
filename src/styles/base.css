@@ -12,106 +12,100 @@ body {
   color: var(--ink);
   font-family: var(--ui);
   font-size: var(--t-body);
-  line-height: 1.55;
-  letter-spacing: -.1px;
+  line-height: 1.5;
+  letter-spacing: var(--track-ui);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'kern', 'liga', 'calt', 'ss01';
   overflow-x: clip;
   transition: background-color var(--t-slow) var(--settle);
 }
 
-h1, h2, h3, h4, p { margin: 0; }
+::selection { background: rgb(var(--espresso) / .12); color: var(--ink); }
+
+h1, h2, h3, h4 { margin: 0; font-weight: 600; letter-spacing: var(--track-title); line-height: 1.02; text-wrap: balance; }
+p { margin: 0; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
 img, svg, video { display: block; max-width: 100%; }
 ul, ol { margin: 0; padding: 0; list-style: none; }
 [hidden] { display: none !important; }
-.num, time { font-variant-numeric: tabular-nums; }
-:focus { outline: none; }
-:focus-visible { outline: 2.5px solid var(--ink); outline-offset: 3px; border-radius: var(--r-tile); }
-main:focus { outline: none; }
-::selection { background: var(--mark); color: var(--ink); }
+.num, time, [data-num] { font-variant-numeric: tabular-nums; }
 
-.wrap { max-width: var(--wrap); margin-inline: auto; padding-inline: var(--gut); }
-.row { display: flex; align-items: center; gap: var(--gap, 12px); }
-.mono  { font-family: var(--mono); }
-.muted { color: var(--ink-2); }
-.faint { color: var(--ink-3); }
-p { text-wrap: pretty; }
+/* ── type roles ──────────────────────────────────────────────────── */
+.t-hero    { font-size: var(--t-hero);    letter-spacing: var(--track-hero);    line-height: .92; font-weight: 700; }
+.t-display { font-size: var(--t-display); letter-spacing: var(--track-display); line-height: .96; font-weight: 650; }
+.t-title   { font-size: var(--t-title);   letter-spacing: var(--track-title);   line-height: 1.02; font-weight: 640; }
+.t-sub     { font-size: var(--t-sub);     letter-spacing: -0.02em; line-height: 1.1; font-weight: 500; }
+.t-card    { font-size: var(--t-card);    letter-spacing: -0.02em; line-height: 1.12; font-weight: 600; }
+.serif     { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+.mono      { font-family: var(--mono); font-weight: 480; letter-spacing: 0; font-feature-settings: 'zero', 'ss02'; }
+.eyebrow   { font-family: var(--mono); font-size: var(--t-fine); font-weight: 520; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-3); }
+.muted     { color: var(--ink-2); }
+.faint     { color: var(--ink-3); }
 
-/* read by assistive tech, never drawn */
-.sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0; overflow: hidden; white-space: nowrap; clip-path: inset(50%); }
-.skip {
-  position: fixed; top: 10px; left: 10px; z-index: 90;
-  padding: 12px 20px; border-radius: var(--r-tile); font-weight: 700;
-  background: var(--solid); color: var(--solid-fg); box-shadow: var(--shadow-btn);
-  transform: translateY(-160%); transition: transform .3s var(--settle);
+/* gradient text in the live accent */
+.grad {
+  background: linear-gradient(100deg, var(--accent) 0%, color-mix(in oklab, var(--accent) 55%, var(--ink)) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
 }
-.skip:focus { transform: none; }
 
-/* ── the small heavy label above a heading ───────────────────────── */
-.eyebrow { font-size: var(--t-tiny); font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-3); }
+/* ── layout ──────────────────────────────────────────────────────── */
+.wrap { width: min(100% - 2 * var(--gut), var(--wrap)); margin-inline: auto; }
+.section { padding-block: var(--sec); position: relative; }
+.stack { display: grid; gap: var(--gap, 16px); }
+.row { display: flex; align-items: center; gap: var(--gap, 12px); }
 
-/* ── section heads, one shape everywhere ─────────────────────────── */
-.head h2 { margin-top: 12px; max-width: 16ch; font-size: var(--t-title); font-weight: 800; letter-spacing: -.035em; line-height: 1.03; text-wrap: balance; }
-.head p.lead { margin-top: 14px; max-width: 42ch; color: var(--ink-2); font-size: clamp(15.5px, 1.4vw, 17px); }
-
-/* ── squircle where the engine can draw it ───────────────────────── */
+/* ── squircle: continuous corners where the engine can draw them ─── */
 .sq { border-radius: var(--r, var(--r-card)); }
 @supports (corner-shape: squircle) { .sq { corner-shape: squircle; } }
 
 /* ── buttons ─────────────────────────────────────────────────────── */
 .btn {
+  --r: var(--r-btn);
   display: inline-flex; align-items: center; gap: 10px;
-  border-radius: var(--r-btn); padding: 14px 24px;
-  font-size: var(--t-copy); font-weight: 700; white-space: nowrap;
-  transition: transform .55s var(--boing), box-shadow .3s var(--settle), filter .2s var(--settle);
+  height: 48px; padding-inline: 22px;
+  font-size: var(--t-ui); font-weight: 600; letter-spacing: -0.005em;
+  border-radius: var(--r); position: relative; isolation: isolate;
+  transition: transform var(--t-base) var(--spring), box-shadow var(--t-base) var(--settle), background-color var(--t-base) var(--settle);
+  will-change: transform;
 }
-.btn:hover { transform: translateY(-2px) scale(1.025); }
-.btn:active { transform: translateY(1px) scale(.98); transition-duration: .12s; }
-.btn--black { background: var(--solid); color: var(--solid-fg); box-shadow: var(--shadow-btn); }
-.btn--beige { background: var(--cream-2); color: var(--ink); }
-.btn--beige:hover { filter: brightness(.98); }
-.btn .chip { background: var(--chip); font-size: var(--t-fine); font-weight: 700; border-radius: var(--r-chip); padding: 3px 9px; }
-.btn--beige .chip { background: var(--chip-2); }
+.btn:active { transform: scale(.97); }
+.btn-solid { background: var(--solid); color: var(--solid-fg); box-shadow: var(--shadow-btn), var(--inset-hi); }
+.btn-solid:hover { box-shadow: 0 4px 8px rgb(var(--espresso) / .14), 0 18px 34px -12px rgb(var(--espresso) / .45), var(--inset-hi); }
+.btn-ghost { background: rgb(var(--espresso) / .05); color: var(--ink); }
+.btn-ghost:hover { background: rgb(var(--espresso) / .09); }
+.btn-accent { background: var(--accent); color: #fff; box-shadow: var(--shadow-btn), var(--inset-hi); }
 
-/* a text link with an arrow that moves */
-.tlink { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: var(--t-ui); color: var(--ink); }
-.tlink .arr { display: inline-block; transition: transform var(--t-base) var(--out-quart); color: var(--ink-3); }
-.tlink:hover .arr { transform: translateX(3px); color: var(--ink); }
-
-/* ── paper card and cream tile ───────────────────────────────────── */
-.card {
-  position: relative; overflow: hidden; display: flex; flex-direction: column;
-  background: var(--paper); border: 1px solid var(--line);
-  border-radius: var(--r-card); padding: 32px 34px 0; box-shadow: var(--shadow-card);
+/* ── chips ───────────────────────────────────────────────────────── */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  --r: var(--r-chip);
+  display: inline-flex; align-items: center; gap: 6px; height: 28px; padding-inline: 10px;
+  font-family: var(--mono); font-size: var(--t-tiny); font-weight: 520; letter-spacing: .01em;
+  color: var(--ink-2); background: rgb(var(--espresso) / .06); border-radius: var(--r);
+  transition: background-color var(--t-fast) var(--settle), color var(--t-fast) var(--settle), transform var(--t-base) var(--spring);
 }
-.card h3 { font-size: var(--t-card); font-weight: 800; letter-spacing: -.03em; line-height: 1.1; text-wrap: balance; }
-.card p { margin-top: 11px; color: var(--ink-2); font-size: var(--t-ui); max-width: 34ch; }
-.card .art { margin-top: 26px; }
-.tile { background: var(--cream-2); border-radius: var(--r-card); padding: 26px 26px 28px; transition: transform .55s var(--boing), background .3s var(--settle); }
-.tile:hover { transform: translateY(-3px); background: color-mix(in srgb, var(--cream-2) 92%, var(--ink)); }
-.tile svg { width: 40px; height: 40px; stroke: var(--ink); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-.tile:hover svg { animation: wiggle .55s var(--boing); }
-@keyframes wiggle { 30% { transform: rotate(-7deg) scale(1.09); } 65% { transform: rotate(4deg); } }
-.tile h3 { margin-top: 18px; font-size: var(--t-tile); font-weight: 800; letter-spacing: -.02em; line-height: 1.2; }
-.tile p { margin-top: 8px; font-size: var(--t-small); color: var(--ink-2); }
+.chip:hover { background: var(--accent-soft); color: var(--accent); transform: translateY(-1px); }
+
+/* ── focus: a soft squircle glow, never the browser rectangle ────── */
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: var(--r, 8px); }
 
 /* ── the demo pill every simulated frame wears ───────────────────── */
 .demo-pill {
   position: absolute; bottom: 10px; right: 12px; z-index: 5;
-  font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  font-family: var(--mono); font-size: 10px; font-weight: 560; letter-spacing: .06em; text-transform: uppercase;
   color: rgb(255 255 255 / .55); background: rgb(255 255 255 / .08); border: .5px solid rgb(255 255 255 / .14);
   padding: 3px 7px; border-radius: 999px; backdrop-filter: blur(6px); pointer-events: none;
 }
 
-/* ── entrances: the hero rises on load, everything else rises on arrival ── */
-.rise { animation: riseIn .9s var(--settle) both; }
-.d2 { animation-delay: .07s; } .d3 { animation-delay: .15s; } .d4 { animation-delay: .25s; }
-@keyframes riseIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
-.up { opacity: 0; transform: translateY(26px); transition: opacity .8s var(--settle), transform .8s var(--boing); }
-.up.in { opacity: 1; transform: none; }
-html.no-js .up { opacity: 1; transform: none; }
+/* ── reveal primitives (JS splits headlines into lines) ──────────── */
+.line { display: block; overflow: clip; }
+.line > .line-in { display: block; transform: translateY(110%); }
+.reveal { opacity: 0; transform: translateY(18px); }
+.is-in .reveal, .reveal.is-in { opacity: 1; transform: none; transition: opacity .7s var(--out-quart), transform .9s var(--out-quart); }
 
 /* ── grain: static, low, on the dark devices only ────────────────── */
 .grain::after {
@@ -120,20 +114,24 @@ html.no-js .up { opacity: 1; transform: none; }
   border-radius: inherit;
 }
 
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .rise, .up { animation: none; opacity: 1; transform: none; transition: none; }
+  .line > .line-in { transform: none; }
+  .reveal { opacity: 1; transform: none; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
 
 /* ── print: the facts, not the theatre ───────────────────────────── */
 @media print {
   body { background: #fff; color: #000; }
-  .nav, .demo-pill, .finish, .pos, .rail, .ky-hint, .ms-hint, .hero-art, .giant { display: none !important; }
-  .reel, .photos { height: auto !important; }
-  .pin, .photos-pin { position: static !important; height: auto !important; }
-  .act { position: static !important; opacity: 1 !important; margin-bottom: 24px; }
-  .stage { display: none !important; }
-  .rise, .up { opacity: 1 !important; transform: none !important; }
+  .bar, .subnav, .mesh, .cue, .demo-pill, .finish, .pos, .rail, .ky-hint, .ms-hint { display: none !important; }
+  .stage-sec, .photos { height: auto !important; }
+  .stage-pin, .photos-pin { position: static !important; height: auto !important; }
+  .copy-slot { position: static !important; opacity: 1 !important; pointer-events: auto !important; margin-bottom: 24px; }
+  .frame { display: none !important; }
+  .line > .line-in { transform: none !important; }
+  .reveal { opacity: 1 !important; transform: none !important; }
   a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .8em; color: #666; }
 }

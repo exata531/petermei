@@ -50,15 +50,15 @@ const items = [
       <div><b>Kyou</b><span class="mono">now</span><p>Physics set clears after 4 PM. Two hours on the wall first, then it's yours.</p></div>
     </div>
     <div class="ky-close" data-kyou-close aria-hidden="true"><span class="mono">day closed</span><b>3 of 4 done.</b><i class="mono">(´ω｀) otsukare</i></div>
-    <p class="ky-hint mono" data-kyou-hint>tap the box to type your own</p>
+    <p class="ky-hint mono" data-kyou-hint>tap the box. it reads what you type.</p>
   </div>
 </div>
 
 <style>
   .phone { position: absolute; inset: 0; background: #0b0b0d; padding: 11px; }
-  .ph-screen { position: relative; width: 100%; height: 100%; border-radius: 44px; overflow: clip; background: #000; color: #fff; font-family: var(--sys); display: grid; grid-template-rows: auto 1fr; isolation: isolate; }
+  .ph-screen { position: relative; width: 100%; height: 100%; border-radius: 44px; overflow: clip; background: #000; color: #fff; font-family: var(--ui); display: grid; grid-template-rows: auto 1fr; isolation: isolate; }
   @supports (corner-shape: squircle) { .ph-screen { corner-shape: squircle; } }
-  .ph-status { position: absolute; top: 12px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 28px; font-size: 13px; font-weight: 600; z-index: 3; font-family: var(--sys); }
+  .ph-status { position: absolute; top: 12px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 28px; font-size: 13px; font-weight: 600; z-index: 3; font-family: var(--ui); }
   .ph-icons { display: inline-flex; gap: 5px; align-items: center; }
   .ph-icons i { display: inline-block; background: #fff; }
   .sig { width: 14px; height: 9px; -webkit-mask: linear-gradient(90deg, #000 0 20%, transparent 20% 27%, #000 27% 47%, transparent 47% 54%, #000 54% 74%, transparent 74% 81%, #000 81%); mask: linear-gradient(90deg, #000 0 20%, transparent 20% 27%, #000 27% 47%, transparent 47% 54%, #000 54% 74%, transparent 74% 81%, #000 81%); clip-path: polygon(0 60%, 100% 0, 100% 100%, 0 100%); }
