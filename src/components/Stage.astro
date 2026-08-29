@@ -6,10 +6,22 @@ import Rin from './scenes/Rin.astro';
 import Kyou from './scenes/Kyou.astro';
 import Market from './scenes/Market.astro';
 export const products = [
-  { id: 'volbase', name: 'volbase', accent: '#5c79b8', face: '(☆_☆)', kicker: 'Live · volbase.app', title: 'Find it. Apply once. <span class="serif grad">Leave with proof.</span>', what: 'One place for students to find programs, apply once, and keep proof the organization signed.', hard: 'Nearest-first search on a live map, sign-in, payments, email, and end-to-end tests. All of it solo.', chips: ['Next.js', 'Supabase', 'Stripe', 'MapLibre', 'AI SDK'], cta: 'Open volbase', href: 'https://volbase.app', w: 960, h: 600, r: 12 },
-  { id: 'rin', name: 'Rin', accent: '#f7be00', face: '(￣ヮ￣)', kicker: 'macOS · lives in the menu bar', title: 'Give your Mac <span class="serif grad">a memory.</span>', what: 'A dropdown terminal running an assistant that already knows your notes, your week, and your deadlines.', hard: 'Extensions get inspected, labelled, and hash-checked before they can touch anything.', chips: ['Swift', 'SwiftUI', 'AppKit', 'SwiftTerm', 'Claude Code'], cta: 'Type something', href: '#rin', w: 720, h: 470, r: 14 },
-  { id: 'kyou', name: 'Kyou', accent: '#ff3b30', face: '(´｡• ω •｡`)', kicker: 'iOS · in progress', title: 'The whole day, <span class="serif grad">one scroll.</span>', what: 'Calendar, homework, and habits, merged into a single timeline for today.', hard: 'A quick-add grammar that refuses to guess. No time typed, no time invented.', chips: ['Swift 6', 'SwiftUI', 'EventKit', 'WidgetKit'], cta: 'Try the quick-add', href: '#kyou', w: 300, h: 620, r: 54 },
-  { id: 'market', name: 'Market Station', accent: '#0e7a70', face: '(•_•)', kicker: 'Python · running since August', title: 'Macro, watched <span class="serif grad">around the clock.</span>', what: 'A 24/7 monitor for twelve market signals, with phone alerts and two written briefings a day.', hard: 'S&P breadth computed by hand across 500 tickers, because no free API has it.', chips: ['Python', 'FastAPI', 'Chart.js', 'Cloudflare Tunnel', 'Claude'], cta: 'Watch it tick', href: '#market', w: 960, h: 600, r: 14 },
+  { id: 'volbase', name: 'volbase', accent: '#5c79b8', kicker: 'web · live at volbase.app',
+    line: 'Volunteer programs near you, one application, and a signed record of the hours.',
+    body: 'Students search a live map sorted nearest-first, apply once, and keep proof the organization signed. I built the whole thing solo: auth, payments, email, and end-to-end tests. It has real users.',
+    stack: 'Next.js · Supabase · Stripe · MapLibre · AI SDK', cta: 'Open volbase', href: 'https://volbase.app' },
+  { id: 'rin', name: 'Rin', accent: '#f7be00', kicker: 'macOS · menu bar',
+    line: 'A terminal that drops down from the menu bar with an assistant already inside it.',
+    body: 'It knows my notes, my week, and my deadlines. Extensions are inspected, labelled, and hash-checked before they can touch anything, and the tabs survive a quit.',
+    stack: 'Swift · SwiftUI · AppKit · SwiftTerm · Claude Code', cta: 'Try the terminal', href: '' },
+  { id: 'kyou', name: 'Kyou', accent: '#ff3b30', kicker: 'iOS · in progress',
+    line: 'Calendar, homework, and habits merged into one timeline for today.',
+    body: 'Quick-add turns a sentence into an event, but it refuses to guess: if you didn’t type a time, it doesn’t invent one. Widgets and plain-language notifications included.',
+    stack: 'Swift 6 · SwiftUI · EventKit · WidgetKit', cta: 'Try quick-add', href: '' },
+  { id: 'market', name: 'Market Station', accent: '#0e7a70', kicker: 'python · running since August',
+    line: 'Twelve macro signals watched all day, with alerts that don’t flap.',
+    body: 'Built for one non-technical reader at home. Alerts use hysteresis so a wobble never pages twice, two briefings a day write themselves, and S&P breadth is computed by hand across 500 tickers because no free API has it.',
+    stack: 'Python · FastAPI · Chart.js · Cloudflare Tunnel · Claude', cta: 'Flip a tile', href: '' },
 ];
 ---
 <section class="stage-sec" id="work" data-stage>
@@ -17,14 +29,15 @@ export const products = [
     <div class="wrap stage-grid">
       <div class="stage-copy">
         {products.map((p, i) => (
-          <div class="copy-slot" data-copy-slot={p.id} data-i={i} aria-hidden={i !== 0}>
-            <p class="eyebrow ck">{p.kicker}</p>
-            <h2 class="t-title ct" set:html={p.title}></h2>
-            <dl class="facts-3">
-              <div><dt class="mono">what</dt><dd>{p.what}</dd></div>
-              <div><dt class="mono">hard part</dt><dd>{p.hard}</dd></div>
-              <div><dt class="mono">stack</dt><dd class="chips">{p.chips.map((c) => <span class="chip sq">{c}</span>)}</dd></div>
-            </dl>
+          <div class="copy-slot" data-copy-slot={p.id} data-i={i} aria-hidden={i !== 0} data-cta-label={p.cta} data-href={p.href}>
+            <p class="ck mono">{p.kicker}</p>
+            <h2 class="t-product">{p.name}</h2>
+            <p class="cl">{p.line}</p>
+            <p class="cb muted">{p.body}</p>
+            <p class="cs mono faint">{p.stack}</p>
+            {p.href
+              ? <a class="tlink" href={p.href} target="_blank" rel="noopener">{p.cta}<span class="arr">↗</span></a>
+              : <button class="tlink" type="button" data-cta={p.id}>{p.cta}<span class="arr">→</span></button>}
           </div>
         ))}
       </div>
@@ -51,8 +64,8 @@ export const products = [
             <button class="finish-btn mono is-on" type="button" data-face-val="(｡•ᴗ•｡)">(｡•ᴗ•｡)</button><button class="finish-btn mono" type="button" data-face-val="(￣ヮ￣)">(￣ヮ￣)</button><button class="finish-btn mono" type="button" data-face-val="(¬_¬)">(¬_¬)</button><button class="finish-btn mono" type="button" data-face-val="(>_<)">(&gt;_&lt;)</button>
           </div>
         </div>
-        <ol class="pos mono" aria-label="Which product is in frame">
-          {products.map((p, i) => (<li data-pos={i} class={i === 0 ? 'is-on' : ''}><span>0{i + 1}</span><em>{p.name}</em></li>))}
+        <ol class="pos" aria-label="Which product is in frame">
+          {products.map((p, i) => (<li><button type="button" data-pos={i} class={i === 0 ? 'is-on' : ''}>{p.name}</button></li>))}
         </ol>
       </div>
     </div>
@@ -60,25 +73,25 @@ export const products = [
 </section>
 
 <style>
-  .stage-sec { position: relative; height: calc(var(--n, 4) * 85svh + 20svh); }
+  /* each product owns 140 screens-hundredths of scroll, so a scene plays at reading pace */
+  .stage-sec { position: relative; height: calc(var(--n, 4) * 140svh + 20svh); }
   .stage-pin { position: sticky; top: 0; height: 100svh; padding-top: calc(var(--bar-h) + var(--sub-h)); display: grid; align-items: center; overflow: clip; }
-  .stage-grid { display: grid; grid-template-columns: minmax(280px, .72fr) minmax(0, 1.6fr); gap: clamp(24px, 4vw, 56px); align-items: center; height: min(760px, calc(100svh - var(--bar-h) - var(--sub-h) - 48px)); }
+  .stage-grid { display: grid; grid-template-columns: minmax(280px, .68fr) minmax(0, 1.6fr); gap: clamp(24px, 4vw, 56px); align-items: center; height: min(760px, calc(100svh - var(--bar-h) - var(--sub-h) - 48px)); }
 
   .stage-copy { position: relative; min-height: 360px; }
-  .copy-slot { position: absolute; inset: 0; display: grid; align-content: center; gap: 18px; opacity: 0; pointer-events: none; }
+  .copy-slot { position: absolute; inset: 0; display: grid; align-content: center; gap: 14px; opacity: 0; pointer-events: none; }
   .copy-slot.is-on { opacity: 1; pointer-events: auto; }
-  .ck { color: var(--accent); transition: color var(--t-slow) var(--settle); }
-  .ct { font-size: clamp(30px, 3.3vw, 48px); max-width: 13ch; }
-  .facts-3 { display: grid; gap: 12px; margin: 6px 0 0; }
-  .facts-3 div { display: grid; grid-template-columns: 76px 1fr; gap: 12px; align-items: baseline; border-top: .5px solid rgb(var(--espresso) / .14); padding-top: 10px; }
-  .facts-3 dt { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
-  .facts-3 dd { margin: 0; font-size: var(--t-small); line-height: 1.4; color: var(--ink-2); }
-  .facts-3 dd.chips { gap: 6px; }
+  .ck { color: var(--accent); font-size: var(--t-fine); transition: color var(--t-slow) var(--settle); }
+  .copy-slot h2 { margin-top: -4px; }
+  .cl { font-size: var(--t-lead); line-height: 1.35; letter-spacing: -0.012em; color: var(--ink); max-width: 26em; }
+  .cb { font-size: var(--t-small); line-height: 1.55; max-width: 40em; }
+  .cs { font-size: var(--t-tiny); line-height: 1.6; }
+  .copy-slot .tlink { margin-top: 6px; justify-self: start; }
 
   .stage-frame-wrap { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; align-content: center; gap: 14px; min-height: 0; min-width: 0; }
   .frame {
     position: relative; width: var(--w); height: var(--h); max-width: 100%; max-height: min(720px, calc(100svh - var(--bar-h) - var(--sub-h) - 64px));
-    background: var(--slate); color: var(--slate-fg);
+    background: var(--slate); color: var(--slate-fg); font-family: var(--sys);
     box-shadow: var(--shadow-device); overflow: clip; isolation: isolate;
     will-change: width, height, border-radius;
     transform: scale(var(--scale, 1)); transform-origin: 50% 50%;
@@ -88,25 +101,22 @@ export const products = [
   .finish { min-height: 30px; display: grid; place-items: center; }
   .finish-row { display: inline-flex; align-items: center; gap: 4px; padding: 3px; border-radius: 999px; background: rgb(var(--espresso) / .06); }
   .finish-row[hidden] { display: none; }
-  .finish-lbl { font-size: 10px; color: var(--ink-3); padding: 0 8px 0 10px; letter-spacing: .06em; text-transform: uppercase; }
+  .finish-lbl { font-size: 10px; color: var(--ink-3); padding: 0 8px 0 10px; }
   .finish-btn { height: 24px; padding: 0 11px; border-radius: 999px; font-size: 12px; font-weight: 600; color: var(--ink-2); transition: background-color var(--t-fast) var(--settle), color var(--t-fast) var(--settle); }
   .finish-btn.is-on { background: var(--paper); color: var(--ink); box-shadow: 0 1px 2px rgb(var(--espresso) / .12); }
 
-  .pos { display: flex; gap: 16px; font-size: 11px; color: var(--ink-3); }
-  .pos li { display: inline-flex; gap: 6px; align-items: baseline; transition: color var(--t-base) var(--settle); }
-  .pos li em { font-style: normal; display: none; }
-  .pos li.is-on { color: var(--accent); }
-  .pos li.is-on em { display: inline; }
+  .pos { display: flex; gap: 4px; }
+  .pos button { height: 26px; padding: 0 10px; border-radius: 999px; font-size: var(--t-tiny); font-weight: 550; color: var(--ink-3); transition: color var(--t-base) var(--settle), background-color var(--t-base) var(--settle); }
+  .pos button:hover { color: var(--ink); background: rgb(var(--espresso) / .05); }
+  .pos button.is-on { color: var(--ink); background: rgb(var(--espresso) / .07); }
 
   @media (max-width: 900px) {
-    .stage-sec { height: calc(var(--n, 4) * 100svh + 20svh); }
+    .stage-sec { height: calc(var(--n, 4) * 120svh + 20svh); }
     .stage-pin { height: auto; min-height: 100svh; padding-top: calc(var(--bar-h) + var(--sub-h) + 12px); padding-bottom: 24px; align-items: start; }
     .stage-grid { grid-template-columns: 1fr; gap: 18px; align-content: start; height: auto; }
     .stage-copy { min-height: 0; }
     .copy-slot { position: static; display: none; }
     .copy-slot.is-on { display: grid; }
-    .ct { font-size: clamp(28px, 7vw, 40px); }
-    .facts-3 div { grid-template-columns: 64px 1fr; }
     .frame { max-height: none; }
   }
 </style>

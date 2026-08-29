@@ -24,8 +24,8 @@ export function initStage({ scrollTo, reduce }: { scrollTo: (t: string | number,
   const products: Product[] = slots.map((s, i) => {
     const c = copies[i];
     return {
-      id: s.dataset.slot!, name: pos[i].querySelector('em')!.textContent!, accent: s.dataset.accentValue || '#292524',
-      face: '', kicker: c.querySelector('.ck')?.textContent || '', cta: '', href: '', w: 960, h: 600, r: 12,
+      id: s.dataset.slot!, name: pos[i].textContent!.trim(), accent: s.dataset.accentValue || '#292524',
+      face: '', kicker: c.querySelector('.ck')?.textContent || '', cta: c.dataset.ctaLabel || '', href: c.dataset.href || '#work', w: 960, h: 600, r: 12,
     };
   });
   const scenes: Record<string, Scene> = {};
@@ -52,10 +52,10 @@ export function initStage({ scrollTo, reduce }: { scrollTo: (t: string | number,
   });
   // geometry + faces + ctas come from the component's data, mirrored here
   const geo: Record<string, Partial<Product>> = {
-    volbase: { w: 960, h: 580, r: 12, face: '(☆_☆)', cta: 'Open volbase', href: 'https://volbase.app' },
-    rin:     { w: 720, h: 470, r: 14, face: '(￣ヮ￣)', cta: 'Type something', href: '#work' },
-    kyou:    { w: 300, h: 620, r: 54, face: '(´｡• ω •｡`)', cta: 'Try the quick-add', href: '#work' },
-    market:  { w: 960, h: 580, r: 14, face: '(•_•)', cta: 'Watch it tick', href: '#work' },
+    volbase: { w: 960, h: 580, r: 12, face: '(☆_☆)' },
+    rin:     { w: 720, h: 470, r: 14, face: '(￣ヮ￣)' },
+    kyou:    { w: 300, h: 620, r: 54, face: '(´｡• ω •｡`)' },
+    market:  { w: 960, h: 580, r: 14, face: '(•_•)' },
   };
   products.forEach((p) => Object.assign(p, geo[p.id]));
   // phones get hand-sized frames, not shrunken desktops
@@ -65,6 +65,8 @@ export function initStage({ scrollTo, reduce }: { scrollTo: (t: string | number,
   };
   const geoFor = (p: Product) => (narrow() ? { ...p, ...mobileGeo[p.id] } : p);
 
+  // the "try it" link in each copy block hands the sim the keyboard
+  sec.querySelectorAll<HTMLButtonElement>('[data-cta]').forEach((b) => b.addEventListener('click', () => scenes[b.dataset.cta!]?.cta?.()));
   const n = products.length;
   sec.style.setProperty('--n', String(n));
   let current = -1;
@@ -123,11 +125,9 @@ export function initStage({ scrollTo, reduce }: { scrollTo: (t: string | number,
   sub?.setAttribute('aria-hidden', 'false');
   show(0);
 
-  document.addEventListener('stage:go', (e) => {
-    const i = (e as CustomEvent<number>).detail;
-    const y = st.start + (st.end - st.start) * ((i + 0.15) / n);
-    scrollTo(y);
-  });
+  const go = (i: number) => scrollTo(st.start + (st.end - st.start) * ((i + 0.12) / n));
+  document.addEventListener('stage:go', (e) => go((e as CustomEvent<number>).detail));
+  pos.forEach((el, i) => el.addEventListener('click', () => go(i)));
 
   return { show, products, trigger: st };
 }

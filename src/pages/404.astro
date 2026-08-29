@@ -5,22 +5,21 @@ import MenuBar from '../components/MenuBar.astro';
 <Base title="Not here · Peter Mei" description="That page does not exist.">
   <MenuBar />
   <main class="nf">
-    <div class="wrap nf-in">
-      <p class="eyebrow">404</p>
-      <h1 class="t-display" data-split="lines">Nothing here. <span class="serif grad">Checked twice.</span></h1>
-      <p class="muted nf-sub">The page you wanted is not on this site. The work is, though.</p>
-      <div class="row" style="--gap:12px">
-        <a class="btn btn-solid sq" href="/#work">The work</a>
+    <div class="wrap"><div class="col nf-in">
+      <p class="mono faint">404</p>
+      <h1 class="t-name">Nothing here.</h1>
+      <p class="t-lead muted">That page doesn’t exist. The work does.</p>
+      <div class="row" style="--gap:8px">
+        <a class="btn btn-solid sq" href="/#work">See the work</a>
         <a class="btn btn-ghost sq" href="/">Home</a>
       </div>
       <p class="mono nf-face" aria-hidden="true">(・_・;)</p>
-    </div>
+    </div></div>
   </main>
 </Base>
 
 <style>
-  .nf { min-height: 100svh; display: grid; place-items: center; padding-top: var(--bar-h); }
-  .nf-in { display: grid; gap: 20px; justify-items: start; }
-  .nf-sub { font-size: var(--t-lead); }
-  .nf-face { font-size: 22px; color: var(--ink-3); margin-top: 12px; }
+  .nf { min-height: 100svh; display: grid; align-items: center; padding-top: var(--bar-h); }
+  .nf-in { display: grid; gap: 18px; justify-items: start; }
+  .nf-face { font-size: 20px; color: var(--ink-3); margin-top: 8px; }
 </style>

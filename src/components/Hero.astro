@@ -1,42 +1,39 @@
+---
+/* The first screen carries the facts with no scroll and no script: name, one
+   paragraph, the links, and what is happening now. The frame with the first
+   product sits just below the fold, so the work is the second thing seen. */
+---
 <section class="hero" id="top" data-accent="#f25c1f" data-face="(｡•ᴗ•｡)">
-  <div class="mesh" aria-hidden="true">
-    <span class="lobe l1"></span><span class="lobe l2"></span><span class="lobe l3"></span>
-  </div>
-  <div class="wrap hero-in">
-    <p class="eyebrow hero-eye" data-load="eye">Detroit · the school ’27 · builds on school nights</p>
-    <h1 class="t-hero hero-name" data-split="lines" data-load="name">Peter Mei</h1>
-    <p class="t-sub serif hero-line" data-load="line">Four things that actually work. No adult supervision.</p>
-    <div class="row hero-cta" style="--gap:12px" data-load="cta">
-      <a class="btn btn-solid sq" href="#work" data-magnet>Go look<span aria-hidden="true">↓</span></a>
-      <a class="btn btn-ghost sq" href="https://github.com/exata531" target="_blank" rel="noopener" data-magnet>GitHub</a>
+  <div class="wrap"><div class="col hero-in">
+    <h1 class="t-name hero-name" data-load>Peter Mei</h1>
+    <p class="t-lead hero-line" data-load>
+      Senior at the school, outside Detroit. I build software and ship it: a volunteering
+      platform with real users, a terminal that lives in the Mac menu bar, an iPhone day
+      planner, and a market monitor that has been running since August. All four are below,
+      as demos you can touch.
+    </p>
+    <div class="hero-foot" data-load>
+      <div class="row hero-links" style="--gap:8px">
+        <a class="btn btn-solid sq" href="#work">See the work</a>
+        <a class="btn btn-ghost sq" href="https://github.com/exata531" target="_blank" rel="noopener">GitHub</a>
+        <button class="btn btn-ghost sq" type="button" data-copy="mailto" data-copy-value="" hidden>Email<span class="hint copy-hint">copy</span></button>
+        <a class="btn btn-ghost sq" href="/Peter-Mei-Resume.pdf" data-resume hidden>Resume<span class="hint">pdf</span></a>
+      </div>
+      <p class="status mono"><span class="live" aria-hidden="true"></span>now: shipping Kyou, running volbase, applying to college</p>
     </div>
-  </div>
-  <a class="cue" href="#spine" aria-label="Scroll" data-load="cue"><span class="cue-dot"></span></a>
+  </div></div>
 </section>
 
 <style>
-  .hero { position: relative; min-height: 100svh; display: grid; place-items: center; padding-top: var(--bar-h); overflow: clip; isolation: isolate; }
-  .hero-in { text-align: center; display: grid; justify-items: center; gap: 22px; position: relative; z-index: 1; }
-  .hero-eye { opacity: 0; }
+  .hero { padding-top: calc(var(--bar-h) + clamp(64px, 11vh, 128px)); padding-bottom: clamp(48px, 7vh, 88px); }
+  .hero-in { display: grid; gap: 24px; }
   .hero-name { color: var(--ink); }
-  .hero-line { color: var(--ink-2); font-size: clamp(26px, 3.4vw, 44px); opacity: 0; max-width: 24ch; }
-  .hero-cta { margin-top: 10px; opacity: 0; }
-
-  .mesh { position: absolute; inset: -20% -10%; z-index: 0; pointer-events: none; filter: blur(70px) saturate(1.1); opacity: 0; }
-  .lobe { position: absolute; border-radius: 50%; mix-blend-mode: multiply; will-change: transform; }
-  .l1 { width: 46vw; height: 46vw; left: 8%;  top: 18%; background: color-mix(in oklab, var(--acc-me) 26%, transparent);      animation: drift1 22s ease-in-out infinite; }
-  .l2 { width: 40vw; height: 40vw; right: 6%; top: 8%;  background: color-mix(in oklab, var(--acc-volbase) 22%, transparent); animation: drift2 26s ease-in-out infinite; }
-  .l3 { width: 36vw; height: 36vw; left: 34%; bottom: 0; background: color-mix(in oklab, var(--acc-market) 16%, transparent); animation: drift3 30s ease-in-out infinite; }
-  @keyframes drift1 { 50% { transform: translate(6vw, -4vw) scale(1.08); } }
-  @keyframes drift2 { 50% { transform: translate(-5vw, 5vw) scale(.94); } }
-  @keyframes drift3 { 50% { transform: translate(3vw, -6vw) scale(1.06); } }
-
-  .cue { position: absolute; bottom: 28px; left: 50%; translate: -50% 0; width: 26px; height: 42px; border: 1.5px solid rgb(var(--espresso) / .25); border-radius: 999px; opacity: 0; }
-  .cue-dot { position: absolute; left: 50%; top: 8px; width: 4px; height: 8px; margin-left: -2px; border-radius: 2px; background: var(--ink-2); animation: cue 1.8s var(--out-quart) infinite; }
-  @keyframes cue { 0% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(14px); opacity: 0; } 100% { opacity: 0; } }
-
-  @media (prefers-reduced-motion: reduce) {
-    .hero-eye, .hero-line, .hero-cta, .cue, .mesh { opacity: 1; }
-    .lobe, .cue-dot { animation: none; }
-  }
+  .hero-line { color: var(--ink-2); max-width: 36em; }
+  .hero-line strong { color: var(--ink); font-weight: 500; }
+  .hero-foot { display: grid; gap: 18px; margin-top: 8px; }
+  .status { font-size: var(--t-fine); color: var(--ink-3); display: inline-flex; align-items: center; gap: 9px; }
+  .live { width: 7px; height: 7px; border-radius: 50%; background: var(--acc-me); box-shadow: 0 0 0 0 color-mix(in oklab, var(--acc-me) 45%, transparent); animation: live 2.4s var(--out-quart) infinite; }
+  @keyframes live { 0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--acc-me) 45%, transparent); } 70% { box-shadow: 0 0 0 8px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+  [data-load] { opacity: 0; transform: translateY(6px); }
+  @media (prefers-reduced-motion: reduce) { .live { animation: none; } }
 </style>
