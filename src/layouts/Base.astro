@@ -1,6 +1,4 @@
 ---
-import '@fontsource-variable/schibsted-grotesk/wght.css';
-import '@fontsource-variable/jetbrains-mono/wght.css';
 import '../styles/base.css';
 
 interface Props {
@@ -9,19 +7,20 @@ interface Props {
 }
 const {
   title = 'Peter Mei',
-  description = 'Peter Mei, a senior at the school outside Detroit, builds software: volbase, Rin, Kyou, and Market Station. All four run live on this page.',
+  description = 'Peter Mei, a senior at the school outside Detroit, builds software that ships: volbase, Rin, Kyou, and Market Station. All four run as demos on this page.',
 } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 <!doctype html>
-<html lang="en">
+<html lang="en" class="no-js">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    <meta name="theme-color" content="#fffdf8" />
+    <meta name="theme-color" content="#fff7ed" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#171310" media="(prefers-color-scheme: dark)" />
     <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <meta property="og:type" content="website" />
@@ -30,9 +29,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={new URL('/og.png', Astro.site)} />
     <meta name="twitter:card" content="summary_large_image" />
+    <script is:inline>document.documentElement.classList.remove('no-js');</script>
     <slot name="head" />
   </head>
   <body>
+    <a class="skip" href="#top">Skip to content</a>
     <slot />
     <script src="../scripts/main.ts"></script>
   </body>

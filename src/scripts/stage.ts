@@ -1,33 +1,31 @@
-/* one frame, four products: reads scroll progress through the tall section,
-   swaps the slot, morphs the chrome, paints the accent, drives the sub-nav */
+/* one stage, four products: reads scroll progress through the tall section,
+   swaps the slot, morphs the frame, repaints the sky and the accent */
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { setFace } from './face';
 import { initVolbase } from './scenes/volbase';
 import { initRin } from './scenes/rin';
 import { initKyou } from './scenes/kyou';
 import { initMarket } from './scenes/market';
 
 type Scene = { set(p: number): void; leave?(): void; enter?(): void; finish?(m: 'light' | 'dark'): void; cta?(): void };
-
-type Product = { id: string; name: string; accent: string; face: string; kicker: string; cta: string; href: string; w: number; h: number; r: number };
+type Product = { id: string; name: string; accent: string; sky: string[]; w: number; h: number; r: number };
 
 export function initStage({ scrollTo, reduce }: { scrollTo: (t: string | number, o?: number) => void; reduce: boolean }) {
   const sec = document.querySelector<HTMLElement>('[data-stage]');
+  const box = document.querySelector<HTMLElement>('[data-stage-box]');
   const frame = document.querySelector<HTMLElement>('[data-frame]');
-  const sub = document.querySelector<HTMLElement>('[data-subnav]');
-  if (!sec || !frame) return null;
+  if (!sec || !box || !frame) return null;
 
   const slots = [...sec.querySelectorAll<HTMLElement>('[data-slot]')];
   const copies = [...sec.querySelectorAll<HTMLElement>('[data-copy-slot]')];
   const pos = [...sec.querySelectorAll<HTMLElement>('[data-pos]')];
-  const products: Product[] = slots.map((s, i) => {
-    const c = copies[i];
-    return {
-      id: s.dataset.slot!, name: pos[i].textContent!.trim(), accent: s.dataset.accentValue || '#292524',
-      face: '', kicker: c.querySelector('.ck')?.textContent || '', cta: c.dataset.ctaLabel || '', href: c.dataset.href || '#work', w: 960, h: 600, r: 12,
-    };
-  });
+  const geo: Record<string, { w: number; h: number; r: number }> = {
+    volbase: { w: 960, h: 580, r: 12 }, rin: { w: 720, h: 470, r: 14 }, kyou: { w: 300, h: 620, r: 54 }, market: { w: 960, h: 580, r: 14 },
+  };
+  const products: Product[] = slots.map((s, i) => ({
+    id: s.dataset.slot!, name: pos[i].textContent!.trim(), accent: s.dataset.accentValue || '#292524',
+    sky: (s.dataset.sky || '').split(','), ...geo[s.dataset.slot!],
+  }));
   const scenes: Record<string, Scene> = {};
   slots.forEach((s) => {
     const id = s.dataset.slot!;
@@ -37,7 +35,7 @@ export function initStage({ scrollTo, reduce }: { scrollTo: (t: string | number,
     if (id === 'kyou') scenes[id] = initKyou(el);
     if (id === 'market') scenes[id] = initMarket(el);
   });
-  // finish pickers under the frame
+  // finish pickers under the stage
   const finishRows = [...document.querySelectorAll<HTMLElement>('[data-finish-for]')];
   finishRows.forEach((row) => {
     row.querySelectorAll<HTMLButtonElement>('[data-finish-val]').forEach((b) => b.addEventListener('click', () => {
@@ -46,45 +44,33 @@ export function initStage({ scrollTo, reduce }: { scrollTo: (t: string | number,
     }));
     row.querySelectorAll<HTMLButtonElement>('[data-face-val]').forEach((b) => b.addEventListener('click', () => {
       row.querySelectorAll('.finish-btn').forEach((x) => x.classList.remove('is-on')); b.classList.add('is-on');
-      const f = b.dataset.faceVal!; setFace(f);
-      const inner = document.querySelector<HTMLElement>('[data-rin-face]'); if (inner) inner.textContent = f;
+      const inner = document.querySelector<HTMLElement>('[data-rin-face]'); if (inner) inner.textContent = b.dataset.faceVal!;
     }));
   });
-  // geometry + faces + ctas come from the component's data, mirrored here
-  const geo: Record<string, Partial<Product>> = {
-    volbase: { w: 960, h: 580, r: 12, face: '(☆_☆)' },
-    rin:     { w: 720, h: 470, r: 14, face: '(￣ヮ￣)' },
-    kyou:    { w: 300, h: 620, r: 54, face: '(´｡• ω •｡`)' },
-    market:  { w: 960, h: 580, r: 14, face: '(•_•)' },
-  };
-  products.forEach((p) => Object.assign(p, geo[p.id]));
+  // the "try it" link in each caption hands the sim the keyboard
+  sec.querySelectorAll<HTMLButtonElement>('[data-cta]').forEach((b) => b.addEventListener('click', () => scenes[b.dataset.cta!]?.cta?.()));
+
   // phones get hand-sized frames, not shrunken desktops
   const narrow = () => window.innerWidth < 900;
-  const mobileGeo: Record<string, Partial<Product>> = {
+  const mobileGeo: Record<string, { w: number; h: number; r: number }> = {
     volbase: { w: 360, h: 460, r: 12 }, rin: { w: 360, h: 400, r: 14 }, kyou: { w: 280, h: 580, r: 50 }, market: { w: 360, h: 560, r: 14 },
   };
   const geoFor = (p: Product) => (narrow() ? { ...p, ...mobileGeo[p.id] } : p);
 
-  // the "try it" link in each copy block hands the sim the keyboard
-  sec.querySelectorAll<HTMLButtonElement>('[data-cta]').forEach((b) => b.addEventListener('click', () => scenes[b.dataset.cta!]?.cta?.()));
   const n = products.length;
   sec.style.setProperty('--n', String(n));
   let current = -1;
   const html = document.documentElement;
 
-  const subName = sub?.querySelector<HTMLElement>('[data-subnav-name]');
-  const subNote = sub?.querySelector<HTMLElement>('[data-subnav-note]');
-  const subCta = sub?.querySelector<HTMLAnchorElement>('[data-subnav-cta]');
-
-  const wrap = frame.parentElement as HTMLElement;
   function fit(p0: Product) {
     const p = geoFor(p0);
-    const availW = wrap.clientWidth, availH = narrow() ? 1e6 : Math.max(320, window.innerHeight - 96 - 64 - 60);
+    const availW = box.clientWidth * 0.9, availH = box.clientHeight * 0.88;
     const s = Math.min(1, availW / p.w, availH / p.h);
     frame.style.setProperty('--scale', s.toFixed(3));
     frame.classList.toggle('is-narrow', narrow());
   }
   window.addEventListener('resize', () => { if (current >= 0) { fit(products[current]); const g = geoFor(products[current]); gsap.set(frame, { '--w': g.w + 'px', '--h': g.h + 'px', '--r': g.r + 'px' }); } });
+
   function show(i: number) {
     if (i === current) return;
     const prev = current; current = i;
@@ -94,21 +80,17 @@ export function initStage({ scrollTo, reduce }: { scrollTo: (t: string | number,
     finishRows.forEach((row) => { row.hidden = row.dataset.finishFor !== p.id; });
     slots.forEach((s, k) => { s.classList.toggle('is-on', k === i); s.setAttribute('aria-hidden', String(k !== i)); });
     pos.forEach((el, k) => el.classList.toggle('is-on', k === i));
-    // copy crossfade: old one drops, new one rises
+    // caption crossfade: old one drops, new one rises
     copies.forEach((c, k) => {
       if (k === i) { c.classList.add('is-on'); c.setAttribute('aria-hidden', 'false'); gsap.fromTo(c, { opacity: 0, y: prev < i ? 18 : -18 }, { opacity: 1, y: 0, duration: 0.7, ease: 'expo.out', overwrite: true }); }
       else if (c.classList.contains('is-on')) { c.classList.remove('is-on'); c.setAttribute('aria-hidden', 'true'); gsap.to(c, { opacity: 0, y: prev < i ? -14 : 14, duration: 0.35, ease: 'power2.in', overwrite: true }); }
     });
-    // chrome morph
+    // frame morph, sky, accent
     fit(p);
     const g = geoFor(p);
     gsap.to(frame, { '--w': g.w + 'px', '--h': g.h + 'px', '--r': g.r + 'px', duration: reduce ? 0 : 0.9, ease: 'expo.inOut', overwrite: 'auto' });
+    gsap.to(box, { '--s1': p.sky[0], '--s2': p.sky[1], '--s3': p.sky[2], '--s4': p.sky[3], duration: reduce ? 0 : 1.1, ease: 'power2.inOut', overwrite: 'auto' });
     gsap.to(html, { '--accent': p.accent, duration: 0.8, ease: 'power2.out', overwrite: 'auto' });
-    setFace(p.face);
-    if (subName) subName.textContent = p.name;
-    if (subNote) subNote.textContent = p.kicker;
-    if (subCta) { subCta.textContent = p.cta; subCta.href = p.href; if (p.href.startsWith('http')) { subCta.target = '_blank'; subCta.rel = 'noopener'; } else { subCta.removeAttribute('target'); } }
-    if (subCta && !subCta.dataset.wired) { subCta.dataset.wired = '1'; subCta.addEventListener('click', (e) => { const cur = products[current]; if (!cur.href.startsWith('http')) { e.preventDefault(); scenes[cur.id]?.cta?.(); } }); }
     document.dispatchEvent(new CustomEvent('stage:change', { detail: p.id }));
   }
 
@@ -119,15 +101,13 @@ export function initStage({ scrollTo, reduce }: { scrollTo: (t: string | number,
       show(i);
       scenes[products[i].id]?.set(Math.min(1, Math.max(0, x - i)));
     },
-    onEnter: () => sub?.classList.add('is-in'), onEnterBack: () => sub?.classList.add('is-in'),
-    onLeave: () => sub?.classList.remove('is-in'), onLeaveBack: () => sub?.classList.remove('is-in'),
   });
-  sub?.setAttribute('aria-hidden', 'false');
   show(0);
 
   const go = (i: number) => scrollTo(st.start + (st.end - st.start) * ((i + 0.12) / n));
   document.addEventListener('stage:go', (e) => go((e as CustomEvent<number>).detail));
   pos.forEach((el, i) => el.addEventListener('click', () => go(i)));
+  document.addEventListener('keydown', (e) => { if ((e.metaKey || e.ctrlKey) && /^[1-4]$/.test(e.key)) { e.preventDefault(); go(Number(e.key) - 1); } });
 
   return { show, products, trigger: st };
 }

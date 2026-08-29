@@ -1,34 +1,33 @@
 ---
-/* Not software. Three rows, each one fact and one line under it. */
-const rows = [
-  { k: 'FIRST Robotics', t: 'Founded the school’s team in tenth grade and still lead it.', s: 'Reached Worlds in the first season as Michigan’s second-ranked rookie team.' },
-  { k: 'Climbing', t: 'Bouldering and speed. Flashes V7, projecting V10.', s: 'Six years at Planet Rock, four on the competitive team. USA Climbing speed nationals in 2025.' },
-  { k: 'Paby LLC', t: 'Ran the warehouse for a lighting company one summer.', s: 'Ordering, inventory, and fulfilment, start to finish.' },
+/* The bento: six things that are not software, one line each. */
+const tiles = [
+  { t: 'FIRST Robotics', p: 'Founded the school’s team in tenth grade and still lead it. Worlds in the first season, second-ranked rookie team in Michigan.', icon: '<rect x="4" y="7.5" width="16" height="12" rx="3"/><circle cx="9.5" cy="13" r="1.2"/><circle cx="14.5" cy="13" r="1.2"/><path d="M12 7.5v-3M9 4.5h6"/>' },
+  { t: 'Climbing', p: 'Bouldering and speed. Flashes V7, projecting V10. Six years at the gym, four on the team, speed nationals in 2025.', icon: '<path d="M4 19 10 7l3 5 2-3 5 10z"/><path d="M8.5 19v-4"/>' },
+  { t: 'Paby LLC', p: 'Ran the warehouse for a lighting company one summer: ordering, inventory, and fulfilment, start to finish.', icon: '<path d="M4 8.5 12 4l8 4.5v8L12 21l-8-4.5z"/><path d="M4 8.5 12 13l8-4.5M12 13v8"/>' },
+  { t: 'Cross country', p: 'Two varsity years. States as a freshman, then climbing took the season.', icon: '<path d="M5 18h6l2-4 3 2 3-3"/><path d="M13 6.5a1.5 1.5 0 1 0 0-.01"/><path d="M8 13l3-3 3 1 2-3"/>' },
+  { t: 'Mandarin', p: 'Spoken at home, so the second language came free. Swift, TypeScript, and Python were the ones that took work.', icon: '<path d="M4.5 6.5h15v9h-8l-4 3v-3h-3z"/><path d="M8.5 10.5h7M8.5 13h4"/>' },
+  { t: 'A camera', p: 'A Canon, mostly in Michigan, mostly things that hold still. A few of them are further down.', icon: '<rect x="3.5" y="7" width="17" height="12" rx="3"/><circle cx="12" cy="13" r="3.2"/><path d="M8.5 7 10 4.5h4L15.5 7"/>', href: '#photos' },
 ];
 ---
-<section class="section" id="elsewhere" data-accent="#f25c1f" data-face="(¬‿¬)">
-  <div class="wrap"><div class="col">
-    <h2 class="t-head reveal">Elsewhere</h2>
-    <ul class="rows">
-      {rows.map((r, i) => (
-        <li class="rowi reveal" style={`--i:${i}`}>
-          <span class="rk mono">{r.k}</span>
-          <div class="rb">
-            <p class="rt">{r.t}</p>
-            <p class="rs muted">{r.s}</p>
-          </div>
-        </li>
+<section id="elsewhere" aria-labelledby="bento-title">
+  <div class="wrap">
+    <div class="head up">
+      <p class="eyebrow">Elsewhere</p>
+      <h2 id="bento-title">The parts without a keyboard</h2>
+    </div>
+    <div class="bento">
+      {tiles.map((t) => (
+        t.href
+          ? <a class="tile up" href={t.href}><svg viewBox="0 0 24 24" aria-hidden="true" set:html={t.icon}></svg><h3>{t.t}</h3><p>{t.p}</p></a>
+          : <div class="tile up"><svg viewBox="0 0 24 24" aria-hidden="true" set:html={t.icon}></svg><h3>{t.t}</h3><p>{t.p}</p></div>
       ))}
-    </ul>
-  </div></div>
+    </div>
+  </div>
 </section>
 
 <style>
-  .rows { margin-top: 28px; border-top: .5px solid rgb(var(--espresso) / .16); }
-  .rowi { display: grid; grid-template-columns: 150px 1fr; gap: 20px; padding: 22px 0; border-bottom: .5px solid rgb(var(--espresso) / .16); transition-delay: calc(var(--i) * 60ms); }
-  .rk { font-size: var(--t-fine); color: var(--ink-3); padding-top: 3px; }
-  .rb { display: grid; gap: 4px; }
-  .rt { font-size: var(--t-body); font-weight: 550; color: var(--ink); letter-spacing: -0.01em; }
-  .rs { font-size: var(--t-small); line-height: 1.5; }
-  @media (max-width: 600px) { .rowi { grid-template-columns: 1fr; gap: 8px; } }
+  #elsewhere { padding-top: var(--sec); }
+  .bento { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; }
+  @media (max-width: 860px) { .bento { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .bento { grid-template-columns: 1fr; } }
 </style>

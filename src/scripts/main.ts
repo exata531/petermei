@@ -2,9 +2,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import { initStage } from './stage';
-import { initMenu } from './menu';
 import { startClocks } from './clock';
-import { setFace } from './face';
 import { initPhotos } from './photos';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -29,18 +27,28 @@ export const scrollTo = (target: string | number, offset = 0) => {
   else window.scrollTo({ top: target + offset, behavior: 'smooth' });
 };
 
-/* ── reveals: a short fade when a block enters, nothing more ────── */
+/* ── the nav goes solid once the page has moved ─────────────────── */
+const nav = document.querySelector<HTMLElement>('[data-nav]');
+const solid = () => nav?.classList.toggle('solid', window.scrollY > 24);
+solid(); window.addEventListener('scroll', solid, { passive: true });
+
+/* ── reveals: rise on arrival, once ─────────────────────────────── */
 const io = new IntersectionObserver((entries) => {
-  for (const e of entries) if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); }
-}, { rootMargin: '0px 0px -10% 0px' });
-document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+}, { rootMargin: '0px 0px -10% 0px', threshold: 0.08 });
+document.querySelectorAll('.up').forEach((el) => io.observe(el));
+
+/* ── the hero cards drift at their own rates as the page moves ──── */
+const leaves = [...document.querySelectorAll<HTMLElement>('[data-leaf]')];
+if (leaves.length && !reduce) {
+  const rates = [0.08, 0.16, 0.24];
+  const drift = () => { const y = window.scrollY; leaves.forEach((l, i) => l.style.setProperty('--ly', `${-y * rates[i]}px`)); };
+  drift(); window.addEventListener('scroll', drift, { passive: true });
+}
 
 /* ── the live accent: one colour, cross-faded per section ───────── */
 document.querySelectorAll<HTMLElement>('[data-accent]').forEach((sec) => {
-  const paint = () => {
-    gsap.to(html, { '--accent': sec.dataset.accent!, duration: 0.8, ease: 'power2.out', overwrite: 'auto' });
-    if (sec.dataset.face) setFace(sec.dataset.face);
-  };
+  const paint = () => gsap.to(html, { '--accent': sec.dataset.accent!, duration: 0.8, ease: 'power2.out', overwrite: 'auto' });
   ScrollTrigger.create({ trigger: sec, start: 'top 55%', end: 'bottom 55%', onEnter: paint, onEnterBack: paint });
 });
 
@@ -55,18 +63,14 @@ document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((b) => {
   });
 });
 
+/* ── footer product links jump into the reel ────────────────────── */
+document.querySelectorAll<HTMLAnchorElement>('[data-go]').forEach((a) => {
+  a.addEventListener('click', (e) => { e.preventDefault(); document.dispatchEvent(new CustomEvent('stage:go', { detail: Number(a.dataset.go) })); });
+});
+
 /* ── boot ───────────────────────────────────────────────────────── */
 startClocks();
-initMenu(scrollTo);
 const stage = initStage({ scrollTo, reduce });
 initPhotos(reduce);
-
-/* load: the bar slides down, the face blinks awake, the first screen fades up in order */
-const tl = gsap.timeline({ defaults: { ease: 'power2.out' }, delay: 0.05 });
-tl.to('#bar', { y: 0, duration: 0.7, ease: 'expo.out', onStart: () => document.getElementById('bar')!.classList.add('is-in') })
-  .from('#face .face-txt', { scaleY: 0.12, duration: 0.4, ease: 'back.out(2.4)' }, '-=0.3')
-  .to('[data-load]', { opacity: 1, y: 0, duration: 0.6, stagger: 0.09 }, '-=0.3');
-if (reduce) { tl.progress(1); }
-
 window.addEventListener('load', () => ScrollTrigger.refresh());
 export { stage };
