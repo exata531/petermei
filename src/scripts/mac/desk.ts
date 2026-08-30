@@ -12,6 +12,7 @@ import { initDock } from './dock';
 import { initSpotlight, type Hit } from './spotlight';
 import { mountScene, type Live } from './scenes';
 import { initPhotos, type PhotoRec } from './photos';
+import { initIntro } from './intro';
 import { onFrame, damp, reduced } from './motion';
 import { apps, byId, links, finder, EDIT, VIEW, WINDOW, type Menu, type MenuItem } from '../../data/apps';
 
@@ -24,6 +25,7 @@ const dockRoot = $('[data-dock-root]')!;
 const dockWrap = $('[data-dock-wrap]')!;
 const mbar = $('[data-mbar]')!;
 const deskEl = $('[data-desk]')!;
+const macEl = $('[data-mac]')!;
 
 const phone = () => matchMedia('(max-width: 767px)').matches;
 /* document-wide on purpose: a body spends most of its life in the stash but is
@@ -513,6 +515,7 @@ const appMenus = $('[data-app-menus]')!;
 
 const APPLE: MenuItem[] = [
   { label: 'About Peter', action: 'open:finder' },
+  { label: 'Back to the start', action: 'intro' },
   { label: '', sep: true },
   { label: 'System Settings…', dis: true },
   { label: 'App Store…', dis: true },
@@ -776,7 +779,7 @@ addEventListener('pointerdown', (e) => {
   if (ctxOpen && !(e.target as HTMLElement).closest('[data-ctx]')) closeCtx();
 });
 document.addEventListener('contextmenu', (e) => {
-  if (phone()) return;
+  if (phone() || intro.active) return;
   const t = e.target as HTMLElement;
   if (!(t instanceof Element)) return;
   if (t.closest('input, textarea, [contenteditable]')) return;
@@ -862,6 +865,7 @@ function run(act: string) {
     case 'about': aboutFront(); break;
     case 'sleep': sleep(); break;
     case 'restart': restart(); break;
+    case 'intro': intro.back(); break;
     case 'spot': spot.show(); break;
     case 'theme': theme.flip(); break;
     case 'gh': window.open(links.github, '_blank', 'noopener'); break;
@@ -1044,6 +1048,7 @@ const sheet = $('[data-sheet]')!;
 const sheetBody = $('[data-sheet-body]')!;
 const sheetName = $('[data-sheet-name]')!;
 const sheetTop = $('[data-sheet-top]')!;
+const sheetFoot = $('[data-sheet-foot]');
 let sheetId: string | null = null;
 
 function sheetOpen(id: string, title?: string) {
@@ -1056,6 +1061,8 @@ function sheetOpen(id: string, title?: string) {
   sheetName.textContent = title ?? byId(id)?.label ?? TITLES[id] ?? '';
   sheet.hidden = false;
   sheet.dataset.app = id;
+  /* the way back to the landing lives at the foot of the About sheet */
+  if (sheetFoot) sheetFoot.hidden = id !== 'finder';
   sheet.style.transform = '';
   requestAnimationFrame(() => sheet.classList.add('is-on'));
   open.add(id);
@@ -1102,6 +1109,7 @@ function sheetClose(now = false) {
   sheetTop.addEventListener('pointercancel', end);
 }
 $('[data-sheet-close]')?.addEventListener('click', () => sheetClose());
+$('[data-intro-back]')?.addEventListener('click', () => intro.back());
 
 /* ── everything that opens an app ──────────────────────────────────────── */
 document.addEventListener('click', (e) => {
@@ -1164,7 +1172,7 @@ const launch = (it: HTMLElement) => {
 
 /* ── the keyboard ──────────────────────────────────────────────────────── */
 addEventListener('keydown', (e) => {
-  if (spot.open) return;
+  if (spot.open || intro.active) return;
   const k = e.key.toLowerCase();
   /* Escape dismisses a menu, the viewer, a sheet, Quick Look or the panel;
      it never closes a window, because a Mac's does not */
@@ -1194,6 +1202,12 @@ addEventListener('keydown', (e) => {
 /* ── go ────────────────────────────────────────────────────────────────── */
 initClock();
 sync();
+/* the landing, if this tab has not been in yet; the desktop is already
+   drawn behind it, live, so the picture shows the real thing */
+const intro = initIntro(macEl, $('[data-land]'), {
+  onEnter: () => { deskEl.tabIndex = -1; deskEl.focus({ preventScroll: true }); },
+  beforeBack: () => { closeMenu(); closeCtx(); if (sheetId) sheetClose(true); },
+});
 document.body.classList.add('is-up');
 dockWrap.classList.add('is-up');
 

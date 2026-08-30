@@ -87,6 +87,20 @@
   --tint-market:  light-dark(var(--c-green-2), #1f3327);
   --tint-peter:   light-dark(var(--c-sky-2), #1c2f3a);
 
+  /* the landing's drawn machines: paper for the bezel, one aluminium for
+     the stand, the sky for the chin and the phone's frame, ink for the edges */
+  --im-bezel-a: light-dark(#f9f6f2, #2b2927);
+  --im-bezel-b: light-dark(#f0ebe6, #232120);
+  --im-chin-a:  light-dark(#a9dbf2, #24414f);
+  --im-chin-b:  light-dark(var(--c-sky), #1c2f3a);
+  --im-stand-a: light-dark(#ebe7e2, #3b3836);
+  --im-stand-b: light-dark(#ded9d3, #302d2b);
+  --im-base:    light-dark(#d4cec7, #282523);
+  --im-edge:    light-dark(rgb(3 3 2 / .16), rgb(255 255 255 / .12));
+  --im-shadow:  light-dark(rgb(3 3 2 / .2), rgb(0 0 0 / .6));
+  --ip-bezel:   #141415;
+  --ip-btn:     light-dark(#86c3e2, #172733);
+
   --lt-off:     light-dark(#dcdad8, #4a4846);
   --lt-off-ring: light-dark(rgb(0 0 0 / .12), rgb(255 255 255 / .06));
 

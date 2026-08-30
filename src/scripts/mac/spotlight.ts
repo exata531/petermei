@@ -92,6 +92,7 @@ export function initSpotlight(
   el.addEventListener('pointerdown', (e) => { if (e.target === el) hide(); });
 
   addEventListener('keydown', (e) => {
+    if (document.body.classList.contains('is-landing')) return;
     const k = e.key.toLowerCase();
     if ((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && (k === 'k' || e.code === 'Space')) {
       e.preventDefault();

@@ -995,6 +995,107 @@ html:not(.js) .pho-side, html:not(.js) .pho-main, html:not(.js) .pho-view { disp
   :root { --dock-i: 56px; }
 }
 
+/* ══ the machine: the whole computer as one thing ══════════════════════
+   Untransformed it is invisible to layout and stacking: its fixed children
+   stay fixed to the viewport. While it sits in the landing's picture, or is
+   on its way in or out, it carries one transform and everything inside
+   follows. The transform is gone the moment the move ends. */
+.mac { position: fixed; inset: 0; transform-origin: 0 0; }
+html:not(.js) .mac { display: none; }
+html:not(.in) .mac.is-pending { visibility: hidden; }
+.mac.is-far, .mac.is-moving { z-index: 90; }
+.mac.is-moving { overflow: hidden; }
+/* the lift is its own property so a window resize moves the desktop at once
+   and only the hover eases */
+@property --lift { syntax: '<length>'; inherits: false; initial-value: 0px; }
+.mac.is-far {
+  transform: translate(var(--fx, 0px), var(--fy, 0px)) translateY(var(--lift, 0px)) scale(var(--fk, 1));
+  border-radius: var(--sr, 0px); overflow: hidden;
+  transition: --lift 200ms var(--out), filter 150ms var(--soft);
+}
+/* the paper grain aliases into static at a third of its size */
+.mac.is-far .wall-grain, .mac.is-moving .wall-grain { opacity: 0; }
+.mac.is-far, .mac.is-far * { pointer-events: none !important; }
+body.is-land-hover .mac.is-far { --lift: -3px; filter: brightness(1.06); }
+.desk:focus, .desk:focus-visible { outline: none; }
+.mac-isle {
+  display: none; position: absolute; z-index: 99;
+  left: 50%; top: 1.3%; translate: -50% 0;
+  width: 31%; height: 4.2%; border-radius: 999px;
+  background: #000;
+}
+
+/* ══ the landing: paper, a drawn machine, the real desktop in its screen ══ */
+.land {
+  position: fixed; inset: 0; z-index: 85; overflow: hidden;
+  display: grid; place-items: center;
+  color: var(--ink);
+}
+html.in .land, html:not(.js) .land { display: none !important; }
+.land-ground { position: absolute; inset: 0; background: var(--surface); }
+.land-col {
+  position: relative; width: 100%;
+  display: grid; justify-items: center; gap: 26px;
+  padding: 24px; transform-origin: 0 0;
+}
+.land-head { display: grid; gap: 10px; text-align: center; max-width: 60ch; }
+.land-name { font-size: 48px; font-weight: 600; letter-spacing: -.022em; line-height: 1.1; }
+.land-line { font-size: 17px; line-height: 1.3; color: var(--ink-2); }
+.land-mac {
+  position: relative;
+  width: min(40vw, calc((100dvh - 320px) * var(--ar, 1.3)), 720px);
+  aspect-ratio: var(--ar, 1.3);
+  transition: transform 200ms var(--out);
+}
+.land-mac svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.land-iphone { display: none; }
+.land.is-hover .land-mac, body.is-land-hover .land-mac { transform: translateY(-3px); }
+.land.is-moving .land-mac { transition: none; transform: none; }
+.land.is-moving { pointer-events: none; }
+/* the screen is the button; the live desktop sits over it and lets the click through */
+.land-screen { position: absolute; display: block; padding: 0; border-radius: 0; }
+.land-screen:not(:disabled) { cursor: pointer; }
+.land-screen:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; border-radius: 2px; }
+.land-iphone .land-screen:focus-visible { border-radius: 12%; }
+.land-foot { position: relative; width: 100%; height: 24px; }
+.land-load, .land-cue {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  font-size: 14px; color: var(--ink-2);
+  transition: opacity 220ms var(--soft);
+}
+.land-bar { display: block; width: 160px; height: 3px; border-radius: 2px; background: var(--line-2); overflow: hidden; }
+.land-fill {
+  display: block; width: 100%; height: 100%; background: var(--ink);
+  transform: scaleX(var(--p, 0)); transform-origin: 0 50%;
+  transition: transform 260ms var(--soft);
+}
+.land-cue { opacity: 0; color: var(--ink); }
+.land-ptr { width: 15px; height: 15px; flex: none; fill: var(--ink); stroke: var(--surface); stroke-width: 1; stroke-linejoin: round; }
+.land.is-ready .land-load { opacity: 0; }
+.land.is-ready .land-cue { opacity: 1; }
+
+@media (max-width: 767px) {
+  .land-col { gap: 22px; padding: 20px; }
+  .land-name { font-size: 34px; }
+  .land-line { font-size: 16px; max-width: 30ch; }
+  .land-mac { width: min(62vw, calc((100dvh - 270px) * var(--ar, .47))); }
+  .land-imac { display: none; }
+  .land-iphone { display: block; }
+  .mac.is-far .mac-isle, .mac.is-moving .mac-isle { display: block; }
+  /* the sheet's last row: the way back to the landing */
+  .sheet { grid-template-rows: auto 1fr auto; }
+  .sheet-foot { padding: 10px 16px max(12px, env(safe-area-inset-bottom)); background: var(--surface); box-shadow: 0 -.5px 0 var(--line); }
+  .sheet-row {
+    display: block; width: 100%; min-height: 48px; padding: 0 16px;
+    border-radius: 12px; background: var(--chip); color: var(--accent);
+    font-size: 17px; font-weight: 500; text-align: center;
+    transition: background var(--t-fast) var(--soft), transform var(--t-press) var(--soft);
+  }
+  .sheet-row:hover { background: var(--chip-2); }
+  .sheet-row:active { transform: scale(.98); }
+}
+
 /* ══ reduced motion: every move becomes a fade ═════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

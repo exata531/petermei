@@ -1,0 +1,53 @@
+---
+/* The landing.
+
+   A page of Craft's paper that is also the loading screen. The name, one
+   line, a drawn machine with the real desktop inside its screen, and under
+   it a thin bar that fills as the page actually settles, then hands over to
+   the one instruction. On a phone the machine is an iPhone and the screen
+   holds the real home screen.
+
+   Both drawings are rendered here for the first paint at the shapes a
+   desktop window and a phone usually have; the script redraws whichever is
+   showing if the visitor's window is shaped differently. Without JavaScript
+   none of this exists: the plain page is the whole site. */
+import { imac, iphone } from '../../scripts/mac/devices';
+
+const mac = imac(1.6);
+const phone = iphone(390 / 844);
+const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(3)}%`;
+const screenStyle = (d: typeof mac) =>
+  `left:${pct(d.screen.x, d.vbW)};top:${pct(d.screen.y, d.vbH)};width:${pct(d.screen.w, d.vbW)};height:${pct(d.screen.h, d.vbH)}`;
+---
+<section class="land" data-land aria-busy="true" aria-label="Peter Mei">
+  <div class="land-ground" aria-hidden="true"></div>
+  <div class="land-col" data-land-col>
+    <header class="land-head">
+      <h1 class="land-name">Peter Mei</h1>
+      <p class="land-line">I make software. Everything I have built is on this Mac.</p>
+    </header>
+
+    <div class="land-mac land-imac" data-land-imac data-aspect="1.6" style={`--ar:${(mac.vbW / mac.vbH).toFixed(4)}`}>
+      <Fragment set:html={mac.svg} />
+      <button class="land-screen" type="button" data-land-enter disabled aria-label="Look around the Mac"
+              data-r="0" style={screenStyle(mac)}></button>
+    </div>
+
+    <div class="land-mac land-iphone" data-land-iphone data-aspect={(390 / 844).toFixed(4)} style={`--ar:${(phone.vbW / phone.vbH).toFixed(4)}`}>
+      <Fragment set:html={phone.svg} />
+      <button class="land-screen" type="button" data-land-enter disabled aria-label="Look around the phone"
+              data-r={(phone.screen.r / phone.screen.w).toFixed(4)} style={screenStyle(phone)}></button>
+    </div>
+
+    <div class="land-foot">
+      <p class="land-load" data-land-load>
+        <span class="land-bar" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-land-bar><span class="land-fill" data-land-fill></span></span>
+        <span>Loading</span>
+      </p>
+      <p class="land-cue" data-land-cue>
+        <svg class="land-ptr" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 1.6v11.9l3.1-3 2.1 4.7 2.3-1-2.1-4.6 4.3-.3Z"/></svg>
+        <span>Click the screen to look around.</span>
+      </p>
+    </div>
+  </div>
+</section>

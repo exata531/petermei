@@ -35,6 +35,8 @@ const url = new URL(Astro.url.pathname, Astro.site ?? 'https://petermei.com');
           var t = localStorage.getItem('appearance');
           if (t === 'light' || t === 'dark') d.dataset.theme = t;
         } catch (e) {}
+        /* the landing shows once per tab: after that a reload lands on the desktop */
+        try { if (sessionStorage.getItem('mac-in')) d.classList.add('in'); } catch (e) {}
       })();
     </script>
   </head>

@@ -4,6 +4,7 @@ import Wallpaper from '../components/mac/Wallpaper.astro';
 import MenuBar from '../components/mac/MenuBar.astro';
 import Dock from '../components/mac/Dock.astro';
 import Stash from '../components/mac/Stash.astro';
+import Landing from '../components/mac/Landing.astro';
 import Icon from '../components/mac/Icon.astro';
 import { readme } from '../data/apps';
 import { deskPhotos } from '../data/photos';
@@ -22,6 +23,10 @@ const padApps = [
   title="Peter Mei"
   desc="Peter Mei builds software outside Detroit. This portfolio is a Mac desktop: volbase, Rin, Kyou and Market Station open as apps on it."
 >
+  <!-- the machine: everything that is the computer, so the landing can hold
+       it in a picture and the way in can move it as one thing -->
+  <div class="mac is-pending" data-mac>
+
   <!-- the desktop -->
   <div class="desk" data-desk>
     <Wallpaper />
@@ -109,12 +114,20 @@ const padApps = [
         <button class="sheet-x" type="button" data-sheet-close aria-label="Close">Done</button>
       </div>
       <div class="sheet-body" data-sheet-body></div>
+      <div class="sheet-foot" data-sheet-foot hidden>
+        <button class="sheet-row" type="button" data-intro-back>Back to the start</button>
+      </div>
     </div>
   </div>
 
   <MenuBar />
   <Dock />
 
+  <!-- the phone's Dynamic Island, only while the home screen sits in the landing's picture -->
+  <span class="mac-isle" data-mac-isle aria-hidden="true"></span>
+  </div>
+
+  <div class="menu" data-menu-pop hidden role="menu"></div>
   <div class="notifs" data-notifs aria-live="polite"></div>
   <div class="menu" data-ctx hidden role="menu"></div>
 
@@ -131,6 +144,8 @@ const padApps = [
   </div>
 
   <button class="sleep" data-sleep hidden aria-label="Wake"></button>
+
+  <Landing />
 
   <Stash />
 </Mac>
