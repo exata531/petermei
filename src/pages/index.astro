@@ -6,6 +6,7 @@ import Dock from '../components/mac/Dock.astro';
 import Stash from '../components/mac/Stash.astro';
 import Icon from '../components/mac/Icon.astro';
 import { readme } from '../data/apps';
+import { deskPhotos } from '../data/photos';
 
 const padApps = [
   { id: 'volbase', label: 'volbase' },
@@ -34,7 +35,7 @@ const padApps = [
         </button>
       </li>
       <li>
-        <button class="item" type="button" data-open="photos">
+        <button class="item" type="button" data-open="finder" data-pane="pictures">
           <span class="item-ico"><Icon id="folder" /></span>
           <span class="item-lbl">Pictures</span>
         </button>
@@ -45,6 +46,14 @@ const padApps = [
           <span class="item-lbl">About Peter</span>
         </button>
       </li>
+      {deskPhotos.map((p) => (
+        <li>
+          <button class="item item-file" type="button" data-open="photos" data-photo={p.i} aria-label={`${p.name}, ${p.alt}`}>
+            <span class="item-ico"><span class="item-pic" data-orient={p.w >= p.h ? 'l' : 'p'}><img src={p.icon} width={p.w} height={p.h} alt="" decoding="async" draggable="false" /></span></span>
+            <span class="item-lbl">{p.name}</span>
+          </button>
+        </li>
+      ))}
     </ul>
 
     <div class="wins" data-wins></div>

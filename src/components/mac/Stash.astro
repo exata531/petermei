@@ -10,12 +10,17 @@ import Rin from '../scenes/Rin.astro';
 import Kyou from '../scenes/Kyou.astro';
 import Market from '../scenes/Market.astro';
 import Icon from './Icon.astro';
+import Photos from './Photos.astro';
+import Pictures from './Pictures.astro';
 import { apps, finder, readme, links } from '../../data/apps';
+import { photos } from '../../data/photos';
 
-const photos = Array.from({ length: 12 }, (_, i) => `/img/photos/p-${String(i + 1).padStart(2, '0')}.webp`);
+/* what the scripts need to know about a photo, once, as JSON */
+const photoJson = JSON.stringify(photos.map((p) => ({ f: p.file, n: p.name, w: p.w, h: p.h, a: p.alt, p: p.place, d: p.dayLabel, m: p.month, ml: p.monthLabel })));
 const scenes = { volbase: Volbase, rin: Rin, kyou: Kyou, market: Market };
 const glyphs: Record<string, string> = {
   person: '<circle cx="8" cy="5.2" r="2.8"/><path d="M2.8 13.6c.6-2.8 2.6-4.2 5.2-4.2s4.6 1.4 5.2 4.2"/>',
+  pictures: '<path d="M2.5 4.5h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1Z"/><path d="M2.5 11 6 7.5l2.5 2.5 2-1.5 3.5 2.5"/><circle cx="10.5" cy="7" r="1" fill="currentColor" stroke="none"/>',
   hammer: '<path d="M9.5 3.5 12.5 6.5 5 14l-3-3Z"/><path d="M8 5 11 2l3 3-3 3"/>',
   star: '<path d="M8 1.8l1.9 4 4.4.6-3.2 3 .8 4.4L8 11.7l-3.9 2.1.8-4.4-3.2-3 4.4-.6Z"/>',
   chevrons: '<path d="M5.5 4 2 8l3.5 4M10.5 4 14 8l-3.5 4"/>',
@@ -64,6 +69,9 @@ const doc = `<svg class="fnd-doc" viewBox="0 0 48 58" aria-hidden="true"><path c
             <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs[s.glyph]} />{s.label}
           </button>
         ))}
+        <button class="fnd-tab" type="button" data-fnd="pictures">
+          <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.pictures} />Pictures
+        </button>
         <span class="fnd-h">Locations</span>
         <a class="fnd-tab" href={links.github} rel="me noopener" target="_blank">
           <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="9" rx="1.5"/><path d="M5.5 14h5M8 12v2"/></svg>GitHub
@@ -83,6 +91,7 @@ const doc = `<svg class="fnd-doc" viewBox="0 0 48 58" aria-hidden="true"><path c
             </ul>
           </div>
         ))}
+        <Pictures />
         <div class="fnd-status" data-fnd-status>4 items</div>
       </div>
     </div>
@@ -90,21 +99,8 @@ const doc = `<svg class="fnd-doc" viewBox="0 0 48 58" aria-hidden="true"><path c
 
   <section class="stash-app" data-body="photos" aria-label="Photos">
     <h2 class="stash-h">Photos</h2>
-    <div class="pho">
-      <ul class="pho-grid" data-pho-grid>
-        {photos.map((p, i) => (
-          <li><button class="pho-cell" type="button" data-pho={i} aria-label={`Photo ${i + 1} of 12`}>
-            <img src={p} width="1086" height="724" alt={`Photograph ${i + 1}, by Peter`} loading="lazy" decoding="async" />
-          </button></li>
-        ))}
-      </ul>
-      <div class="pho-big" data-pho-big hidden>
-        <button class="pho-nav pho-prev" type="button" aria-label="Previous photo"><svg viewBox="0 0 14 14"><path d="M9 2 4 7l5 5"/></svg></button>
-        <img data-pho-img src={photos[0]} width="1086" height="724" alt="" decoding="async" />
-        <button class="pho-nav pho-next" type="button" aria-label="Next photo"><svg viewBox="0 0 14 14"><path d="M5 2l5 5-5 5"/></svg></button>
-        <button class="pho-close" type="button" aria-label="Back to the grid">Done</button>
-      </div>
-    </div>
+    <p class="stash-p">{photos.length} photographs I took, in the places on the labels.</p>
+    <Photos />
   </section>
 
   <section class="stash-app" data-body="textedit" aria-label="Read me">
@@ -159,6 +155,8 @@ const doc = `<svg class="fnd-doc" viewBox="0 0 48 58" aria-hidden="true"><path c
       <a class="abt-link" href={links.github} rel="me noopener" target="_blank">github.com/exata531</a>
     </div>
   </section>
+
+  <script type="application/json" data-ph-json set:html={photoJson} />
 
   {/* icons the scripts clone into Spotlight rows and notifications */}
   {['finder', 'volbase', 'rin', 'kyou', 'market', 'photos', 'textedit', 'trash', 'github', 'settings'].map((id) => (

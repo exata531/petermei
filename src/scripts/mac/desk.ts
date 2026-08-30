@@ -11,6 +11,7 @@ import { Desk, type Win } from './windows';
 import { initDock } from './dock';
 import { initSpotlight, type Hit } from './spotlight';
 import { mountScene, type Live } from './scenes';
+import { initPhotos, type PhotoRec } from './photos';
 import { onFrame, damp, reduced } from './motion';
 import { apps, byId, links, EDIT, VIEW, WINDOW, type Menu, type MenuItem } from '../../data/apps';
 
@@ -30,6 +31,8 @@ const phone = () => matchMedia('(max-width: 900px)').matches;
 const body = (id: string) => $(`[data-body="${id}"]`);
 /* an icon, cloned out of the templates the page rendered once */
 const icon = (id: string) => $<HTMLTemplateElement>(`template[data-icon="${id}"]`)?.innerHTML ?? '';
+/* the photo library, as the scripts know it: file, name, size, place, date */
+const PH: PhotoRec[] = JSON.parse($('[data-ph-json]')?.textContent || '[]');
 
 /* ── appearance ─────────────────────────────────────────────────────────── */
 function initTheme() {
@@ -227,12 +230,40 @@ function safariTool(id: string) {
   return t;
 }
 
+/* Photos: sidebar toggle and the back chevron on the left, the four views
+   centred, the thumbnail slider on the right; in the viewer the views and the
+   slider step aside for the photo's place and date */
+function photosTool() {
+  const t = document.createElement('div');
+  t.dataset.drag = '';
+  t.className = 'pho-tool is-lib';
+  const modes: [string, string][] = [['years', 'Years'], ['months', 'Months'], ['days', 'Days'], ['all', 'All Photos']];
+  t.innerHTML =
+    `${btn(G.side, 'Hide or show the sidebar', ' pho-sideb')}
+     ${btn(G.back, 'Back to the library', ' pho-back')}
+     <span class="tb-title pho-ttl" data-ph-title hidden></span>
+     <span class="tb-title pho-vt" data-ph-vt aria-live="polite"></span>
+     <span class="tb-sp" data-drag></span>
+     <span class="tb-seg pho-seg" role="tablist" aria-label="View">
+       ${modes.map(([k, l]) => `<button class="tb-btn tb-txt${k === 'all' ? ' is-on' : ''}" type="button" role="tab" aria-selected="${k === 'all'}" tabindex="${k === 'all' ? 0 : -1}" data-ph-mode="${k}">${l}</button>`).join('')}
+     </span>
+     <span class="tb-sp" data-drag></span>
+     <label class="pho-zoom" title="Thumbnail size">
+       <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="6" height="6" rx="1"/></svg>
+       <input type="range" min="0" max="4" step="1" value="2" data-ph-zoom aria-label="Thumbnail size" />
+       <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" rx="1.5"/></svg>
+     </label>`;
+  t.querySelector('.pho-sideb')!.setAttribute('data-ph-side', '');
+  t.querySelector('.pho-back')!.setAttribute('data-ph-back', '');
+  return t;
+}
+
 const TITLES: Record<string, string> = {
   finder: 'About Peter', photos: 'Photos', textedit: 'Read me', trash: 'Trash',
 };
 const SIZES: Record<string, { w: number; h: number; min?: number; klass?: string }> = {
   finder: { w: 700, h: 440, min: 460, klass: 'win-finder' },
-  photos: { w: 760, h: 520, min: 400, klass: 'win-photos' },
+  photos: { w: 920, h: 600, min: 420, klass: 'win-photos' },
   textedit: { w: 460, h: 260, min: 300, klass: 'win-text' },
   trash: { w: 560, h: 340, min: 380, klass: 'win-finder' },
 };
@@ -254,7 +285,7 @@ function openApp(id: string) {
   if (id === 'volbase') tool = safariTool(id);
   if (id === 'finder') tool = finderTool('About Peter', { views: true });
   if (id === 'trash') tool = finderTool('Trash');
-  if (id === 'photos') tool = finderTool('Photos', { count: '12 Photos' });
+  if (id === 'photos') tool = photosTool();
 
   dock.bounce(id);
   const win = desk.open({
@@ -322,7 +353,63 @@ function openApp(id: string) {
     }
   }
   if (id === 'finder') wireFinder(el, tool!);
-  if (id === 'photos') wirePhotos(el);
+  if (id === 'photos') { photosApp.attachTool(tool!); photosApp.enter('desk'); }
+  return win;
+}
+
+/* a photo opened from anywhere: the desktop, Finder, a Spotlight hit */
+function openPhoto(i: number) {
+  if (phone()) { sheetOpen('photos'); requestAnimationFrame(() => photosApp.openAt(i)); return; }
+  quickLookClose();
+  openApp('photos');
+  photosApp.openAt(i);
+}
+
+/* ── Quick Look: a floating panel with the file's name for a title ─────── */
+let ql: Win | null = null;
+let qlAt = -1;
+let qlBody: HTMLElement | null = null;
+function qlSize(p: PhotoRec) {
+  const maxW = Math.min(920, innerWidth - 80);
+  const maxH = Math.min(660, desk.dockTop() - 24 - 80);
+  let w = maxW, h = (w * p.h) / p.w;
+  if (h > maxH) { h = maxH; w = (h * p.w) / p.h; }
+  return { w: Math.round(w), h: Math.round(h) + 28 };
+}
+function quickLook(i: number) {
+  const p = PH[i];
+  if (!p) return;
+  qlAt = i;
+  if (!qlBody) {
+    qlBody = document.createElement('div');
+    qlBody.className = 'ql';
+    qlBody.innerHTML = `<img data-ql-img alt="" decoding="async" draggable="false" />`;
+  }
+  const img = qlBody.querySelector<HTMLImageElement>('[data-ql-img]')!;
+  img.src = p.f; img.alt = p.a; img.width = p.w; img.height = p.h;
+  const { w, h } = qlSize(p);
+  if (ql) {
+    ql.el.querySelector('.win-title')!.textContent = p.n;
+    desk.setSize(ql, w, h);
+    return;
+  }
+  const win = desk.open({
+    id: 'ql', title: p.n, body: qlBody, w, h, klass: 'win-ql', fixed: true,
+    onClose: () => { ql = null; qlAt = -1; },
+  });
+  ql = win;
+  const pad = win.el.querySelector('.win-pad')!;
+  const b = document.createElement('button');
+  b.className = 'tb-btn tb-txt ql-open';
+  b.type = 'button';
+  b.textContent = 'Open with Photos';
+  b.addEventListener('click', () => { const at = qlAt; quickLookClose(); openPhoto(at); });
+  pad.appendChild(b);
+}
+function quickLookClose() {
+  if (!ql) return;
+  desk.close(ql);
+  ql = null; qlAt = -1;
 }
 
 function closeFront() {
@@ -374,6 +461,7 @@ const FINDER_MENUS: Menu[] = [
   VIEW,
   { label: 'Go', items: [
     { label: 'Read me', action: 'open:textedit' },
+    { label: 'Pictures', action: 'pictures' },
     { label: 'Photos', action: 'open:photos' },
     { label: 'GitHub', action: 'gh' },
     { label: '', sep: true },
@@ -391,9 +479,29 @@ function currentApp(): { name: string; menus: Menu[] } {
   const id = rinPanel && (rinFront || !f) ? 'rin' : f?.id;
   const known = id ? byId(id) : null;
   if (known) return { name: known.name, menus: known.menus };
+  if (id === 'photos') {
+    return {
+      name: 'Photos',
+      menus: [
+        { label: 'File', items: [{ label: 'Close Window', key: '⌘W', action: 'close' }] },
+        EDIT,
+        { label: 'View', items: [
+          { label: 'Years', action: 'ph:years', check: photosApp.mode === 'years' },
+          { label: 'Months', action: 'ph:months', check: photosApp.mode === 'months' },
+          { label: 'Days', action: 'ph:days', check: photosApp.mode === 'days' },
+          { label: 'All Photos', action: 'ph:all', check: photosApp.mode === 'all' },
+          { label: '', sep: true },
+          { label: photosApp.sidebar ? 'Hide Sidebar' : 'Show Sidebar', key: '⌥⌘S', action: 'ph:side' },
+          { label: 'Enter Full Screen', key: '⌃⌘F', action: 'zoom' },
+        ] },
+        WINDOW,
+        { label: 'Help', items: [{ label: 'Spotlight', key: '⌘K', action: 'spot' }] },
+      ],
+    };
+  }
   if (id && TITLES[id]) {
     return {
-      name: id === 'textedit' ? 'TextEdit' : id === 'photos' ? 'Photos' : 'Finder',
+      name: id === 'textedit' ? 'TextEdit' : 'Finder',
       menus: [
         { label: 'File', items: [{ label: 'Close Window', key: '⌘W', action: 'close' }] },
         EDIT, VIEW, WINDOW,
@@ -580,6 +688,13 @@ function run(act: string) {
   if (!act) return;
   if (act.startsWith('open:')) { openApp(act.slice(5)); return; }
   if (act.startsWith('focus:')) { const w = desk.get(act.slice(6)); if (w) desk.open({ id: w.id, title: '', body: w.opts.body, w: 0, h: 0 }); return; }
+  if (act.startsWith('ph:')) {
+    const m = act.slice(3);
+    if (m === 'side') photosApp.toggleSidebar();
+    else photosApp.setMode(m as 'years' | 'months' | 'days' | 'all');
+    return;
+  }
+  if (act === 'pictures') { openApp('finder'); finderPane('pictures'); return; }
   if (act.startsWith('quit:')) {
     const id = act.slice(5);
     if (id === 'rin') rinClose();
@@ -637,51 +752,79 @@ function wireFinder(root: HTMLElement, tool: HTMLElement) {
   if (root.dataset.wired) return;
   root.dataset.wired = '1';
   const status = $('[data-fnd-status]', root);
-  $$('[data-fnd]', root).forEach((b) =>
-    b.addEventListener('click', () => {
-      const id = b.dataset.fnd!;
-      $$('[data-fnd]', root).forEach((x) => x.classList.toggle('is-on', x === b));
-      $$('[data-fnd-pane]', root).forEach((p) => p.classList.toggle('is-on', p.dataset.fndPane === id));
-      const n = $(`[data-fnd-pane="${id}"]`, root)?.querySelectorAll('.fnd-row').length ?? 0;
-      if (status) status.textContent = `${n} items`;
-    }),
-  );
-  $$('.fnd-row', root).forEach((r) =>
+  const title = $('.tb-title', tool);
+  const show = (id: string) => {
+    $$('[data-fnd]', root).forEach((x) => x.classList.toggle('is-on', x.dataset.fnd === id));
+    $$('[data-fnd-pane]', root).forEach((p) => p.classList.toggle('is-on', p.dataset.fndPane === id));
+    const n = $(`[data-fnd-pane="${id}"]`, root)?.querySelectorAll('.fnd-row').length ?? 0;
+    if (status) status.textContent = `${n} items`;
+    if (title) title.textContent = id === 'pictures' ? 'Pictures' : 'About Peter';
+    /* a folder of pictures opens in icon view, the facts stay in list view */
+    const list = id !== 'pictures';
+    views.forEach((x, i) => x.classList.toggle('is-on', (i === 1) === list));
+    fnd?.classList.toggle('is-list', list);
+    if (id === 'pictures') $$<HTMLImageElement>('[data-fnd-pane="pictures"] img[data-src]', root).forEach((im) => { im.src = im.dataset.src!; delete im.dataset.src; });
+    desk.get('finder')?.el.setAttribute('aria-label', id === 'pictures' ? 'Pictures' : 'About Peter');
+  };
+  (root as HTMLElement & { showPane?: (id: string) => void }).showPane = show;
+  $$('[data-fnd]', root).forEach((b) => b.addEventListener('click', () => show(b.dataset.fnd!)));
+  $$('.fnd-row:not([data-pic])', root).forEach((r) =>
     r.addEventListener('click', () => {
       $$('.fnd-row', root).forEach((x) => x.classList.toggle('is-sel', x === r));
     }),
   );
+  wirePictures(root);
+}
+function finderPane(id: string) {
+  const el = body('finder') as (HTMLElement & { showPane?: (id: string) => void }) | null;
+  el?.showPane?.(id);
 }
 
-let photoEsc: (() => boolean) | null = null;
-function wirePhotos(root: HTMLElement) {
-  if (root.dataset.wired) return;
-  root.dataset.wired = '1';
-  const big = $('[data-pho-big]', root)!;
-  const img = $<HTMLImageElement>('[data-pho-img]', root)!;
-  const cells = $$<HTMLButtonElement>('[data-pho]', root);
-  const srcs = cells.map((c) => c.querySelector('img')!.src);
-  let i = 0;
-  const show = (n: number) => {
-    i = (n + srcs.length) % srcs.length;
-    img.src = srcs[i];
-    big.hidden = false;
-    requestAnimationFrame(() => big.classList.add('is-on'));
-    photoEsc = () => { hide(); return true; };
+const photosApp = initPhotos(body('photos')!, PH, {
+  onTitle: (t) => {
+    const w = desk.get('photos');
+    if (w) w.el.setAttribute('aria-label', t);
+  },
+});
+const photoEsc = () => photosApp.viewing && photosApp.closeViewer();
+
+/* the Pictures folder: rows that select, open in Photos, and Quick Look */
+function wirePictures(root: HTMLElement) {
+  const rows = $$('[data-pic]', root);
+  let sel = -1;
+  const pick = (i: number, focus = true) => {
+    sel = i;
+    rows.forEach((r) => {
+      const on = Number(r.dataset.pic) === i;
+      r.classList.toggle('is-sel', on);
+      r.setAttribute('aria-selected', String(on));
+      r.tabIndex = on ? 0 : -1;
+    });
+    const r = rows.find((x) => Number(x.dataset.pic) === i);
+    if (r && focus) r.focus({ preventScroll: true });
+    r?.scrollIntoView({ block: 'nearest' });
+    if (ql) quickLook(i);
   };
-  const hide = () => {
-    big.classList.remove('is-on');
-    setTimeout(() => { big.hidden = true; }, reduced() ? 0 : 160);
-    photoEsc = null;
-  };
-  cells.forEach((c, n) => c.addEventListener('click', () => show(n)));
-  $('.pho-prev', root)!.addEventListener('click', () => show(i - 1));
-  $('.pho-next', root)!.addEventListener('click', () => show(i + 1));
-  $('.pho-close', root)!.addEventListener('click', hide);
-  addEventListener('keydown', (e) => {
-    if (big.hidden || !root.isConnected) return;
-    if (e.key === 'ArrowLeft') show(i - 1);
-    if (e.key === 'ArrowRight') show(i + 1);
+  rows.forEach((r) => {
+    r.addEventListener('click', () => pick(Number(r.dataset.pic)));
+    r.addEventListener('dblclick', () => openPhoto(Number(r.dataset.pic)));
+  });
+  root.addEventListener('keydown', (e) => {
+    if (!(e.target as HTMLElement).closest('[data-pic]')) return;
+    const list = root.querySelector('.fnd')?.classList.contains('is-list');
+    const cols = list ? 1 : Math.max(1, Math.round((rows[0].parentElement!.clientWidth) / (rows[0].getBoundingClientRect().width + 6)));
+    const at = Math.max(0, sel);
+    const go = (n: number) => { e.preventDefault(); pick(Math.min(rows.length - 1, Math.max(0, n))); };
+    switch (e.key) {
+      case 'ArrowLeft': go(at - 1); break;
+      case 'ArrowRight': go(at + 1); break;
+      case 'ArrowUp': go(at - cols); break;
+      case 'ArrowDown': go(at + cols); break;
+      case 'Home': go(0); break;
+      case 'End': go(rows.length - 1); break;
+      case 'Enter': e.preventDefault(); openPhoto(at); break;
+      case ' ': e.preventDefault(); e.stopPropagation(); if (ql) quickLookClose(); else quickLook(at); break;
+    }
   });
 }
 
@@ -720,6 +863,7 @@ const hits = (): Hit[] => [
   { id: 'finder', label: 'About Peter', kind: 'Finder', icon: icon('finder'), run: () => openApp('finder') },
   ...apps.map((a) => ({ id: a.id, label: a.name, kind: 'Application', icon: icon(a.id), run: () => openApp(a.id) })),
   { id: 'photos', label: 'Photos', kind: 'Application', icon: icon('photos'), run: () => openApp('photos') },
+  { id: 'pictures', label: 'Pictures', kind: 'Folder', icon: icon('folder'), run: () => { openApp('finder'); finderPane('pictures'); } },
   { id: 'textedit', label: 'Read me', kind: 'Document', icon: icon('textedit'), run: () => openApp('textedit') },
   { id: 'trash', label: 'Trash', kind: 'Finder', icon: icon('trash'), run: () => openApp('trash') },
   { id: 'gh', label: 'GitHub', kind: 'Website', icon: icon('github'), run: () => window.open(links.github, '_blank', 'noopener') },
@@ -749,6 +893,7 @@ function sheetOpen(id: string, title?: string) {
   sheet.style.transform = '';
   requestAnimationFrame(() => sheet.classList.add('is-on'));
   open.add(id);
+  if (id === 'photos') photosApp.enter('phone');
   const l = live(id);
   if (l) requestAnimationFrame(() => { l.fit(); l.scene.enter?.(); });
 }
@@ -796,8 +941,16 @@ document.addEventListener('click', (e) => {
   const b = (e.target as HTMLElement).closest<HTMLElement>('[data-open], [data-dock]');
   if (!b || b.tagName === 'A') return;
   const id = b.dataset.open ?? b.dataset.dock;
-  if (id) openApp(id);
+  if (!id) return;
+  if (b.dataset.photo) { openPhoto(Number(b.dataset.photo)); return; }
+  openApp(id);
+  if (b.dataset.pane) finderPane(b.dataset.pane);
 });
+const launch = (it: HTMLElement) => {
+  if (it.dataset.photo) { openPhoto(Number(it.dataset.photo)); return; }
+  openApp(it.dataset.open!);
+  if (it.dataset.pane) finderPane(it.dataset.pane);
+};
 /* a desktop icon: one click selects, two open, like a Mac */
 {
   let sel: HTMLElement | null = null;
@@ -823,8 +976,25 @@ document.addEventListener('click', (e) => {
     e.stopImmediatePropagation();
   }, true);
   items.forEach((it) => {
-    it.addEventListener('dblclick', () => openApp(it.dataset.open!));
-    it.addEventListener('keydown', (e) => { if (e.key === 'Enter') openApp(it.dataset.open!); });
+    it.addEventListener('dblclick', () => launch(it));
+  });
+  /* the keyboard on the desktop: arrows walk the column, Return opens,
+     Space is Quick Look on a picture, the way Finder does it */
+  const pick = (it: HTMLElement) => {
+    items.forEach((x) => x.classList.toggle('is-sel', x === it));
+    sel = it;
+    it.focus({ preventScroll: true });
+    if (ql && it.dataset.photo) quickLook(Number(it.dataset.photo));
+    else if (ql && !it.dataset.photo) quickLookClose();
+  };
+  $('[aria-label="Desktop"]')?.addEventListener('keydown', (e) => {
+    const it = (e.target as HTMLElement).closest<HTMLElement>('[data-open].item');
+    if (!it) return;
+    const at = items.indexOf(it);
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); pick(items[Math.min(items.length - 1, at + 1)]); }
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); pick(items[Math.max(0, at - 1)]); }
+    else if (e.key === 'Enter') { e.preventDefault(); launch(it); }
+    else if (e.key === ' ' && it.dataset.photo) { e.preventDefault(); e.stopPropagation(); if (ql) quickLookClose(); else quickLook(Number(it.dataset.photo)); }
   });
   void sel;
 }
@@ -836,12 +1006,13 @@ addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     if (popFor) { closeMenu(); return; }
     if (ctxOpen) { closeCtx(); return; }
+    if (photoEsc()) return;
     if (sheetId) { sheetClose(); return; }
-    if (photoEsc?.()) return;
     if ((e.target as HTMLElement)?.matches?.('input, textarea')) return;
     closeFront();
     return;
   }
+  if (e.key === ' ' && ql && !(e.target as HTMLElement)?.matches?.('input, textarea, button.tb-btn')) { e.preventDefault(); quickLookClose(); return; }
   if (e.altKey && e.key === 'Tab') { e.preventDefault(); desk.cycle(); return; }
   if (!(e.metaKey || e.ctrlKey)) return;
   if (k === 'w') { e.preventDefault(); closeFront(); }

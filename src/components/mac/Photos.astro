@@ -1,0 +1,111 @@
+---
+/* The Photos library, rendered once.
+
+   This is the body of the Photos window on the desktop and of the Photos
+   sheet on the phone; the same element is carried into whichever one opens.
+   The grid is built here in the All Photos grouping, one cell per photo,
+   because that is what a visitor with JavaScript off should see. The script
+   regroups those same cells for Days, filters them for an album, and never
+   creates a second copy of a thumbnail.
+
+   Every thumbnail starts without a src. The script hands one over when the
+   cell is about to scroll into view, so opening the window costs a few
+   images, not forty eight. */
+import { photos, byMonth, byYear, albums } from '../../data/photos';
+
+const months = byMonth();
+const years = byYear();
+const G = {
+  lib: '<path d="M2.5 4.5h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1Z"/><path d="M2.5 11 6 7.5l2.5 2.5 2-1.5 3.5 2.5"/><circle cx="10.5" cy="7" r="1" fill="currentColor" stroke="none"/>',
+  places: '<path d="M8 14.5s-4.5-4.2-4.5-7.5a4.5 4.5 0 0 1 9 0c0 3.3-4.5 7.5-4.5 7.5Z"/><circle cx="8" cy="7" r="1.6"/>',
+  album: '<rect x="2" y="3.5" width="12" height="9.5" rx="1.5"/><path d="M2 6.5h12"/>',
+  chev: '<path d="M6 3.5 10.5 8 6 12.5"/>',
+};
+---
+<div class="pho" data-pho data-mode="all" data-view="lib">
+  <nav class="pho-side fnd-side" aria-label="Sidebar">
+    <span class="fnd-h">Library</span>
+    <button class="fnd-tab is-on" type="button" data-ph-nav="lib" aria-current="page">
+      <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={G.lib} />Library
+    </button>
+    <button class="fnd-tab" type="button" data-ph-nav="places">
+      <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={G.places} />Places
+    </button>
+    <span class="fnd-h">Albums</span>
+    {albums.map((a) => (
+      <button class="fnd-tab" type="button" data-ph-nav="album" data-ph-album={a.id}>
+        <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={G.album} />{a.place}
+      </button>
+    ))}
+  </nav>
+
+  <div class="pho-main" data-ph-main>
+    {/* Years and Months: one cover tile per group */}
+    <div class="pho-pane pho-tiles" data-ph-pane="years" hidden>
+      {years.map((y) => (
+        <button class="pho-tile" type="button" data-ph-year={y.key} aria-label={`${y.key}, ${y.items.length} photos`}>
+          <img data-src={y.items[y.items.length - 1].thumb} width={y.items[y.items.length - 1].w} height={y.items[y.items.length - 1].h} alt={y.items[y.items.length - 1].alt} decoding="async" />
+          <span class="pho-tile-t"><b>{y.key}</b></span>
+        </button>
+      ))}
+    </div>
+    <div class="pho-pane pho-tiles" data-ph-pane="months" hidden>
+      {months.map((m) => (
+        <button class="pho-tile" type="button" data-ph-month={m.key} aria-label={`${m.label}, ${m.sub}, ${m.items.length} photos`}>
+          <img data-src={m.items[m.items.length - 1].thumb} width={m.items[m.items.length - 1].w} height={m.items[m.items.length - 1].h} alt={m.items[m.items.length - 1].alt} decoding="async" />
+          <span class="pho-tile-t"><b>{m.label}</b><span>{m.sub}</span></span>
+        </button>
+      ))}
+    </div>
+
+    {/* Days, All Photos and an album share these cells; the script regroups them */}
+    <div class="pho-pane pho-groups" data-ph-pane="grid">
+      {months.map((m) => (
+        <section class="pho-grp" data-ph-grp={m.key}>
+          <h3 class="pho-h"><b>{m.label}</b><span>{m.sub}</span></h3>
+          <ul class="pho-grid" role="listbox" aria-label={`${m.label}, ${m.sub}`}>
+            {m.items.map((p) => (
+              <li role="option" aria-selected="false" data-ph-cell={p.i} data-place={p.place} data-day={p.date} data-month={p.month}>
+                <button class="pho-cell" type="button" tabindex={p.i === 0 ? 0 : -1} aria-label={`${p.alt}. ${p.place}, ${p.dayLabel}`}>
+                  <img data-src={p.thumb} width={p.w} height={p.h} alt="" decoding="async" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+      <p class="pho-count" data-ph-count>{photos.length} Photos</p>
+    </div>
+
+    {/* Places: the albums as cover tiles */}
+    <div class="pho-pane pho-albums" data-ph-pane="places" hidden>
+      {albums.map((a) => (
+        <button class="pho-alb" type="button" data-ph-open-album={a.id} aria-label={`${a.place}, ${a.items.length} photos`}>
+          <span class="pho-alb-cover"><img data-src={a.cover.thumb} width={a.cover.w} height={a.cover.h} alt={a.cover.alt} decoding="async" /></span>
+          <span class="pho-alb-t"><b>{a.place}</b><span>{a.items.length}</span></span>
+        </button>
+      ))}
+    </div>
+  </div>
+
+  {/* the viewer: one photo, the whole window, the sidebar underneath it */}
+  <div class="pho-view" data-ph-view hidden role="group" aria-label="Photo">
+    <div class="pho-vbar">
+      <span class="pho-vtitle" data-ph-vtitle></span>
+      <button class="pho-vdone" type="button" data-ph-close>Done</button>
+    </div>
+    <div class="pho-stage" data-ph-stage>
+      <img data-ph-big alt="" decoding="async" draggable="false" />
+    </div>
+    <button class="pho-nav pho-prev" type="button" data-ph-prev aria-label="Previous photo"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5"/></svg></button>
+    <button class="pho-nav pho-next" type="button" data-ph-next aria-label="Next photo"><svg viewBox="0 0 16 16" aria-hidden="true" set:html={G.chev} /></button>
+  </div>
+
+  <noscript>
+    <ul class="pho-ns">
+      {photos.map((p) => (
+        <li><img src={p.thumb} width={p.w} height={p.h} alt={p.alt} loading="lazy" decoding="async" /><small>{p.place}, {p.dayLabel}</small></li>
+      ))}
+    </ul>
+  </noscript>
+</div>

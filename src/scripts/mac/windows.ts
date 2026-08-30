@@ -219,11 +219,13 @@ export class Desk {
     el.style.opacity = String(Math.min(1, t * 2.4));
   }
 
+  /* the owner hears about the close while the body is still inside the
+     window, so it can carry the body back out before the frame is dropped */
   private reap(win: Win) {
     if (win.minimized) return;
-    win.el.remove();
     this.wins = this.wins.filter((w) => w !== win);
     win.opts.onClose?.();
+    win.el.remove();
     this.next();
   }
 
@@ -310,6 +312,17 @@ export class Desk {
       win.el.classList.add('is-zoom');
       setTimeout(() => win.el.classList.remove('is-zoom'), 280);
     }
+    this.size(win);
+    this.paint(win);
+  }
+
+  /* a panel that follows its content, the way Quick Look does */
+  setSize(win: Win, w: number, h: number) {
+    const cx = win.x + win.w / 2, cy = win.y + win.h / 2;
+    win.w = Math.min(w, innerWidth - 24);
+    win.h = Math.min(h, this.dockTop() - BAR - 24);
+    win.x = cx - win.w / 2; win.y = cy - win.h / 2;
+    this.clamp(win);
     this.size(win);
     this.paint(win);
   }
