@@ -108,15 +108,35 @@ export function byYear(list = photos): Group[] {
   return out;
 }
 
+/* one sentence per album, in Peter's words, shown over the album's grid */
+export const blurbs: Record<string, string> = {
+  'Oahu, Hawaii': 'A week on Oahu, mostly the coast and the tide pools.',
+  'Maui, Hawaii': 'One photo from under the water off Maui.',
+  'Niagara Falls': 'Niagara from the Canadian side, in June.',
+  'Valencia': 'One evening of rooftops in Valencia.',
+  'Dallas': 'Dallas from a high floor, and a mineral from a museum there a year later.',
+  'From a plane': 'Window seat photos. I always take the window seat.',
+  'Shanghai': 'The Bund at night on a summer trip.',
+  'Abstract': 'Light through water.',
+  'Austin': 'Looking straight up inside the Texas Capitol.',
+  'Michigan': 'Where I live. Mostly birds, flowers, and weather.',
+  'Colorado': 'A June drive through the mountains.',
+  'Red Rocks, Colorado': 'Red Rocks with nobody in it.',
+  'Rocky Mountain National Park': 'Trails around Estes Park in June, with snow still in the gullies.',
+  'Houston': 'One glass tower, straight up.',
+  'the school': 'My school. The campus is the best-looking thing for miles and I have a lot of photos of it.',
+  'Yellowstone': 'Yellowstone in July, the hot springs mostly.',
+};
+
 /* one album per place, the sidebar's list, in the order the places first
    appear in the roll */
-export type Album = { id: string; place: string; items: Photo[]; cover: Photo };
+export type Album = { id: string; place: string; blurb: string; items: Photo[]; cover: Photo };
 export const albums: Album[] = (() => {
   const out: Album[] = [];
   for (const p of photos) {
     let a = out.find((x) => x.place === p.place);
     if (!a) {
-      a = { id: p.place.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''), place: p.place, items: [], cover: p };
+      a = { id: p.place.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''), place: p.place, blurb: blurbs[p.place] ?? '', items: [], cover: p };
       out.push(a);
     }
     a.items.push(p);

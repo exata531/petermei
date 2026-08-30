@@ -34,6 +34,7 @@ const fills: Record<string, [string, string]> = {
   folder:   ['#8fd0f2', '#7cc4ec'],
   peter:    ['#d1eef9', '#bfe4f4'],
   settings: ['#e8e4df', '#dad4cd'],
+  safari:   ['#d7effa', '#c3e6f5'],
 };
 const [c0, c1] = fills[id] ?? fills.folder;
 const squircle = id !== 'trash' && id !== 'folder' && id !== 'doc';
@@ -143,6 +144,20 @@ const squircle = id !== 'trash' && id !== 'folder' && id !== 'doc';
     <text x="50" y="52" text-anchor="middle" dominant-baseline="central"
           fill="#1f3b52" font-size="50" font-weight="600" letter-spacing="-2"
           font-family="-apple-system,'SF Pro Display',system-ui,sans-serif">P</text>
+  )}
+
+  {id === 'safari' && (
+    <g>
+      <circle cx="50" cy="50" r="30" fill="#fff" stroke="#7cbfe9" stroke-width="3"/>
+      <g stroke="#1f3b52" stroke-opacity=".45" stroke-width="1.6" stroke-linecap="round">
+        {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((a) => (
+          <path d="M50 22v5" transform={`rotate(${a} 50 50)`} />
+        ))}
+      </g>
+      <path d="M50 26 57 46 50 50 43 46Z" fill="#bb433a"/>
+      <path d="M50 74 43 54 50 50 57 54Z" fill="#f2eeea" stroke="#1f3b52" stroke-opacity=".35" stroke-width="1"/>
+      <circle cx="50" cy="50" r="2" fill="#1f3b52"/>
+    </g>
   )}
 
   {id === 'settings' && (

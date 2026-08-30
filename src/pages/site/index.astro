@@ -1,0 +1,82 @@
+---
+/* petermei.com: the home, which is also the Work index. A pinned sky hero
+   with the name, the one paragraph, and three live cards; then the paper
+   with the four tiles; then the rail of what he built; then the footer. */
+import Site from '../../layouts/Site.astro';
+import Tile from '../../components/site/Tile.astro';
+import { projects, copy, timeline, build, photoFacts, links } from '../../data/site';
+const [vb, rin, kyou, ms] = projects;
+---
+<Site title="petermei.com" desc="Peter Mei is a senior at the school, outside Detroit, and makes software. volbase, Rin, Kyou and Market Station, and the Mac they run on." route="work">
+  <section class="hero" data-hero data-nav-tone="light" aria-label="Peter Mei">
+    <span class="sun" aria-hidden="true"></span>
+    <span class="cloud cloud-a" aria-hidden="true"></span>
+    <span class="cloud cloud-b" aria-hidden="true"></span>
+    <div class="hero-in">
+      <div class="hero-grid">
+        <div>
+          <h1 class="h-display hero-name">Peter Mei</h1>
+          <p class="lede hero-line">{copy.workIntro}</p>
+        </div>
+        <div class="live" aria-label="Live">
+          <div class="card">
+            <p class="card-h is-green"><i></i>Deployed</p>
+            <p class="card-p"><b>{build.sha ? `Commit ${build.sha}` : 'The latest commit'}</b>{build.message ? `. ${build.message}` : ''}</p>
+            <p class="card-src">Built {build.when} on {build.host}, with Astro {build.astro}. <a href={links.github} rel="noopener" target="_blank">Source on GitHub</a></p>
+          </div>
+          <div class="card">
+            <p class="card-h is-blue"><i></i>Photos</p>
+            <p class="card-num">{photoFacts.count}<small>photographs</small></p>
+            <p class="card-src">The newest album is {photoFacts.newest.place}, {photoFacts.newest.cover.monthLabel}. They are in the Photos app on the desktop.</p>
+          </div>
+          <div class="card">
+            <p class="card-h is-amber"><i></i>This page</p>
+            <p class="card-p" data-where><b>On its own.</b> This page also runs inside a Mac. <a href="/?open=safari">Open it there.</a></p>
+            <p class="card-src">These are real.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" data-nav-tone="light" aria-label="Work">
+    <div class="crest" aria-hidden="true"></div>
+    <div class="wrap">
+      <h2 class="h-section intro">Four things, each <em>running somewhere right now</em>.</h2>
+      <div class="tiles">
+        <div class="row"><Tile p={vb} wide /><Tile p={rin} /></div>
+        <div class="row"><Tile p={kyou} /><Tile p={ms} wide /></div>
+      </div>
+      <div class="acts" style="margin-top: 36px">
+        <a class="btn is-quiet" href="/site/work">Read about each one<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6.5 3.5 11 8l-4.5 4.5"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="rail-sec" data-nav-tone="light" aria-label="What I built">
+    <div class="crest" aria-hidden="true"></div>
+    <div class="wrap">
+      <h2 class="h-section">What I built, <em>newest at the top</em>.</h2>
+      <div class="rail-grid">
+        <div class="machine">
+          <b>Built on a MacBook, from the docs.</b>
+          <p>Every one of these was taught to me by its documentation and by getting it wrong first. None of them came with a mentor.</p>
+        </div>
+        <ol class="rail">
+          {timeline.map((s) => (
+            <li class="stop">
+              <span class:list={['node', { 'is-origin': s.origin }]} aria-hidden="true">
+                {s.tone === 'blue' ? <svg viewBox="0 0 16 16"><path d="M2 9.5 6.5 8l2.5-5.5 1.5.5-1.2 5.2L14 9.4l-.3 1.3-4.8-.6-2.6 3.6-1.2-.4 1.2-3.8L2.4 10.8Z"/></svg> : <i></i>}
+              </span>
+              <span class="stop-t">
+                <b>{s.name}</b>
+                <span>{s.text} {s.href && <a href={s.href} rel="noopener" target="_blank" data-tab={s.href.includes('volbase') ? 'volbase' : undefined}>{s.href.replace('https://', '')}</a>}{s.open && <> <a href={`/?open=${s.open}`} data-open={s.open}>Open it on the desktop.</a></>}</span>
+              </span>
+              {s.state && <span class:list={['stop-s', `is-${s.tone}`]}>{s.state}</span>}
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  </section>
+</Site>

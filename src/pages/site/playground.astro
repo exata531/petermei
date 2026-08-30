@@ -1,0 +1,58 @@
+---
+/* Playground: three things that already exist somewhere else on the Mac,
+   made into toys. The faces the menu bar wears, a palette pulled off one of
+   his photos, and the part of Kyou that reads a sentence. */
+import Site from '../../layouts/Site.astro';
+import { copy, paletteSet } from '../../data/site';
+---
+<Site title="Playground" desc="Three small things Peter Mei made along the way: a face maker, a palette from his photos, and the sentence reader from Kyou." route="playground" footer={false}>
+  <section class="top" data-nav-tone="light">
+    <div class="wrap">
+      <h1 class="h-title">Playground</h1>
+      <p class="lede" style="margin-top: 18px; max-width: 34ch">{copy.playgroundIntro}</p>
+      <div class="toys">
+        <div class="toy" style="--toy-tint: var(--c-lemon)">
+          <div class="toy-h"><b>Faces</b><p>This makes the little text faces the Mac wears in its menu bar. Press the button until you get one you like, and click the face to copy it.</p></div>
+          <div class="toy-stage">
+            <button class="face-out" type="button" data-face-out title="Copy" aria-live="polite">(｡•ᴗ•｡)</button>
+            <div class="toy-row">
+              <button class="toy-btn" type="button" data-face-new>Another one</button>
+              <button class="toy-btn is-quiet" type="button" data-face-mood="happy">Happy</button>
+              <button class="toy-btn is-quiet" type="button" data-face-mood="sleepy">Sleepy</button>
+              <button class="toy-btn is-quiet" type="button" data-face-mood="smug">Smug</button>
+            </div>
+            <p class="toy-note" data-face-note></p>
+          </div>
+        </div>
+
+        <div class="toy" style="--toy-tint: var(--c-sky)">
+          <div class="toy-h"><b>Palette</b><p>Pick one of my photos and it pulls out the five colors that show up most. Click a swatch to copy it.</p></div>
+          <div class="toy-stage" data-pal>
+            <div class="pick" role="group" aria-label="Photos">
+              {paletteSet.map((p, i) => (
+                <button type="button" data-pal-pick={p.thumb} aria-pressed={i === 0 ? 'true' : 'false'} aria-label={p.alt}>
+                  <img src={p.icon} width={p.w} height={p.h} alt="" loading="lazy" decoding="async" crossorigin="anonymous" />
+                </button>
+              ))}
+            </div>
+            <div class="swatches" data-pal-out aria-live="polite"></div>
+            <p class="toy-note" data-pal-note></p>
+          </div>
+        </div>
+
+        <div class="toy" style="--toy-tint: var(--c-apri)">
+          <div class="toy-h"><b>Quick add</b><p>This is the part of Kyou that reads a sentence. It only lights up what you actually typed and never guesses a time.</p></div>
+          <div class="toy-stage">
+            <div class="qa">
+              <label class="qa-field"><span class="sr" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Type something to add</span><input data-qa-in type="text" value="physics set friday at 4pm" autocomplete="off" autocapitalize="off" spellcheck="false" /></label>
+              <p class="qa-view" data-qa-view></p>
+              <div class="qa-tokens" data-qa-tokens></div>
+              <div class="qa-row" data-qa-row hidden><small data-qa-when></small><span><b data-qa-title></b><small data-qa-sub></small></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script>import '../../scripts/site/toys';</script>
+</Site>

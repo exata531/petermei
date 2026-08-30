@@ -12,7 +12,7 @@ import Market from '../scenes/Market.astro';
 import Icon from './Icon.astro';
 import Photos from './Photos.astro';
 import Pictures from './Pictures.astro';
-import { apps, finder, readme, links } from '../../data/apps';
+import { apps, finder, readme, links, aboutPeter } from '../../data/apps';
 import { photos } from '../../data/photos';
 
 /* what the scripts need to know about a photo, once, as JSON */
@@ -33,8 +33,8 @@ const glyph = (name: string) => `<svg class="fnd-glyph" viewBox="0 0 16 16" aria
 <div class="stash" data-stash>
   <div class="stash-head">
     <h1>Peter Mei</h1>
-    <p>I am a senior at the school, outside Detroit. I build software and I ship it.</p>
-    <p class="stash-note">This page is a Mac desktop you can use. It needs JavaScript. Below is everything that would be on it.</p>
+    <p>I am a senior at the school, outside Detroit, and I make software. This page is normally a Mac desktop you can click around in, and it needs JavaScript for that. Everything that would be on it is below.</p>
+    <p class="stash-note">The same things are also on a plain website: <a href="/site">petermei.com</a>.</p>
   </div>
 
   {apps.map((a) => {
@@ -46,9 +46,9 @@ const glyph = (name: string) => `<svg class="fnd-glyph" viewBox="0 0 16 16" aria
         {a.about && <p class="stash-meta">{a.about.built} · {a.about.state}</p>}
         {a.about?.link && <p><a href={a.about.link.href} rel="noopener">{a.about.link.label}</a></p>}
         {Scene && (
-          <div class="sbox" data-fitbox>
+          <div class:list={['sbox', { 'is-flat': a.id === 'volbase' }]} data-fitbox>
             <figure class="sfig" data-scene={a.scene} data-w={a.sw} data-h={a.sh}
-                    data-mw={a.mw} data-mh={a.mh}
+                    data-mw={a.mw} data-mh={a.mh} data-flat={a.id === 'volbase' ? '' : undefined}
                     style={`--w:${a.sw}px;--h:${a.sh}px`}>
               <div class="sframe" data-scene-root role="group" aria-label={`A working demo of ${a.name}`}>
                 <Scene />
@@ -80,27 +80,25 @@ const glyph = (name: string) => `<svg class="fnd-glyph" viewBox="0 0 16 16" aria
       </nav>
       <div class="fnd-main">
         {finder.map((s, i) => (
-          <div class:list={['fnd-pane', { 'is-on': i === 0 }]} data-fnd-pane={s.id}>
-            <div class="fnd-head" aria-hidden="true"><span>Name</span><span>Comments</span></div>
-            <ul class="fnd-rows">
-              {s.items.map((f) => (
-                <li class="fnd-row">
-                  <span class="fnd-name"><Fragment set:html={glyph(s.glyph)} /><b>{f.label}</b></span>
-                  <small>{f.value}</small>
-                </li>
-              ))}
-            </ul>
+          <div class:list={['fnd-pane', 'fnd-doc', { 'is-on': i === 0 }]} data-fnd-pane={s.id}>
+            <div class="fnd-file">
+              <span class="fnd-file-ico"><Icon id="doc" /></span>
+              <span class="fnd-file-name"><b>{s.file}</b><small>Plain Text Document</small></span>
+            </div>
+            <div class="fnd-sheet">
+              {s.text.map((t) => <p>{t}</p>)}
+            </div>
           </div>
         ))}
         <Pictures />
-        <div class="fnd-status" data-fnd-status>4 items</div>
+        <div class="fnd-status" data-fnd-status>1 item</div>
       </div>
     </div>
   </section>
 
   <section class="stash-app" data-body="photos" aria-label="Photos">
     <h2 class="stash-h">Photos</h2>
-    <p class="stash-p">{photos.length} photographs I took, in the places on the labels.</p>
+    <p class="stash-p">Forty eight photographs I took, in the places on the labels.</p>
     <Photos />
   </section>
 
@@ -158,7 +156,7 @@ const glyph = (name: string) => `<svg class="fnd-glyph" viewBox="0 0 16 16" aria
       <span class="abt-ico"><Icon id="peter" /></span>
       <h3 class="abt-name">Peter Mei</h3>
       <p class="abt-ver">Senior, class of 2027</p>
-      <p class="abt-line">I am a senior at the school, outside Detroit. I taught myself all of this from the docs.</p>
+      <p class="abt-line">{aboutPeter}</p>
       <div class="abt-facts">
         <span><svg viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.hammer} /><b>Made</b> volbase, Rin, Kyou, Market Station</span>
         <span><svg viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.state} /><b>Now</b> Applying to college this fall</span>
@@ -170,7 +168,7 @@ const glyph = (name: string) => `<svg class="fnd-glyph" viewBox="0 0 16 16" aria
   <script type="application/json" data-ph-json set:html={photoJson} />
 
   {/* icons the scripts clone into Spotlight rows and notifications */}
-  {['finder', 'volbase', 'rin', 'kyou', 'market', 'photos', 'textedit', 'trash', 'github', 'settings', 'folder', 'doc'].map((id) => (
+  {['finder', 'volbase', 'rin', 'kyou', 'market', 'photos', 'textedit', 'trash', 'github', 'settings', 'folder', 'doc', 'safari'].map((id) => (
     <template data-icon={id}><Icon id={id} /></template>
   ))}
 </div>

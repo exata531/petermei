@@ -1,0 +1,71 @@
+---
+/* One product: a deck. The first panel is the hero, with the whole first
+   sentence and the plain facts. Each sentence after that gets a panel that
+   slides up over the one before, numbered on a ledger. The last panel is
+   ink, with the two things to press and the next study. */
+import Site from '../../../layouts/Site.astro';
+import Icon from '../../../components/mac/Icon.astro';
+import { projects, bySlug } from '../../../data/site';
+
+export function getStaticPaths() {
+  return projects.map((p) => ({ params: { slug: p.slug } }));
+}
+const p = bySlug(Astro.params.slug!)!;
+const i = projects.indexOf(p);
+const next = projects[(i + 1) % projects.length];
+const tint: Record<string, string> = { volbase: 'var(--c-sky)', rin: 'var(--c-peri)', kyou: 'var(--c-green)', market: 'var(--c-apri)' };
+const rest = p.story.slice(1);
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+<Site title={p.name} desc={p.blurb} route="project" back="/site/work">
+  <div class="deck" style={`--p-tint:${tint[p.slug]}`}>
+    <section class="panel hero-p" data-panel data-nav-tone="light">
+      <div class="ledger">
+        <div>
+          <span class="p-ico"><Icon id={p.slug} /></span>
+          <h1 class="h-title">{p.name}</h1>
+          <p class="lede" style="margin-top: 20px; max-width: 30ch">{p.story[0]}</p>
+        </div>
+        <div class="meta">
+          <p><small>Built with</small>{p.built}.</p>
+          <p><small>Where it is</small>{p.state}.</p>
+          {p.link && <p><small>Address</small><a href={p.link.href} rel="noopener" target="_blank" data-tab={p.slug === 'volbase' ? 'volbase' : undefined} style="text-decoration: underline; text-underline-offset: 3px">{p.link.label}</a></p>}
+          <p><small>On this desktop</small><a href={`/?open=${p.open}`} data-open={p.open} style="text-decoration: underline; text-underline-offset: 3px">Open it and click around.</a></p>
+        </div>
+      </div>
+    </section>
+
+    {rest.map((s, k) => (
+      <section class:list={['panel', { 'is-tint': k % 2 === 0 }]} data-panel data-nav-tone="light">
+        <div class="ledger">
+          <div>
+            <span class="num" aria-hidden="true">{pad(k + 2)}</span>
+            <span class="chap">{p.chapters[k] ?? ''}</span>
+          </div>
+          <p class="h-section pull">{s}</p>
+        </div>
+      </section>
+    ))}
+
+    <section class="panel is-dark" data-panel data-nav-tone="dark">
+      <div class="ledger">
+        <div>
+          <span class="num" aria-hidden="true">{pad(rest.length + 2)}</span>
+          <span class="chap">See it</span>
+        </div>
+        <div>
+          <p class="h-section">It is running on the desktop this page sits inside, <em>so open it</em>.</p>
+          <div class="results">
+            <a class="btn" href={`/?open=${p.open}`} data-open={p.open}>Open {p.name} on the desktop</a>
+            {p.link && <a class="btn is-quiet" href={p.link.href} rel="noopener" target="_blank" data-tab={p.slug === 'volbase' ? 'volbase' : undefined}>{p.link.label}</a>}
+          </div>
+          <p class="next">Read next: <a href={`/site/work/${next.slug}`}>{next.name}</a></p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="pager" aria-hidden="true">
+    {Array.from({ length: rest.length + 2 }).map(() => <button class="tick" type="button" data-tick tabindex="-1"></button>)}
+  </div>
+</Site>

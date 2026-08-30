@@ -33,7 +33,7 @@ const G = {
     </button>
     <span class="fnd-h">Albums</span>
     {albums.map((a) => (
-      <button class="fnd-tab" type="button" data-ph-nav="album" data-ph-album={a.id} title={a.place}>
+      <button class="fnd-tab" type="button" data-ph-nav="album" data-ph-album={a.id} data-ph-blurb={a.blurb} title={a.place}>
         <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={G.album} /><span>{a.place}</span>
       </button>
     ))}

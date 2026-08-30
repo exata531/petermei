@@ -46,7 +46,7 @@ type Hooks = { onEnter?: () => void; beforeLeave?: (kind: Power) => void; onLeav
 /* what the screen in the picture is doing, and the caption under it */
 type Screen = 'on' | 'off' | 'asleep';
 const CUE: Record<Screen, { text: string; verb: string }> = {
-  on: { text: 'Click the screen to look around.', verb: 'Look around' },
+  on: { text: 'Click the screen to have a look around.', verb: 'Look around' },
   off: { text: 'Click the screen to turn it on.', verb: 'Turn on' },
   asleep: { text: 'Click the screen to wake it.', verb: 'Wake' },
 };

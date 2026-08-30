@@ -1,0 +1,28 @@
+---
+/* One product tile: a pastel field with the product drawn as an object on
+   it (a browser window for volbase, a phone for Kyou, a dark panel for Rin
+   and Market Station), the icon above it, and a frosted overlay with the
+   name and one line that shows on hover. */
+import Icon from '../mac/Icon.astro';
+import type { Project } from '../../data/site';
+interface Props { p: Project; wide?: boolean; href?: string; line?: string }
+const { p, wide = false, href = `/site/work/${p.slug}`, line = p.blurb.split('. ')[0] + '.' } = Astro.props;
+const tint: Record<string, string> = { volbase: 'var(--c-peri)', rin: 'var(--c-lemon)', kyou: 'var(--c-apri)', market: 'var(--c-green)' };
+---
+<a class:list={['tile', wide ? 'is-wide' : 'is-narrow']} href={href} style={`--tile-tint:${tint[p.slug]}`} data-tile data-cursor-label="Read about it" aria-label={`${p.name}. ${line}`}>
+  <span class="tile-ico"><Icon id={p.slug} /></span>
+  {p.slug === 'volbase' && (
+    <span class="tile-device" aria-hidden="true">
+      <span class="tile-device-bar"><i></i><i></i><i></i></span>
+      <img src="/img/volbase-landing.webp" width="1280" height="2400" alt="" loading="lazy" decoding="async" style="aspect-ratio: 1280 / 640; object-fit: cover; object-position: top;" />
+    </span>
+  )}
+  {p.slug === 'kyou' && <span class="tile-phone" aria-hidden="true"><span>(≧∪≦)</span></span>}
+  {p.slug === 'rin' && <span class="tile-panel" aria-hidden="true"><b>❯</b> /daily<br /><span style="opacity:.6">two things with teeth today.</span></span>}
+  {p.slug === 'market' && (
+    <span class="tile-panel is-tool" aria-hidden="true">VIX 16.8 <span style="opacity:.6">· calm, below 20</span>
+      <svg viewBox="0 0 100 28" preserveAspectRatio="none"><polyline points="0,20 12,17 24,19 36,13 48,15 60,9 72,12 84,7 100,10" /></svg>
+    </span>
+  )}
+  <span class="tile-over"><b>{p.name}</b><span>{line}</span></span>
+</a>

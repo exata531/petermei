@@ -1,0 +1,98 @@
+---
+/* petermei.com, the page inside the Mac's Safari window.
+
+   Craft's paper, pastels and shadow; Zainab's structure: a glass pill that
+   folds on the way down, sections that scroll up over each other with a
+   wavy edge, and a footer with something to click. The system font, no web
+   fonts, and the appearance follows the Mac's: the frame is told when the
+   desktop switches, and a page standing on its own reads the same setting. */
+import '../styles/tokens.css';
+import '../styles/site.css';
+import { copy, links } from '../data/site';
+
+interface Props { title: string; desc: string; route: 'work' | 'about' | 'playground' | 'project'; back?: string; footer?: boolean; nav?: 'light' | 'dark' }
+const { title, desc, route, back, footer = true, nav = 'light' } = Astro.props;
+const url = new URL(Astro.url.pathname, Astro.site ?? 'https://petermei.com');
+const full = title === 'petermei.com' ? 'Peter Mei' : `${title} · Peter Mei`;
+const holds = ['sky', 'green', 'peri', 'apri', 'lemon', 'sky', 'apri', 'green', 'lemon', 'peri', 'sky', 'apri'];
+---
+<!doctype html>
+<html lang="en" data-route={route}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{full}</title>
+    <meta name="description" content={desc} />
+    <link rel="canonical" href={url.href} />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#fcf9f7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#141312" media="(prefers-color-scheme: dark)" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={full} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={url.href} />
+    <meta property="og:image" content={new URL('/og.png', url).href} />
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('js');
+        try { var t = localStorage.getItem('appearance'); if (t === 'light' || t === 'dark') d.dataset.theme = t; } catch (e) {}
+        try { if (window.parent !== window) d.classList.add('framed'); } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to the page</a>
+    <header class="nav" data-nav data-tone={nav}>
+      <div class="nav-l">
+        {back && <a class="nav-back" href={back}><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 3.5 5 8l4.5 4.5"/></svg>Back</a>}
+      </div>
+      <nav class="pill" data-pill aria-label="Site">
+        <a class="pill-face" href="/site" aria-label="petermei.com"><span aria-hidden="true">(｡•ᴗ•｡)</span></a>
+        <span class="pill-links">
+          <a class="pill-link" href="/site" aria-current={route === 'work' || route === 'project' ? 'page' : undefined}>Work</a>
+          <a class="pill-link" href="/site/about" aria-current={route === 'about' ? 'page' : undefined}>About</a>
+          <a class="pill-link" href="/site/playground" aria-current={route === 'playground' ? 'page' : undefined}>Playground</a>
+        </span>
+        <span class="pill-status"><i aria-hidden="true"></i>{copy.status}</span>
+      </nav>
+      <div class="nav-r">
+        <a class="nav-mac" href="/?open=safari" data-mac-link title="Open this page inside the Mac">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2" y="3.5" width="16" height="10.5" rx="2"/><path d="M7 17h6M10 14v3"/></svg><span>The Mac</span>
+        </a>
+      </div>
+    </header>
+
+    <main id="main" class="page">
+      <slot />
+    </main>
+
+    {footer && (
+      <footer class="foot" data-nav-tone="light">
+        <div class="crest crest-foot" aria-hidden="true"></div>
+        <div class="foot-in">
+          <p class="foot-sub">{copy.footer}</p>
+          <h2 class="foot-h" data-foot-h>{copy.footerHeadline}</h2>
+          <p class="foot-note">The holds along the bottom are a small climbing wall. Click one and it counts as sent.</p>
+        </div>
+        <div class="wall" data-wall>
+          {holds.map((h, i) => (
+            <button class={`hold hold-${h}`} type="button" style={`--i:${i}`} data-hold aria-label={`Hold ${i + 1}`}></button>
+          ))}
+          <span class="wall-count" data-wall-count aria-live="polite"></span>
+        </div>
+        <div class="foot-bar">
+          <span>Peter Mei · Michigan · 2026</span>
+          <span class="foot-links">
+            <a href={links.github} rel="me noopener" target="_blank">GitHub</a>
+            <a href={links.volbase} rel="noopener" target="_blank" data-tab="volbase">volbase</a>
+          </span>
+        </div>
+      </footer>
+    )}
+
+    <div class="dot" data-dot aria-hidden="true"><span data-dot-label></span></div>
+    <script>import '../scripts/site/site';</script>
+  </body>
+</html>

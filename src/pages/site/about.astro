@@ -1,0 +1,55 @@
+---
+/* About: the long one, pinned, with four of his photos as paper on the
+   right; then the rows of what he has done; then the last two paragraphs. */
+import Site from '../../layouts/Site.astro';
+import { copy, pile } from '../../data/site';
+const spots = [
+  { x: 20, y: 20, r: -2.06 }, { x: 250, y: 60, r: -8.7 }, { x: 60, y: 210, r: 5.47 }, { x: 260, y: 240, r: 3.06 },
+];
+---
+<Site title="About" desc="Peter Mei, a senior at the school outside Detroit, on why he makes software, the robotics team, climbing, and what is next." route="about">
+  <section class="about-hero" data-hero data-nav-tone="light" aria-label="About">
+    <div class="about-grid">
+      <div class="about-copy">
+        <h1 class="h-title">About</h1>
+        {copy.about.slice(0, 3).map((t) => <p>{t}</p>)}
+      </div>
+      <div class="pile" data-pile aria-label="Four photographs">
+        {pile.map((ph, i) => (
+          <figure class="polaroid" data-polaroid style={`--x:${spots[i].x}px;--y:${spots[i].y}px;--r:${spots[i].r}deg;z-index:${i + 1}`}>
+            <img src={ph.thumb} width={ph.w} height={ph.h} alt={ph.alt} loading="lazy" decoding="async" draggable="false" />
+            <small>{ph.place}</small>
+          </figure>
+        ))}
+        <button class="pile-reset" type="button" data-pile-reset aria-label="Put the photos back">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10a5.5 5.5 0 1 1 1.6 3.9"/><path d="M4.5 16.5v-3.2h3.2"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="done-sec" data-nav-tone="light" aria-label="What I have done">
+    <div class="crest" aria-hidden="true"></div>
+    <div class="wrap">
+      <div class="done-grid">
+        <span class="done-label" aria-hidden="true">What I have done</span>
+        <div class="rows">
+          {copy.done.map((d, i) => (
+            <details class="rowx" open={i === 0}>
+              <summary><span>{d.name}</span><span class="plus" aria-hidden="true"></span></summary>
+              <p>{d.text}</p>
+            </details>
+          ))}
+        </div>
+      </div>
+      <div class="about-after">
+        <p>{copy.about[3]}</p>
+        <p class="now">{copy.about[4]}</p>
+        <div class="acts">
+          <a class="btn is-quiet" href="/?open=photos" data-open="photos">Open the Photos app</a>
+          <a class="btn is-quiet" href="/site/work">Read about the four</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Site>

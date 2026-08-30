@@ -45,6 +45,7 @@ function initTheme() {
     try { localStorage.setItem('appearance', t); } catch {}
   };
   const set = (t: 'light' | 'dark') => {
+    lives.get('volbase')?.scene.theme?.(t);
     const doc = document as Document & { startViewTransition?: (f: () => void) => void };
     if (reduced() || !doc.startViewTransition) {
       document.body.classList.add('is-fading');
@@ -240,6 +241,9 @@ function finderTool(title: string, opts: { views?: boolean; count?: string; empt
   return t;
 }
 
+/* Safari's toolbar: back and forward on the front tab's own history, the
+   URL field that mirrors the page, reload, the share button that opens the
+   same page in a real tab, and About */
 function safariTool(id: string) {
   const t = document.createElement('div');
   t.dataset.drag = '';
@@ -247,14 +251,16 @@ function safariTool(id: string) {
     `<span class="tb-nav">${btn(G.back, 'Back', ' is-dis')}${btn(G.fwd, 'Forward', ' is-dis')}</span>
      ${btn(G.side, 'Show sidebar', ' is-dis')}
      <span class="tb-sp" data-drag></span>
-     <span class="tb-url" data-drag>${G.lock}<span data-vb-url>volbase.app</span>${btn(G.reload, 'Reload the page and play the demo', ' tb-reload')}</span>
+     <span class="tb-url" data-drag>${G.lock}<span data-vb-url>volbase.app</span>${btn(G.reload, 'Reload this page', ' tb-reload')}</span>
      <span class="tb-sp" data-drag></span>
-     <a class="tb-btn" href="${links.volbase}" target="_blank" rel="noopener" aria-label="Open volbase.app in a new tab" title="Open volbase.app">${G.share}</a>
+     <a class="tb-btn" href="${links.volbase}" target="_blank" rel="noopener" aria-label="Open this page in a new tab" title="Open in a new tab" data-vb-open>${G.share}</a>
      ${btn(G.info, `About ${byId(id)?.label ?? ''}`, ' tb-about')}`;
-  t.querySelector('.tb-reload')!.addEventListener('click', () => {
-    const s = lives.get(id)?.scene;
-    s?.run?.();
-  });
+  const scene = () => lives.get(id)?.scene;
+  const [b, f] = t.querySelectorAll<HTMLButtonElement>('.tb-nav .tb-btn');
+  b.setAttribute('data-vb-back', ''); f.setAttribute('data-vb-fwd', '');
+  b.addEventListener('click', () => scene()?.back?.());
+  f.addEventListener('click', () => scene()?.fwd?.());
+  t.querySelector('.tb-reload')!.addEventListener('click', () => scene()?.run?.());
   t.querySelector('.tb-about')!.addEventListener('click', () => openAbout(id));
   return t;
 }
@@ -297,12 +303,19 @@ const TITLES: Record<string, string> = {
 const SIZES: Record<string, { w: number; h: number; min?: number; klass?: string }> = {
   finder: { w: 700, h: 440, min: 460, klass: 'win-finder' },
   photos: { w: 920, h: 600, min: 420, klass: 'win-photos' },
-  textedit: { w: 520, h: 220, min: 300, klass: 'win-text' },
+  textedit: { w: 560, h: 300, min: 300, klass: 'win-text' },
   trash: { w: 560, h: 340, min: 380, klass: 'win-finder' },
 };
 
 function openApp(id: string) {
   if (id === 'github') { window.open(links.github, '_blank', 'noopener'); return; }
+  /* Safari is the volbase window with the other tab in front */
+  if (id === 'safari') {
+    const w = openApp('volbase');
+    const s = lives.get('volbase')?.scene;
+    if (s?.tab) requestAnimationFrame(() => s.tab!('site'));
+    return w;
+  }
   if (phone()) { sheetOpen(id); return; }
   if (id === 'rin') { if (!rinPanel) dock.bounce('rin'); rinOpen(); return; }
   if (id === 'ql') { if (ql) desk.open({ id: 'ql', title: '', body: qlBody!, w: 0, h: 0 }); return; }
@@ -400,6 +413,18 @@ function openApp(id: string) {
         const d = (e as CustomEvent).detail as { title: string; text: string };
         notify(d.title, d.text, 'market');
       });
+    }
+    if (id === 'volbase' && !el.dataset.sfWired) {
+      el.dataset.sfWired = '1';
+      el.addEventListener('sf:here', (e) => {
+        const d = (e as CustomEvent<{ href: string; title: string; tab: string }>).detail;
+        const w = desk.get('volbase');
+        const a = w?.el.querySelector<HTMLAnchorElement>('[data-vb-open]');
+        if (a) { a.href = d.href; a.title = `Open ${d.title} in a new tab`; }
+        w?.el.setAttribute('aria-label', d.title);
+      });
+      el.addEventListener('sf:gated', () => notify('Safari', 'volbase opened in a new tab so you can sign in.', 'volbase'));
+      el.addEventListener('sf:open', (e) => openApp((e as CustomEvent<string>).detail));
     }
   }
   if (id === 'finder') wireFinder(el, tool!);
@@ -571,6 +596,7 @@ const FINDER_MENUS: Menu[] = [
     { label: 'Read me', action: 'open:textedit' },
     { label: 'Pictures', action: 'pictures' },
     { label: 'Photos', action: 'open:photos' },
+    { label: 'petermei.com', action: 'open:safari' },
     { label: 'GitHub', action: 'gh' },
     { label: '', sep: true },
     { label: 'Trash', action: 'open:trash' },
@@ -627,7 +653,7 @@ function sync() {
   appMenus.innerHTML = menus
     .map((m, i) => `<button class="mb-item" type="button" data-menu="app-${i + 1}" aria-haspopup="true" aria-expanded="false">${m.label}</button>`)
     .join('');
-  dock.running([...open]);
+  dock.running([...open, ...(open.has('volbase') ? ['safari'] : [])]);
 }
 
 /* ── the drop-down menus ───────────────────────────────────────────────── */
@@ -857,6 +883,21 @@ function run(act: string) {
     return;
   }
   if (act.startsWith('power:')) { power(act.slice(6) as Power); return; }
+  if (act.startsWith('sf-')) {
+    const s = lives.get('volbase')?.scene;
+    if (act.startsWith('sf-go:')) {
+      const [, tab, ...rest] = act.split(':');
+      const path = rest.join(':');
+      if (!desk.has('volbase')) openApp('volbase');
+      const go = () => lives.get('volbase')?.scene.go?.(tab as 'site' | 'volbase', path);
+      if (s) go(); else requestAnimationFrame(go);
+      return;
+    }
+    if (act === 'sf-back') s?.back?.();
+    if (act === 'sf-fwd') s?.fwd?.();
+    if (act === 'sf-reload') s?.run?.();
+    return;
+  }
   const f = desk.front;
   switch (act) {
     case 'close': closeFront(); break;
@@ -868,7 +909,7 @@ function run(act: string) {
     case 'spot': spot.show(); break;
     case 'theme': theme.flip(); break;
     case 'gh': window.open(links.github, '_blank', 'noopener'); break;
-    case 'vb': window.open(links.volbase, '_blank', 'noopener'); break;
+    case 'vb': window.open(lives.get('volbase')?.scene.href?.() ?? links.volbase, '_blank', 'noopener'); break;
     case 'rin-gh': window.open(links.rin, '_blank', 'noopener'); break;
   }
 }
@@ -914,8 +955,9 @@ function wireFinder(root: HTMLElement, tool: HTMLElement) {
   const show = (id: string) => {
     $$('[data-fnd]', root).forEach((x) => x.classList.toggle('is-on', x.dataset.fnd === id));
     $$('[data-fnd-pane]', root).forEach((p) => p.classList.toggle('is-on', p.dataset.fndPane === id));
-    const n = $(`[data-fnd-pane="${id}"]`, root)?.querySelectorAll('.fnd-row').length ?? 0;
-    if (status) status.textContent = `${n} items`;
+    const pane = $(`[data-fnd-pane="${id}"]`, root);
+    const n = pane?.querySelectorAll('.fnd-row').length ?? 0;
+    if (status) status.textContent = pane?.classList.contains('fnd-doc') ? '1 item' : `${n} items`;
     if (title) title.textContent = id === 'pictures' ? 'Pictures' : 'About Peter';
     /* a folder of pictures opens in icon view, the facts stay in list view */
     const list = id !== 'pictures';
@@ -1094,14 +1136,16 @@ const hits = (): Hit[] => [
   { id: 'pictures', label: 'Pictures', kind: 'Folder', icon: icon('folder'), run: () => { openApp('finder'); finderPane('pictures'); } },
   { id: 'textedit', label: 'Read me', kind: 'Document', icon: icon('doc'), run: () => openApp('textedit') },
   { id: 'trash', label: 'Trash', kind: 'Finder', icon: icon('trash'), run: () => openApp('trash') },
+  { id: 'safari', label: 'Safari', kind: 'Application', icon: icon('safari'), run: () => openApp('safari') },
+  { id: 'site', label: 'petermei.com', kind: 'Website', icon: icon('safari'), run: () => openApp('safari') },
   { id: 'gh', label: 'GitHub', kind: 'Website', icon: icon('github'), run: () => window.open(links.github, '_blank', 'noopener') },
-  { id: 'vb', label: 'volbase.app', kind: 'Website', icon: icon('volbase'), run: () => window.open(links.volbase, '_blank', 'noopener') },
+  { id: 'vb', label: 'volbase.app', kind: 'Website', icon: icon('volbase'), run: () => openApp('volbase') },
   { id: 'dark', label: 'Switch appearance', kind: 'System Settings', icon: icon('settings'), run: () => theme.flip() },
-  /* the facts in the About window, and the places in the photo library */
-  ...finder.flatMap((s) => s.items.map((f) => ({
-    id: `fact-${s.id}-${slug(f.label)}`, label: `${f.label} · ${f.value}`, kind: 'About Peter', icon: icon('finder'),
+  /* the text files in the About window, and the places in the photo library */
+  ...finder.map((s) => ({
+    id: `doc-${s.id}`, label: s.file, kind: 'About Peter', icon: icon('doc'),
     run: () => { openApp('finder'); finderPane(s.id); },
-  }))),
+  })),
   ...placeList.map((p) => ({
     id: `place-${slug(p)}`, label: p, kind: 'Photos', icon: icon('photos'),
     run: () => { openApp('photos'); photosApp.setView('album', slug(p)); },
@@ -1125,7 +1169,7 @@ function sheetOpen(id: string, title?: string) {
   sheetId = id;
   sheetBody.appendChild(el);
   sheetBody.scrollTop = 0;
-  sheetName.textContent = title ?? byId(id)?.label ?? TITLES[id] ?? '';
+  sheetName.textContent = title ?? (id === 'volbase' ? 'Safari' : byId(id)?.label) ?? TITLES[id] ?? '';
   sheet.hidden = false;
   sheet.dataset.app = id;
   /* the way back to the landing lives at the foot of the About sheet */
@@ -1270,8 +1314,11 @@ initClock();
 sync();
 /* the landing, if this tab has not been in yet; the desktop is already
    drawn behind it, live, so the picture shows the real thing */
+/* a link from the plain site: /?open=volbase opens that app once the desktop is up */
+const wanted = (() => { try { return new URLSearchParams(location.search).get('open') || ''; } catch { return ''; } })();
+const openWanted = () => { if (wanted && (byId(wanted) || wanted === 'safari' || wanted === 'finder' || wanted === 'photos' || wanted === 'textedit')) setTimeout(() => openApp(wanted), 200); };
 const intro = initIntro(macEl, $('[data-land]'), {
-  onEnter: () => { deskEl.tabIndex = -1; deskEl.focus({ preventScroll: true }); },
+  onEnter: () => { deskEl.tabIndex = -1; deskEl.focus({ preventScroll: true }); openWanted(); },
   beforeLeave: (kind) => {
     closeMenu(); closeCtx();
     if (sheetId) sheetClose(true);
@@ -1280,6 +1327,7 @@ const intro = initIntro(macEl, $('[data-land]'), {
 });
 document.body.classList.add('is-up');
 dockWrap.classList.add('is-up');
+if (!intro.active) openWanted();
 
 addEventListener('resize', () => {
   if (phone() && desk.wins.length) {

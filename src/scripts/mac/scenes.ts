@@ -18,6 +18,13 @@ export type Scene = {
   leave?(): void;        // the window closed or minimized
   finish?(m: 'light' | 'dark'): void;
   run?(): void;          // the one honest film, started by the visitor
+  back?(): void;         // Safari: one page back in the tab's own history
+  fwd?(): void;
+  go?(tab: 'site' | 'volbase', path: string): void;
+  tab?(id: 'site' | 'volbase'): void;
+  href?(): string;       // the page the front tab is on, as a real address
+  title?(): string;
+  theme?(v: string): void;
 };
 
 const builders: Record<string, (el: HTMLElement) => Scene> = {
@@ -51,6 +58,16 @@ export function mountScene(host: HTMLElement): Live | null {
     if (!bw) return;
     let s: number;
     const box = fig.parentElement as HTMLElement | null;
+    /* a live page is never scaled: the figure takes the box, one to one */
+    if (fig.dataset.flat !== undefined) {
+      host.style.height = '';
+      if (box) box.style.height = '';
+      fig.style.setProperty('--w', `${bw}px`);
+      fig.style.setProperty('--h', `${host.offsetHeight}px`);
+      fig.style.setProperty('--s', '1');
+      root.classList.toggle('is-narrow', bw < 520);
+      return;
+    }
     if (narrow()) {
       s = bw / w;
       const px = `${Math.round(h * s)}px`;

@@ -94,8 +94,9 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
     if (vw === 'album') {
       const t = document.createElement('div');
       t.className = 'pho-title';
-      t.innerHTML = `<h2></h2><p></p>`;
+      t.innerHTML = `<h2></h2><p class="pho-blurb"></p><p></p>`;
       t.firstElementChild!.textContent = albumPlace(album);
+      t.children[1].textContent = albumBlurb(album);
       t.lastElementChild!.textContent = plural(subset.length);
       frag.appendChild(t);
     }
@@ -125,6 +126,7 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
   }
 
   const albumPlace = (id: string) => $(`[data-ph-album="${id}"]`, el)?.textContent?.trim() ?? '';
+  const albumBlurb = (id: string) => $(`[data-ph-album="${id}"]`, el)?.dataset.phBlurb ?? '';
   const plural = (n: number) => `${n} ${n === 1 ? 'Photo' : 'Photos'}`;
 
   /* ── panes, modes, views ──────────────────────────────────────────── */
