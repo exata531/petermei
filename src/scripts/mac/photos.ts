@@ -13,7 +13,7 @@ import { reduced } from './motion';
 
 export type PhotoRec = { f: string; n: string; w: number; h: number; a: string; p: string; d: string; m: string; ml: string };
 export type Mode = 'years' | 'months' | 'days' | 'all';
-export type View = 'lib' | 'places' | 'album';
+export type View = 'lib' | 'places' | 'album' | 'otd';
 
 const ZOOM = [72, 104, 144, 208, 304];   // the slider's steps, thumbnail edge in px
 const $ = <T extends Element = HTMLElement>(s: string, r: ParentNode) => r.querySelector<T>(s);
@@ -76,10 +76,12 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
   function regroup() {
     const subset = vw === 'album'
       ? cells.filter((c) => c.dataset.place === albumPlace(album))
-      : cells;
+      : vw === 'otd'
+        ? cells.filter((c) => c.dataset.month!.slice(5, 7) === otdPick().mm)
+        : cells;
     const key = (c: HTMLElement) => (mode === 'days' && vw === 'lib' ? c.dataset.day! : c.dataset.month!);
     /* All Photos is one continuous grid; the headers belong to Days */
-    const flat = vw === 'album' || (vw === 'lib' && mode === 'all');
+    const flat = vw === 'album' || vw === 'otd' || (vw === 'lib' && mode === 'all');
     const order: string[] = [];
     const by = new Map<string, HTMLElement[]>();
     for (const c of subset) {
@@ -91,12 +93,12 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
     for (const c of cells) hold.appendChild(c);
     $$('.pho-grp, .pho-title', groups).forEach((g) => g.remove());
     const frag = document.createDocumentFragment();
-    if (vw === 'album') {
+    if (vw === 'album' || vw === 'otd') {
       const t = document.createElement('div');
       t.className = 'pho-title';
       t.innerHTML = `<h2></h2><p class="pho-blurb"></p><p></p>`;
-      t.firstElementChild!.textContent = albumPlace(album);
-      t.children[1].textContent = albumBlurb(album);
+      t.firstElementChild!.textContent = vw === 'otd' ? 'On This Day' : albumPlace(album);
+      t.children[1].textContent = vw === 'otd' ? otdPick().label : albumBlurb(album);
       t.lastElementChild!.textContent = plural(subset.length);
       frag.appendChild(t);
     }
@@ -126,12 +128,30 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
   }
 
   const albumPlace = (id: string) => $(`[data-ph-album="${id}"]`, el)?.textContent?.trim() ?? '';
+  /* the roll is dated to the month, so On This Day is this month in other
+     years, or the nearest month the roll has */
+  const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const otdPick = () => {
+    const m = new Date().getMonth() + 1;
+    let best = m, bestD = 99;
+    for (const c of cells) {
+      const mo = Number(c.dataset.month!.slice(5, 7));
+      const d = Math.min(Math.abs(mo - m), 12 - Math.abs(mo - m));
+      if (d < bestD) { bestD = d; best = mo; }
+    }
+    return {
+      mm: String(best).padStart(2, '0'),
+      label: bestD === 0
+        ? `${MONTH_NAMES[best - 1]}, in other years.`
+        : `Nothing from ${MONTH_NAMES[m - 1]} yet, so here is ${MONTH_NAMES[best - 1]}.`,
+    };
+  };
   const albumBlurb = (id: string) => $(`[data-ph-album="${id}"]`, el)?.dataset.phBlurb ?? '';
   const plural = (n: number) => `${n} ${n === 1 ? 'Photo' : 'Photos'}`;
 
   /* ── panes, modes, views ──────────────────────────────────────────── */
   function paint() {
-    const pane = vw === 'places' ? 'places' : vw === 'album' ? 'grid' : mode === 'years' ? 'years' : mode === 'months' ? 'months' : 'grid';
+    const pane = vw === 'places' ? 'places' : vw === 'album' || vw === 'otd' ? 'grid' : mode === 'years' ? 'years' : mode === 'months' ? 'months' : 'grid';
     $$('[data-ph-pane]', el).forEach((p) => { p.hidden = p.dataset.phPane !== pane; });
     el.dataset.mode = mode;
     el.dataset.view = vw;
@@ -149,10 +169,10 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
       });
       tool.classList.toggle('is-lib', vw === 'lib');
       const t = $('[data-ph-title]', tool)!;
-      t.textContent = vw === 'places' ? 'Places' : vw === 'album' ? albumPlace(album) : '';
+      t.textContent = vw === 'places' ? 'Places' : vw === 'album' ? albumPlace(album) : vw === 'otd' ? 'On This Day' : '';
       t.hidden = vw === 'lib';
     }
-    hooks.onTitle?.(vw === 'places' ? 'Places' : vw === 'album' ? albumPlace(album) : 'Photos');
+    hooks.onTitle?.(vw === 'places' ? 'Places' : vw === 'album' ? albumPlace(album) : vw === 'otd' ? 'On This Day' : 'Photos');
   }
 
   function setMode(m: Mode) {
@@ -163,7 +183,7 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
   }
   function setView(v: View, id = '') {
     vw = v; album = id;
-    if (v === 'lib' || v === 'album') regroup();
+    if (v === 'lib' || v === 'album' || v === 'otd') regroup();
     paint();
   }
 
@@ -298,6 +318,7 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
       const k = navB.dataset.phNav!;
       if (k === 'album') setView('album', navB.dataset.phAlbum);
       else if (k === 'places') setView('places');
+      else if (k === 'otd') setView('otd');
       else setView('lib');
       return;
     }

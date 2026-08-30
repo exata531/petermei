@@ -1178,3 +1178,136 @@ html.in .land, html:not(.js) .land { display: none !important; }
     scroll-behavior: auto !important;
   }
 }
+
+/* ══ Terminal: paper, mono, a prompt that answers ══════════════════════ */
+.win-term .win-body { background: light-dark(#fdfbf7, #1b1a19); }
+.term {
+  position: relative; display: grid; grid-template-rows: minmax(0, 1fr);
+  height: 100%; min-height: 240px;
+  font-family: var(--mono); font-size: 12px; line-height: 1.55;
+  color: light-dark(#2c2b27, #e8e4de);
+  background: light-dark(#fdfbf7, #1b1a19);
+}
+.term-scroll { overflow: auto; padding: 10px 12px 12px; overscroll-behavior: contain; cursor: text; }
+.term-out { margin: 0; font: inherit; white-space: pre-wrap; word-break: break-word; }
+.term-out:empty { display: none; }
+.term .dim { color: light-dark(rgb(44 43 39 / .55), rgb(232 228 222 / .55)); }
+.term-dir { color: var(--link); font-weight: 600; }
+.term-acc { color: light-dark(#b25620, #f6cb98); font-weight: 600; }
+.term-art { color: light-dark(#4b68c3, #8fa6ec); }
+.term-ps { color: light-dark(#3f8850, #9bd8a9); font-weight: 600; }
+.term-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 7px; }
+.term-mirror { white-space: pre-wrap; word-break: break-all; min-height: 1em; }
+.term-caret { width: 7px; height: 13px; align-self: center; box-shadow: inset 0 0 0 1px currentColor; opacity: .5; }
+.term:focus-within .term-caret { background: currentColor; opacity: .8; }
+.term-in { position: absolute; left: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; border: 0; padding: 0; }
+html:not(.js) .stash-js-only { display: none; }
+
+/* ══ Stickies: paper squares the visitor leaves on the desk ════════════ */
+.stickies { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+@media (max-width: 767px) { .stickies { display: none; } }
+.sticky {
+  position: absolute; width: 184px; pointer-events: auto;
+  display: grid; grid-template-rows: 16px 1fr; border-radius: 2px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .22), 0 10px 24px rgb(0 0 0 / .2);
+}
+.sticky-c0 { background: linear-gradient(180deg, #fdf0a8, #fbe98c); }
+.sticky-c1 { background: linear-gradient(180deg, #fbdcc8, #f8cfb2); }
+.sticky-c2 { background: linear-gradient(180deg, #d9f2df, #c7ebd1); }
+.sticky-c3 { background: linear-gradient(180deg, #d8e6fb, #c6dbf9); }
+.sticky-bar {
+  display: flex; align-items: center; gap: 4px; padding: 2px 5px;
+  background: rgb(0 0 0 / .07); cursor: default;
+  touch-action: none; user-select: none; -webkit-user-select: none;
+}
+.sticky-x { position: relative; width: 10px; height: 10px; border-radius: 2px; background: rgb(0 0 0 / .28); opacity: 0; transition: opacity var(--t-fast) var(--soft); }
+.sticky-x::before { content: ''; position: absolute; inset: -7px; }
+.sticky:hover .sticky-x, .sticky:focus-within .sticky-x, .sticky-x:focus-visible { opacity: 1; }
+.sticky-dots { margin-left: auto; display: inline-flex; gap: 5px; opacity: 0; transition: opacity var(--t-fast) var(--soft); }
+.sticky:hover .sticky-dots, .sticky:focus-within .sticky-dots { opacity: 1; }
+.sticky-dot { width: 10px; height: 10px; border-radius: 50%; box-shadow: inset 0 0 0 .5px rgb(0 0 0 / .3); }
+.sticky-dot[aria-current] { box-shadow: inset 0 0 0 .5px rgb(0 0 0 / .3), 0 0 0 1.5px rgb(0 0 0 / .4); }
+.sticky-dc0 { background: #fbe98c; } .sticky-dc1 { background: #f8cfb2; }
+.sticky-dc2 { background: #c7ebd1; } .sticky-dc3 { background: #c6dbf9; }
+.sticky textarea {
+  border: 0; background: none; resize: none; outline: none;
+  font: 13px/1.4 var(--ui); color: #3a3628;
+  padding: 7px 9px 9px; min-height: 112px;
+}
+.sticky textarea::placeholder { color: rgb(58 54 40 / .4); }
+
+/* ══ Mission Control: the windows step back and line up ════════════════ */
+.mc-veil {
+  position: absolute; inset: 0; z-index: 3;
+  background: rgb(0 0 0 / .2);
+  animation: mc-in 240ms var(--soft) both;
+}
+.mc-veil.is-out { animation: mc-out 240ms var(--soft) both; }
+@keyframes mc-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes mc-out { from { opacity: 1; } to { opacity: 0; } }
+.mc-labels { position: fixed; inset: 0; z-index: 2147483647; pointer-events: none; }
+.mc-label {
+  position: absolute; translate: -50% 0;
+  max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  padding: 3px 10px; border-radius: 6px; font-size: 12px;
+  background: rgb(0 0 0 / .55); color: #fff;
+  animation: mc-in 240ms var(--soft) both;
+}
+.win.mc-win { transition: transform 320ms var(--ease); }
+html.is-mc .win .win-body, html.is-mc .win .rz, html.is-mc .win .lights { pointer-events: none; }
+
+/* ══ the screenshot flash ══════════════════════════════════════════════ */
+.shot-flash { position: fixed; inset: 0; z-index: 96; background: #fff; pointer-events: none; animation: shot-flash 260ms ease-out both; }
+@keyframes shot-flash { from { opacity: .85; } to { opacity: 0; } }
+
+/* ══ the screensaver: the one thing allowed to move on its own ═════════ */
+.saver { position: fixed; inset: 0; z-index: 88; background: #000; opacity: 0; transition: opacity 800ms ease; cursor: none; }
+.saver.is-on { opacity: 1; }
+.sv-img { position: absolute; inset: -4%; width: 108%; height: 108%; object-fit: cover; opacity: 0; transition: opacity 1.8s ease; }
+.sv-img.is-on { opacity: 1; animation: sv-drift 30s linear both; }
+@keyframes sv-drift {
+  from { transform: translate3d(-1.4%, -.9%, 0) scale(1); }
+  to   { transform: translate3d(1.4%, .9%, 0) scale(1.05); }
+}
+.sv-clock { position: absolute; left: 48px; bottom: 44px; color: #fff; display: grid; gap: 2px; text-shadow: 0 2px 18px rgb(0 0 0 / .65); }
+.sv-clock b { font-size: 92px; font-weight: 275; line-height: 1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.sv-clock span { font-size: 17px; font-weight: 400; opacity: .85; }
+
+/* ══ About This Mac ════════════════════════════════════════════════════ */
+.abt-amc { --tint: var(--tint-peter); }
+.amc-art { display: block; width: 138px; margin: 2px 0 8px; filter: drop-shadow(0 6px 14px rgb(3 3 2 / .18)); }
+.amc-art svg { display: block; width: 100%; height: auto; }
+.amc-ver { cursor: default; border-radius: 5px; padding: 1px 7px; transition: background var(--t-fast) var(--soft); }
+.amc-ver:hover { background: var(--chip); }
+.amc-facts { margin-top: 8px; }
+.amc-secrets { margin-top: 10px; font-size: 12px; }
+.amc-secrets b { font-weight: 600; }
+.amc-hint { font-size: 11px; color: var(--ink-2); max-width: 34ch; }
+.amc-hint:empty { display: none; }
+
+/* ══ the Trash holds the old versions; the paper leaves when it is emptied ══ */
+html.pm-trash-empty .ico-paper { display: none; }
+[data-tr-items] .pic-rows { grid-template-columns: repeat(auto-fill, 128px); }
+[data-tr-items] .pic-row { width: 128px; }
+[data-tr-items] .pic-name { max-width: 100%; min-width: 0; }
+/* a long file name wraps to two lines under its icon, the way Finder wraps */
+[data-tr-items] .pic-row b {
+  display: block; max-width: 100%; white-space: normal;
+  overflow-wrap: anywhere; text-align: center; line-height: 1.25;
+}
+[data-tr-items] .pic-row b .stem { display: inline; overflow: visible; }
+
+/* ══ Control Center's sound switch ═════════════════════════════════════ */
+.cc-lbl-row { display: flex; align-items: center; justify-content: space-between; }
+.cc-mute {
+  font-size: 11px; font-weight: 500; padding: 1px 8px; border-radius: 999px;
+  background: var(--chip-2); color: var(--ink-2);
+  transition: background var(--t-fast) var(--soft), color var(--t-fast) var(--soft);
+}
+.cc-mute.is-on { background: var(--accent); color: var(--accent-fg); }
+
+/* a plain confirm (Empty Trash) hides the power alert's checkbox */
+.alert-veil.is-plain .alert-chk { display: none; }
+
+/* while a screenshot renders, the grain layers hide their CSS-borne SVG */
+.is-shooting .wall-grain, .is-shooting .abt::after { background-image: none !important; }

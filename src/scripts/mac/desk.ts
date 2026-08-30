@@ -14,7 +14,15 @@ import { mountScene, type Live } from './scenes';
 import { initPhotos, type PhotoRec } from './photos';
 import { initIntro, type Power } from './intro';
 import { onFrame, damp, reduced } from './motion';
-import { apps, byId, links, finder, EDIT, VIEW, WINDOW, type Menu, type MenuItem } from '../../data/apps';
+import { initTerminal } from './terminal';
+import { initStickies } from './stickies';
+import { initMission } from './mission';
+import { initSaver } from './saver';
+import { takeScreenshot, type Shot } from './shot';
+import { sound } from './sounds';
+import { secrets } from './secrets';
+import { apps, byId, links, finder, readme, EDIT, VIEW, WINDOW, type Menu, type MenuItem } from '../../data/apps';
+import { trashItems } from '../../data/trash';
 
 const $ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => r.querySelector<T>(s);
 const $$ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => [...r.querySelectorAll<T>(s)];
@@ -35,6 +43,8 @@ const body = (id: string) => $(`[data-body="${id}"]`);
 const icon = (id: string) => $<HTMLTemplateElement>(`template[data-icon="${id}"]`)?.innerHTML ?? '';
 /* the photo library, as the scripts know it: file, name, size, place, date */
 const PH: PhotoRec[] = JSON.parse($('[data-ph-json]')?.textContent || '[]');
+/* the build facts the page rendered once: commit, date, Astro, weight */
+const BUILD = JSON.parse($('[data-build-json]')?.textContent || '{}') as { commit: string; astro: string; date: string; mb: number };
 
 /* ── appearance ─────────────────────────────────────────────────────────── */
 function initTheme() {
@@ -102,6 +112,8 @@ const desk = new Desk(winRoot);
 const dock = initDock(dockRoot as HTMLElement);
 desk.dockTop = () => dock.top() - 8;
 const open = new Set<string>();
+const mission = initMission(desk, deskEl);
+const stickies = initStickies($('[data-stickies]') ?? deskEl);
 
 function returnBody(id: string) {
   const el = body(id);
@@ -251,7 +263,7 @@ function finderTool(title: string, opts: { views?: boolean; count?: string; empt
        <span class="tb-sp" data-drag></span>
        ${opts.count ? `<span class="tb-count">${opts.count}</span>` : ''}
        ${opts.views ? `<span class="tb-seg" data-fnd-view>${btn(G.grid, 'Icon view')}${btn(G.list, 'List view', ' is-on')}${btn(G.cols, 'Column view', ' is-dis')}${btn(G.gallery, 'Gallery view', ' is-dis')}</span>` : ''}
-       ${opts.empty ? `<button class="tb-btn tb-txt is-dis" type="button" aria-disabled="true">Empty</button>` : ''}
+       ${opts.empty ? `<button class="tb-btn tb-txt" type="button" data-tr-do>Empty</button>` : ''}
        <span class="tb-search" aria-hidden="true">${G.search}<span>Search</span></span>
      </span>`;
   t.querySelectorAll('.tb-btn.is-dis').forEach((b) => b.setAttribute('aria-disabled', 'true'));
@@ -316,15 +328,21 @@ function photosTool() {
 
 const TITLES: Record<string, string> = {
   finder: 'About Peter', photos: 'Photos', textedit: 'Read me', trash: 'Trash',
+  terminal: 'visitor — fake-zsh — 80×24',
 };
 const SIZES: Record<string, { w: number; h: number; min?: number; klass?: string }> = {
   finder: { w: 700, h: 440, min: 460, klass: 'win-finder' },
   photos: { w: 920, h: 600, min: 420, klass: 'win-photos' },
   textedit: { w: 560, h: 300, min: 300, klass: 'win-text' },
-  trash: { w: 560, h: 340, min: 380, klass: 'win-finder' },
+  trash: { w: 620, h: 360, min: 420, klass: 'win-finder' },
+  terminal: { w: 585, h: 400, min: 400, klass: 'win-term' },
 };
 
 function openApp(id: string) {
+  mission.exit();
+  mission.unpeek();
+  if (id === 'about-mac') { openAboutMac(); return; }
+  if (id === 'stickies') { stickyOpen(); return; }
   if (id === 'github') { window.open(links.github, '_blank', 'noopener'); return; }
   /* Safari is the volbase window with the other tab in front */
   if (id === 'safari') {
@@ -449,6 +467,8 @@ function openApp(id: string) {
   }
   if (id === 'finder') wireFinder(el, tool!);
   if (id === 'photos') { photosApp.attachTool(tool!); photosApp.enter('desk'); }
+  if (id === 'terminal') { termWire(); requestAnimationFrame(() => term?.focus()); }
+  if (id === 'trash') wireTrash(el, tool!);
   return win;
 }
 
@@ -502,7 +522,7 @@ function openPhoto(i: number) {
 let ql: Win | null = null;
 let qlAt = -1;
 let qlBody: HTMLElement | null = null;
-function qlSize(p: PhotoRec) {
+function qlSize(p: { w: number; h: number }) {
   const maxW = Math.min(920, innerWidth - 80);
   const maxH = Math.min(660, desk.dockTop() - 24 - 80);
   let w = maxW, h = (w * p.h) / p.w;
@@ -512,7 +532,13 @@ function qlSize(p: PhotoRec) {
 function quickLook(i: number) {
   const p = PH[i];
   if (!p) return;
-  qlAt = i;
+  qlShow(p, i);
+}
+type QlRec = { f: string; n: string; w: number; h: number; a: string };
+let qlOpenBtn: HTMLElement | null = null;
+let qlDl: HTMLAnchorElement | null = null;
+function qlShow(p: QlRec, at = -1, download?: string) {
+  qlAt = at;
   if (!qlBody) {
     qlBody = document.createElement('div');
     qlBody.className = 'ql';
@@ -521,25 +547,41 @@ function quickLook(i: number) {
   const img = qlBody.querySelector<HTMLImageElement>('[data-ql-img]')!;
   img.src = p.f; img.alt = p.a; img.width = p.w; img.height = p.h;
   const { w, h } = qlSize(p);
+  const state = () => {
+    if (qlOpenBtn) qlOpenBtn.hidden = at < 0;
+    if (qlDl) {
+      qlDl.hidden = !download;
+      if (download) { qlDl.href = download; qlDl.setAttribute('download', p.n); }
+    }
+  };
   if (ql) {
     ql.el.querySelector('.win-title')!.textContent = p.n;
     desk.setSize(ql, w, h);
+    state();
     return;
   }
   const win = desk.open({
     id: 'ql', title: p.n, body: qlBody, w, h, klass: 'win-ql', zoomOnly: true,
-    onClose: () => { ql = null; qlAt = -1; },
+    onClose: () => { ql = null; qlAt = -1; qlOpenBtn = null; qlDl = null; },
   });
   ql = win;
   const pad = win.el.querySelector('.win-pad')!;
   pad.insertAdjacentHTML('beforeend', btn(G.share, 'Share', ' ql-share is-dis'));
   pad.querySelector('.ql-share')!.setAttribute('aria-disabled', 'true');
+  const dl = document.createElement('a');
+  dl.className = 'tb-btn tb-txt ql-open';
+  dl.textContent = 'Download';
+  dl.hidden = true;
+  pad.appendChild(dl);
+  qlDl = dl;
   const b = document.createElement('button');
   b.className = 'tb-btn tb-txt ql-open';
   b.type = 'button';
   b.textContent = 'Open with Photos';
-  b.addEventListener('click', () => { const at = qlAt; quickLookClose(); openPhoto(at); });
+  b.addEventListener('click', () => { const at2 = qlAt; quickLookClose(); openPhoto(at2); });
   pad.appendChild(b);
+  qlOpenBtn = b;
+  state();
 }
 function quickLookClose() {
   if (!ql) return;
@@ -560,6 +602,7 @@ const appMenus = $('[data-app-menus]')!;
 
 /* the Apple menu's order, and its power items are the ways out of the Mac */
 const APPLE: MenuItem[] = [
+  { label: 'About This Mac', action: 'open:about-mac' },
   { label: 'About Peter', action: 'open:finder' },
   { label: '', sep: true },
   { label: 'System Settings…', dis: true },
@@ -576,7 +619,7 @@ const APPLE: MenuItem[] = [
 ];
 /* Control Center: a glass panel of modules, not a list. The radios and the
    sliders are this desktop's own; the appearance tile is the real switch. */
-const cc = { wifi: true, bt: true, air: true, disp: 80, snd: 55 };
+const cc = { wifi: true, bt: true, air: true, disp: 80, snd: sound.volume };
 function ccPanel() {
   const radio = (k: 'wifi' | 'bt' | 'air', g: string, name: string, sub: [string, string]) =>
     `<button class="cc-row${cc[k] ? ' is-on' : ''}" type="button" role="switch" aria-checked="${cc[k]}" data-cc="${k}">
@@ -595,7 +638,9 @@ function ccPanel() {
       <span class="cc-txt"><b>Appearance</b><small>${dark ? 'Dark' : 'Light'}</small></span>
     </button>
     <label class="cc-card cc-slide"><span class="cc-lbl">Display</span><span class="cc-range">${G.bright}<input type="range" min="0" max="100" value="${cc.disp}" data-cc="disp" aria-label="Display brightness" /></span></label>
-    <label class="cc-card cc-slide"><span class="cc-lbl">Sound</span><span class="cc-range">${G.sound}<input type="range" min="0" max="100" value="${cc.snd}" data-cc="snd" aria-label="Sound volume" /></span></label>
+    <label class="cc-card cc-slide"><span class="cc-lbl cc-lbl-row">Sound
+      <button class="cc-mute${sound.muted ? '' : ' is-on'}" type="button" role="switch" aria-checked="${!sound.muted}" data-cc="mute">${sound.muted ? 'Off' : 'On'}</button></span>
+      <span class="cc-range">${G.sound}<input type="range" min="0" max="100" value="${cc.snd}" data-cc="snd" aria-label="Sound volume" /></span></label>
   </div>`;
 }
 
@@ -649,6 +694,20 @@ function currentApp(): { name: string; about: string; menus: Menu[] } {
           { label: 'Enter Full Screen', key: '⌃⌘F', action: 'zoom' },
         ] },
         WINDOW,
+        { label: 'Help', items: [{ label: 'Spotlight', key: '⌘K', action: 'spot' }] },
+      ],
+    };
+  }
+  if (id === 'terminal') {
+    return {
+      name: 'Terminal', about: 'Terminal',
+      menus: [
+        { label: 'Shell', items: [
+          { label: 'New Window', key: '⌘N', dis: true },
+          { label: '', sep: true },
+          { label: 'Close Window', key: '⌘W', action: 'close' },
+        ] },
+        EDIT, VIEW, WINDOW,
         { label: 'Help', items: [{ label: 'Spotlight', key: '⌘K', action: 'spot' }] },
       ],
     };
@@ -787,6 +846,7 @@ pop.addEventListener('click', (e) => {
   if (!b) return;
   const k = b.dataset.cc!;
   if (k === 'theme') { theme.flip(); setTimeout(() => { if (popFor) pop.innerHTML = ccPanel(); }, 220); return; }
+  if (k === 'mute') { sound.setMuted(!sound.muted); pop.innerHTML = ccPanel(); return; }
   const key = k as 'wifi' | 'bt' | 'air';
   cc[key] = !cc[key];
   pop.innerHTML = ccPanel();
@@ -794,7 +854,7 @@ pop.addEventListener('click', (e) => {
 pop.addEventListener('input', (e) => {
   const r = e.target as HTMLInputElement;
   if (r.dataset.cc === 'disp') cc.disp = Number(r.value);
-  if (r.dataset.cc === 'snd') cc.snd = Number(r.value);
+  if (r.dataset.cc === 'snd') { cc.snd = Number(r.value); sound.setVolume(cc.snd); }
 });
 addEventListener('pointerdown', (e) => {
   if (!popFor) return;
@@ -835,9 +895,18 @@ document.addEventListener('contextmenu', (e) => {
   const w = t.closest<HTMLElement>('.win');
   if (d) {
     const id = d.dataset.dock!;
+    if (id === 'trash') {
+      openCtx([
+        { label: 'Open', action: 'open:trash' },
+        { label: '', sep: true },
+        { label: 'Empty Trash…', action: 'trash-empty', dis: trashEmptied },
+      ], e.clientX, e.clientY);
+      return;
+    }
     const running = open.has(id);
     openCtx([
       { label: 'Options', dis: true },
+      { label: 'Mission Control', action: 'mc' },
       { label: 'Show in Finder', action: 'open:finder' },
       { label: '', sep: true },
       running ? { label: 'Quit', action: `quit:${id}` } : { label: 'Open', action: `open:${id}` },
@@ -852,6 +921,7 @@ document.addEventListener('contextmenu', (e) => {
   } else {
     /* only what this desktop can actually do; nothing greyed */
     openCtx([
+      { label: 'Mission Control', action: 'mc' },
       { label: 'Change Appearance', action: 'theme' },
       { label: '', sep: true },
       { label: 'Sort By Name', action: 'sort:name', check: deskSort === 'name' },
@@ -903,6 +973,8 @@ function run(act: string) {
     return;
   }
   if (act.startsWith('power:')) { power(act.slice(6) as Power); return; }
+  if (act === 'mc') { mission.toggle(); if (mission.active) secrets.found('mission'); return; }
+  if (act === 'trash-empty') { if (!trashEmptied) emptyTrash(); return; }
   if (act.startsWith('sf-')) {
     const s = lives.get('volbase')?.scene;
     if (act.startsWith('sf-go:')) {
@@ -1048,6 +1120,171 @@ function wirePictures(root: HTMLElement) {
   });
 }
 
+/* ── Terminal ──────────────────────────────────────────────────────────── */
+let term: ReturnType<typeof initTerminal> | null = null;
+function termWire() {
+  if (term) return;
+  const host = body('terminal')?.querySelector<HTMLElement>('[data-vterm]');
+  if (!host) return;
+  term = initTerminal(host, {
+    open: (id) => openApp(id),
+    bonk: () => sound.bonk(),
+    photos: PH.map((p) => ({ n: p.n, a: p.a, p: p.p })),
+    build: BUILD,
+  });
+  term.setReadme(readme);
+}
+
+/* ── Stickies: notes live on the desk, the Dock icon makes one ─────────── */
+function stickyOpen() {
+  if (phone()) return;
+  dock.bounce('stickies');
+  dock.settle('stickies');
+  stickies.create();
+}
+
+/* ── the Trash holds the site's earlier versions, until it is emptied ──── */
+let trashEmptied = false;
+try { trashEmptied = sessionStorage.getItem('pm-trash-empty') === '1'; } catch {}
+if (trashEmptied) document.documentElement.classList.add('pm-trash-empty');
+let trashRefresh: (() => void) | null = null;
+
+function emptyTrash() {
+  askPlain(
+    'Are you sure you want to permanently erase the items in the Trash?',
+    'You can’t undo this action.',
+    'Empty Trash',
+    () => {
+      trashEmptied = true;
+      try { sessionStorage.setItem('pm-trash-empty', '1'); } catch {}
+      document.documentElement.classList.add('pm-trash-empty');
+      sound.trash();
+      quickLookClose();
+      trashRefresh?.();
+    },
+  );
+}
+
+function wireTrash(root: HTMLElement, tool: HTMLElement) {
+  if (!trashEmptied) secrets.found('trash');
+  const emptyBtn = tool.querySelector<HTMLButtonElement>('[data-tr-do]');
+  const refresh = () => {
+    root.querySelector('[data-tr-items]')?.classList.toggle('is-on', !trashEmptied);
+    root.querySelector('[data-tr-empty]')?.classList.toggle('is-on', trashEmptied);
+    const st = root.querySelector('[data-tr-status]');
+    if (st) st.textContent = trashEmptied ? '0 items' : `${trashItems.length} items`;
+    if (emptyBtn) {
+      emptyBtn.classList.toggle('is-dis', trashEmptied);
+      emptyBtn.toggleAttribute('aria-disabled', trashEmptied);
+    }
+  };
+  trashRefresh = refresh;
+  refresh();
+  emptyBtn?.addEventListener('click', () => { if (!trashEmptied) emptyTrash(); });
+  $$<HTMLImageElement>('img[data-src]', root).forEach((im) => { im.src = im.dataset.src!; delete im.dataset.src; });
+  if (root.dataset.trWired) return;
+  root.dataset.trWired = '1';
+  const rows = $$('[data-tr]', root);
+  const rec = (i: number): QlRec => ({ f: trashItems[i].file, n: trashItems[i].name, w: trashItems[i].w, h: trashItems[i].h, a: trashItems[i].alt });
+  let sel = -1;
+  const pick = (i: number, focus = true) => {
+    sel = i;
+    rows.forEach((r) => {
+      const on = Number(r.dataset.tr) === i;
+      r.classList.toggle('is-sel', on);
+      r.setAttribute('aria-selected', String(on));
+      (r as HTMLElement).tabIndex = on ? 0 : -1;
+    });
+    const r = rows.find((x) => Number(x.dataset.tr) === i);
+    if (r && focus) r.focus({ preventScroll: true });
+    if (ql) qlShow(rec(i));
+  };
+  rows.forEach((r) => {
+    r.addEventListener('click', () => pick(Number(r.dataset.tr)));
+    r.addEventListener('dblclick', () => qlShow(rec(Number(r.dataset.tr))));
+  });
+  root.addEventListener('keydown', (e) => {
+    const it = (e.target as HTMLElement).closest<HTMLElement>('[data-tr]');
+    if (!it) return;
+    const at = Math.max(0, sel);
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); pick(Math.min(rows.length - 1, at + 1)); }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); pick(Math.max(0, at - 1)); }
+    else if (e.key === 'Enter') { e.preventDefault(); qlShow(rec(at)); }
+    else if (e.key === ' ') { e.preventDefault(); e.stopPropagation(); if (ql) quickLookClose(); else qlShow(rec(at)); }
+  });
+}
+
+/* ── About This Mac: a truthful panel, and the count of secrets ────────── */
+function amcFill() {
+  const el = body('about-mac');
+  if (!el) return;
+  const d = $('[data-amc-display]', el);
+  if (d) d.textContent = `${innerWidth} × ${innerHeight}${devicePixelRatio >= 2 ? ' Retina' : ''}`;
+  const c = $('[data-amc-count]', el);
+  if (c) c.textContent = String(secrets.count());
+  const h = $('[data-amc-hint]', el);
+  if (h) h.textContent = secrets.count() >= secrets.total ? 'That is all of them.' : secrets.hint();
+}
+secrets.onChange(amcFill);
+{
+  const v = $('[data-amc-ver]');
+  if (v) {
+    const line = ['Version 5 (the Mac)', `Built ${BUILD.date}`, `Serial ${BUILD.commit}`];
+    let vi = 0;
+    v.addEventListener('click', () => { vi = (vi + 1) % line.length; v.textContent = line[vi]; });
+  }
+}
+function openAboutMac() {
+  const el = body('about-mac');
+  if (!el) return;
+  amcFill();
+  if (phone()) { sheetOpen('about-mac', 'About This Mac'); return; }
+  const w = desk.open({
+    id: 'about-mac', title: '', body: el, w: 336, h: 430, klass: 'win-about', fixed: true,
+    onClose: () => { returnBody('about-mac'); sync(); },
+  });
+  requestAnimationFrame(() => desk.fit(w, 0));
+}
+
+/* ── command shift 3: a real screenshot lands on the desktop ───────────── */
+async function shoot() {
+  if (phone() || intro.active) return;
+  sound.shutter();
+  if (!reduced()) {
+    const f = document.createElement('div');
+    f.className = 'shot-flash';
+    document.body.appendChild(f);
+    setTimeout(() => f.remove(), 320);
+  }
+  const s = await takeScreenshot(macEl);
+  if (!s) return;
+  secrets.found('screenshot');
+  addShotIcon(s);
+}
+function addShotIcon(s: Shot) {
+  const li = document.createElement('li');
+  li.innerHTML =
+    `<button class="item item-file" type="button">
+       <span class="item-ico"><span class="item-pic" data-orient="l"><img alt="" draggable="false" /></span></span>
+       <span class="item-lbl"></span>
+     </button>`;
+  const sBtn = li.querySelector('button')!;
+  sBtn.setAttribute('aria-label', `${s.name}, a screenshot of this desktop`);
+  const im = li.querySelector('img')!;
+  im.src = s.url; im.width = s.w; im.height = s.h;
+  li.querySelector('.item-lbl')!.textContent = s.name;
+  const rec: QlRec = { f: s.url, n: s.name, w: s.w, h: s.h, a: 'A screenshot of this desktop, taken a moment ago.' };
+  sBtn.addEventListener('click', () => {
+    $$('.item').forEach((x) => x.classList.remove('is-sel'));
+    sBtn.classList.add('is-sel');
+  });
+  sBtn.addEventListener('dblclick', () => qlShow(rec, -1, s.url));
+  sBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); qlShow(rec, -1, s.url); }
+  });
+  itemsEl.appendChild(li);
+}
+
 /* ── power ─────────────────────────────────────────────────────────────── */
 /* Sleep and Lock Screen go at once. Restart, Shut Down and Log Out ask
    first, the way a Mac does: its words, its default button, its sixty
@@ -1072,7 +1309,9 @@ const alertBox = $('[data-alert-box]')!;
 const alertTitle = $('[data-alert-title]')!;
 const alertWait = $('[data-alert-wait]')!;
 const alertOk = $<HTMLButtonElement>('[data-alert-ok]')!;
+const alertIco = $('[data-alert] .alert-ico')!;
 let alertKind: Ask | null = null;
+let plainOk: (() => void) | null = null;
 let alertLeft = 60;
 let alertTimer = 0;
 let alertFrom: Element | null = null;
@@ -1086,12 +1325,29 @@ function quitAll() {
 }
 
 function power(kind: Power) {
+  if (kind === 'sleep') sound.chime();
   if (kind === 'sleep' || kind === 'lock') { intro.power(kind); return; }
   ask(kind);
 }
 
+function askPlain(title: string, text: string, okLabel: string, onOk: () => void) {
+  if (alertKind || plainOk || intro.active) return;
+  plainOk = onOk;
+  alertFrom = document.activeElement;
+  alertIco.innerHTML = icon('trash');
+  alertTitle.textContent = title;
+  alertOk.textContent = okLabel;
+  alertWait.textContent = text;
+  alertEl.classList.add('is-plain');
+  alertEl.hidden = false;
+  macEl.inert = true;
+  requestAnimationFrame(() => alertEl.classList.add('is-on'));
+  alertOk.focus({ preventScroll: true });
+}
+
 function ask(kind: Ask) {
-  if (alertKind || intro.active) return;
+  if (alertKind || plainOk || intro.active) return;
+  alertIco.innerHTML = icon('finder');
   alertKind = kind;
   alertLeft = 60;
   alertFrom = document.activeElement;
@@ -1111,6 +1367,16 @@ function countdown() {
 }
 
 function answer(go: boolean) {
+  if (plainOk) {
+    const fn = plainOk;
+    plainOk = null;
+    alertEl.classList.remove('is-on');
+    setTimeout(() => { alertEl.hidden = true; alertEl.classList.remove('is-plain'); }, reduced() ? 0 : 140);
+    macEl.inert = false;
+    if (go) fn();
+    else (alertFrom?.isConnected ? (alertFrom as HTMLElement) : $('[data-menu="apple"]'))?.focus({ preventScroll: true });
+    return;
+  }
   if (!alertKind) return;
   const kind = alertKind;
   alertKind = null;
@@ -1133,7 +1399,7 @@ alertEl.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') { e.preventDefault(); answer(false); return; }
   if (e.key === 'Enter') { e.preventDefault(); answer(true); return; }
   if (e.key !== 'Tab') return;
-  const f = $$<HTMLElement>('input, button', alertBox);
+  const f = $$<HTMLElement>('input, button', alertBox).filter((x) => x.offsetParent !== null);
   const at = f.indexOf(document.activeElement as HTMLElement);
   if (e.shiftKey && at <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
   else if (!e.shiftKey && at === f.length - 1) { e.preventDefault(); f[0].focus(); }
@@ -1157,6 +1423,9 @@ const hits = (): Hit[] => [
   { id: 'textedit', label: 'Read me', kind: 'Document', icon: icon('doc'), run: () => openApp('textedit') },
   { id: 'trash', label: 'Trash', kind: 'Finder', icon: icon('trash'), run: () => openApp('trash') },
   { id: 'safari', label: 'Safari', kind: 'Application', icon: icon('safari'), run: () => openApp('safari') },
+  { id: 'terminal', label: 'Terminal', kind: 'Application', icon: icon('terminal'), run: () => openApp('terminal') },
+  { id: 'stickies', label: 'Stickies', kind: 'Application', icon: icon('stickies'), run: () => openApp('stickies') },
+  { id: 'about-mac', label: 'About This Mac', kind: 'System', icon: icon('finder'), run: () => openApp('about-mac') },
   { id: 'site', label: 'petermei.com', kind: 'Website', icon: icon('safari'), run: () => openApp('safari') },
   { id: 'gh', label: 'GitHub', kind: 'Website', icon: icon('github'), run: () => window.open(links.github, '_blank', 'noopener') },
   { id: 'vb', label: 'volbase.app', kind: 'Website', icon: icon('volbase'), run: () => openApp('volbase') },
@@ -1201,6 +1470,7 @@ function sheetOpen(id: string, title?: string) {
   const l = live(id);
   if (l) requestAnimationFrame(() => { l.fit(); l.scene.enter?.(); });
   if (id === 'rin') setTimeout(() => el.querySelector<HTMLInputElement>('[data-term-real]')?.focus({ preventScroll: true }), reduced() ? 0 : 360);
+  if (id === 'terminal') { termWire(); setTimeout(() => term?.focus(), reduced() ? 0 : 360); }
 }
 
 function sheetClose(now = false) {
@@ -1302,11 +1572,25 @@ const launch = (it: HTMLElement) => {
 
 /* ── the keyboard ──────────────────────────────────────────────────────── */
 addEventListener('keydown', (e) => {
-  if (spot.open || intro.active || alertKind) return;
+  if (spot.open || intro.active || alertKind || plainOk) return;
   const k = e.key.toLowerCase();
+  if (!phone()) {
+    /* the reflexes a Mac hand tries: Mission Control, show the desktop,
+       and the screenshot */
+    const typing = (e.target as HTMLElement)?.matches?.('input, textarea');
+    if (e.key === 'F3' || (e.ctrlKey && !e.metaKey && !e.altKey && e.key === 'ArrowUp' && !typing)) {
+      e.preventDefault();
+      mission.toggle();
+      if (mission.active) secrets.found('mission');
+      return;
+    }
+    if (e.key === 'F11') { e.preventDefault(); mission.peek(); return; }
+    if (e.metaKey && e.shiftKey && e.code === 'Digit3') { e.preventDefault(); shoot(); return; }
+  }
   /* Escape dismisses a menu, the viewer, a sheet, Quick Look or the panel;
      it never closes a window, because a Mac's does not */
   if (e.key === 'Escape') {
+    if (mission.active) { mission.exit(); return; }
     if (popFor) { closeMenu(); return; }
     if (ctxOpen) { closeCtx(); return; }
     if (photoEsc()) return;
@@ -1348,6 +1632,12 @@ const intro = initIntro(macEl, $('[data-land]'), {
 document.body.classList.add('is-up');
 dockWrap.classList.add('is-up');
 if (!intro.active) openWanted();
+
+/* the screensaver arms itself; it is the one sanctioned self-starter */
+initSaver(
+  PH.map((p) => ({ f: p.f, p: p.p })),
+  () => document.documentElement.classList.contains('in') && !intro.active && !alertKind && !plainOk,
+);
 
 addEventListener('resize', () => {
   if (phone() && desk.wins.length) {

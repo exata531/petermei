@@ -13,6 +13,9 @@ import Icon from './Icon.astro';
 import Photos from './Photos.astro';
 import Pictures from './Pictures.astro';
 import { apps, finder, readme, links, aboutPeter } from '../../data/apps';
+import { build } from '../../data/build';
+import { trashItems } from '../../data/trash';
+import { imac } from '../../scripts/mac/devices';
 import { photos } from '../../data/photos';
 
 /* what the scripts need to know about a photo, once, as JSON */
@@ -129,9 +132,48 @@ const glyph = (name: string) => `<svg class="fnd-glyph" viewBox="0 0 16 16" aria
         </a>
       </nav>
       <div class="fnd-main">
-        <div class="fnd-pane fnd-pane-empty is-on"><div class="fnd-empty">No Items</div></div>
-        <div class="fnd-status">0 items</div>
+        <div class="fnd-pane is-on" data-tr-items>
+          <ul class="fnd-rows pic-rows" role="listbox" aria-label="Trash">
+            {trashItems.map((t, i) => (
+              <li class="fnd-row pic-row" role="option" aria-selected="false" tabindex={i === 0 ? 0 : -1} data-tr={i} aria-label={`${t.name}, ${t.alt}`}>
+                <span class="pic-name">
+                  <span class="pic-ico" data-orient="l"><img data-src={t.thumb} width={t.w} height={t.h} alt="" decoding="async" draggable="false" /></span>
+                  <b><span class="stem">{t.name.replace(/\.jpeg$/, '')}</span><span class="ext">.jpeg</span></b>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="fnd-pane fnd-pane-empty" data-tr-empty><div class="fnd-empty">No Items</div></div>
+        <div class="fnd-status" data-tr-status>{trashItems.length} items</div>
       </div>
+    </div>
+  </section>
+
+  <section class="stash-app stash-js-only" data-body="terminal" aria-label="Terminal">
+    <div class="term" data-vterm>
+      <div class="term-scroll" data-vt-scroll>
+        <pre class="term-out" data-vt-out></pre>
+        <div class="term-line"><span class="term-ps" data-vt-ps>visitor@petermei ~ %</span><span class="term-mirror" data-vt-mirror></span><span class="term-caret" aria-hidden="true"></span></div>
+      </div>
+      <input class="term-in" data-vt-in type="text" aria-label="Terminal command" autocomplete="off" autocapitalize="off" spellcheck="false" />
+    </div>
+  </section>
+
+  <section class="stash-app stash-js-only" data-body="about-mac" aria-label="About This Mac">
+    <div class="abt abt-amc">
+      <span class="amc-art" aria-hidden="true" set:html={imac(1.6).svg} />
+      <h3 class="abt-name">petermei.com</h3>
+      <button class="abt-ver amc-ver" type="button" data-amc-ver title="Click for more">Version 5 (the Mac)</button>
+      <div class="abt-facts amc-facts">
+        <span><b>Chip</b> Astro {build.astro}, on Vercel</span>
+        <span><b>Memory</b> {build.mb} MB, mostly photographs</span>
+        <span><b>Serial number</b> {build.commit}</span>
+        <span><b>Display</b> <span data-amc-display>this window</span></span>
+        <span><b>Built</b> {build.date}</span>
+      </div>
+      <p class="amc-secrets"><b data-amc-count>0</b> of <b>5</b> secrets found on this Mac.</p>
+      <p class="amc-hint" data-amc-hint></p>
     </div>
   </section>
 
@@ -166,9 +208,10 @@ const glyph = (name: string) => `<svg class="fnd-glyph" viewBox="0 0 16 16" aria
   </section>
 
   <script type="application/json" data-ph-json set:html={photoJson} />
+  <script type="application/json" data-build-json set:html={JSON.stringify({ commit: build.commit, astro: build.astro, date: build.date, mb: build.mb })} />
 
   {/* icons the scripts clone into Spotlight rows and notifications */}
-  {['finder', 'volbase', 'rin', 'kyou', 'market', 'photos', 'textedit', 'trash', 'github', 'settings', 'folder', 'doc', 'safari'].map((id) => (
+  {['finder', 'volbase', 'rin', 'kyou', 'market', 'photos', 'textedit', 'trash', 'github', 'settings', 'folder', 'doc', 'safari', 'terminal', 'stickies'].map((id) => (
     <template data-icon={id}><Icon id={id} /></template>
   ))}
 </div>

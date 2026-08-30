@@ -31,6 +31,9 @@ const G = {
     <button class="fnd-tab" type="button" data-ph-nav="places">
       <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={G.places} /><span>Places</span>
     </button>
+    <button class="fnd-tab" type="button" data-ph-nav="otd">
+      <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="10.5" rx="1.5"/><path d="M2 6.5h12M5.5 3.2V1.8M10.5 3.2V1.8"/><circle cx="8" cy="10" r="1.4" fill="currentColor" stroke="none"/></svg><span>On This Day</span>
+    </button>
     <span class="fnd-h">Albums</span>
     {albums.map((a) => (
       <button class="fnd-tab" type="button" data-ph-nav="album" data-ph-album={a.id} data-ph-blurb={a.blurb} title={a.place}>
