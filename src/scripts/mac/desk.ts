@@ -157,7 +157,7 @@ function rinOpen() {
   const take = () => prompt?.focus({ preventScroll: true });
   (document.activeElement as HTMLElement | null)?.blur?.();
   take();
-  p.addEventListener('click', take);
+  p.addEventListener('click', (e) => { if (!(e.target as HTMLElement).closest('button, a, input, [role="tab"]')) take(); });
   if (reduced()) { p.style.setProperty('--drop', '1'); return; }
   let v = 0;
   rinStop = onFrame((dt) => {
@@ -185,6 +185,23 @@ function rinClose(back = false) {
     v = damp(v, 0, 0.06, dt);
     p.style.setProperty('--drop', v.toFixed(4));
     if (v < 0.004) { rinStop?.(); rinStop = null; done(); }
+  });
+}
+/* what she can do to the Mac around her: open an app, switch the
+   appearance, put it to sleep, and wear a face in the menu bar for a moment */
+{
+  const el = body('rin');
+  const faceEl = $('[data-face]');
+  const rest = faceEl?.textContent ?? '';
+  let faceT = 0;
+  el?.addEventListener('rin:open', (e) => { const id = (e as CustomEvent<string>).detail; if (!phone()) rinClose(); openApp(id); });
+  el?.addEventListener('rin:theme', (e) => { const v = (e as CustomEvent<string>).detail; if (v === 'flip') theme.flip(); else if (theme.now() !== v) theme.flip(); });
+  el?.addEventListener('rin:power', (e) => { const k = (e as CustomEvent<Power>).detail; if (phone() && sheetId) sheetClose(true); power(k); });
+  el?.addEventListener('rin:face', (e) => {
+    if (!faceEl) return;
+    faceEl.textContent = (e as CustomEvent<string>).detail;
+    clearTimeout(faceT);
+    faceT = window.setTimeout(() => { faceEl.textContent = rest; }, 2600);
   });
 }
 /* the real panel closes when you click anywhere else */
@@ -382,7 +399,10 @@ function openApp(id: string) {
         b.className = 'tb-btn tb-txt';
         b.type = 'button';
         b.textContent = t.label;
-        if (t.action === 'kyou-light') b.classList.add('is-on');
+        /* the segment lights whichever finish the screen is already wearing,
+           so a window reopened on a dark demo does not claim Light */
+        const dark = !!el.querySelector('.ph-screen.is-dark');
+        if (t.action === (dark ? 'kyou-dark' : 'kyou-light')) b.classList.add('is-on');
         b.addEventListener('click', () => {
           if (t.action === 'kyou-light') lives.get('kyou')?.scene.finish?.('light');
           if (t.action === 'kyou-dark') lives.get('kyou')?.scene.finish?.('dark');

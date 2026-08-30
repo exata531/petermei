@@ -379,7 +379,7 @@ button.mb-item:active { background: var(--chip-2); }
 /* the product windows hold a scaled demo and nothing else */
 /* the letterbox around a scaled demo wears the demo's own surface */
 .win-volbase .win-body { background: var(--vb-page); }
-.win-market .win-body { background: var(--tool); }
+.win-market .win-body { background: light-dark(#f5f5f8, #1a1b1f); }
 .win-kyou .win-body { background: var(--surface); }
 .win-volbase .sframe { border-radius: 0; }
 .win-kyou .sframe { background: transparent; }
@@ -1005,7 +1005,7 @@ html:not(.js) .pho-side, html:not(.js) .pho-main, html:not(.js) .pho-view { disp
   /* the sheet wears the demo's own surface under the demo, so nothing sits empty */
   .sheet[data-app='rin'] .sheet-body { background: var(--slate); }
   .sheet[data-app='kyou'] .sheet-body { background: #000; }
-  .sheet[data-app='market'] .sheet-body { background: var(--tool); }
+  .sheet[data-app='market'] .sheet-body { background: light-dark(#f5f5f8, #1a1b1f); }
   .sheet[data-app='volbase'] .sheet-body { background: var(--vb-page); }
   .sheet[data-app='volbase'] .sf-tab { height: 44px; }
   .sheet[data-app='volbase'] .sf-tabs { height: 44px; }

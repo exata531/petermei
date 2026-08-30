@@ -158,7 +158,7 @@ export const apps: App[] = [
     title: 'iPhone 17 Pro',
     kind: 'sim',
     w: 330, h: 700,
-    scene: 'kyou', sw: 300, sh: 620, mw: 390, mh: 700,
+    scene: 'kyou', sw: 300, sh: 620, mw: 390, mh: 720,
     toolbar: [
       { label: 'Light', action: 'kyou-light' },
       { label: 'Dark', action: 'kyou-dark' },
@@ -178,8 +178,8 @@ export const apps: App[] = [
     label: 'Market Station',
     title: 'Market Station',
     kind: 'window',
-    w: 920, h: 400, min: 520,
-    scene: 'market', sw: 1280, sh: 460, mw: 390, mh: 600,
+    w: 980, h: 640, min: 520,
+    scene: 'market', sw: 1100, sh: 720, mw: 390, mh: 640,
     about: {
       name: 'Market Station',
       line: 'Market Station watches a set of public market readings all day, like the VIX, the yield curve, and how many stocks are above their own average, and sends a phone alert when one of them crosses a line. I built it for one non-technical reader at home, so every reading says in plain English what it means, and an alert fires once per crossing instead of every time the number wobbles. It has been running on an old laptop since August and writes a short briefing twice a day. It is a tool before it is pretty, and the only color on it is for warnings.',

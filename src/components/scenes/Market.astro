@@ -1,100 +1,201 @@
 ---
-/* Market Station: a dashboard at rest. Six readings with sparklines, the
-   yield curve, the morning briefing. The sparklines tick while the window is
-   open; the alert chip walks its state machine when you press it. */
-const tiles = [
-  { id: 'vix', name: 'VIX', v: '16.8', unit: '', state: 'ok', note: 'calm · below 20' },
-  { id: 'fg', name: 'Fear & Greed', v: '62', unit: '', state: 'watch', note: 'greed · CNN' },
-  { id: 'hy', name: 'HY spread', v: '3.12', unit: '%', state: 'ok', note: 'credit · FRED' },
-  { id: 'sahm', name: 'Sahm rule', v: '0.33', unit: '', state: 'ok', note: 'below the 0.50 trigger' },
-  { id: 'breadth', name: 'S&P breadth', v: '58', unit: '%', state: 'watch', note: 'above 50-day · computed' },
-  { id: 'cape', name: 'CAPE', v: '34.1', unit: '', state: 'watch', note: 'rich · multpl' },
-];
+/* Market Station, the dashboard as it is. The header, the status strip, the
+   twelve readings as tiles, and under them the briefing and the alert
+   history, the way the real page lays them out. A tile opens into its full
+   detail: the reading, what it was, the plain-English line, the condition
+   bar, the history chart with the owner's line on it, the range buttons, and
+   the alert rule with its state machine. Settings is a sheet of alert lines.
+   The script in scripts/scenes/market.ts builds all of it from demo data and
+   keeps every change for the tab. With JavaScript off this is the shell. */
 ---
 <div class="ms" data-ms>
-  <div class="ms-bar" data-drag>
-    <span class="ms-title"><i class="ms-live" aria-hidden="true"></i>Market Station</span>
-    <span class="ms-sub mono">demo data · macro · <span data-ms-clock>9:41:07</span></span>
-    <button class="ms-alert mono" type="button" data-ms-alert data-state="armed" aria-label="Alert state: armed. Press to test the alert."><b></b><span data-ms-alert-txt>armed</span><span class="ms-alert-hint">test</span></button>
-  </div>
-  <div class="ms-grid">
-    <div class="ms-tiles">
-      {tiles.map((t, i) => (
-        <button class="ms-tile" type="button" data-ms-tile={t.id} data-state={t.state} style={`--i:${i}`} aria-label={`${t.name} ${t.v}${t.unit}, ${t.note}`}>
-          <span class="ms-front">
-            <span class="ms-name">{t.name}</span>
-            <span class="ms-val num"><span data-ms-val data-base={t.v}>{t.v}</span>{t.unit}</span>
-            <svg class="ms-spark" viewBox="0 0 100 28" preserveAspectRatio="none" aria-hidden="true"><polyline data-ms-spark points="" /></svg>
-            <span class="ms-note"><i></i>{t.note}</span>
-          </span>
-          <span class="ms-back mono"><span class="ms-name ms-back-name">{t.name}</span><span>raw</span><b class="num" data-ms-raw>{t.v}</b><span>state</span><b data-ms-state>{t.state}</b><span>hysteresis</span><b>armed → fired → easing</b></span>
-        </button>
-      ))}
+  <header class="ms-head" data-drag>
+    <div class="ms-hl">
+      <span class="ms-brand"><svg viewBox="0 0 32 32" aria-hidden="true"><rect class="mk-tile" width="32" height="32" rx="8"/><polyline class="mk-line" points="6,21 13,14 18,18 26,9" fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Market Station</span>
+      <span class="ms-clock mono" data-ms-clock></span>
+      <span class="ms-fresh mono" data-ms-fresh title="Most recent successful data collection">checking…</span>
     </div>
-    <div class="ms-side">
-      <div class="ms-card">
-        <span class="ms-name">Yield curve <span class="mono">10Y − 2Y</span></span>
-        <svg class="ms-curve" viewBox="0 0 220 90" aria-hidden="true">
-          <line x1="0" y1="62" x2="220" y2="62" class="ms-zero" />
-          <path data-ms-curve d="M0 78 C 30 74, 50 70, 70 66 S 110 60, 130 56 S 170 44, 200 40 L 220 38" />
-        </svg>
-        <span class="ms-note"><i></i>un-inverted · <b class="num">+0.42</b></span>
-      </div>
-      <div class="ms-card ms-brief">
-        <span class="ms-name">Briefing <span class="mono">7:00 AM</span></span>
-        <p class="ms-brief-txt" data-ms-brief>Volatility is asleep and breadth is thinning: 58% of the S&amp;P is above its 50-day, down from 71% a month ago. Credit is calm. Nothing fires today; the watch is on breadth.</p>
-        <span class="ms-src mono">Sources: FRED, CNN, Yahoo Finance</span>
-      </div>
+    <div class="ms-tools" data-nodrag>
+      <span class="ms-demo">demo data</span>
+      <button class="ms-btn" type="button" data-ms-refresh title="Fetch fresh data from all sources now">Check for new data</button>
+      <button class="ms-btn ms-btn-link" type="button" data-ms-settings>Settings</button>
     </div>
+  </header>
+
+  <div class="ms-scroll" data-ms-scroll>
+    <div class="ms-strip" data-ms-strip role="status">
+      <span class="ms-light" aria-hidden="true"></span>
+      <div class="ms-words"><strong data-ms-headline>Loading…</strong><div data-ms-detail></div></div>
+    </div>
+
+    <main class="ms-main">
+      <section class="ms-grid" data-ms-tiles aria-label="Readings"></section>
+
+      <section class="ms-lower">
+        <div class="ms-panel ms-brief">
+          <div class="ms-panel-head">
+            <h2>Today's briefing</h2>
+            <div class="ms-panel-tools"><span class="mono ms-muted" data-ms-brief-time></span><button class="ms-btn" type="button" data-ms-rewrite title="Write a fresh briefing from the current readings">Write a new one</button></div>
+          </div>
+          <div class="ms-brief-body" data-ms-brief-body></div>
+        </div>
+        <div class="ms-panel">
+          <div class="ms-panel-head"><h2>Alert history</h2></div>
+          <div class="ms-log ms-muted" data-ms-log>Nothing so far. When a reading crosses one of your alert lines it is recorded here and sent to the phone.</div>
+        </div>
+      </section>
+    </main>
+    <footer class="ms-foot">Readings from the Federal Reserve (FRED), Yahoo Finance, The Conference Board, multpl.com and CNN. Market data is checked every 5 minutes while the market is open. <span class="mono" data-ms-loaded></span></footer>
   </div>
+
+  <!-- a reading, opened -->
+  <div class="ms-detail" data-ms-detail hidden role="dialog" aria-label="Reading"></div>
+
+  <!-- the settings sheet -->
+  <div class="ms-sheet" data-ms-sheet hidden role="dialog" aria-label="Settings"></div>
 </div>
 
-<style>
-  .ms { position: absolute; inset: 0; display: grid; grid-template-rows: 44px 1fr; background: var(--tool); color: #eceef2; font-family: var(--ui); }
-  .ms-bar { display: flex; align-items: center; gap: 16px; padding: 0 16px; box-shadow: 0 .5px 0 rgb(255 255 255 / .08); font-size: 13px; }
-  .ms-title { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; }
-  .ms-live { width: 8px; height: 8px; border-radius: 50%; background: #43b25b; }
-  .ms-sub { font-size: 11px; color: rgb(236 238 242 / .55); }
-  .ms-alert { position: relative; margin-left: auto; display: inline-flex; align-items: center; gap: 7px; font-size: 11px; padding: 4px 10px; border-radius: 999px; background: rgb(255 255 255 / .06); text-transform: uppercase; letter-spacing: .06em; color: inherit; cursor: pointer; transition: background-color var(--t-fast) var(--soft); }
-  .ms-alert::before { content: ''; position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: max(100%, 44px); height: 44px; }
-  .ms-alert:active { transform: scale(.98); }
-  .ms-alert:hover { background: rgb(255 255 255 / .1); }
-  .ms-alert b { width: 8px; height: 8px; border-radius: 50%; background: #8b8f97; transition: background-color .3s, box-shadow .3s; }
-  .ms-alert[data-state="fired"] b { background: #fb4b3d; box-shadow: 0 0 8px #fb4b3d; }
-  .ms-alert[data-state="easing"] b { background: #dd9a18; }
-  .ms-alert[data-state="recovered"] b { background: #43b25b; }
-  .ms-alert-hint { color: rgb(236 238 242 / .7); padding-left: 4px; }
-  .ms-alert:not([data-state="armed"]) .ms-alert-hint { display: none; }
-  .ms-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 12px; padding: 12px; min-height: 0; }
-  .ms-tiles { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; gap: 10px; }
-  .ms-tile { position: relative; border-radius: 14px; background: var(--tool-2); text-align: left; padding: 0; perspective: 800px; cursor: default; }
-  .ms-front, .ms-back { position: absolute; inset: 0; padding: 12px 13px; display: grid; align-content: start; gap: 4px; backface-visibility: hidden; border-radius: 14px; transition: transform .5s var(--out); }
-  .ms-back { transform: rotateY(180deg); background: #2a2d33; font-size: 10px; grid-template-columns: auto 1fr; column-gap: 8px; align-content: center; color: rgb(236 238 242 / .6); }
-  .ms-back b { color: #eceef2; font-weight: 600; }
-  .ms-back-name { grid-column: 1 / -1; margin-bottom: 4px; }
-  .ms-tile:hover .ms-front, .ms-tile:focus-visible .ms-front { transform: rotateY(180deg); }
-  .ms-tile:hover .ms-back, .ms-tile:focus-visible .ms-back { transform: rotateY(360deg); }
-  .ms-name { font-size: 11px; color: rgb(236 238 242 / .6); font-weight: 500; }
-  .ms-name .mono { font-size: 10px; margin-left: 6px; opacity: .7; }
-  .ms-val { font-size: 24px; font-weight: 650; letter-spacing: -0.02em; line-height: 1.1; }
-  .ms-spark { width: 100%; height: 28px; margin-top: 4px; }
-  .ms-spark polyline { fill: none; stroke: #20a496; stroke-width: 1.6; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
-  .ms-note { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; color: rgb(236 238 242 / .55); }
-  .ms-note i { width: 6px; height: 6px; border-radius: 50%; background: #43b25b; }
-  [data-state="watch"] .ms-note i { background: #dd9a18; } [data-state="alert"] .ms-note i { background: #fb4b3d; }
-  .ms-side { display: grid; grid-template-rows: auto 1fr; gap: 10px; min-height: 0; }
-  .ms-card { border-radius: 14px; background: var(--tool-2); padding: 12px 13px; display: grid; gap: 6px; align-content: start; }
-  .ms-curve { width: 100%; height: 90px; }
-  .ms-curve path { fill: none; stroke: #20a496; stroke-width: 2; stroke-linecap: round; }
-  .ms-zero { stroke: rgb(255 255 255 / .18); stroke-dasharray: 3 4; }
-  .ms-brief-txt { font-size: 12px; line-height: 1.45; color: rgb(236 238 242 / .85); }
-  .ms-src { font-size: 9.5px; color: rgb(236 238 242 / .7); margin-top: auto; }
-  :global(.is-narrow) .ms-brief-txt { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-  :global(.is-narrow) .ms-card { min-height: 0; }
-  :global(.is-narrow) .ms-grid { grid-template-columns: 1fr; grid-template-rows: auto auto; gap: 8px; padding: 8px; }
-  :global(.is-narrow) .ms-tiles { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 110px; gap: 8px; }
-  :global(.is-narrow) .ms-val { font-size: 20px; }
-  :global(.is-narrow) .ms-side { grid-template-rows: auto auto; }
-  :global(.is-narrow) .ms-sub { display: none; }
-  :global(.is-narrow) .ms-front, :global(.is-narrow) .ms-back { padding: 10px 11px; }
+<style is:global>
+  .ms {
+    position: absolute; inset: 0; display: grid; grid-template-rows: 44px minmax(0, 1fr); font-family: var(--ui); font-size: 13px; line-height: 1.4;
+    --bg: light-dark(#f5f5f8, #1a1b1f); --card: light-dark(#ffffff, #24262b); --card-2: light-dark(#f0f0f4, #2b2d33);
+    --ink: light-dark(#1b1b1f, #eceef2); --mute: light-dark(#5f6168, #a2a6ad); --line: light-dark(rgb(27 27 31 / .1), rgb(255 255 255 / .09)); --line-2: light-dark(rgb(27 27 31 / .2), rgb(255 255 255 / .18));
+    --data: light-dark(#1b1b1f, #eceef2);
+    --ok: light-dark(#2e7d4f, #5fcf8a); --ok-t: light-dark(rgb(46 125 79 / .14), rgb(95 207 138 / .16));
+    --watch: light-dark(#9a6a00, #e6b83a); --watch-t: light-dark(rgb(154 106 0 / .14), rgb(230 184 58 / .16));
+    --alert: light-dark(#c1362b, #ff6b5e); --alert-t: light-dark(rgb(193 54 43 / .14), rgb(255 107 94 / .16));
+    --good: light-dark(#0f766e, #4fd1c5); --good-t: light-dark(rgb(15 118 110 / .14), rgb(79 209 197 / .16));
+    --zone-calm: light-dark(rgb(46 125 79 / .22), rgb(95 207 138 / .22)); --zone-hot: light-dark(rgb(193 54 43 / .22), rgb(255 107 94 / .22)); --zone-buy: light-dark(rgb(15 118 110 / .24), rgb(79 209 197 / .22)); --zone-mid: light-dark(rgb(27 27 31 / .08), rgb(255 255 255 / .1));
+    background: var(--bg); color: var(--ink);
+  }
+  .ms .mono { font-family: var(--mono); font-size: 11px; }
+  .ms-muted { color: var(--mute); }
+  .ms-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 16px; box-shadow: 0 .5px 0 var(--line); background: var(--card); }
+  .ms-hl { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  .ms-brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; white-space: nowrap; }
+  .ms-brand svg { width: 19px; height: 19px; }
+  .mk-tile { fill: var(--ink); } .mk-line { stroke: var(--bg); }
+  .ms-clock { color: var(--mute); }
+  .ms-fresh { color: var(--mute); white-space: nowrap; }
+  .ms-fresh.is-orange { color: var(--watch); } .ms-fresh.is-red { color: var(--alert); }
+  .ms-tools { display: flex; align-items: center; gap: 8px; }
+  .ms-demo { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--mute); padding: 3px 7px; border-radius: 4px; box-shadow: inset 0 0 0 .5px var(--line-2); margin-right: 4px; }
+  .ms-btn { min-height: 30px; padding: 0 12px; border-radius: 8px; background: var(--card-2); color: var(--ink); font: inherit; font-size: 12px; font-weight: 500; box-shadow: inset 0 0 0 .5px var(--line-2); transition: background-color var(--t-fast) var(--soft), transform var(--t-fast) var(--soft); white-space: nowrap; }
+  .ms-btn:hover { background: var(--line); }
+  .ms-btn:active { transform: scale(.98); }
+  .ms-btn[disabled] { opacity: .55; }
+  .ms-btn-link { background: transparent; box-shadow: none; text-decoration: underline; text-underline-offset: 3px; }
+  .ms-btn.is-primary { background: var(--ink); color: var(--bg); box-shadow: none; }
+  .ms-scroll { overflow-y: auto; overscroll-behavior: contain; }
+  .ms-strip { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; margin: 12px 16px 0; border-radius: 10px; background: var(--card); box-shadow: inset 0 0 0 .5px var(--line); }
+  .ms-light { width: 10px; height: 10px; border-radius: 50%; background: var(--ok); margin-top: 5px; flex: none; }
+  .ms-strip.is-alert .ms-light { background: var(--alert); } .ms-strip.is-mixed .ms-light { background: var(--watch); } .ms-strip.is-good .ms-light { background: var(--good); }
+  .ms-words strong { display: block; font-size: 14px; }
+  .ms-words div { color: var(--mute); font-size: 12px; margin-top: 2px; }
+  .ms-words .alarm { color: var(--ink); }
+  .ms-main { padding: 12px 16px 8px; display: grid; gap: 12px; }
+  .ms-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .ms-tile { display: grid; gap: 2px; align-content: start; padding: 12px 13px 10px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 .5px var(--line); text-align: left; color: inherit; font: inherit; transition: transform var(--t-fast) var(--soft), box-shadow var(--t-fast) var(--soft); cursor: pointer; min-height: 128px; }
+  .ms-tile:hover { box-shadow: inset 0 0 0 1px var(--line-2); }
+  .ms-tile:active { transform: scale(.98); }
+  .ms-tile-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+  .ms-name { font-size: 12px; font-weight: 600; color: var(--mute); }
+  .ms-chip { font-family: var(--mono); font-size: 9.5px; letter-spacing: .06em; padding: 2px 6px; border-radius: 4px; font-weight: 700; white-space: nowrap; }
+  .ms-chip.ok { background: var(--ok-t); color: var(--ok); } .ms-chip.watch { background: var(--watch-t); color: var(--watch); } .ms-chip.alert { background: var(--alert-t); color: var(--alert); } .ms-chip.good { background: var(--good-t); color: var(--good); } .ms-chip.nodata { background: var(--zone-mid); color: var(--mute); }
+  .ms-val { font-size: 26px; font-weight: 650; letter-spacing: -.02em; line-height: 1.1; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .ms-val small { font-size: 14px; font-weight: 500; color: var(--mute); margin-left: 1px; }
+  .ms-prev { font-size: 10.5px; color: var(--mute); min-height: 14px; font-variant-numeric: tabular-nums; }
+  .ms-plain { font-size: 11px; color: var(--mute); line-height: 1.3; }
+  .ms-spark { width: 100%; height: 26px; margin-top: 6px; }
+  .ms-spark polyline { fill: none; stroke: var(--data); stroke-width: 1.4; stroke-linejoin: round; vector-effect: non-scaling-stroke; opacity: .8; }
+  .ms-spark line { stroke: var(--alert); stroke-width: 1; stroke-dasharray: 2 3; vector-effect: non-scaling-stroke; opacity: .7; }
+  .ms-lower { display: grid; grid-template-columns: 1.6fr 1fr; gap: 10px; }
+  .ms-panel { border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 .5px var(--line); padding: 12px 14px; display: grid; gap: 8px; align-content: start; }
+  .ms-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .ms-panel h2 { font-size: 13px; font-weight: 700; }
+  .ms-panel-tools { display: flex; align-items: center; gap: 8px; }
+  .ms-brief-body { font-size: 12.5px; line-height: 1.5; display: grid; gap: 8px; }
+  .ms-brief-body h3 { font-size: 13px; font-weight: 700; margin-top: 2px; }
+  .ms-brief-body .ms-src { font-size: 11px; color: var(--mute); }
+  .ms-brief-body .ms-writing { display: grid; gap: 6px; color: var(--mute); }
+  .ms-bar-track { height: 4px; border-radius: 4px; background: var(--zone-mid); overflow: hidden; }
+  .ms-bar-fill { height: 100%; width: 0; background: var(--ink); transition: width .4s var(--soft); }
+  .ms-log { font-size: 12px; display: grid; gap: 6px; }
+  .ms-log-row { display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: start; }
+  .ms-log-row .when { font-family: var(--mono); font-size: 10.5px; color: var(--mute); white-space: nowrap; padding-top: 2px; }
+  .ms-log-row.is-alert b { color: var(--alert); } .ms-log-row.is-recover b { color: var(--ok); }
+  .ms-foot { padding: 8px 16px 14px; font-size: 10.5px; color: var(--mute); line-height: 1.4; }
+
+  /* the detail */
+  .ms-detail { position: absolute; inset: 44px 0 0; background: var(--bg); overflow-y: auto; overscroll-behavior: contain; padding: 12px 16px 16px; display: grid; gap: 10px; align-content: start; z-index: 3; }
+  .ms-detail[hidden], .ms-sheet[hidden] { display: none; }
+  .ms-back { justify-self: start; display: inline-flex; align-items: center; gap: 4px; min-height: 30px; padding: 0 10px 0 6px; border-radius: 8px; color: var(--ink); font: inherit; font-size: 12px; font-weight: 500; background: var(--card-2); box-shadow: inset 0 0 0 .5px var(--line-2); }
+  .ms-back svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .ms-d-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 10px; align-items: start; }
+  .ms-d-card { border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 .5px var(--line); padding: 14px 16px; display: grid; gap: 8px; align-content: start; }
+  .ms-d-card h2 { font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .ms-d-val { font-size: 40px; font-weight: 700; letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .ms-d-val small { font-size: 18px; font-weight: 500; color: var(--mute); }
+  .ms-d-sub { font-size: 12px; color: var(--mute); line-height: 1.45; }
+  .ms-d-sub b { color: var(--ink); }
+  .ms-cond { display: grid; gap: 4px; margin-top: 4px; }
+  .ms-cond-track { position: relative; height: 10px; border-radius: 5px; overflow: hidden; background: var(--zone-mid); }
+  .ms-zone { position: absolute; top: 0; bottom: 0; }
+  .ms-zone.calm { background: var(--zone-calm); } .ms-zone.hot { background: var(--zone-hot); } .ms-zone.buy { background: var(--zone-buy); } .ms-zone.mid { background: var(--zone-mid); }
+  .ms-notch { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--ink); opacity: .6; transform: translateX(-1px); }
+  .ms-needle { position: absolute; top: -2px; bottom: -2px; width: 4px; border-radius: 2px; background: var(--ink); box-shadow: 0 0 0 2px var(--card); transform: translateX(-2px); transition: left .4s var(--out); }
+  .ms-cond-lbl { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--mute); }
+  .ms-chart-wrap { position: relative; height: 170px; margin-top: 4px; }
+  .ms-chart { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: crosshair; }
+  .ms-hover { position: absolute; top: 0; padding: 3px 7px; border-radius: 6px; background: var(--ink); color: var(--bg); font-family: var(--mono); font-size: 10.5px; pointer-events: none; white-space: nowrap; transform: translateX(-50%); opacity: 0; transition: opacity var(--t-fast) var(--soft); }
+  .ms-hover.is-on { opacity: 1; }
+  .ms-ranges { display: flex; gap: 4px; flex-wrap: wrap; }
+  .ms-range { min-width: 44px; min-height: 28px; padding: 0 10px; border-radius: 7px; font: inherit; font-size: 11.5px; font-weight: 500; color: var(--mute); background: transparent; box-shadow: inset 0 0 0 .5px var(--line-2); transition: background-color var(--t-fast) var(--soft), color var(--t-fast) var(--soft); }
+  .ms-range.is-on { background: var(--ink); color: var(--bg); box-shadow: none; }
+  .ms-rule { display: grid; gap: 6px; font-size: 12px; }
+  .ms-rule b { font-weight: 600; }
+  .ms-states { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 2px; }
+  .ms-state { display: grid; justify-items: center; gap: 4px; padding: 8px 4px; border-radius: 8px; background: var(--card-2); font-family: var(--mono); font-size: 10px; letter-spacing: .06em; color: var(--mute); text-transform: uppercase; box-shadow: inset 0 0 0 .5px var(--line); transition: background-color .3s var(--soft), color .3s var(--soft); }
+  .ms-state i { width: 8px; height: 8px; border-radius: 50%; background: var(--line-2); }
+  .ms-state.is-on { color: var(--ink); background: var(--card); box-shadow: inset 0 0 0 1.5px var(--ink); }
+  .ms-state.is-on.fired i { background: var(--alert); box-shadow: 0 0 8px var(--alert); } .ms-state.is-on.easing i { background: var(--watch); } .ms-state.is-on.recovered i { background: var(--ok); } .ms-state.is-on.armed i { background: var(--ink); }
+  .ms-state-line { font-size: 12px; color: var(--mute); min-height: 34px; }
+  .ms-play { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .ms-play small { font-size: 10.5px; color: var(--mute); }
+  .ms-checked { font-size: 10.5px; color: var(--mute); }
+
+  /* settings */
+  .ms-sheet { position: absolute; inset: 44px 0 0; background: var(--bg); overflow-y: auto; overscroll-behavior: contain; padding: 12px 16px 16px; display: grid; gap: 10px; align-content: start; z-index: 4; }
+  .ms-sheet-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .ms-sheet h2 { font-size: 15px; font-weight: 700; }
+  .ms-sheet h3 { font-size: 13px; font-weight: 700; }
+  .ms-set-rows { display: grid; gap: 0; }
+  .ms-set { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 44px; padding: 4px 0; box-shadow: 0 .5px 0 var(--line); font-size: 12.5px; }
+  .ms-set:last-child { box-shadow: none; }
+  .ms-set small { display: block; color: var(--mute); font-size: 11px; }
+  .ms-set-ctl { display: inline-flex; align-items: center; gap: 6px; }
+  .ms-set input[type="number"] { width: 84px; min-height: 30px; padding: 0 8px; border-radius: 7px; border: 0; box-shadow: inset 0 0 0 .5px var(--line-2); background: var(--card); color: var(--ink); font: inherit; font-size: 12.5px; font-variant-numeric: tabular-nums; text-align: right; }
+  .ms-set .suffix { font-size: 11px; color: var(--mute); min-width: 34px; }
+  .ms-sw { position: relative; width: 40px; height: 24px; border-radius: 999px; background: var(--line-2); transition: background-color .2s var(--soft); }
+  .ms-sw::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgb(0 0 0 / .3); transition: transform .2s var(--out); }
+  .ms-sw[aria-checked="true"] { background: var(--ok); }
+  .ms-sw[aria-checked="true"]::after { transform: translateX(16px); }
+  .ms-sheet-note { font-size: 11.5px; color: var(--mute); line-height: 1.45; }
+
+  .ms :is(button, input, select):focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+  .is-narrow .ms-head { padding: 0 12px; gap: 6px; }
+  .is-narrow .ms-clock, .is-narrow .ms-fresh, .is-narrow .ms-demo { display: none; }
+  .is-narrow .ms-btn { padding: 0 9px; min-height: 36px; }
+  .is-narrow .ms-strip { margin: 10px 12px 0; padding: 10px 12px; }
+  .is-narrow .ms-main { padding: 10px 12px 8px; }
+  .is-narrow .ms-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .is-narrow .ms-tile { min-height: 116px; padding: 10px 11px 8px; }
+  .is-narrow .ms-val { font-size: 22px; }
+  .is-narrow .ms-lower { grid-template-columns: 1fr; }
+  .is-narrow .ms-detail, .is-narrow .ms-sheet { padding: 10px 12px 14px; }
+  .is-narrow .ms-d-grid { grid-template-columns: 1fr; }
+  .is-narrow .ms-d-val { font-size: 34px; }
+  .is-narrow .ms-chart-wrap { height: 150px; }
+  .is-narrow .ms-states { grid-template-columns: repeat(2, 1fr); }
 </style>
