@@ -52,7 +52,7 @@ ${shade('im-sh', '--im-shadow')}
 <rect x="0" y="${b + sh}" width="${W}" height="1" fill="var(--im-edge)"/>
 <rect x="0" y="1" width="${W}" height="1" fill="#fff" fill-opacity=".38"/>
 </g>
-<rect x="${b}" y="${b}" width="${sw}" height="${sh}" fill="var(--wall-flat)"/>
+<rect class="dev-screen" x="${b}" y="${b}" width="${sw}" height="${sh}" fill="var(--wall-flat)"/>
 </svg>`;
   return { svg, vbW: W, vbH: H, screen: { x: b, y: b, w: sw, h: sh, r: 0 } };
 }
@@ -86,7 +86,7 @@ ${side(W - 8, bh * 0.6, 68)}
 <rect x=".5" y=".5" width="${W - 1}" height="${bh - 1}" rx="${r}" fill="url(#ip-fr)" stroke="var(--im-edge)" stroke-width="1"/>
 <rect x="${ring}" y="${ring}" width="${W - 2 * ring}" height="${bh - 2 * ring}" rx="${r - ring}" fill="var(--ip-bezel)"/>
 <g clip-path="url(#ip-body)"><rect x="0" y="1" width="${W}" height="1" fill="#fff" fill-opacity=".4"/></g>
-<rect x="${f}" y="${f}" width="${sw}" height="${sh}" rx="${sr}" fill="var(--wall-flat)"/>
+<rect class="dev-screen" x="${f}" y="${f}" width="${sw}" height="${sh}" rx="${sr}" fill="var(--wall-flat)"/>
 </svg>`;
   return { svg, vbW: W, vbH: H, screen: { x: f, y: f, w: sw, h: sh, r: sr } };
 }

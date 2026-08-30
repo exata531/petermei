@@ -841,12 +841,44 @@ html:not(.js) .pho-side, html:not(.js) .pho-main, html:not(.js) .pho-view { disp
 .sp-kind { font-size: 12px; opacity: .6; }
 .sp-none { display: grid; place-items: center; height: 44px; font-size: 13px; color: var(--ink-2); }
 
-/* ══ sleep ═════════════════════════════════════════════════════════════ */
-.sleep {
-  position: fixed; inset: 0; z-index: 95; width: 100%; height: 100%;
-  background: #000; opacity: 0; transition: opacity 400ms var(--soft);
+/* ══ the alert: a Mac asks before it restarts, shuts down or logs out ══ */
+.alert-veil {
+  position: fixed; inset: 0; z-index: 82;
+  display: grid; justify-items: center; align-content: start;
+  padding: 22vh 16px 0;
+  opacity: 0; transition: opacity 140ms var(--soft);
 }
-.sleep.is-on { opacity: 1; }
+.alert-veil.is-on { opacity: 1; }
+.alert {
+  width: 300px; max-width: 100%;
+  padding: 20px 16px 16px; border-radius: 12px;
+  display: grid; justify-items: center; gap: 12px; text-align: center;
+  background: var(--glass-menu); color: var(--ink);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  box-shadow: var(--sh-menu), 0 0 0 .5px var(--glass-edge), inset 0 0 0 .5px var(--glass-hi);
+  transform: scale(.96); transition: transform 140ms var(--out);
+  user-select: none; -webkit-user-select: none;
+}
+.alert-veil.is-on .alert { transform: none; }
+.alert-ico { display: block; width: 64px; height: 64px; }
+.alert-ico svg { display: block; width: 100%; height: 100%; }
+.alert-title { font-size: 13px; font-weight: 700; line-height: 1.3; }
+.alert-chk { display: flex; align-items: center; gap: 6px; font-size: 11px; line-height: 1.2; }
+.alert-chk input { width: 14px; height: 14px; margin: 0; accent-color: var(--sys-blue); }
+.alert-chk input:focus-visible { outline: 3px solid var(--sys-blue-ring); outline-offset: 1px; border-radius: 3px; }
+.alert-wait { font-size: 11px; line-height: 1.35; color: var(--ink-2); }
+.alert-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 4px; }
+.alert-btn {
+  height: 22px; border-radius: 6px; font-size: 13px; line-height: 1;
+  background: var(--chip); color: var(--ink);
+  box-shadow: inset 0 0 0 .5px var(--line), 0 .5px 1px rgb(3 3 2 / .08);
+  transition: filter var(--t-fast) var(--soft), transform var(--t-press) var(--soft);
+}
+.alert-btn.is-default { background: var(--sys-blue); color: #fff; box-shadow: 0 .5px 1px rgb(3 3 2 / .16); }
+.alert-btn:hover { filter: brightness(.96); }
+.alert-btn:active { filter: brightness(.9); transform: scale(.98); }
+.alert-btn:focus-visible { outline: 3px solid var(--sys-blue-ring); outline-offset: 2px; border-radius: 6px; }
 
 /* ══ the phone: an iPhone home screen ══════════════════════════════════ */
 .home { display: none; }
@@ -1015,6 +1047,15 @@ html:not(.in) .mac.is-pending { visibility: hidden; }
 }
 /* the paper grain aliases into static at a third of its size */
 .mac.is-far .wall-grain, .mac.is-moving .wall-grain { opacity: 0; }
+/* the screen's black, above the bar and the dock, under the phone's island;
+   the script fades it. Off in the picture, the glass keeps one faint light */
+.mac-blank { position: absolute; inset: 0; z-index: 97; background: #000; opacity: 0; pointer-events: none; }
+.mac-blank::after {
+  content: ''; position: absolute; inset: 0; opacity: 0;
+  background: linear-gradient(112deg, rgb(255 255 255 / .075) 0%, rgb(255 255 255 / .025) 30%, transparent 48%);
+  transition: opacity 300ms var(--soft);
+}
+.mac.is-far .mac-blank::after { opacity: 1; }
 .mac.is-far, .mac.is-far * { pointer-events: none !important; }
 body.is-land-hover .mac.is-far { --lift: -3px; filter: brightness(1.06); }
 .desk:focus, .desk:focus-visible { outline: none; }
@@ -1048,6 +1089,8 @@ html.in .land, html:not(.js) .land { display: none !important; }
   transition: transform 200ms var(--out);
 }
 .land-mac svg { display: block; width: 100%; height: 100%; overflow: visible; }
+/* the drawn screen goes black under a dark desktop, so no edge of sky shows */
+.land.is-dark .dev-screen { fill: #000; }
 .land-iphone { display: none; }
 .land.is-hover .land-mac, body.is-land-hover .land-mac { transform: translateY(-3px); }
 .land.is-moving .land-mac { transition: none; transform: none; }
@@ -1074,6 +1117,8 @@ html.in .land, html:not(.js) .land { display: none !important; }
 .land-ptr { width: 15px; height: 15px; flex: none; fill: var(--ink); stroke: var(--surface); stroke-width: 1; stroke-linejoin: round; }
 .land.is-ready .land-load { opacity: 0; }
 .land.is-ready .land-cue { opacity: 1; }
+/* a restart is off and back on from the one click: no caption between */
+.land.is-ready.is-blank .land-cue { opacity: 0; }
 
 @media (max-width: 767px) {
   .land-col { gap: 22px; padding: 20px; }
@@ -1083,8 +1128,9 @@ html.in .land, html:not(.js) .land { display: none !important; }
   .land-imac { display: none; }
   .land-iphone { display: block; }
   .mac.is-far .mac-isle, .mac.is-moving .mac-isle { display: block; }
-  /* the sheet's last row: the way back to the landing */
+  /* the sheet's last row: the phone's power control, Sleep and Shut Down */
   .sheet { grid-template-rows: auto 1fr auto; }
+  .sheet-power { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .sheet-foot { padding: 10px 16px max(12px, env(safe-area-inset-bottom)); background: var(--surface); box-shadow: 0 -.5px 0 var(--line); }
   .sheet-row {
     display: block; width: 100%; min-height: 48px; padding: 0 16px;

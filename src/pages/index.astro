@@ -115,7 +115,10 @@ const padApps = [
       </div>
       <div class="sheet-body" data-sheet-body></div>
       <div class="sheet-foot" data-sheet-foot hidden>
-        <button class="sheet-row" type="button" data-intro-back>Back to the start</button>
+        <div class="sheet-power" role="group" aria-label="Power">
+          <button class="sheet-row" type="button" data-power="sleep">Sleep</button>
+          <button class="sheet-row" type="button" data-power="shutdown">Shut Down</button>
+        </div>
       </div>
     </div>
   </div>
@@ -125,6 +128,8 @@ const padApps = [
 
   <!-- the phone's Dynamic Island, only while the home screen sits in the landing's picture -->
   <span class="mac-isle" data-mac-isle aria-hidden="true"></span>
+  <!-- the screen's black: inside the machine so it scales with the screen -->
+  <div class="mac-blank" data-mac-blank aria-hidden="true"></div>
   </div>
 
   <div class="menu" data-menu-pop hidden role="menu"></div>
@@ -143,7 +148,19 @@ const padApps = [
     </div>
   </div>
 
-  <button class="sleep" data-sleep hidden aria-label="Wake"></button>
+  <!-- the alert a Mac shows before it restarts, shuts down or logs out -->
+  <div class="alert-veil" data-alert hidden>
+    <div class="alert" data-alert-box role="alertdialog" aria-modal="true" aria-labelledby="alert-title" aria-describedby="alert-wait">
+      <span class="alert-ico" aria-hidden="true"><Icon id="finder" /></span>
+      <p class="alert-title" id="alert-title" data-alert-title></p>
+      <label class="alert-chk"><input type="checkbox" checked /><span>Reopen windows when logging back in</span></label>
+      <p class="alert-wait" id="alert-wait" data-alert-wait></p>
+      <div class="alert-btns">
+        <button class="alert-btn" type="button" data-alert-cancel>Cancel</button>
+        <button class="alert-btn is-default" type="button" data-alert-ok>Restart</button>
+      </div>
+    </div>
+  </div>
 
   <Landing />
 

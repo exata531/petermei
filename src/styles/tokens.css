@@ -78,6 +78,9 @@
   --accent-fg:  light-dark(#ffffff, var(--c-ink));
   --accent-soft: light-dark(rgb(75 104 195 / .16), rgb(143 166 236 / .2));
   --focus:      light-dark(rgb(75 104 195 / .55), rgb(143 166 236 / .6));
+  /* the system's own blue: the default button in an alert is always this */
+  --sys-blue:      light-dark(#0a7aff, #0a84ff);
+  --sys-blue-ring: light-dark(rgb(10 122 255 / .45), rgb(10 132 255 / .55));
   --link:       light-dark(var(--a-purple), #8fa6ec);
 
   /* one pastel per product: the About panel's field and the icon's tint */

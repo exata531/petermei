@@ -12,7 +12,7 @@ import { initDock } from './dock';
 import { initSpotlight, type Hit } from './spotlight';
 import { mountScene, type Live } from './scenes';
 import { initPhotos, type PhotoRec } from './photos';
-import { initIntro } from './intro';
+import { initIntro, type Power } from './intro';
 import { onFrame, damp, reduced } from './motion';
 import { apps, byId, links, finder, EDIT, VIEW, WINDOW, type Menu, type MenuItem } from '../../data/apps';
 
@@ -513,20 +513,21 @@ function closeFront() {
 const appName = $('[data-app-name]')!;
 const appMenus = $('[data-app-menus]')!;
 
+/* the Apple menu's order, and its power items are the ways out of the Mac */
 const APPLE: MenuItem[] = [
   { label: 'About Peter', action: 'open:finder' },
-  { label: 'Back to the start', action: 'intro' },
   { label: '', sep: true },
   { label: 'System Settings…', dis: true },
   { label: 'App Store…', dis: true },
   { label: '', sep: true },
   { label: 'Force Quit…', key: '⌥⌘⎋', dis: true },
   { label: '', sep: true },
-  { label: 'Sleep', action: 'sleep' },
-  { label: 'Restart…', action: 'restart' },
-  { label: 'Shut Down…', action: 'sleep' },
+  { label: 'Sleep', action: 'power:sleep' },
+  { label: 'Restart…', action: 'power:restart' },
+  { label: 'Shut Down…', action: 'power:shutdown' },
   { label: '', sep: true },
-  { label: 'Lock Screen', key: '⌃⌘Q', action: 'sleep' },
+  { label: 'Lock Screen', key: '⌃⌘Q', action: 'power:lock' },
+  { label: 'Log Out Peter…', key: '⇧⌘Q', action: 'power:logout' },
 ];
 /* Control Center: a glass panel of modules, not a list. The radios and the
    sliders are this desktop's own; the appearance tile is the real switch. */
@@ -779,7 +780,7 @@ addEventListener('pointerdown', (e) => {
   if (ctxOpen && !(e.target as HTMLElement).closest('[data-ctx]')) closeCtx();
 });
 document.addEventListener('contextmenu', (e) => {
-  if (phone() || intro.active) return;
+  if (phone() || intro.active || alertKind) return;
   const t = e.target as HTMLElement;
   if (!(t instanceof Element)) return;
   if (t.closest('input, textarea, [contenteditable]')) return;
@@ -855,6 +856,7 @@ function run(act: string) {
     else { const w = desk.get(id); if (w) desk.close(w); }
     return;
   }
+  if (act.startsWith('power:')) { power(act.slice(6) as Power); return; }
   const f = desk.front;
   switch (act) {
     case 'close': closeFront(); break;
@@ -863,9 +865,6 @@ function run(act: string) {
     case 'cycle': desk.cycle(); break;
     case 'front': if (f) desk.focus(f); break;
     case 'about': aboutFront(); break;
-    case 'sleep': sleep(); break;
-    case 'restart': restart(); break;
-    case 'intro': intro.back(); break;
     case 'spot': spot.show(); break;
     case 'theme': theme.flip(); break;
     case 'gh': window.open(links.github, '_blank', 'noopener'); break;
@@ -987,34 +986,102 @@ function wirePictures(root: HTMLElement) {
   });
 }
 
-/* ── sleep and restart ─────────────────────────────────────────────────── */
-const sleepEl = $('[data-sleep]')!;
-function sleep() {
-  sleepEl.hidden = false;
-  requestAnimationFrame(() => sleepEl.classList.add('is-on'));
-  const wake = () => {
-    sleepEl.classList.remove('is-on');
-    setTimeout(() => { sleepEl.hidden = true; }, reduced() ? 0 : 400);
-    removeEventListener('keydown', wake);
-  };
-  setTimeout(() => {
-    sleepEl.addEventListener('click', wake, { once: true });
-    addEventListener('keydown', wake, { once: true });
-  }, 300);
-}
+/* ── power ─────────────────────────────────────────────────────────────── */
+/* Sleep and Lock Screen go at once. Restart, Shut Down and Log Out ask
+   first, the way a Mac does: its words, its default button, its sixty
+   seconds. The camera move itself lives with the landing. */
+type Ask = 'restart' | 'shutdown' | 'logout';
+const ASK: Record<Ask, { title: string; ok: string; wait: (n: string) => string }> = {
+  restart: {
+    title: 'Are you sure you want to restart your computer now?', ok: 'Restart',
+    wait: (n) => `If you do nothing, the computer will restart automatically in ${n}.`,
+  },
+  shutdown: {
+    title: 'Are you sure you want to shut down your computer now?', ok: 'Shut Down',
+    wait: (n) => `If you do nothing, the computer will shut down automatically in ${n}.`,
+  },
+  logout: {
+    title: 'Are you sure you want to quit all applications and log out now?', ok: 'Log Out',
+    wait: (n) => `If you do nothing, the system will log out automatically in ${n}.`,
+  },
+};
+const alertEl = $('[data-alert]')!;
+const alertBox = $('[data-alert-box]')!;
+const alertTitle = $('[data-alert-title]')!;
+const alertWait = $('[data-alert-wait]')!;
+const alertOk = $<HTMLButtonElement>('[data-alert-ok]')!;
+let alertKind: Ask | null = null;
+let alertLeft = 60;
+let alertTimer = 0;
+let alertFrom: Element | null = null;
 
-function restart() {
+/* every app quits on the way out of anything but Sleep and Lock Screen */
+function quitAll() {
   [...open].forEach((id) => {
     if (id === 'rin') rinClose();
     else { const w = desk.get(id); if (w) desk.close(w); }
   });
-  sleepEl.hidden = false;
-  requestAnimationFrame(() => sleepEl.classList.add('is-on'));
-  setTimeout(() => {
-    sleepEl.classList.remove('is-on');
-    setTimeout(() => { sleepEl.hidden = true; }, 400);
-  }, reduced() ? 100 : 900);
 }
+
+function power(kind: Power) {
+  if (kind === 'sleep' || kind === 'lock') { intro.power(kind); return; }
+  ask(kind);
+}
+
+function ask(kind: Ask) {
+  if (alertKind || intro.active) return;
+  alertKind = kind;
+  alertLeft = 60;
+  alertFrom = document.activeElement;
+  alertTitle.textContent = ASK[kind].title;
+  alertOk.textContent = ASK[kind].ok;
+  countdown();
+  alertEl.hidden = false;
+  macEl.inert = true;
+  requestAnimationFrame(() => alertEl.classList.add('is-on'));
+  alertOk.focus({ preventScroll: true });
+  alertTimer = window.setInterval(() => { alertLeft--; if (alertLeft <= 0) answer(true); else countdown(); }, 1000);
+}
+
+function countdown() {
+  if (!alertKind) return;
+  alertWait.textContent = ASK[alertKind].wait(`${alertLeft} second${alertLeft === 1 ? '' : 's'}`);
+}
+
+function answer(go: boolean) {
+  if (!alertKind) return;
+  const kind = alertKind;
+  alertKind = null;
+  clearInterval(alertTimer);
+  alertEl.classList.remove('is-on');
+  setTimeout(() => { alertEl.hidden = true; }, reduced() ? 0 : 140);
+  if (go) { intro.power(kind); return; }
+  macEl.inert = false;
+  /* back to where the choice came from: the menu row is gone with its
+     menu, so on the Mac that is the kaomoji button */
+  const from = alertFrom?.isConnected ? (alertFrom as HTMLElement) : $('[data-menu="apple"]');
+  from?.focus({ preventScroll: true });
+}
+alertOk.addEventListener('click', () => answer(true));
+$('[data-alert-cancel]')!.addEventListener('click', () => answer(false));
+/* the alert keeps the keyboard: Escape cancels, Return is the default
+   button, Tab stays inside it */
+alertEl.addEventListener('keydown', (e) => {
+  e.stopPropagation();
+  if (e.key === 'Escape') { e.preventDefault(); answer(false); return; }
+  if (e.key === 'Enter') { e.preventDefault(); answer(true); return; }
+  if (e.key !== 'Tab') return;
+  const f = $$<HTMLElement>('input, button', alertBox);
+  const at = f.indexOf(document.activeElement as HTMLElement);
+  if (e.shiftKey && at <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+  else if (!e.shiftKey && at === f.length - 1) { e.preventDefault(); f[0].focus(); }
+});
+/* a click beside the alert does nothing, and does not take the focus */
+alertEl.addEventListener('pointerdown', (e) => {
+  if (!(e.target as HTMLElement).closest('[data-alert-box]')) e.preventDefault();
+});
+/* the phone's power control, at the foot of the About sheet */
+$$<HTMLElement>('[data-power]').forEach((b) => b.addEventListener('click', () => power(b.dataset.power as Power)));
 
 /* ── Spotlight ─────────────────────────────────────────────────────────── */
 const spotEl = $('[data-spot]')!;
@@ -1109,7 +1176,6 @@ function sheetClose(now = false) {
   sheetTop.addEventListener('pointercancel', end);
 }
 $('[data-sheet-close]')?.addEventListener('click', () => sheetClose());
-$('[data-intro-back]')?.addEventListener('click', () => intro.back());
 
 /* ── everything that opens an app ──────────────────────────────────────── */
 document.addEventListener('click', (e) => {
@@ -1172,7 +1238,7 @@ const launch = (it: HTMLElement) => {
 
 /* ── the keyboard ──────────────────────────────────────────────────────── */
 addEventListener('keydown', (e) => {
-  if (spot.open || intro.active) return;
+  if (spot.open || intro.active || alertKind) return;
   const k = e.key.toLowerCase();
   /* Escape dismisses a menu, the viewer, a sheet, Quick Look or the panel;
      it never closes a window, because a Mac's does not */
@@ -1206,7 +1272,11 @@ sync();
    drawn behind it, live, so the picture shows the real thing */
 const intro = initIntro(macEl, $('[data-land]'), {
   onEnter: () => { deskEl.tabIndex = -1; deskEl.focus({ preventScroll: true }); },
-  beforeBack: () => { closeMenu(); closeCtx(); if (sheetId) sheetClose(true); },
+  beforeLeave: (kind) => {
+    closeMenu(); closeCtx();
+    if (sheetId) sheetClose(true);
+    if (kind !== 'sleep' && kind !== 'lock') quitAll();
+  },
 });
 document.body.classList.add('is-up');
 dockWrap.classList.add('is-up');

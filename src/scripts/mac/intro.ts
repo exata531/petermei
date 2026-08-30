@@ -1,4 +1,4 @@
-/* The landing, and the way in.
+/* The landing, the way in, and the ways out.
 
    The first thing a fresh visitor sees is a page of paper with a drawn iMac
    on it, and inside its screen the real desktop, live and scaled down: what
@@ -11,10 +11,18 @@
    to the whole viewport and the picture around it grows past the edges and
    fades, both on the same curve, transform and opacity only, so at the end
    nothing is left but the real desktop at one to one with every transform
-   gone. The kaomoji menu can run the same move backwards.
+   gone.
+
+   Every power item in the kaomoji menu runs the same move backwards, with
+   the flavour a Mac gives it. Shut Down blanks the screen first and lands
+   with it off; Sleep dims it and lands with it dark; Restart blanks, lands
+   off, and comes back in on its own after a moment; Lock Screen and Log Out
+   leave with the desktop still showing. The black is a layer inside the
+   machine, so it scales with the screen instead of covering the paper.
 
    Once entered, the landing stays out of the way for the rest of the tab
-   session. With reduced motion the move is a short crossfade. */
+   session; Shut Down, Restart and Log Out end that, Sleep and Lock Screen
+   keep it. With reduced motion every move is a short crossfade. */
 import { imac, iphone } from './devices';
 import { reduced } from './motion';
 
@@ -23,24 +31,43 @@ const DUR = 900;
 const FADE = 300;
 const FLOOR = 600;
 const CAP = 2500;
+/* how long a restart leaves the screen off before it comes back on */
+const BOOT = 1000;
+/* the blank: a Mac's screen goes black in about this long */
+const BLANK = 400;
+const DIM = 600;
+const WAKE = 260;
 
-export type Intro = { readonly active: boolean; back(): void };
+export type Power = 'sleep' | 'restart' | 'shutdown' | 'logout' | 'lock';
+export type Intro = { readonly active: boolean; power(kind: Power): void };
 
-type Hooks = { onEnter?: () => void; beforeBack?: () => void; onBack?: () => void };
+type Hooks = { onEnter?: () => void; beforeLeave?: (kind: Power) => void; onLeave?: (kind: Power) => void };
+
+/* what the screen in the picture is doing, and the caption under it */
+type Screen = 'on' | 'off' | 'asleep';
+const CUE: Record<Screen, { text: string; verb: string }> = {
+  on: { text: 'Click the screen to look around.', verb: 'Look around' },
+  off: { text: 'Click the screen to turn it on.', verb: 'Turn on' },
+  asleep: { text: 'Click the screen to wake it.', verb: 'Wake' },
+};
 
 export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hooks = {}): Intro {
-  if (!land) { mac.classList.remove('is-pending'); return { get active() { return false; }, back() {} }; }
+  if (!land) { mac.classList.remove('is-pending'); return { get active() { return false; }, power() {} }; }
 
   const $ = <T extends HTMLElement = HTMLElement>(s: string, r: ParentNode = land) => r.querySelector<T>(s)!;
   const col = $('[data-land-col]');
   const hosts = { desk: $('[data-land-imac]'), phone: $('[data-land-iphone]') };
   const fill = $('[data-land-fill]');
   const bar = $('[data-land-bar]');
+  const cue = $('[data-land-cue-text]');
   const isle = mac.querySelector<HTMLElement>('[data-mac-isle]');
+  const blank = mac.querySelector<HTMLElement>('[data-mac-blank]')!;
   const phoneMq = matchMedia('(max-width: 767px)');
   const device = () => (phoneMq.matches ? 'phone' : 'desk');
+  const ms = (n: number) => (reduced() ? Math.min(n, 80) : n);
 
   let state: 'off' | 'loading' | 'ready' | 'moving' = 'off';
+  let screen: Screen = 'on';
   /* where the screen is: the desktop's transform while it sits in the picture */
   let fx = 0, fy = 0, k = 1, sr = 0;
   const drawn = {
@@ -48,6 +75,7 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     phone: Number(hosts.phone.dataset.aspect) || NaN,
   };
   let anims: Animation[] = [];
+  let blankAnim: Animation | null = null;
 
   const screenOf = (which: 'desk' | 'phone') => hosts[which].querySelector<HTMLButtonElement>('[data-land-enter]')!;
 
@@ -89,6 +117,30 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
   function setProgress(p: number) {
     fill.style.setProperty('--p', p.toFixed(3));
     bar.setAttribute('aria-valuenow', String(Math.round(p * 100)));
+  }
+
+  /* the caption and the screen's label follow what the screen is doing */
+  function setScreen(s: Screen) {
+    screen = s;
+    land.classList.toggle('is-dark', s !== 'on');
+    cue.textContent = CUE[s].text;
+    screenOf('desk').setAttribute('aria-label', `${CUE[s].verb} the Mac`);
+    screenOf('phone').setAttribute('aria-label', `${CUE[s].verb} the phone`);
+  }
+
+  /* the black over the screen, faded in or out; the resting value is set at
+     once so a cancelled fade still lands where it was going */
+  function blankTo(on: boolean, dur: number) {
+    return new Promise<void>((done) => {
+      const from = getComputedStyle(blank).opacity;
+      blankAnim?.cancel();
+      blank.style.opacity = on ? '1' : '0';
+      if (dur <= 0) { blankAnim = null; done(); return; }
+      const a = blank.animate([{ opacity: from }, { opacity: on ? 1 : 0 }], { duration: dur, easing: on ? 'ease-in' : 'ease-out' });
+      blankAnim = a;
+      a.onfinish = () => { if (blankAnim === a) blankAnim = null; done(); };
+      a.oncancel = () => done();
+    });
   }
 
   function ready() {
@@ -137,8 +189,9 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
   const far = () => `translate(${fx.toFixed(2)}px, ${fy.toFixed(2)}px) scale(${k.toFixed(5)})`;
   const home = 'translate(0px, 0px) scale(1)';
 
-  function enter() {
-    if (state !== 'ready') return;
+  /* the way in: the camera moves from the picture to the desktop. A visitor's
+     click is remembered for the tab; a restart's own return is not */
+  function go(remember: boolean) {
     state = 'moving';
     document.body.classList.remove('is-land-hover');
     land.classList.add('is-moving');
@@ -152,10 +205,11 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
       clearVars();
       mac.inert = false;
       land.remove();
-      land.classList.remove('is-moving');
+      land.classList.remove('is-moving', 'is-blank');
       document.body.classList.remove('is-landing');
       document.documentElement.classList.add('in');
-      try { sessionStorage.setItem('mac-in', '1'); } catch {}
+      try { if (remember) sessionStorage.setItem('mac-in', '1'); } catch {}
+      setScreen('on');
       state = 'off';
       hooks.onEnter?.();
     };
@@ -188,13 +242,23 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     a1.onfinish = finish;
   }
 
-  function back() {
-    if (state !== 'off') return;
-    hooks.beforeBack?.();
+  /* the screen, clicked: a dark screen brightens while the camera starts
+     moving, no boot sequence, and the desktop is there */
+  function enter() {
+    if (state !== 'ready') return;
+    try { sessionStorage.removeItem('mac-power'); } catch {}
+    if (screen !== 'on') blankTo(false, ms(WAKE));
+    go(true);
+  }
+
+  /* the way out: the camera moves from the desktop back into the picture,
+     which is put back on the page first */
+  function leave(kind: Power, after: Screen) {
     document.documentElement.classList.remove('in');
-    try { sessionStorage.removeItem('mac-in'); } catch {}
     document.body.appendChild(land);
+    setScreen(after);
     land.classList.add('is-ready');
+    land.classList.toggle('is-blank', kind === 'restart');
     land.classList.remove('is-moving');
     land.setAttribute('aria-busy', 'false');
     setProgress(1);
@@ -210,9 +274,14 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
       mac.style.opacity = '';
       col.style.willChange = '';
       stopAnims();
+      if (kind === 'restart') {
+        /* off for a moment, then on and back in, all from the one click */
+        setTimeout(() => { blankTo(false, ms(WAKE)); go(false); }, BOOT);
+        return;
+      }
       state = 'ready';
       screenOf(device()).focus({ preventScroll: true });
-      hooks.onBack?.();
+      hooks.onLeave?.(kind);
     };
     if (reduced()) {
       const a = mac.animate([{ opacity: 1 }, { opacity: 0 }], { duration: FADE, easing: 'ease', fill: 'both' });
@@ -242,6 +311,23 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     a1.onfinish = finish;
   }
 
+  /* a power item, chosen: the screen does what a Mac's does, then the
+     camera moves out. Nothing here runs without that choice */
+  function power(kind: Power) {
+    if (state !== 'off') return;
+    state = 'moving';
+    mac.inert = true;
+    hooks.beforeLeave?.(kind);
+    try {
+      if (kind === 'shutdown' || kind === 'restart' || kind === 'logout') sessionStorage.removeItem('mac-in');
+      if (kind === 'shutdown') sessionStorage.setItem('mac-power', 'off');
+      else sessionStorage.removeItem('mac-power');
+    } catch {}
+    const after: Screen = kind === 'sleep' ? 'asleep' : kind === 'shutdown' || kind === 'restart' ? 'off' : 'on';
+    const fade = kind === 'sleep' ? DIM : after === 'off' ? BLANK : 0;
+    blankTo(after !== 'on', ms(fade)).then(() => leave(kind, after));
+  }
+
   /* the screen reads as a button: it lifts and brightens under the pointer */
   for (const which of ['desk', 'phone'] as const) {
     const b = screenOf(which);
@@ -262,8 +348,12 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     land.remove();
     mac.classList.remove('is-pending');
   } else {
+    /* shut down last time: the landing opens with the screen still off */
+    let off = false;
+    try { off = sessionStorage.getItem('mac-power') === 'off'; } catch {}
+    if (off) { blank.style.opacity = '1'; setScreen('off'); }
     load();
   }
 
-  return { get active() { return state !== 'off'; }, back };
+  return { get active() { return state !== 'off'; }, power };
 }
