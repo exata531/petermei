@@ -59,24 +59,49 @@ export function initKyou(root: HTMLElement) {
       }
     }, 55);
   };
+  /* "3pm" or "10:15am" as minutes into the day, and as the label the rows wear */
+  const minutes = (t: string) => {
+    const m = /^(\d{1,2})(?::(\d{2}))?\s?(am|pm)$/i.exec(t);
+    if (!m) return -1;
+    let h = Number(m[1]) % 12;
+    if (m[3].toLowerCase() === 'pm') h += 12;
+    return h * 60 + Number(m[2] ?? 0);
+  };
+  const label = (t: string) => {
+    const m = /^(\d{1,2})(?::(\d{2}))?\s?(am|pm)$/i.exec(t);
+    return m ? `${Number(m[1])}:${m[2] ?? '00'}` : t;
+  };
   const commit = () => {
     const v = real.value.trim();
     if (!v) return;
     const { found } = tokenize(v);
-    const time = found.find((f) => f.label === 'time')?.text ?? found.find((f) => f.label === 'when')?.text ?? 'later';
+    const when = found.find((f) => f.label === 'when')?.text;
+    const time = found.find((f) => f.label === 'time')?.text;
     const title = v.replace(/\b(\d{1,2}(:\d{2})?\s?(am|pm))\b/gi, '').replace(rules[0][0], '').replace(rules[2][0], '').replace(/\s+/g, ' ').trim() || v;
-    const li = document.createElement('li');
-    li.className = 'ky-item is-task is-new';
-    li.style.setProperty('--i', String(n++));
-    li.style.setProperty('--len', '40px');
-    li.innerHTML = `<span class="ky-t num"></span><span class="ky-mark"></span><span class="ky-body"><b></b><small></small></span>`;
-    li.querySelector('.ky-t')!.textContent = time;
-    li.querySelector('b')!.textContent = title;
-    li.querySelector('small')!.textContent = found.length ? found.map((f) => f.text).join(' · ') : 'no time assumed';
-    tl.appendChild(li);
-    requestAnimationFrame(() => li.classList.add('is-in'));
     real.value = ''; render('');
     if (face) face.textContent = '(ˊᗜˋ)';
+    /* another day: it goes on that day, which is not the one on screen */
+    if (when && when !== 'today' && when !== 'tonight') {
+      tokens.innerHTML = `<span>added · ${when}${time ? ` ${time}` : ''}</span>`;
+      return;
+    }
+    /* a clone of a real row keeps the row's styles; the text is replaced */
+    const seed = tl.querySelector<HTMLElement>('[data-kyou-item]')!;
+    const li = seed.cloneNode(true) as HTMLElement;
+    li.className = 'ky-item is-task is-new';
+    li.removeAttribute('data-kyou-item');
+    li.style.setProperty('--i', String(n++));
+    li.style.setProperty('--len', '40px');
+    const at = time ? minutes(time) : when === 'tonight' ? 1380 : -1;
+    li.dataset.min = String(at);
+    li.querySelector('.ky-t')!.textContent = time ? label(time) : when === 'tonight' ? 'tonight' : 'later';
+    li.querySelector('b')!.textContent = title;
+    li.querySelector('small')!.textContent = found.length ? found.map((f) => f.text).join(' · ') : 'no time assumed';
+    /* in time order: before the first row that is later in the day */
+    const rows = [...tl.querySelectorAll<HTMLElement>('.ky-item')];
+    const next = at >= 0 ? rows.find((r) => Number(r.dataset.min ?? -1) > at) : undefined;
+    if (next) tl.insertBefore(li, next); else tl.appendChild(li);
+    requestAnimationFrame(() => li.classList.add('is-in'));
   };
 
   field.addEventListener('click', () => { stopTyping(); real.focus(); });

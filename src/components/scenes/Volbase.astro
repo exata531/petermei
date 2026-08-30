@@ -3,9 +3,9 @@
    with the opportunities map where pins drop nearest-first. The reload button
    in the window's own toolbar plays the one film; until then it is a page. */
 const pins = [
-  { x: 52, y: 44, d: '0.8 mi', name: 'Henry Ford Hospital · patient support' },
   { x: 36, y: 58, d: '1.4 mi', name: 'the school Institute of Science · docent' },
   { x: 68, y: 30, d: '2.9 mi', name: 'Gleaners Food Bank · sort shift' },
+  { x: 52, y: 44, d: '3.0 mi', name: "Children's hospital · patient support" },
   { x: 24, y: 34, d: '4.1 mi', name: 'Detroit Zoo · summer program' },
   { x: 78, y: 66, d: '6.7 mi', name: 'Michigan Science Center · camp lead' },
 ];
@@ -20,7 +20,8 @@ const pins = [
   </div>
   <div class="sf-page">
     <div class="vb-landing" data-vb-view="landing">
-      <img class="vb-shot" src="/img/volbase-landing.webp" width="1280" height="2400" alt="The live volbase.app landing page" loading="lazy" decoding="async" data-vb-shot />
+      <img class="vb-shot vb-shot-wide" src="/img/volbase-landing.webp" width="1280" height="2400" alt="The live volbase.app landing page" loading="lazy" decoding="async" data-vb-shot />
+      <img class="vb-shot vb-shot-hand" src="/img/volbase-landing-m.webp" width="390" height="1740" alt="The live volbase.app landing page, on a phone" loading="lazy" decoding="async" data-vb-shot-m />
     </div>
     <div class="vb-map" data-vb-view="map" aria-hidden="true">
       <svg class="vb-roads" viewBox="0 0 960 520" preserveAspectRatio="none" aria-hidden="true">
@@ -44,14 +45,20 @@ const pins = [
   .safari { position: absolute; inset: 0; display: grid; grid-template-rows: 34px 1fr; background: #f6f3ee; color: #2b2622; font-family: var(--ui); }
   .sf-bar { display: flex; align-items: center; gap: 8px; padding: 0 8px; background: #ebe7e1; box-shadow: 0 .5px 0 rgb(0 0 0 / .14); }
   .sf-tabs { display: flex; gap: 1px; flex: 1; min-width: 0; height: 26px; }
-  .sf-tab { display: inline-flex; align-items: center; gap: 7px; flex: 1; min-width: 0; padding: 0 12px; border-radius: 7px; font-size: 12px; color: #6b655e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background-color var(--t-fast) var(--soft), color var(--t-fast) var(--soft); cursor: default; justify-content: center; }
+  .sf-tab { position: relative; display: inline-flex; align-items: center; gap: 7px; flex: 1; min-width: 0; padding: 0 12px; border-radius: 7px; font-size: 12px; color: #6b655e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background-color var(--t-fast) var(--soft), color var(--t-fast) var(--soft); cursor: default; justify-content: center; }
+  .sf-tab::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; translate: 0 -50%; height: 44px; }
+  .sf-tab:active { transform: scale(.98); }
   .sf-tab img { border-radius: 3px; flex: none; }
   .sf-tab.is-on { background: #fbfaf7; color: #2b2622; box-shadow: 0 1px 2px rgb(0 0 0 / .12), 0 0 0 .5px rgb(0 0 0 / .08); }
   .sf-tab:hover:not(.is-on) { background: rgb(0 0 0 / .05); }
-  .sf-demo { flex: none; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #8a837b; padding: 2px 7px; border-radius: 4px; box-shadow: inset 0 0 0 .5px rgb(0 0 0 / .18); }
+  .sf-demo { flex: none; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #5f5952; padding: 2px 7px; border-radius: 4px; box-shadow: inset 0 0 0 .5px rgb(0 0 0 / .18); }
   .sf-page { position: relative; overflow: clip; }
   .vb-landing { position: absolute; inset: 0; will-change: transform; transition: opacity var(--t-fast) var(--soft); }
   .vb-shot { width: 100%; height: auto; transform: translateY(var(--vb-scroll, 0px)); will-change: transform; }
+  /* on a phone the page is the phone page, at its own size, not the desktop one shrunk */
+  .vb-shot-hand { display: none; }
+  :global(.is-narrow) .vb-shot-wide { display: none; }
+  :global(.is-narrow) .vb-shot-hand { display: block; }
 
   .vb-map { position: absolute; inset: 0; background: #ece9e2; opacity: 0; pointer-events: none; transition: opacity var(--t-fast) var(--soft); }
   .vb-map.is-on { opacity: 1; pointer-events: auto; }
@@ -65,10 +72,10 @@ const pins = [
   .vb-list { position: absolute; left: 14px; top: 14px; width: 250px; display: grid; gap: 8px; }
   .vb-card { display: grid; grid-template-columns: 48px 1fr; gap: 10px; align-items: center; padding: 10px 12px; background: #fff; border-radius: 12px; box-shadow: 0 1px 2px rgb(0 0 0 / .08), 0 8px 20px -14px rgb(0 0 0 / .3); font-size: 12px; line-height: 1.3; opacity: 0; transform: translateY(10px); }
   .vb-card.is-in { opacity: 1; transform: none; transition: opacity .4s var(--soft), transform .5s var(--out); transition-delay: calc(var(--i) * 80ms + 150ms); }
-  .vb-card b { color: #5c79b8; font-weight: 700; font-size: 12px; }
+  .vb-card b { color: #4b68c3; font-weight: 700; font-size: 12px; }
   .vb-sort { position: absolute; right: 14px; top: 14px; font-size: 11px; padding: 6px 10px; border-radius: 999px; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / .1); color: #4b4640; opacity: 0; transform: translateY(6px); }
   .vb-sort.is-in { opacity: 1; transform: none; transition: opacity .4s var(--out) .6s, transform .4s var(--out) .6s; }
-  .vb-sort b { color: #5c79b8; }
+  .vb-sort b { color: #4b68c3; }
   :global(.is-narrow) .sf-tab { padding: 0 8px; font-size: 11px; }
   :global(.is-narrow) .vb-list { width: 160px; }
   :global(.is-narrow) .vb-card { grid-template-columns: 40px 1fr; padding: 7px 9px; font-size: 10.5px; }

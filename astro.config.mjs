@@ -6,5 +6,4 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'never',
   build: { inlineStylesheets: 'auto' },
-  vite: { build: { cssMinify: 'lightningcss' } },
 });

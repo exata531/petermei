@@ -48,23 +48,20 @@
 
   --ink:    light-dark(var(--c-ink), #f2eeea);
   --ink-2:  light-dark(rgb(3 3 2 / .6), rgb(242 238 234 / .62));   /* a muted label */
-  --ink-3:  light-dark(rgb(3 3 2 / .38), rgb(242 238 234 / .4));   /* a greyed item */
+  --ink-3:  light-dark(rgb(3 3 2 / .56), rgb(242 238 234 / .62));  /* a greyed item, still 4.5:1 */
   --line:   light-dark(rgb(3 3 2 / .1), rgb(255 255 255 / .09));
   --line-2: light-dark(rgb(3 3 2 / .15), rgb(255 255 255 / .14));
   --chip:   light-dark(rgb(3 3 2 / .05), rgb(255 255 255 / .07));
   --chip-2: light-dark(rgb(3 3 2 / .09), rgb(255 255 255 / .12));
 
-  /* ── the wallpaper: a soft field of the section pastels ──────────── */
-  --wall-base:  light-dark(#d5e4f2, #0f1320);
-  --wall-a:     light-dark(var(--c-peri), #36416f);
-  --wall-b:     light-dark(var(--c-sky), #24505f);
-  --wall-c:     light-dark(var(--c-apri), #5e3f2c);
-  --wall-d:     light-dark(var(--c-lemon), #4d4628);
-  --wall-e:     light-dark(#fdf6ee, #151a2c);
-  --wall-flat:  light-dark(#cfe0f1, #0d1018);
+  /* ── the wallpaper: one family, two stops, the way Craft lays a hero ── */
+  --wall-a:     light-dark(var(--c-sky), #0f1320);      /* the top of the sky */
+  --wall-b:     light-dark(var(--c-sky-2), #1c2f3a);    /* the bottom of it */
+  --wall-bloom: light-dark(rgb(253 246 238 / .45), rgb(143 166 236 / .1));
+  --wall-flat:  light-dark(#b9e0f4, #151f2c);
   --wall-ink:   #ffffff;               /* a desktop label, on any wallpaper */
   --wall-ink-sh: rgb(0 0 0 / .55);
-  --grain:      light-dark(.16, .12);   /* an overlay, so this reads far lighter than it sounds */
+  --grain:      light-dark(.05, 0);     /* an overlay, so this reads far lighter than it sounds */
 
   /* ── glass: Liquid Glass Regular, in Craft's paper ───────────────── */
   --glass-bar:   light-dark(rgb(252 249 247 / .62), rgb(20 19 18 / .58));
@@ -126,7 +123,8 @@
   --r-win:   12px;
   --r-menu:  8px;
   --dock-i:  50px;
-  --dock-pad: 6px;
+  --dock-pad: 8px;
+  --side-w:  192px;  /* a Finder or Photos sidebar */
 
   /* ── motion: two speeds, Craft's rule ─────────────────────────────── */
   --ease:    cubic-bezier(.22, 1, .36, 1);
@@ -136,7 +134,7 @@
   --t-press: 120ms;
   --t-fast:  150ms;
   --t-base:  250ms;
-  --t-slow:  500ms;
+  --t-slow:  200ms;
 }
 
 /* the toggle writes one of these onto the root and the whole palette follows */
@@ -146,48 +144,43 @@
 /* the window shadows, too long to stay readable inside light-dark() */
 :root {
   --sh-win:
-    0 50px 40px rgb(3 3 2 / .03),
-    0 50px 40px rgb(3 3 2 / .04),
-    0 20px 40px rgb(3 3 2 / .12),
-    0 3px 10px rgb(3 3 2 / .12),
-    0 0 0 .5px rgb(3 3 2 / .22);
+    0 0 0 .5px rgb(0 0 0 / .28),
+    0 3px 10px rgb(0 0 0 / .16),
+    0 20px 60px rgb(0 0 0 / .36);
   --sh-win-back:
-    0 20px 40px rgb(3 3 2 / .08),
-    0 3px 10px rgb(3 3 2 / .08),
-    0 0 0 .5px rgb(3 3 2 / .18);
+    0 0 0 .5px rgb(0 0 0 / .18),
+    0 3px 10px rgb(0 0 0 / .08),
+    0 20px 60px rgb(0 0 0 / .18);
   --sh-win-lift:
-    0 60px 50px rgb(3 3 2 / .06),
-    0 30px 50px rgb(3 3 2 / .16),
-    0 6px 14px rgb(3 3 2 / .14),
-    0 0 0 .5px rgb(3 3 2 / .22);
+    0 0 0 .5px rgb(0 0 0 / .28),
+    0 6px 14px rgb(0 0 0 / .18),
+    0 30px 70px rgb(0 0 0 / .42);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     --sh-win:
-      0 50px 60px rgb(0 0 0 / .6),
-      0 20px 40px rgb(0 0 0 / .5),
+      0 0 0 .5px rgb(255 255 255 / .14),
       0 3px 10px rgb(0 0 0 / .4),
-      0 0 0 .5px rgb(255 255 255 / .14);
+      0 20px 60px rgb(0 0 0 / .7);
     --sh-win-back:
-      0 20px 40px rgb(0 0 0 / .4),
-      0 0 0 .5px rgb(255 255 255 / .09);
+      0 0 0 .5px rgb(255 255 255 / .09),
+      0 20px 60px rgb(0 0 0 / .5);
     --sh-win-lift:
-      0 60px 70px rgb(0 0 0 / .7),
-      0 30px 50px rgb(0 0 0 / .5),
-      0 0 0 .5px rgb(255 255 255 / .14);
+      0 0 0 .5px rgb(255 255 255 / .14),
+      0 6px 14px rgb(0 0 0 / .5),
+      0 30px 70px rgb(0 0 0 / .75);
   }
 }
 :root[data-theme='dark'] {
   --sh-win:
-    0 50px 60px rgb(0 0 0 / .6),
-    0 20px 40px rgb(0 0 0 / .5),
+    0 0 0 .5px rgb(255 255 255 / .14),
     0 3px 10px rgb(0 0 0 / .4),
-    0 0 0 .5px rgb(255 255 255 / .14);
+    0 20px 60px rgb(0 0 0 / .7);
   --sh-win-back:
-    0 20px 40px rgb(0 0 0 / .4),
-    0 0 0 .5px rgb(255 255 255 / .09);
+    0 0 0 .5px rgb(255 255 255 / .09),
+    0 20px 60px rgb(0 0 0 / .5);
   --sh-win-lift:
-    0 60px 70px rgb(0 0 0 / .7),
-    0 30px 50px rgb(0 0 0 / .5),
-    0 0 0 .5px rgb(255 255 255 / .14);
+    0 0 0 .5px rgb(255 255 255 / .14),
+    0 6px 14px rgb(0 0 0 / .5),
+    0 30px 70px rgb(0 0 0 / .75);
 }

@@ -15,7 +15,7 @@ import { photos } from '../../data/photos';
       <li class="fnd-row pic-row" role="option" aria-selected="false" tabindex={p.i === 0 ? 0 : -1} data-pic={p.i} aria-label={`${p.name}, ${p.alt}`}>
         <span class="pic-name">
           <span class="pic-ico" data-orient={p.w >= p.h ? 'l' : 'p'}><img data-src={p.icon} width={p.w} height={p.h} alt="" decoding="async" draggable="false" /></span>
-          <b>{p.name}</b>
+          <b><span class="stem">{p.name.replace(/\.jpeg$/, '')}</span><span class="ext">.jpeg</span></b>
         </span>
         <span class="pic-date">{p.shortDate}</span>
         <span class="pic-kind">JPEG image</span>

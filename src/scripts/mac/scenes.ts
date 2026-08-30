@@ -30,7 +30,7 @@ export type Live = {
   dispose(): void;
 };
 
-const phone = () => matchMedia('(max-width: 900px)').matches;
+const phone = () => matchMedia('(max-width: 767px)').matches;
 
 export function mountScene(host: HTMLElement): Live | null {
   const fig = host.querySelector<HTMLElement>('[data-scene]');

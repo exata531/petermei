@@ -18,14 +18,14 @@ export type Photo = {
   w: number; h: number;
   alt: string;
   place: string;
-  date: string;        // ISO
+  date: string;        // "2022-03": the roll is dated to the month, on purpose
   name: string;        // IMG_0000.jpeg
   bytes: number;
   size: string;        // "146 KB"
   month: string;       // "2022-03"
   monthLabel: string;  // "March 2022"
-  dayLabel: string;    // "March 18, 2022"
-  shortDate: string;   // "Mar 18, 2022"
+  dayLabel: string;    // the same, at the coarseness the roll keeps
+  shortDate: string;   // "Mar 2022"
   year: string;        // "2022"
 };
 
@@ -43,7 +43,7 @@ const kb = (n: number) => `${Math.max(1, Math.round(n / 1000))} KB`;
 
 export const photos: Photo[] = (raw as { file: string; w: number; h: number; alt: string; place: string; date: string }[]).map((p, i) => {
   const base = p.file.split('/').pop()!;
-  const [y, m, d] = p.date.split('-').map(Number);
+  const [y, m] = p.date.split('-').map(Number);
   let bytes = 0;
   try { bytes = statSync(join(process.cwd(), 'public', p.file)).size; } catch {}
   return {
@@ -60,8 +60,8 @@ export const photos: Photo[] = (raw as { file: string; w: number; h: number; alt
     size: kb(bytes),
     month: p.date.slice(0, 7),
     monthLabel: `${MONTHS[m - 1]} ${y}`,
-    dayLabel: `${MONTHS[m - 1]} ${d}, ${y}`,
-    shortDate: `${MONTHS[m - 1].slice(0, 3)} ${d}, ${y}`,
+    dayLabel: `${MONTHS[m - 1]} ${y}`,
+    shortDate: `${MONTHS[m - 1].slice(0, 3)} ${y}`,
     year: String(y),
   };
 });

@@ -1,20 +1,16 @@
 ---
 /* The wallpaper: a still.
 
-   Apple's default wallpapers are large soft abstract forms, a few hues from
-   one family, no readable objects. This one is that formula in Craft's
-   section pastels: periwinkle, sky, apricot and lemon laid as wide soft
-   fields over a pale base, with Craft's paper grain over the top so the
-   gradient never reads as a screen gradient. After dark the same fields
-   sit in the ink.
+   Apple's default wallpapers are large soft abstract forms from one family
+   of hues, no readable objects. This is Craft's own hero recipe: one sky
+   laid as two stops, a single warm bloom rising from the bottom edge, and a
+   whisper of paper grain so the gradient never reads as a screen gradient.
+   After dark the same sky sits in the ink and the grain goes away.
 
-   Nothing in it moves except one field that drifts a few percent over
-   several minutes, which is below what an eye notices per second, and even
-   that stops under reduced motion. */
+   Nothing in it moves. */
 ---
 <div class="wall" aria-hidden="true">
   <div class="wall-field"></div>
-  <div class="wall-drift"></div>
   <div class="wall-grain"></div>
 </div>
 
@@ -22,27 +18,13 @@
   .wall {
     position: fixed; inset: 0; z-index: 0; overflow: hidden;
     pointer-events: none; contain: strict;
-    background: var(--wall-base);
+    background: var(--wall-flat);
   }
   .wall-field {
     position: absolute; inset: 0;
     background:
-      radial-gradient(110% 80% at 12% 12%, var(--wall-a) 0%, transparent 62%),
-      radial-gradient(90% 70% at 88% 22%, var(--wall-b) 0%, transparent 60%),
-      radial-gradient(80% 60% at 78% 96%, var(--wall-c) 0%, transparent 64%),
-      radial-gradient(64% 52% at 14% 88%, var(--wall-d) 0%, transparent 62%),
-      linear-gradient(180deg, var(--wall-e) 0%, var(--wall-base) 100%);
-  }
-  /* one slow field, the imperceptible drift */
-  .wall-drift {
-    position: absolute; inset: -12%;
-    background: radial-gradient(48% 42% at 50% 50%, var(--wall-e) 0%, transparent 70%);
-    opacity: .55; mix-blend-mode: soft-light;
-    animation: wall-drift 420s ease-in-out infinite alternate;
-  }
-  @keyframes wall-drift {
-    from { transform: translate3d(-3%, -2%, 0); }
-    to   { transform: translate3d(3%, 2%, 0); }
+      radial-gradient(70% 55% at 50% 108%, var(--wall-bloom), transparent 70%),
+      linear-gradient(168deg in oklab, var(--wall-a) 0%, var(--wall-b) 100%);
   }
   .wall-grain {
     position: absolute; inset: 0;
@@ -50,8 +32,5 @@
     mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     background-size: 180px 180px;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .wall-drift { animation: none; transform: none; }
   }
 </style>

@@ -13,7 +13,7 @@ import { initSpotlight, type Hit } from './spotlight';
 import { mountScene, type Live } from './scenes';
 import { initPhotos, type PhotoRec } from './photos';
 import { onFrame, damp, reduced } from './motion';
-import { apps, byId, links, EDIT, VIEW, WINDOW, type Menu, type MenuItem } from '../../data/apps';
+import { apps, byId, links, finder, EDIT, VIEW, WINDOW, type Menu, type MenuItem } from '../../data/apps';
 
 const $ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => r.querySelector<T>(s);
 const $$ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => [...r.querySelectorAll<T>(s)];
@@ -25,7 +25,7 @@ const dockWrap = $('[data-dock-wrap]')!;
 const mbar = $('[data-mbar]')!;
 const deskEl = $('[data-desk]')!;
 
-const phone = () => matchMedia('(max-width: 900px)').matches;
+const phone = () => matchMedia('(max-width: 767px)').matches;
 /* document-wide on purpose: a body spends most of its life in the stash but is
    moved into a window when its app opens, and it has to stay findable there */
 const body = (id: string) => $(`[data-body="${id}"]`);
@@ -38,6 +38,8 @@ const PH: PhotoRec[] = JSON.parse($('[data-ph-json]')?.textContent || '[]');
 function initTheme() {
   const apply = (t: 'light' | 'dark') => {
     document.documentElement.dataset.theme = t;
+    /* the browser chrome follows the desktop, not the system */
+    $$<HTMLMetaElement>('meta[name="theme-color"]').forEach((m) => { m.content = t === 'dark' ? '#151f2c' : '#b9e0f4'; });
     try { localStorage.setItem('appearance', t); } catch {}
   };
   const set = (t: 'light' | 'dark') => {
@@ -45,7 +47,7 @@ function initTheme() {
     if (reduced() || !doc.startViewTransition) {
       document.body.classList.add('is-fading');
       apply(t);
-      setTimeout(() => document.body.classList.remove('is-fading'), 400);
+      setTimeout(() => document.body.classList.remove('is-fading'), 200);
       return;
     }
     doc.startViewTransition(() => apply(t));
@@ -62,9 +64,11 @@ const theme = initTheme();
 /* ── the clock ──────────────────────────────────────────────────────────── */
 function initClock() {
   const long = $<HTMLTimeElement>('[data-clock]');
+  const short = $$<HTMLElement>('[data-clock-short]');
   const paint = () => {
     const d = new Date();
     const t = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    short.forEach((s) => { s.textContent = t.replace(/\s?[AP]M$/, ''); });
     if (long) {
       long.textContent =
         d.toLocaleDateString('en-US', { weekday: 'short' }) + ' ' +
@@ -145,6 +149,12 @@ function rinOpen() {
   l?.fit();
   l?.scene.enter?.();
   dock.settle('rin');
+  /* the prompt takes the keyboard the moment the panel drops, and keeps it */
+  const prompt = el.querySelector<HTMLInputElement>('[data-term-real]');
+  const take = () => prompt?.focus({ preventScroll: true });
+  (document.activeElement as HTMLElement | null)?.blur?.();
+  take();
+  p.addEventListener('click', take);
   if (reduced()) { p.style.setProperty('--drop', '1'); return; }
   let v = 0;
   rinStop = onFrame((dt) => {
@@ -153,7 +163,7 @@ function rinOpen() {
     if (v > 0.999) { p.style.setProperty('--drop', '1'); rinStop?.(); rinStop = null; }
   });
 }
-function rinClose() {
+function rinClose(back = false) {
   const p = rinPanel;
   if (!p) return;
   rinPanel = null;
@@ -162,6 +172,8 @@ function rinClose() {
   open.delete('rin');
   lives.get('rin')?.scene.leave?.();
   sync();
+  /* closed from the keyboard: the keyboard goes back to the icon it came from */
+  if (back) dockRoot.querySelector<HTMLElement>('[data-dock="rin"]')?.focus({ preventScroll: true });
   const done = () => { returnBody('rin'); p.remove(); };
   if (reduced()) { done(); return; }
   rinStop?.();
@@ -194,20 +206,35 @@ const G = {
   info: '<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M10 9v5"/><circle cx="10" cy="6.4" r=".9" fill="currentColor" stroke="none"/></svg>',
   plus: '<svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></svg>',
   check: '<svg viewBox="0 0 12 12"><path d="M2.5 6.5 5 9l4.5-6"/></svg>',
+  cols: '<svg viewBox="0 0 20 20"><rect x="2.5" y="4" width="15" height="12" rx="2"/><path d="M7.5 4v12M12.5 4v12"/></svg>',
+  gallery: '<svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="9" rx="1.5"/><rect x="3" y="14.5" width="3" height="2.5" rx=".6"/><rect x="8.5" y="14.5" width="3" height="2.5" rx=".6"/><rect x="14" y="14.5" width="3" height="2.5" rx=".6"/></svg>',
+  wifi: '<svg viewBox="0 0 20 20"><path d="M2.2 7.4a11 11 0 0 1 15.6 0"/><path d="M5.2 10.6a6.8 6.8 0 0 1 9.6 0"/><path d="M8.1 13.8a2.7 2.7 0 0 1 3.8 0"/><circle cx="10" cy="16.4" r="1.3" fill="currentColor" stroke="none"/></svg>',
+  bt: '<svg viewBox="0 0 20 20"><path d="M6 6.5l8 7-4 3.5V3l4 3.5-8 7"/></svg>',
+  airdrop: '<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="2.2"/><path d="M5.8 14.2a6 6 0 0 1 0-8.4M14.2 5.8a6 6 0 0 1 0 8.4M3.3 16.7a9.5 9.5 0 0 1 0-13.4M16.7 3.3a9.5 9.5 0 0 1 0 13.4"/></svg>',
+  sun: '<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="3.4"/><path d="M10 2v2.2M10 15.8V18M2 10h2.2M15.8 10H18M4.3 4.3l1.6 1.6M14.1 14.1l1.6 1.6M15.7 4.3l-1.6 1.6M5.9 14.1l-1.6 1.6"/></svg>',
+  moon: '<svg viewBox="0 0 20 20"><path d="M15.6 12.6A6.6 6.6 0 0 1 7.4 4.4a6.6 6.6 0 1 0 8.2 8.2Z"/></svg>',
+  bright: '<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="3"/><path d="M10 3v1.5M10 15.5V17M3 10h1.5M15.5 10H17M5 5l1 1M14 14l1 1M15 5l-1 1M6 14l-1 1"/></svg>',
+  sound: '<svg viewBox="0 0 20 20"><path d="M3.5 7.5h3L11 4v12l-4.5-3.5h-3z"/><path d="M13.5 7.5a3.5 3.5 0 0 1 0 5M15.5 5a7 7 0 0 1 0 10"/></svg>',
 };
 const btn = (g: string, label: string, extra = '') =>
   `<button class="tb-btn${extra}" type="button" aria-label="${label}" title="${label}">${g}</button>`;
 
-function finderTool(title: string, opts: { views?: boolean; count?: string } = {}) {
+/* the back/forward pair sits on the sidebar strip, everything else over the
+   content pane; both halves are handles */
+function finderTool(title: string, opts: { views?: boolean; count?: string; empty?: boolean } = {}) {
   const t = document.createElement('div');
   t.dataset.drag = '';
   t.innerHTML =
-    `<span class="tb-nav">${btn(G.back, 'Back', ' is-dis')}${btn(G.fwd, 'Forward', ' is-dis')}</span>
-     <span class="tb-title">${title}</span>
-     <span class="tb-sp" data-drag></span>
-     ${opts.count ? `<span class="tb-count">${opts.count}</span>` : ''}
-     ${opts.views ? `<span class="tb-seg" data-fnd-view>${btn(G.grid, 'Icon view')}${btn(G.list, 'List view', ' is-on')}</span>` : ''}
-     <span class="tb-search" aria-hidden="true">${G.search}<span>Search</span></span>`;
+    `<span class="tb-side" data-drag><span class="tb-nav">${btn(G.back, 'Back', ' is-dis')}${btn(G.fwd, 'Forward', ' is-dis')}</span></span>
+     <span class="tb-main" data-drag>
+       <span class="tb-title">${title}</span>
+       <span class="tb-sp" data-drag></span>
+       ${opts.count ? `<span class="tb-count">${opts.count}</span>` : ''}
+       ${opts.views ? `<span class="tb-seg" data-fnd-view>${btn(G.grid, 'Icon view')}${btn(G.list, 'List view', ' is-on')}${btn(G.cols, 'Column view', ' is-dis')}${btn(G.gallery, 'Gallery view', ' is-dis')}</span>` : ''}
+       ${opts.empty ? `<button class="tb-btn tb-txt is-dis" type="button" aria-disabled="true">Empty</button>` : ''}
+       <span class="tb-search" aria-hidden="true">${G.search}<span>Search</span></span>
+     </span>`;
+  t.querySelectorAll('.tb-btn.is-dis').forEach((b) => b.setAttribute('aria-disabled', 'true'));
   return t;
 }
 
@@ -221,7 +248,7 @@ function safariTool(id: string) {
      <span class="tb-url" data-drag>${G.lock}<span data-vb-url>volbase.app</span>${btn(G.reload, 'Reload the page and play the demo', ' tb-reload')}</span>
      <span class="tb-sp" data-drag></span>
      <a class="tb-btn" href="${links.volbase}" target="_blank" rel="noopener" aria-label="Open volbase.app in a new tab" title="Open volbase.app">${G.share}</a>
-     ${btn(G.info, `About ${byId(id)?.name ?? ''}`, ' tb-about')}`;
+     ${btn(G.info, `About ${byId(id)?.label ?? ''}`, ' tb-about')}`;
   t.querySelector('.tb-reload')!.addEventListener('click', () => {
     const s = lives.get(id)?.scene;
     s?.run?.();
@@ -239,20 +266,24 @@ function photosTool() {
   t.className = 'pho-tool is-lib';
   const modes: [string, string][] = [['years', 'Years'], ['months', 'Months'], ['days', 'Days'], ['all', 'All Photos']];
   t.innerHTML =
-    `${btn(G.side, 'Hide or show the sidebar', ' pho-sideb')}
-     ${btn(G.back, 'Back to the library', ' pho-back')}
-     <span class="tb-title pho-ttl" data-ph-title hidden></span>
-     <span class="tb-title pho-vt" data-ph-vt aria-live="polite"></span>
-     <span class="tb-sp" data-drag></span>
-     <span class="tb-seg pho-seg" role="tablist" aria-label="View">
-       ${modes.map(([k, l]) => `<button class="tb-btn tb-txt${k === 'all' ? ' is-on' : ''}" type="button" role="tab" aria-selected="${k === 'all'}" tabindex="${k === 'all' ? 0 : -1}" data-ph-mode="${k}">${l}</button>`).join('')}
+    `<span class="tb-side" data-drag>
+       ${btn(G.side, 'Hide or show the sidebar', ' pho-sideb')}
+       ${btn(G.back, 'Back to the library', ' pho-back')}
      </span>
-     <span class="tb-sp" data-drag></span>
-     <label class="pho-zoom" title="Thumbnail size">
-       <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="6" height="6" rx="1"/></svg>
-       <input type="range" min="0" max="4" step="1" value="2" data-ph-zoom aria-label="Thumbnail size" />
-       <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" rx="1.5"/></svg>
-     </label>`;
+     <span class="tb-main" data-drag>
+       <span class="tb-title pho-ttl" data-ph-title hidden></span>
+       <span class="tb-title pho-vt" data-ph-vt aria-live="polite"></span>
+       <span class="tb-sp" data-drag></span>
+       <span class="tb-seg pho-seg" role="tablist" aria-label="View">
+         ${modes.map(([k, l]) => `<button class="tb-btn tb-txt${k === 'all' ? ' is-on' : ''}" type="button" role="tab" aria-selected="${k === 'all'}" tabindex="${k === 'all' ? 0 : -1}" data-ph-mode="${k}">${l}</button>`).join('')}
+       </span>
+       <span class="tb-sp" data-drag></span>
+       <label class="pho-zoom" title="Thumbnail size">
+         <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="6" height="6" rx="1"/></svg>
+         <input type="range" min="0" max="4" step="1" value="2" data-ph-zoom aria-label="Thumbnail size" />
+         <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" rx="1.5"/></svg>
+       </label>
+     </span>`;
   t.querySelector('.pho-sideb')!.setAttribute('data-ph-side', '');
   t.querySelector('.pho-back')!.setAttribute('data-ph-back', '');
   return t;
@@ -264,7 +295,7 @@ const TITLES: Record<string, string> = {
 const SIZES: Record<string, { w: number; h: number; min?: number; klass?: string }> = {
   finder: { w: 700, h: 440, min: 460, klass: 'win-finder' },
   photos: { w: 920, h: 600, min: 420, klass: 'win-photos' },
-  textedit: { w: 460, h: 260, min: 300, klass: 'win-text' },
+  textedit: { w: 520, h: 220, min: 300, klass: 'win-text' },
   trash: { w: 560, h: 340, min: 380, klass: 'win-finder' },
 };
 
@@ -272,6 +303,7 @@ function openApp(id: string) {
   if (id === 'github') { window.open(links.github, '_blank', 'noopener'); return; }
   if (phone()) { sheetOpen(id); return; }
   if (id === 'rin') { if (!rinPanel) dock.bounce('rin'); rinOpen(); return; }
+  if (id === 'ql') { if (ql) desk.open({ id: 'ql', title: '', body: qlBody!, w: 0, h: 0 }); return; }
 
   const el = body(id);
   if (!el) return;
@@ -284,18 +316,34 @@ function openApp(id: string) {
   let tool: HTMLElement | undefined;
   if (id === 'volbase') tool = safariTool(id);
   if (id === 'finder') tool = finderTool('About Peter', { views: true });
-  if (id === 'trash') tool = finderTool('Trash');
+  if (id === 'trash') tool = finderTool('Trash', { empty: true });
   if (id === 'photos') tool = photosTool();
+  const side = id === 'finder' || id === 'trash' || id === 'photos';
 
   dock.bounce(id);
+  const title = known?.title ?? TITLES[id] ?? id;
+  let tile: HTMLElement | null = null;
   const win = desk.open({
     id,
-    title: known?.title ?? TITLES[id] ?? id,
+    title,
     body: el,
-    w: size.w, h: size.h, min: size.min, klass: size.klass, tool,
+    w: size.w, h: size.h, min: size.min, klass: size.klass, tool, side,
     onClose: () => { open.delete(id); lives.get(id)?.scene.leave?.(); returnBody(id); sync(); },
     onFocus: () => { rinFront = false; sync(); },
-    onMin: () => { lives.get(id)?.scene.leave?.(); },
+    /* minimized: a thumbnail goes into the Dock beside the Trash, and the
+       window folds into it instead of into the app's icon */
+    onMin: () => {
+      lives.get(id)?.scene.leave?.();
+      tile = minTile(win, id, title);
+      const r = tile.querySelector('.dock-tile')!.getBoundingClientRect();
+      desk.setFrom(win, r);
+    },
+    onRestore: () => {
+      tile?.remove(); tile = null;
+      dock.refresh();
+      const r = dock.rect(id);
+      if (r) desk.setFrom(win, r);
+    },
   }, dock.rect(id));
   win.settle = () => dock.settle(id);
 
@@ -334,8 +382,8 @@ function openApp(id: string) {
     const b = document.createElement('button');
     b.className = 'tb-btn';
     b.type = 'button';
-    b.setAttribute('aria-label', `About ${known.name}`);
-    b.title = `About ${known.name}`;
+    b.setAttribute('aria-label', `About ${known.label}`);
+    b.title = `About ${known.label}`;
     b.innerHTML = G.info;
     b.addEventListener('click', () => openAbout(id));
     pad.appendChild(b);
@@ -355,6 +403,44 @@ function openApp(id: string) {
   if (id === 'finder') wireFinder(el, tool!);
   if (id === 'photos') { photosApp.attachTool(tool!); photosApp.enter('desk'); }
   return win;
+}
+
+/* a minimized window's thumbnail: the window itself, cloned and scaled into
+   a tile, the app's icon badged on its corner, sitting beside the Trash */
+function minTile(win: Win, id: string, title: string) {
+  const k = Math.min(50 / win.w, 50 / win.h);
+  const tile = document.createElement('button');
+  tile.className = 'dock-i dock-min';
+  tile.type = 'button';
+  tile.dataset.restore = id;
+  tile.setAttribute('aria-label', `${title}, minimized`);
+  const clone = win.el.cloneNode(true) as HTMLElement;
+  clone.removeAttribute('style');
+  clone.removeAttribute('role');
+  clone.removeAttribute('data-win');
+  clone.setAttribute('aria-hidden', 'true');
+  clone.inert = true;
+  clone.className = win.el.className.replace(/\bis-min\b/g, '') + ' is-front';
+  clone.style.width = `${win.w}px`;
+  clone.style.height = `${win.h}px`;
+  clone.querySelectorAll('.rz, [data-body] script').forEach((e) => e.remove());
+  clone.querySelectorAll('[data-body], [id]').forEach((e) => { e.removeAttribute('data-body'); e.removeAttribute('id'); });
+  const thumb = document.createElement('span');
+  thumb.className = 'dock-thumb';
+  thumb.style.setProperty('--tw', `${Math.round(win.w * k)}px`);
+  thumb.style.setProperty('--th', `${Math.round(win.h * k)}px`);
+  thumb.style.setProperty('--k', k.toFixed(4));
+  thumb.appendChild(clone);
+  const t = document.createElement('span');
+  t.className = 'dock-tile';
+  t.appendChild(thumb);
+  t.insertAdjacentHTML('beforeend', `<span class="dock-badge" aria-hidden="true">${icon(id)}</span>`);
+  tile.appendChild(t);
+  tile.insertAdjacentHTML('beforeend', `<span class="dock-name" aria-hidden="true"></span>`);
+  tile.querySelector('.dock-name')!.textContent = title;
+  dockRoot.querySelector('[data-dock="trash"]')!.before(tile);
+  dock.refresh();
+  return tile;
 }
 
 /* a photo opened from anywhere: the desktop, Finder, a Spotlight hit */
@@ -394,11 +480,13 @@ function quickLook(i: number) {
     return;
   }
   const win = desk.open({
-    id: 'ql', title: p.n, body: qlBody, w, h, klass: 'win-ql', fixed: true,
+    id: 'ql', title: p.n, body: qlBody, w, h, klass: 'win-ql', zoomOnly: true,
     onClose: () => { ql = null; qlAt = -1; },
   });
   ql = win;
   const pad = win.el.querySelector('.win-pad')!;
+  pad.insertAdjacentHTML('beforeend', btn(G.share, 'Share', ' ql-share is-dis'));
+  pad.querySelector('.ql-share')!.setAttribute('aria-disabled', 'true');
   const b = document.createElement('button');
   b.className = 'tb-btn tb-txt ql-open';
   b.type = 'button';
@@ -437,15 +525,30 @@ const APPLE: MenuItem[] = [
   { label: '', sep: true },
   { label: 'Lock Screen', key: '⌃⌘Q', action: 'sleep' },
 ];
-const CONTROL: MenuItem[] = [
-  { label: 'Wi-Fi', check: true },
-  { label: 'Bluetooth', check: true },
-  { label: 'AirDrop', dis: true },
-  { label: '', sep: true },
-  { label: 'Appearance', action: 'theme' },
-  { label: 'Sound', dis: true },
-  { label: 'Display', dis: true },
-];
+/* Control Center: a glass panel of modules, not a list. The radios and the
+   sliders are this desktop's own; the appearance tile is the real switch. */
+const cc = { wifi: true, bt: true, air: true, disp: 80, snd: 55 };
+function ccPanel() {
+  const radio = (k: 'wifi' | 'bt' | 'air', g: string, name: string, sub: [string, string]) =>
+    `<button class="cc-row${cc[k] ? ' is-on' : ''}" type="button" role="switch" aria-checked="${cc[k]}" data-cc="${k}">
+       <span class="cc-tog" aria-hidden="true">${g}</span>
+       <span class="cc-txt"><b>${name}</b><small>${cc[k] ? sub[0] : sub[1]}</small></span>
+     </button>`;
+  const dark = theme.now() === 'dark';
+  return `<div class="cc">
+    <div class="cc-card cc-radios">
+      ${radio('wifi', G.wifi, 'Wi-Fi', ['Home', 'Off'])}
+      ${radio('bt', G.bt, 'Bluetooth', ['On', 'Off'])}
+      ${radio('air', G.airdrop, 'AirDrop', ['Contacts Only', 'Off'])}
+    </div>
+    <button class="cc-card cc-appear is-on" type="button" data-cc="theme" aria-label="Appearance, switch to ${dark ? 'light' : 'dark'}">
+      <span class="cc-tog" aria-hidden="true">${dark ? G.moon : G.sun}</span>
+      <span class="cc-txt"><b>Appearance</b><small>${dark ? 'Dark' : 'Light'}</small></span>
+    </button>
+    <label class="cc-card cc-slide"><span class="cc-lbl">Display</span><span class="cc-range">${G.bright}<input type="range" min="0" max="100" value="${cc.disp}" data-cc="disp" aria-label="Display brightness" /></span></label>
+    <label class="cc-card cc-slide"><span class="cc-lbl">Sound</span><span class="cc-range">${G.sound}<input type="range" min="0" max="100" value="${cc.snd}" data-cc="snd" aria-label="Sound volume" /></span></label>
+  </div>`;
+}
 
 const FINDER_MENUS: Menu[] = [
   { label: 'File', items: [
@@ -455,6 +558,7 @@ const FINDER_MENUS: Menu[] = [
     { label: 'Open Read me', action: 'open:textedit' },
     { label: 'Get Info', key: '⌘I', action: 'open:finder' },
     { label: '', sep: true },
+    { label: 'Close Window', key: '⌘W', action: 'close' },
     { label: 'Move to Trash', key: '⌘⌫', dis: true },
   ] },
   EDIT,
@@ -470,18 +574,18 @@ const FINDER_MENUS: Menu[] = [
   WINDOW,
   { label: 'Help', items: [
     { label: 'Spotlight', key: '⌘K', action: 'spot' },
-    { label: 'Drag a window by its title bar', dis: true },
   ] },
 ];
 
-function currentApp(): { name: string; menus: Menu[] } {
+/* the app in the menu bar, and the name its About row and Quit row use */
+function currentApp(): { name: string; about: string; menus: Menu[] } {
   const f = desk.front;
   const id = rinPanel && (rinFront || !f) ? 'rin' : f?.id;
   const known = id ? byId(id) : null;
-  if (known) return { name: known.name, menus: known.menus };
+  if (known) return { name: known.name, about: known.label, menus: known.menus };
   if (id === 'photos') {
     return {
-      name: 'Photos',
+      name: 'Photos', about: 'Photos',
       menus: [
         { label: 'File', items: [{ label: 'Close Window', key: '⌘W', action: 'close' }] },
         EDIT,
@@ -499,9 +603,9 @@ function currentApp(): { name: string; menus: Menu[] } {
       ],
     };
   }
-  if (id && TITLES[id]) {
+  if (id === 'textedit') {
     return {
-      name: id === 'textedit' ? 'TextEdit' : 'Finder',
+      name: 'TextEdit', about: 'TextEdit',
       menus: [
         { label: 'File', items: [{ label: 'Close Window', key: '⌘W', action: 'close' }] },
         EDIT, VIEW, WINDOW,
@@ -509,8 +613,8 @@ function currentApp(): { name: string; menus: Menu[] } {
       ],
     };
   }
-  if (id?.startsWith('about-')) return { name: 'Finder', menus: FINDER_MENUS };
-  return { name: 'Finder', menus: FINDER_MENUS };
+  /* Finder, the Trash, an About panel, Quick Look, or nothing: Finder, with its Go menu */
+  return { name: 'Finder', about: 'Finder', menus: FINDER_MENUS };
 }
 
 function sync() {
@@ -538,14 +642,21 @@ function windowRows(): MenuItem[] {
 
 function menuFor(key: string): MenuItem[] {
   if (key === 'apple') return APPLE;
-  if (key === 'control') return CONTROL;
-  if (key === 'clock') {
-    const d = new Date();
-    return [{ label: d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }), dis: true }];
-  }
   const i = Number(key.split('-')[1]);
-  const menus = currentApp().menus;
-  if (i === 0) return [{ label: `About ${currentApp().name}`, action: 'about' }, { label: '', sep: true }, { label: 'Settings…', key: '⌘,', dis: true }, { label: '', sep: true }, { label: `Hide ${currentApp().name}`, key: '⌘H', action: 'min' }, { label: 'Hide Others', key: '⌥⌘H', dis: true }, { label: '', sep: true }, { label: `Quit ${currentApp().name}`, key: '⌘Q', action: 'close' }];
+  const { name, about, menus } = currentApp();
+  /* the HIG order: About, Settings, Services, Hide, Hide Others, Show All, Quit */
+  if (i === 0) return [
+    { label: `About ${about}`, action: 'about' },
+    { label: '', sep: true },
+    { label: 'Settings…', key: '⌘,', dis: true },
+    { label: 'Services', dis: true },
+    { label: '', sep: true },
+    { label: `Hide ${name}`, key: '⌘H', action: 'min' },
+    { label: 'Hide Others', key: '⌥⌘H', dis: true },
+    { label: 'Show All', dis: true },
+    { label: '', sep: true },
+    { label: `Quit ${name}`, key: '⌘Q', action: 'close' },
+  ];
   const m = menus[i - 1];
   if (!m) return [];
   return m.label === 'Window' ? [...m.items, ...windowRows()] : m.items;
@@ -578,9 +689,11 @@ function openMenu(b: HTMLElement) {
   if (popFor === b) { closeMenu(); return; }
   closeMenu();
   closeCtx();
-  const items = menuFor(key);
-  if (!items.length) return;
-  pop.innerHTML = rows(items);
+  const control = key === 'control';
+  const items = control ? [] : menuFor(key);
+  if (!control && !items.length) return;
+  pop.innerHTML = control ? ccPanel() : rows(items);
+  pop.classList.toggle('menu-cc', control);
   pop.hidden = false;
   pop.style.top = '';
   const r = b.getBoundingClientRect();
@@ -617,6 +730,22 @@ const fireRow = (e: Event) => {
 };
 pop.addEventListener('pointerup', fireRow);
 pop.addEventListener('keydown', (e) => { if (e.key === 'Enter') fireRow(e); });
+/* the Control Center modules: the radios flip, the sliders slide, the
+   appearance tile is the real switch, and the panel stays open the way it does */
+pop.addEventListener('click', (e) => {
+  const b = (e.target as HTMLElement).closest<HTMLElement>('button[data-cc]');
+  if (!b) return;
+  const k = b.dataset.cc!;
+  if (k === 'theme') { theme.flip(); setTimeout(() => { if (popFor) pop.innerHTML = ccPanel(); }, 220); return; }
+  const key = k as 'wifi' | 'bt' | 'air';
+  cc[key] = !cc[key];
+  pop.innerHTML = ccPanel();
+});
+pop.addEventListener('input', (e) => {
+  const r = e.target as HTMLInputElement;
+  if (r.dataset.cc === 'disp') cc.disp = Number(r.value);
+  if (r.dataset.cc === 'snd') cc.snd = Number(r.value);
+});
 addEventListener('pointerdown', (e) => {
   if (!popFor) return;
   const t = e.target as HTMLElement;
@@ -671,18 +800,37 @@ document.addEventListener('contextmenu', (e) => {
       { label: 'Close Window', key: '⌘W', action: 'close' },
     ], e.clientX, e.clientY);
   } else {
+    /* only what this desktop can actually do; nothing greyed */
     openCtx([
-      { label: 'New Folder', dis: true },
-      { label: 'Get Info', dis: true },
-      { label: '', sep: true },
       { label: 'Change Appearance', action: 'theme' },
-      { label: 'Use Stacks', dis: true },
-      { label: 'Sort By', dis: true },
-      { label: 'Clean Up', dis: true },
-      { label: 'Show View Options', dis: true },
+      { label: '', sep: true },
+      { label: 'Sort By Name', action: 'sort:name', check: deskSort === 'name' },
+      { label: 'Sort By Kind', action: 'sort:kind', check: deskSort === 'kind' },
+      { label: 'Clean Up', action: 'cleanup' },
+      { label: '', sep: true },
+      { label: 'Show View Options', action: 'viewopts', check: itemsEl.classList.contains('is-big') },
     ], e.clientX, e.clientY);
   }
 });
+
+/* the desktop's own arrangement: by name, by kind, or back to the grid it
+   was laid out in; view options is the one Finder offers that matters here,
+   the label size */
+const itemsEl = $('[aria-label="Desktop"]')!;
+const itemsRest = [...itemsEl.children] as HTMLElement[];
+let deskSort: 'none' | 'name' | 'kind' = 'none';
+function arrange(by: 'none' | 'name' | 'kind') {
+  deskSort = by;
+  const kind = (li: HTMLElement) => {
+    const b = li.querySelector<HTMLElement>('[data-open]')!;
+    return b.dataset.photo ? 2 : b.dataset.open === 'textedit' ? 1 : 0;
+  };
+  const name = (li: HTMLElement) => li.querySelector('.item-lbl')?.textContent?.toLowerCase() ?? '';
+  const list = [...itemsRest];
+  if (by === 'name') list.sort((a, b) => name(a).localeCompare(name(b)));
+  if (by === 'kind') list.sort((a, b) => kind(a) - kind(b) || name(a).localeCompare(name(b)));
+  list.forEach((li) => itemsEl.appendChild(li));
+}
 
 function run(act: string) {
   if (!act) return;
@@ -695,6 +843,9 @@ function run(act: string) {
     return;
   }
   if (act === 'pictures') { openApp('finder'); finderPane('pictures'); return; }
+  if (act.startsWith('sort:')) { arrange(act.slice(5) as 'name' | 'kind'); return; }
+  if (act === 'cleanup') { arrange('none'); return; }
+  if (act === 'viewopts') { itemsEl.classList.toggle('is-big'); return; }
   if (act.startsWith('quit:')) {
     const id = act.slice(5);
     if (id === 'rin') rinClose();
@@ -714,6 +865,8 @@ function run(act: string) {
     case 'spot': spot.show(); break;
     case 'theme': theme.flip(); break;
     case 'gh': window.open(links.github, '_blank', 'noopener'); break;
+    case 'vb': window.open(links.volbase, '_blank', 'noopener'); break;
+    case 'rin-gh': window.open(links.rin, '_blank', 'noopener'); break;
   }
 }
 
@@ -726,7 +879,9 @@ function aboutFront() {
 function openAbout(id: string) {
   const el = body(`about-${id}`);
   if (!el) return;
-  if (phone()) { sheetOpen(`about-${id}`, `About ${id === 'peter' ? 'Peter' : byId(id)?.name ?? ''}`); return; }
+  if (phone()) { sheetOpen(`about-${id}`, `About ${id === 'peter' ? 'Peter' : byId(id)?.label ?? ''}`); return; }
+  /* the panel would cover its own About box; it goes back up first */
+  if (id === 'rin' && rinPanel) rinClose();
   const w = desk.open({
     id: `about-${id}`,
     title: '',
@@ -859,16 +1014,27 @@ function restart() {
 
 /* ── Spotlight ─────────────────────────────────────────────────────────── */
 const spotEl = $('[data-spot]')!;
+const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const placeList = PH.map((p) => p.p).filter((p, i, a) => a.indexOf(p) === i);
 const hits = (): Hit[] => [
   { id: 'finder', label: 'About Peter', kind: 'Finder', icon: icon('finder'), run: () => openApp('finder') },
-  ...apps.map((a) => ({ id: a.id, label: a.name, kind: 'Application', icon: icon(a.id), run: () => openApp(a.id) })),
+  ...apps.map((a) => ({ id: a.id, label: a.label, kind: 'Application', icon: icon(a.id), run: () => openApp(a.id) })),
   { id: 'photos', label: 'Photos', kind: 'Application', icon: icon('photos'), run: () => openApp('photos') },
   { id: 'pictures', label: 'Pictures', kind: 'Folder', icon: icon('folder'), run: () => { openApp('finder'); finderPane('pictures'); } },
-  { id: 'textedit', label: 'Read me', kind: 'Document', icon: icon('textedit'), run: () => openApp('textedit') },
+  { id: 'textedit', label: 'Read me', kind: 'Document', icon: icon('doc'), run: () => openApp('textedit') },
   { id: 'trash', label: 'Trash', kind: 'Finder', icon: icon('trash'), run: () => openApp('trash') },
   { id: 'gh', label: 'GitHub', kind: 'Website', icon: icon('github'), run: () => window.open(links.github, '_blank', 'noopener') },
   { id: 'vb', label: 'volbase.app', kind: 'Website', icon: icon('volbase'), run: () => window.open(links.volbase, '_blank', 'noopener') },
   { id: 'dark', label: 'Switch appearance', kind: 'System Settings', icon: icon('settings'), run: () => theme.flip() },
+  /* the facts in the About window, and the places in the photo library */
+  ...finder.flatMap((s) => s.items.map((f) => ({
+    id: `fact-${s.id}-${slug(f.label)}`, label: `${f.label} · ${f.value}`, kind: 'About Peter', icon: icon('finder'),
+    run: () => { openApp('finder'); finderPane(s.id); },
+  }))),
+  ...placeList.map((p) => ({
+    id: `place-${slug(p)}`, label: p, kind: 'Photos', icon: icon('photos'),
+    run: () => { openApp('photos'); photosApp.setView('album', slug(p)); },
+  })),
 ];
 const spot = initSpotlight(spotEl, hits);
 $('[data-spot-open]')?.addEventListener('click', () => spot.show());
@@ -887,7 +1053,7 @@ function sheetOpen(id: string, title?: string) {
   sheetId = id;
   sheetBody.appendChild(el);
   sheetBody.scrollTop = 0;
-  sheetName.textContent = title ?? byId(id)?.name ?? TITLES[id] ?? '';
+  sheetName.textContent = title ?? byId(id)?.label ?? TITLES[id] ?? '';
   sheet.hidden = false;
   sheet.dataset.app = id;
   sheet.style.transform = '';
@@ -896,6 +1062,7 @@ function sheetOpen(id: string, title?: string) {
   if (id === 'photos') photosApp.enter('phone');
   const l = live(id);
   if (l) requestAnimationFrame(() => { l.fit(); l.scene.enter?.(); });
+  if (id === 'rin') setTimeout(() => el.querySelector<HTMLInputElement>('[data-term-real]')?.focus({ preventScroll: true }), reduced() ? 0 : 360);
 }
 
 function sheetClose(now = false) {
@@ -938,9 +1105,11 @@ $('[data-sheet-close]')?.addEventListener('click', () => sheetClose());
 
 /* ── everything that opens an app ──────────────────────────────────────── */
 document.addEventListener('click', (e) => {
-  const b = (e.target as HTMLElement).closest<HTMLElement>('[data-open], [data-dock]');
+  const b = (e.target as HTMLElement).closest<HTMLElement>('[data-open], [data-dock], [data-restore]');
   if (!b || b.tagName === 'A') return;
-  const id = b.dataset.open ?? b.dataset.dock;
+  /* a desktop icon opens on a double click or Return, never on one click */
+  if (b.classList.contains('item')) return;
+  const id = b.dataset.open ?? b.dataset.dock ?? b.dataset.restore;
   if (!id) return;
   if (b.dataset.photo) { openPhoto(Number(b.dataset.photo)); return; }
   openApp(id);
@@ -956,8 +1125,7 @@ const launch = (it: HTMLElement) => {
   let sel: HTMLElement | null = null;
   const items = $$('[data-open].item');
   items.forEach((it) => {
-    it.addEventListener('click', (e) => {
-      e.stopPropagation();
+    it.addEventListener('click', () => {
       items.forEach((x) => x.classList.toggle('is-sel', x === it));
       sel = it;
     });
@@ -970,11 +1138,6 @@ const launch = (it: HTMLElement) => {
     desk.blur();
     sync();
   });
-  document.addEventListener('click', (e) => {
-    const b = (e.target as HTMLElement).closest<HTMLElement>('[data-open].item');
-    if (!b) return;
-    e.stopImmediatePropagation();
-  }, true);
   items.forEach((it) => {
     it.addEventListener('dblclick', () => launch(it));
   });
@@ -1003,20 +1166,28 @@ const launch = (it: HTMLElement) => {
 addEventListener('keydown', (e) => {
   if (spot.open) return;
   const k = e.key.toLowerCase();
+  /* Escape dismisses a menu, the viewer, a sheet, Quick Look or the panel;
+     it never closes a window, because a Mac's does not */
   if (e.key === 'Escape') {
     if (popFor) { closeMenu(); return; }
     if (ctxOpen) { closeCtx(); return; }
     if (photoEsc()) return;
     if (sheetId) { sheetClose(); return; }
+    if (ql) { quickLookClose(); return; }
     if ((e.target as HTMLElement)?.matches?.('input, textarea')) return;
-    closeFront();
+    if (rinPanel && (rinFront || !desk.front)) rinClose(true);
     return;
   }
   if (e.key === ' ' && ql && !(e.target as HTMLElement)?.matches?.('input, textarea, button.tb-btn')) { e.preventDefault(); quickLookClose(); return; }
   if (e.altKey && e.key === 'Tab') { e.preventDefault(); desk.cycle(); return; }
   if (!(e.metaKey || e.ctrlKey)) return;
+  if ((e.target as HTMLElement)?.matches?.('input, textarea') && k !== 'w') return;
+  const f = desk.front;
   if (k === 'w') { e.preventDefault(); closeFront(); }
-  else if (k === 'm') { e.preventDefault(); const f = desk.front; if (f) desk.minimize(f); }
+  else if (k === 'm' || k === 'h') { e.preventDefault(); if (f) desk.minimize(f); }
+  else if (k === 'n') { e.preventDefault(); openApp('finder'); }
+  else if (k === 'i') { e.preventDefault(); openApp('finder'); }
+  else if (k === 'f' && e.ctrlKey && e.metaKey) { e.preventDefault(); if (f) desk.zoom(f); }
   else if (k === '`' || e.key === 'Tab') { e.preventDefault(); desk.cycle(); }
 });
 

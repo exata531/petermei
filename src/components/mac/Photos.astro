@@ -26,15 +26,15 @@ const G = {
   <nav class="pho-side fnd-side" aria-label="Sidebar">
     <span class="fnd-h">Library</span>
     <button class="fnd-tab is-on" type="button" data-ph-nav="lib" aria-current="page">
-      <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={G.lib} />Library
+      <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={G.lib} /><span>Library</span>
     </button>
     <button class="fnd-tab" type="button" data-ph-nav="places">
-      <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={G.places} />Places
+      <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={G.places} /><span>Places</span>
     </button>
     <span class="fnd-h">Albums</span>
     {albums.map((a) => (
-      <button class="fnd-tab" type="button" data-ph-nav="album" data-ph-album={a.id}>
-        <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={G.album} />{a.place}
+      <button class="fnd-tab" type="button" data-ph-nav="album" data-ph-album={a.id} title={a.place}>
+        <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={G.album} /><span>{a.place}</span>
       </button>
     ))}
   </nav>
@@ -59,21 +59,19 @@ const G = {
     </div>
 
     {/* Days, All Photos and an album share these cells; the script regroups them */}
+    {/* All Photos: one continuous grid, no headers; the script regroups it for Days */}
     <div class="pho-pane pho-groups" data-ph-pane="grid">
-      {months.map((m) => (
-        <section class="pho-grp" data-ph-grp={m.key}>
-          <h3 class="pho-h"><b>{m.label}</b><span>{m.sub}</span></h3>
-          <ul class="pho-grid" role="listbox" aria-label={`${m.label}, ${m.sub}`}>
-            {m.items.map((p) => (
-              <li role="option" aria-selected="false" data-ph-cell={p.i} data-place={p.place} data-day={p.date} data-month={p.month}>
-                <button class="pho-cell" type="button" tabindex={p.i === 0 ? 0 : -1} aria-label={`${p.alt}. ${p.place}, ${p.dayLabel}`}>
-                  <img data-src={p.thumb} width={p.w} height={p.h} alt="" decoding="async" />
-                </button>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
+      <section class="pho-grp">
+        <ul class="pho-grid" role="listbox" aria-label="All Photos">
+          {photos.map((p) => (
+            <li role="option" aria-selected="false" data-ph-cell={p.i} data-place={p.place} data-day={p.date} data-month={p.month}>
+              <button class="pho-cell" type="button" tabindex={p.i === 0 ? 0 : -1} aria-label={`${p.alt}. ${p.place}, ${p.dayLabel}`}>
+                <img data-src={p.thumb} width={p.w} height={p.h} alt="" decoding="async" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
       <p class="pho-count" data-ph-count>{photos.length} Photos</p>
     </div>
 

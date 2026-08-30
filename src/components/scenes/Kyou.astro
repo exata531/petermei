@@ -5,11 +5,11 @@
    parser does with a line. */
 const week = [['W', 26], ['T', 27], ['F', 28], ['S', 29], ['S', 30], ['M', 31], ['T', 1]];
 const items = [
-  { t: '8:00', kind: 'event', title: 'Calculus', sub: 'Room 214', len: 50 },
-  { t: '10:15', kind: 'task', title: 'Physics set', sub: 'due Monday', len: 0 },
-  { t: '12:30', kind: 'event', title: 'Lunch', sub: 'the usual spot', len: 45 },
-  { t: '4:00', kind: 'event', title: 'Climbing', sub: 'Planet Rock · 2 hr', len: 120 },
-  { t: 'tonight', kind: 'habit', title: 'Read 20 pages', sub: 'streak 6', len: 0 },
+  { t: '8:00', min: 480, kind: 'event', title: 'Calculus', sub: 'Room 214', len: 50 },
+  { t: '10:15', min: 615, kind: 'task', title: 'Physics set', sub: 'due Monday', len: 0 },
+  { t: '12:30', min: 750, kind: 'event', title: 'Lunch', sub: 'the usual spot', len: 45 },
+  { t: '4:00', min: 960, kind: 'event', title: 'Climbing', sub: 'gym · 2 hr', len: 120 },
+  { t: 'tonight', min: 1380, kind: 'habit', title: 'Read 20 pages', sub: 'streak 6', len: 0 },
 ];
 ---
 <div class="phone" data-kyou data-drag>
@@ -29,7 +29,7 @@ const items = [
     <div class="ky-curtain">
       <ul class="ky-tl" data-kyou-tl>
         {items.map((it, i) => (
-          <li class={`ky-item is-${it.kind} is-in`} style={`--i:${i};--len:${Math.max(40, it.len * 0.5)}px`} data-kyou-item>
+          <li class={`ky-item is-${it.kind} is-in`} style={`--i:${i};--len:${Math.max(40, it.len * 0.5)}px`} data-kyou-item data-min={it.min}>
             <span class="ky-t num">{it.t}</span>
             <span class="ky-mark"></span>
             <span class="ky-body"><b>{it.title}</b><small>{it.sub}</small></span>
@@ -89,13 +89,13 @@ const items = [
   .ky-item { display: grid; grid-template-columns: 44px 14px 1fr; gap: 8px; align-items: start; min-height: var(--len); opacity: 0; transform: translateY(10px); }
   .ky-item.is-in { opacity: 1; transform: none; }
   .ky-item.is-new { transition: opacity .35s var(--soft), transform .4s var(--out); }
-  .ky-t { font-size: 10.5px; color: #8e8e93; padding-top: 3px; }
+  .ky-t { font-size: 10.5px; color: #6e6e73; padding-top: 3px; }
   .ky-mark { width: 12px; height: 12px; border-radius: 50%; margin-top: 3px; box-shadow: inset 0 0 0 2px #ff9f0a; }
   .is-event .ky-mark { border-radius: 4px; background: #0a84ff; box-shadow: none; width: 4px; height: 100%; min-height: 24px; margin-left: 4px; margin-top: 2px; }
   .is-habit .ky-mark { box-shadow: inset 0 0 0 2px #30d158; }
   .ky-body { display: grid; line-height: 1.25; }
   .ky-body b { font-size: 13px; font-weight: 600; }
-  .ky-body small { font-size: 11px; color: #8e8e93; }
+  .ky-body small { font-size: 11px; color: #6e6e73; }
   .is-event .ky-body { background: rgb(10 132 255 / .1); border-radius: 10px; padding: 6px 10px; min-height: var(--len); }
 
   .ky-add { position: absolute; left: 12px; right: 12px; bottom: 14px; opacity: 0; transform: translateY(14px); pointer-events: none; }
@@ -109,24 +109,24 @@ const items = [
   .ky-field .caret { display: inline-block; width: 2px; height: 16px; background: #ff3b30; }
   .ky-field:focus-within .caret { animation: kblink 1.05s step-end infinite; }
   @keyframes kblink { 50% { opacity: 0; } }
-  .ky-tokens { display: flex; gap: 6px; margin-top: 8px; font-size: 10px; color: #8e8e93; flex-wrap: wrap; }
+  .ky-tokens { display: flex; gap: 6px; margin-top: 8px; font-size: 10px; color: #6e6e73; flex-wrap: wrap; }
   .ky-tokens span { background: #fff; border-radius: 6px; padding: 3px 7px; box-shadow: 0 1px 2px rgb(0 0 0 / .08); }
   .ky-fab { position: absolute; right: 16px; bottom: 16px; width: 48px; height: 48px; border-radius: 50%; background: #ff3b30; color: #fff; font-size: 26px; font-weight: 400; line-height: 1; box-shadow: 0 8px 20px -8px rgb(255 59 48 / .8); transition: transform var(--t-fast) var(--soft), opacity var(--t-fast) var(--soft); cursor: pointer; }
   .ky-fab:active { transform: scale(.92); }
   .ky-fab.is-hidden { opacity: 0; pointer-events: none; }
-  .ky-hint { position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; font-size: 9.5px; color: #8e8e93; z-index: 2; pointer-events: none; }
+  .ky-hint { position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; font-size: 9.5px; color: #6e6e73; z-index: 2; pointer-events: none; }
   .ky-hint.is-off { opacity: 0; }
 
-  .ky-notif { position: absolute; top: 52px; left: 10px; right: 10px; display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; padding: 10px 12px; border-radius: 18px; background: rgb(255 255 255 / .92); color: #1c1c1e; box-shadow: 0 10px 30px -10px rgb(0 0 0 / .5); font-size: 11.5px; line-height: 1.3; transform: translateY(-160%); z-index: 2; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); transition: transform .5s var(--ease); }
+  .ky-notif { position: absolute; top: 52px; left: 10px; right: 10px; display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; padding: 10px 12px; border-radius: 18px; background: rgb(255 255 255 / .96); color: #1c1c1e; box-shadow: 0 10px 30px -10px rgb(0 0 0 / .5); font-size: 11.5px; line-height: 1.3; transform: translateY(-160%); z-index: 2; transition: transform .5s var(--ease); }
   .ky-notif.is-in { transform: none; }
   .ky-notif img { border-radius: 7px; }
   .ky-notif b { font-size: 11px; }
-  .ky-notif span { margin-left: 6px; font-size: 10px; color: #8e8e93; }
+  .ky-notif span { margin-left: 6px; font-size: 10px; color: #6e6e73; }
   .ky-notif p { margin-top: 2px; }
 
   .ph-screen.is-light .ky-curtain { background: #f2f2f7; }
   .ph-screen.is-dark .ky-curtain { background: #1c1c1e; color: #fff; }
   .ph-screen.is-dark .ky-field { background: #2c2c2e; color: #fff; }
   .ph-screen.is-dark .ky-tokens span { background: #2c2c2e; color: #aeaeb2; }
-  .ph-screen.is-dark .ky-body small, .ph-screen.is-dark .ky-t { color: #8e8e93; }
+  .ph-screen.is-dark .ky-body small, .ph-screen.is-dark .ky-t { color: #aeaeb2; }
 </style>

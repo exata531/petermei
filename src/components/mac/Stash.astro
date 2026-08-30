@@ -27,7 +27,8 @@ const glyphs: Record<string, string> = {
   built: '<path d="M2.5 11.5 8 14l5.5-2.5v-7L8 2 2.5 4.5Z"/><path d="M2.5 4.5 8 7l5.5-2.5M8 7v7"/>',
   state: '<circle cx="8" cy="8" r="5.5"/><path d="M8 4.8V8l2.2 1.4"/>',
 };
-const doc = `<svg class="fnd-doc" viewBox="0 0 48 58" aria-hidden="true"><path class="pg" d="M4 3h26l14 14v38H4z"/><path d="M30 3v14h14"/><path d="M12 30h24M12 37h24M12 44h16" stroke-linecap="round"/></svg>`;
+/* the same glyph the sidebar carries for a section, at row size */
+const glyph = (name: string) => `<svg class="fnd-glyph" viewBox="0 0 16 16" aria-hidden="true">${glyphs[name]}</svg>`;
 ---
 <div class="stash" data-stash>
   <div class="stash-head">
@@ -66,25 +67,25 @@ const doc = `<svg class="fnd-doc" viewBox="0 0 48 58" aria-hidden="true"><path c
         <span class="fnd-h">Favorites</span>
         {finder.map((s, i) => (
           <button class:list={['fnd-tab', { 'is-on': i === 0 }]} type="button" data-fnd={s.id}>
-            <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs[s.glyph]} />{s.label}
+            <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs[s.glyph]} /><span>{s.label}</span>
           </button>
         ))}
         <button class="fnd-tab" type="button" data-fnd="pictures">
-          <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.pictures} />Pictures
+          <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.pictures} /><span>Pictures</span>
         </button>
         <span class="fnd-h">Locations</span>
         <a class="fnd-tab" href={links.github} rel="me noopener" target="_blank">
-          <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="9" rx="1.5"/><path d="M5.5 14h5M8 12v2"/></svg>GitHub
+          <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="9" rx="1.5"/><path d="M5.5 14h5M8 12v2"/></svg><span>GitHub</span>
         </a>
       </nav>
       <div class="fnd-main">
         {finder.map((s, i) => (
           <div class:list={['fnd-pane', { 'is-on': i === 0 }]} data-fnd-pane={s.id}>
-            <div class="fnd-head" aria-hidden="true"><span>Name</span><span>Notes</span></div>
+            <div class="fnd-head" aria-hidden="true"><span>Name</span><span>Comments</span></div>
             <ul class="fnd-rows">
               {s.items.map((f) => (
                 <li class="fnd-row">
-                  <span class="fnd-name"><Fragment set:html={doc} /><b>{f.label}</b></span>
+                  <span class="fnd-name"><Fragment set:html={glyph(s.glyph)} /><b>{f.label}</b></span>
                   <small>{f.value}</small>
                 </li>
               ))}
@@ -113,16 +114,24 @@ const doc = `<svg class="fnd-doc" viewBox="0 0 48 58" aria-hidden="true"><path c
   <section class="stash-app" data-body="trash" aria-label="Trash">
     <h2 class="stash-h">Trash</h2>
     <div class="fnd">
+      {/* the standard Finder sidebar; a row here opens the About window on that section */}
       <nav class="fnd-side" aria-label="Sidebar">
         <span class="fnd-h">Favorites</span>
-        <button class="fnd-tab" type="button" data-open="finder">
-          <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.person} />Peter
+        {finder.map((s) => (
+          <button class="fnd-tab" type="button" data-open="finder" data-pane={s.id}>
+            <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs[s.glyph]} /><span>{s.label}</span>
+          </button>
+        ))}
+        <button class="fnd-tab" type="button" data-open="finder" data-pane="pictures">
+          <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.pictures} /><span>Pictures</span>
         </button>
         <span class="fnd-h">Locations</span>
-        <span class="fnd-tab is-on"><svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 4.5h10M6.5 4.5v-1h3v1M4 4.5l.8 9h6.4l.8-9"/></svg>Trash</span>
+        <a class="fnd-tab" href={links.github} rel="me noopener" target="_blank">
+          <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="9" rx="1.5"/><path d="M5.5 14h5M8 12v2"/></svg><span>GitHub</span>
+        </a>
       </nav>
       <div class="fnd-main">
-        <div class="fnd-pane is-on"><div class="fnd-empty">No Items</div></div>
+        <div class="fnd-pane fnd-pane-empty is-on"><div class="fnd-empty">No Items</div></div>
         <div class="fnd-status">0 items</div>
       </div>
     </div>
@@ -133,10 +142,11 @@ const doc = `<svg class="fnd-doc" viewBox="0 0 48 58" aria-hidden="true"><path c
       <div class:list={['abt', `abt-${a.id}`]}>
         <span class="abt-ico"><Icon id={a.id} /></span>
         <h3 class="abt-name">{a.about!.name}</h3>
+        <p class="abt-ver">{a.about!.state}</p>
         <p class="abt-line">{a.about!.line}</p>
         <div class="abt-facts">
-          <span><svg viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.built} />Built with {a.about!.built}</span>
-          <span><svg viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.state} />{a.about!.state}</span>
+          <span><svg viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.built} /><b>Built</b> {a.about!.built}</span>
+          <span><svg viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.state} /><b>Now</b> {a.about!.state}</span>
         </div>
         <a class="abt-link" href={a.about!.link.href} rel="noopener" target="_blank">{a.about!.link.label}</a>
       </div>
@@ -147,10 +157,11 @@ const doc = `<svg class="fnd-doc" viewBox="0 0 48 58" aria-hidden="true"><path c
     <div class="abt abt-peter">
       <span class="abt-ico"><Icon id="peter" /></span>
       <h3 class="abt-name">Peter Mei</h3>
+      <p class="abt-ver">Senior, class of 2027</p>
       <p class="abt-line">I am a senior at the school, outside Detroit. I taught myself all of this from the docs.</p>
       <div class="abt-facts">
-        <span><svg viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.hammer} />volbase, Rin, Kyou, Market Station</span>
-        <span><svg viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.state} />Applying to college this fall</span>
+        <span><svg viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.hammer} /><b>Made</b> volbase, Rin, Kyou, Market Station</span>
+        <span><svg viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.state} /><b>Now</b> Applying to college this fall</span>
       </div>
       <a class="abt-link" href={links.github} rel="me noopener" target="_blank">github.com/exata531</a>
     </div>
@@ -159,7 +170,7 @@ const doc = `<svg class="fnd-doc" viewBox="0 0 48 58" aria-hidden="true"><path c
   <script type="application/json" data-ph-json set:html={photoJson} />
 
   {/* icons the scripts clone into Spotlight rows and notifications */}
-  {['finder', 'volbase', 'rin', 'kyou', 'market', 'photos', 'textedit', 'trash', 'github', 'settings'].map((id) => (
+  {['finder', 'volbase', 'rin', 'kyou', 'market', 'photos', 'textedit', 'trash', 'github', 'settings', 'folder', 'doc'].map((id) => (
     <template data-icon={id}><Icon id={id} /></template>
   ))}
 </div>

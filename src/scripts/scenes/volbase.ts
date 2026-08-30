@@ -14,6 +14,7 @@ export function initVolbase(root: HTMLElement) {
   let stop: (() => void) | null = null;
 
   const url = () => document.querySelector<HTMLElement>('[data-vb-url]');
+  const busy = (on: boolean) => document.querySelector('.tb-reload')?.classList.toggle('is-busy', on);
   const scroll = (px: number) => shot?.style.setProperty('--vb-scroll', `${-px}px`);
 
   function setTab(t: 'landing' | 'map') {
@@ -35,6 +36,7 @@ export function initVolbase(root: HTMLElement) {
       setTab('landing');
       scroll(0);
       if (reduced()) { scroll(1100); setTab('map'); return; }
+      busy(true);
       const t0 = performance.now();
       const dur = 3000;
       stop = onFrame((_dt, now) => {
@@ -42,9 +44,9 @@ export function initVolbase(root: HTMLElement) {
         /* ease in and out, so it reads as a hand on a trackpad */
         const e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
         scroll(e * 1100);
-        if (p >= 1) { stop?.(); stop = null; setTimeout(() => { if (tab === 'landing') setTab('map'); }, 350); }
+        if (p >= 1) { stop?.(); stop = null; setTimeout(() => { if (tab === 'landing') setTab('map'); busy(false); }, 350); }
       });
     },
-    leave() { stop?.(); stop = null; },
+    leave() { stop?.(); stop = null; busy(false); },
   };
 }

@@ -40,7 +40,8 @@ export function initSpotlight(
            </button></li>`,
       )
       .join('');
-    el.classList.toggle('has-hits', hits.length > 0);
+    if (q && !hits.length) list.innerHTML = '<li class="sp-none" aria-live="polite">No Results</li>';
+    el.classList.toggle('has-hits', q.length > 0);
   };
 
   const mark = () => {

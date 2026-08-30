@@ -26,10 +26,13 @@ export type WinOpts = {
   minH?: number;         // minimum height
   klass?: string;
   tool?: HTMLElement;    // a toolbar: the title bar grows to carry it
-  fixed?: boolean;       // an About panel: no resize, no zoom
+  side?: boolean;        // a sidebar runs the full height, under the lights
+  fixed?: boolean;       // an About panel: no resize, no zoom, no minimize
+  zoomOnly?: boolean;    // Quick Look: no resize, no minimize, but zoom is live
   onClose?: () => void;
   onFocus?: () => void;
   onMin?: () => void;
+  onRestore?: () => void;
 };
 
 export type Win = {
@@ -42,6 +45,7 @@ export type Win = {
   open: Spring;          // 0 closed, 1 open
   from: { x: number; y: number; w: number };  // the dock icon it grew out of
   minimized: boolean;
+  restoring?: boolean;
   z: number;
   opts: WinOpts;
   stop?: () => void;
@@ -81,8 +85,9 @@ export class Desk {
   private place(w: number, h: number) {
     const n = this.wins.length;
     const vw = innerWidth, vh = this.dockTop();
-    const x = Math.max(12, (vw - w) / 2 + (n % 5) * 22 - 44);
-    const y = Math.max(BAR + 8, (vh + BAR - h) / 2 - 12 + (n % 5) * 22);
+    const snap = (v: number) => Math.round(v / 8) * 8;
+    const x = Math.max(16, snap((vw - w) / 2 + (n % 5) * 24 - 48));
+    const y = Math.max(BAR + 8, snap((vh + BAR - h) / 2 - 16 + (n % 5) * 24));
     return { x, y };
   }
 
@@ -100,7 +105,7 @@ export class Desk {
     const { x, y } = this.place(w, h);
 
     const el = document.createElement('section');
-    el.className = `win${o.klass ? ` ${o.klass}` : ''}${o.tool ? ' has-tool' : ''}${o.fixed ? ' is-fixed' : ''}`;
+    el.className = `win${o.klass ? ` ${o.klass}` : ''}${o.tool ? ' has-tool' : ''}${o.side ? ' has-side' : ''}${o.fixed ? ' is-fixed' : ''}${o.zoomOnly ? ' is-nomin' : ''}`;
     el.dataset.win = o.id;
     el.setAttribute('role', 'dialog');
     el.setAttribute('aria-label', o.title || 'About');
@@ -128,7 +133,7 @@ export class Desk {
     body.appendChild(o.body);
 
     el.append(bar, body);
-    if (!o.fixed) {
+    if (!o.fixed && !o.zoomOnly) {
       for (const d of ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw']) {
         const h = document.createElement('span');
         h.className = `rz rz-${d}`;
@@ -155,7 +160,7 @@ export class Desk {
     bar.querySelector('.lt-z')!.addEventListener('click', (e) => { e.stopPropagation(); this.zoom(win); });
     this.wireFocus(win);
     this.drag(win);
-    if (!o.fixed) this.resize(win);
+    if (!o.fixed && !o.zoomOnly) this.resize(win);
     this.focus(win);
 
     if (reduced()) {
@@ -193,7 +198,11 @@ export class Desk {
       if (win.open.done) {
         win.stop?.(); win.stop = undefined;
         if (win.open.value === 0) this.reap(win);
-        else { win.el.style.willChange = 'auto'; win.settle?.(); }
+        else {
+          win.el.style.willChange = 'auto';
+          win.settle?.();
+          if (win.restoring) { win.restoring = false; win.opts.onRestore?.(); }
+        }
       }
     });
     win.el.style.willChange = 'transform, opacity';
@@ -274,9 +283,10 @@ export class Desk {
   }
 
   minimize(win: Win) {
-    if (win.minimized) return;
+    if (win.minimized || win.opts.fixed || win.opts.zoomOnly) return;
     win.minimized = true;
     win.el.classList.add('is-min');
+    /* the owner may hang a thumbnail in the Dock here and point `from` at it */
     win.opts.onMin?.();
     win.el.classList.remove('is-front');
     win.open.to(0);
@@ -285,12 +295,18 @@ export class Desk {
     this.next();
   }
 
+  /* where a minimized window folds to, and grows back from */
+  setFrom(win: Win, r: DOMRect) {
+    win.from = { x: r.left + r.width / 2, y: r.top + r.height / 2, w: Math.max(8, r.width) };
+  }
+
   restore(win: Win) {
     win.minimized = false;
+    win.restoring = true;
     win.el.classList.remove('is-min');
     win.open.to(1);
     this.focus(win);
-    if (reduced()) { win.open.set(1); this.paint(win); return; }
+    if (reduced()) { win.open.set(1); this.paint(win); win.restoring = false; win.opts.onRestore?.(); return; }
     this.animate(win);
   }
 
@@ -352,13 +368,16 @@ export class Desk {
     win.y = Math.min(Math.max(BAR, win.y), this.dockTop() - this.barH(win));
   }
 
-  /* Drag by any chrome surface marked data-drag. Pointer capture on the
-     window means it keeps receiving moves even when the cursor outruns it,
-     and the only thing written per frame is a transform. */
+  /* Drag by any chrome surface marked data-drag. The pointer is captured
+     only once the hand has actually moved, so a plain click on the bar stays
+     a click and a second press within a third of a second is the zoom; once
+     captured, the window keeps receiving moves even when the cursor outruns
+     it, and the only thing written per frame is a transform. */
   private drag(win: Win) {
     const vel = new Velocity();
     let px = 0, py = 0, ox = 0, oy = 0, id = -1;
-    let pending = false, nx = 0, ny = 0;
+    let pending = false, nx = 0, ny = 0, started = false;
+    let lastDown = 0, lastX = 0, lastY = 0;
 
     const flush = () => {
       pending = false;
@@ -377,6 +396,15 @@ export class Desk {
 
     const move = (e: PointerEvent) => {
       if (e.pointerId !== id) return;
+      if (!started) {
+        if (Math.hypot(e.clientX - px, e.clientY - py) <= 3) return;
+        started = true;
+        try { win.el.setPointerCapture(e.pointerId); } catch {}
+        win.el.classList.add('is-drag');
+        document.body.classList.add('is-dragging');
+        win.el.style.willChange = 'transform';
+        this.dragging = win;
+      }
       const rx = ox + (e.clientX - px);
       const ry = oy + (e.clientY - py);
       nx = band(rx, KEEP - win.w, innerWidth - KEEP);
@@ -389,17 +417,19 @@ export class Desk {
     const up = (e: PointerEvent) => {
       if (e.pointerId !== id) return;
       id = -1;
+      const was = started;
+      started = false;
       try { win.el.releasePointerCapture(e.pointerId); } catch {}
       win.el.classList.remove('is-drag');
       document.body.classList.remove('is-dragging');
       win.el.style.willChange = 'auto';
       this.dragging = null;
       if (pending) flush();
-      const v = vel.read(); vel.clear();
+      vel.clear();
       win.el.removeEventListener('pointermove', move);
       win.el.removeEventListener('pointerup', up);
       win.el.removeEventListener('pointercancel', up);
-      this.release(win, v);
+      if (was) this.release(win);
     };
 
     win.el.addEventListener('pointerdown', (e) => {
@@ -407,50 +437,38 @@ export class Desk {
       const t = e.target as HTMLElement;
       const hit = t.closest('[data-drag], [data-nodrag], button, a, input, textarea, select, [contenteditable]');
       if (!hit || !(hit as HTMLElement).hasAttribute('data-drag')) return;
+      /* two presses in the same spot: the title bar's double click, the zoom */
+      if (e.timeStamp - lastDown < 350 && Math.hypot(e.clientX - lastX, e.clientY - lastY) < 4) {
+        lastDown = 0;
+        this.zoom(win);
+        return;
+      }
+      lastDown = e.timeStamp; lastX = e.clientX; lastY = e.clientY;
       if (win.stop) {
         /* grabbed mid-open: the spring is over, the hand wins */
         win.stop(); win.stop = undefined;
         win.open.set(1);
       }
       id = e.pointerId;
-      try { win.el.setPointerCapture(e.pointerId); } catch {}
+      started = false;
       px = e.clientX; py = e.clientY; ox = win.x; oy = win.y;
       nx = ox; ny = oy;
       vel.clear(); vel.push(e.clientX, e.clientY, e.timeStamp);
-      win.el.classList.add('is-drag');
-      document.body.classList.add('is-dragging');
-      win.el.style.willChange = 'transform';
-      this.dragging = win;
       win.el.addEventListener('pointermove', move);
       win.el.addEventListener('pointerup', up);
       win.el.addEventListener('pointercancel', up);
-      e.preventDefault();
-    });
-
-    win.el.addEventListener('dblclick', (e) => {
-      const t = e.target as HTMLElement;
-      const hit = t.closest('[data-drag], [data-nodrag], button, a, input');
-      if (hit && (hit as HTMLElement).hasAttribute('data-drag')) this.zoom(win);
     });
   }
 
-  /* letting go: a few pixels of settle in the direction of travel, then a
-     spring back inside the bounds if the hand left the window past them */
-  private release(win: Win, v: { x: number; y: number }) {
-    const speed = Math.hypot(v.x, v.y);
-    let cx = 0, cy = 0;
-    if (!reduced() && speed > 300) {
-      const carry = Math.min(14, speed * 0.012);
-      cx = (v.x / speed) * carry;
-      cy = (v.y / speed) * carry;
-    }
-    const tx = Math.min(Math.max(KEEP - win.w, win.x + cx), innerWidth - KEEP);
-    const ty = Math.min(Math.max(BAR, win.y + cy), this.dockTop() - this.barH(win));
+  /* letting go: the window stops dead under the hand, and only a window
+     dropped past the edge springs back inside the bounds */
+  private release(win: Win) {
+    const tx = Math.min(Math.max(KEEP - win.w, win.x), innerWidth - KEEP);
+    const ty = Math.min(Math.max(BAR, win.y), this.dockTop() - this.barH(win));
     if (Math.abs(tx - win.x) < 0.5 && Math.abs(ty - win.y) < 0.5) return;
     if (reduced()) { win.x = tx; win.y = ty; this.paint(win); return; }
-    const out = tx !== win.x + cx || ty !== win.y + cy;
-    const sx = new Spring(win.x, out ? 260 : 400, out ? 28 : 40);
-    const sy = new Spring(win.y, out ? 260 : 400, out ? 28 : 40);
+    const sx = new Spring(win.x, 260, 28);
+    const sy = new Spring(win.y, 260, 28);
     sx.to(tx); sy.to(ty);
     const stop = onFrame((dt) => {
       if (this.dragging === win) { stop(); return; }

@@ -21,7 +21,8 @@ export type Menu = { label: string; items: MenuItem[] };
 
 export type App = {
   id: AppId;
-  name: string;          // the name in the menu bar
+  name: string;          // the name in the menu bar: the app that is hosting it
+  label: string;         // the product's own name, for the Dock, Spotlight and About
   title: string;         // the window's title bar text
   kind: 'window' | 'panel' | 'sim';
   w: number; h: number;  // the window's opening size, in CSS px
@@ -57,6 +58,11 @@ export const VIEW: Menu = {
     { label: 'Enter Full Screen', key: '⌃⌘F', action: 'zoom' },
   ],
 };
+/* Safari and Simulator carry menus this desktop has nothing behind, greyed */
+const HISTORY: Menu = { label: 'History', items: [{ label: 'Show All History', key: '⌘Y', dis: true }, { label: 'Back', key: '⌘[', dis: true }, { label: 'Forward', key: '⌘]', dis: true }] };
+const BOOKMARKS: Menu = { label: 'Bookmarks', items: [{ label: 'Show Bookmarks', key: '⌃⌘1', dis: true }, { label: 'Add Bookmark…', key: '⌘D', dis: true }] };
+const DEVICE: Menu = { label: 'Device', items: [{ label: 'Rotate Left', key: '⌘←', dis: true }, { label: 'Rotate Right', key: '⌘→', dis: true }, { label: 'Home', key: '⇧⌘H', dis: true }, { label: '', sep: true }, { label: 'Erase All Content and Settings…', dis: true }] };
+const IO: Menu = { label: 'I/O', items: [{ label: 'Keyboard', dis: true }, { label: 'Input', dis: true }, { label: 'Audio', dis: true }] };
 export const WINDOW: Menu = {
   label: 'Window',
   items: [
@@ -67,23 +73,26 @@ export const WINDOW: Menu = {
     { label: 'Bring All to Front', action: 'front' },
   ],
 };
-const std = (name: string): Menu[] => ([
+/* the standard set, with the host app's own menus slotted in where it keeps them */
+const std = (name: string, go?: MenuItem, extra: Menu[] = []): Menu[] => ([
   {
     label: 'File',
     items: [
       { label: `About ${name}`, action: 'about' },
+      ...(go ? [go] : []),
       { label: '', sep: true },
       { label: 'Close Window', key: '⌘W', action: 'close' },
     ],
   },
-  EDIT, VIEW, WINDOW,
-  { label: 'Help', items: [{ label: `${name} Help`, action: 'about' }] },
+  EDIT, VIEW, ...extra, WINDOW,
+  { label: 'Help', items: [{ label: 'Spotlight', key: '⌘K', action: 'spot' }, { label: `${name} Help`, action: 'about' }] },
 ]);
 
 export const apps: App[] = [
   {
     id: 'volbase',
-    name: 'volbase',
+    name: 'Safari',
+    label: 'volbase',
     title: 'volbase.app',
     kind: 'window',
     w: 960, h: 620, min: 560,
@@ -91,16 +100,17 @@ export const apps: App[] = [
     toolbar: [{ label: 'Open volbase.app', href: 'https://volbase.app' }],
     about: {
       name: 'volbase',
-      line: 'A marketplace that puts volunteer and internship openings in front of students who have nobody finding them.',
+      line: 'A marketplace that shows students volunteer and internship openings they would otherwise never hear about.',
       built: 'Next.js',
       state: 'Live, with real users',
       link: { label: 'volbase.app', href: 'https://volbase.app' },
     },
-    menus: std('volbase'),
+    menus: std('volbase', { label: 'Open volbase.app', action: 'vb' }, [HISTORY, BOOKMARKS]),
   },
   {
     id: 'rin',
     name: 'Rin',
+    label: 'Rin',
     title: 'Rin',
     kind: 'panel',
     w: 760, h: 372,
@@ -108,7 +118,7 @@ export const apps: App[] = [
     toolbar: [{ label: 'Source on GitHub', href: 'https://github.com/exata531/Rin' }],
     about: {
       name: 'Rin',
-      line: 'An assistant that lives in the menu bar and has already read my folder before I open the panel.',
+      line: 'A menu bar assistant that reads my notes folder, so it already knows the context when the panel drops.',
       built: 'Swift, SwiftUI, AppKit',
       state: 'Free and open source',
       link: { label: 'github.com/exata531/Rin', href: 'https://github.com/exata531/Rin' },
@@ -118,18 +128,20 @@ export const apps: App[] = [
         label: 'File',
         items: [
           { label: 'About Rin', action: 'about' },
+          { label: 'Source on GitHub', action: 'rin-gh' },
           { label: '', sep: true },
           { label: 'Close Panel', key: '⌘W', action: 'close' },
         ],
       },
       EDIT,
       { label: 'Window', items: [{ label: 'Drop Panel', action: 'front' }] },
-      { label: 'Help', items: [{ label: 'Rin Help', action: 'about' }] },
+      { label: 'Help', items: [{ label: 'Spotlight', key: '⌘K', action: 'spot' }, { label: 'Rin Help', action: 'about' }] },
     ],
   },
   {
     id: 'kyou',
-    name: 'Kyou',
+    name: 'Simulator',
+    label: 'Kyou',
     title: 'iPhone 17 Pro',
     kind: 'sim',
     w: 330, h: 700,
@@ -140,16 +152,17 @@ export const apps: App[] = [
     ],
     about: {
       name: 'Kyou',
-      line: 'My calendar, my homework and my habits on one timeline, so the day reads as one thing instead of three apps.',
+      line: 'My calendar, homework and habits on one timeline.',
       built: 'Swift, SwiftUI, EventKit',
       state: 'In progress, aimed at the App Store',
       link: { label: 'github.com/exata531', href: 'https://github.com/exata531' },
     },
-    menus: std('Kyou'),
+    menus: std('Kyou', undefined, [DEVICE, IO]),
   },
   {
     id: 'market',
     name: 'Market Station',
+    label: 'Market Station',
     title: 'Market Station',
     kind: 'window',
     w: 920, h: 400, min: 520,
@@ -214,7 +227,7 @@ export const finder: FinderSection[] = [
 export const readme = [
   'I am a senior at the school, outside Detroit.',
   'I taught myself all of this from the docs. Four things I built are on this desktop.',
-  'Open one. They are running, not screenshots.',
+  'Open one. Each of them runs here.',
 ];
 
 export const links = {

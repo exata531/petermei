@@ -78,10 +78,12 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
       ? cells.filter((c) => c.dataset.place === albumPlace(album))
       : cells;
     const key = (c: HTMLElement) => (mode === 'days' && vw === 'lib' ? c.dataset.day! : c.dataset.month!);
+    /* All Photos is one continuous grid; the headers belong to Days */
+    const flat = vw === 'album' || (vw === 'lib' && mode === 'all');
     const order: string[] = [];
     const by = new Map<string, HTMLElement[]>();
     for (const c of subset) {
-      const k = vw === 'album' ? 'album' : key(c);
+      const k = flat ? 'all' : key(c);
       if (!by.has(k)) { by.set(k, []); order.push(k); }
       by.get(k)!.push(c);
     }
@@ -94,7 +96,7 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
       t.className = 'pho-title';
       t.innerHTML = `<h2></h2><p></p>`;
       t.firstElementChild!.textContent = albumPlace(album);
-      t.lastElementChild!.textContent = `${subset.length} Photos`;
+      t.lastElementChild!.textContent = plural(subset.length);
       frag.appendChild(t);
     }
     for (const k of order) {
@@ -102,7 +104,7 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
       const s = document.createElement('section');
       s.className = 'pho-grp';
       const first = rec(Number(list[0].dataset.phCell));
-      if (vw !== 'album') {
+      if (!flat) {
         const idx = list.map((c) => Number(c.dataset.phCell));
         s.appendChild(grpHead(placesOf(idx), mode === 'days' ? first.d : first.ml));
       }
@@ -115,13 +117,15 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
       frag.appendChild(s);
     }
     groups.insertBefore(frag, count);
-    count.textContent = `${subset.length} Photos`;
+    count.textContent = plural(subset.length);
+    count.hidden = vw === 'album';
     shown = subset.map((c) => Number(c.dataset.phCell));
     if (!shown.includes(sel)) select(shown[0] ?? 0, false);
     main.scrollTop = 0;
   }
 
   const albumPlace = (id: string) => $(`[data-ph-album="${id}"]`, el)?.textContent?.trim() ?? '';
+  const plural = (n: number) => `${n} ${n === 1 ? 'Photo' : 'Photos'}`;
 
   /* ── panes, modes, views ──────────────────────────────────────────── */
   function paint() {

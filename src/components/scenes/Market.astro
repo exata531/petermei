@@ -55,13 +55,15 @@ const tiles = [
   .ms-title { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; }
   .ms-live { width: 8px; height: 8px; border-radius: 50%; background: #43b25b; }
   .ms-sub { font-size: 11px; color: rgb(236 238 242 / .55); }
-  .ms-alert { margin-left: auto; display: inline-flex; align-items: center; gap: 7px; font-size: 11px; padding: 4px 10px; border-radius: 999px; background: rgb(255 255 255 / .06); text-transform: uppercase; letter-spacing: .06em; color: inherit; cursor: pointer; transition: background-color var(--t-fast) var(--soft); }
+  .ms-alert { position: relative; margin-left: auto; display: inline-flex; align-items: center; gap: 7px; font-size: 11px; padding: 4px 10px; border-radius: 999px; background: rgb(255 255 255 / .06); text-transform: uppercase; letter-spacing: .06em; color: inherit; cursor: pointer; transition: background-color var(--t-fast) var(--soft); }
+  .ms-alert::before { content: ''; position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: max(100%, 44px); height: 44px; }
+  .ms-alert:active { transform: scale(.98); }
   .ms-alert:hover { background: rgb(255 255 255 / .1); }
   .ms-alert b { width: 8px; height: 8px; border-radius: 50%; background: #8b8f97; transition: background-color .3s, box-shadow .3s; }
   .ms-alert[data-state="fired"] b { background: #fb4b3d; box-shadow: 0 0 8px #fb4b3d; }
   .ms-alert[data-state="easing"] b { background: #dd9a18; }
   .ms-alert[data-state="recovered"] b { background: #43b25b; }
-  .ms-alert-hint { color: rgb(236 238 242 / .4); padding-left: 4px; }
+  .ms-alert-hint { color: rgb(236 238 242 / .7); padding-left: 4px; }
   .ms-alert:not([data-state="armed"]) .ms-alert-hint { display: none; }
   .ms-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 12px; padding: 12px; min-height: 0; }
   .ms-tiles { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; gap: 10px; }
@@ -86,7 +88,7 @@ const tiles = [
   .ms-curve path { fill: none; stroke: #20a496; stroke-width: 2; stroke-linecap: round; }
   .ms-zero { stroke: rgb(255 255 255 / .18); stroke-dasharray: 3 4; }
   .ms-brief-txt { font-size: 12px; line-height: 1.45; color: rgb(236 238 242 / .85); }
-  .ms-src { font-size: 9.5px; color: rgb(236 238 242 / .45); margin-top: auto; }
+  .ms-src { font-size: 9.5px; color: rgb(236 238 242 / .7); margin-top: auto; }
   :global(.is-narrow) .ms-brief-txt { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
   :global(.is-narrow) .ms-card { min-height: 0; }
   :global(.is-narrow) .ms-grid { grid-template-columns: 1fr; grid-template-rows: auto auto; gap: 8px; padding: 8px; }
