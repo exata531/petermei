@@ -1,7 +1,7 @@
 ---
-/* petermei.com: the home, which is also the Work index. A pinned sky hero
-   with the name, the one paragraph, and three live cards; then the paper
-   with the four tiles; then the rail of what he built; then the footer. */
+/* petermei.com: the home, which is also the Work index. A pinned hero with
+   the name and two paragraphs; then the paper with the four tiles, each one
+   named under its picture; then the rail of what he built; then the footer. */
 import Site from '../../layouts/Site.astro';
 import Tile from '../../components/site/Tile.astro';
 import { projects, copy, timeline, build, photoFacts, links } from '../../data/site';
@@ -18,31 +18,17 @@ const [vb, rin, kyou, ms] = projects;
           <h1 class="h-display hero-name">Peter Mei</h1>
           <p class="lede hero-line">{copy.workIntro}</p>
         </div>
-        <div class="live" aria-label="Live">
-          <div class="card">
-            <p class="card-h is-green"><i></i>Deployed</p>
-            <p class="card-p"><b>{build.sha ? `Commit ${build.sha}` : 'The latest commit'}</b>{build.message ? `. ${build.message}` : ''}</p>
-            <p class="card-src">Built {build.when} on {build.host}, with Astro {build.astro}. <a href={links.github} rel="noopener" target="_blank">Source on GitHub</a></p>
-          </div>
-          <div class="card">
-            <p class="card-h is-blue"><i></i>Photos</p>
-            <p class="card-num">{photoFacts.count}<small>photographs</small></p>
-            <p class="card-src">The newest album is {photoFacts.newest.place}, {photoFacts.newest.cover.monthLabel}. They are in the Photos app on the desktop.</p>
-          </div>
-          <div class="card">
-            <p class="card-h is-amber"><i></i>This page</p>
-            <p class="card-p" data-where><b>On its own.</b> This page also runs inside a Mac. <a href="/?open=safari">Open it there.</a></p>
-            <p class="card-src">These are real.</p>
-          </div>
+        <div class="hero-note">
+          <p>The last thing I pushed to this site was a Terminal, some Stickies and a Trash that still has the old versions of the site in it, and it went up on {build.day}. There are {photoFacts.countWord.toLowerCase()} photographs I took in the Photos app on the desktop, and the newest of them are from {photoFacts.newest.place} in {photoFacts.newest.cover.monthLabel.split(' ')[0]}.</p>
+          <p>This page is also running inside that Mac, so you can <a href="/?open=safari">open it there</a> and see it in a window. The code for all of it is on <a href={links.github} rel="noopener" target="_blank">GitHub</a>.</p>
         </div>
       </div>
     </div>
   </section>
 
   <section class="sheet" data-nav-tone="light" aria-label="Work">
-    <div class="crest" aria-hidden="true"></div>
     <div class="wrap">
-      <h2 class="h-section intro">Four things, each <em>running somewhere right now</em>.</h2>
+      <h2 class="h-section intro">I have built four things and all four of them are running somewhere right now.</h2>
       <div class="tiles">
         <div class="row"><Tile p={vb} wide /><Tile p={rin} /></div>
         <div class="row"><Tile p={kyou} /><Tile p={ms} wide /></div>
@@ -54,9 +40,8 @@ const [vb, rin, kyou, ms] = projects;
   </section>
 
   <section class="rail-sec" data-nav-tone="light" aria-label="What I built">
-    <div class="crest" aria-hidden="true"></div>
     <div class="wrap">
-      <h2 class="h-section">What I built, <em>newest at the top</em>.</h2>
+      <h2 class="h-section">Here is what I built, with the newest at the top.</h2>
       <div class="rail-grid">
         <div class="machine">
           <b>Built on a MacBook, from the docs.</b>
@@ -69,10 +54,8 @@ const [vb, rin, kyou, ms] = projects;
                 {s.tone === 'blue' ? <svg viewBox="0 0 16 16"><path d="M2 9.5 6.5 8l2.5-5.5 1.5.5-1.2 5.2L14 9.4l-.3 1.3-4.8-.6-2.6 3.6-1.2-.4 1.2-3.8L2.4 10.8Z"/></svg> : <i></i>}
               </span>
               <span class="stop-t">
-                <b>{s.name}</b>
-                <span>{s.text} {s.href && <a href={s.href} rel="noopener" target="_blank" data-tab={s.href.includes('volbase') ? 'volbase' : undefined}>{s.href.replace('https://', '')}</a>}{s.open && <> <a href={`/?open=${s.open}`} data-open={s.open}>Open it on the desktop.</a></>}</span>
+                <span>{s.name && <b>{s.name}</b>}{s.name ? ' ' : ''}{s.text} {s.href && <a href={s.href} rel="noopener" target="_blank" data-tab={s.href.includes('volbase') ? 'volbase' : undefined}>{s.href.replace('https://', '')}</a>}{s.open && <> <a href={`/?open=${s.open}`} data-open={s.open}>Open it on the desktop.</a></>}</span>
               </span>
-              {s.state && <span class:list={['stop-s', `is-${s.tone}`]}>{s.state}</span>}
             </li>
           ))}
         </ol>

@@ -91,16 +91,18 @@ export function initMarket(root: HTMLElement) {
   const rel = (ts: number) => { const m = Math.max(0, Math.round((Date.now() - ts) / 60000)); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : `${Math.round(m / 60)} hr ago`; };
 
   /* ── the rule ── */
+  /* the class names are prefixed: a bare .alert collides with the Mac's own
+     alert panel and the badge inherits its 300px width */
   const status = (m: Metric): { cls: string; word: string } => {
     const a = st.alerts[m.key], v = val(m), l = line(m);
     if (a.state === 'fired') {
-      if (a.easing) return { cls: 'alert', word: 'EASING' };
-      return a.kind === 'opportunity' ? { cls: 'good', word: 'GOOD SIGN' } : { cls: 'alert', word: 'ALERT' };
+      if (a.easing) return { cls: 'ms-alert', word: 'EASING' };
+      return a.kind === 'opportunity' ? { cls: 'ms-good', word: 'GOOD SIGN' } : { cls: 'ms-alert', word: 'ALERT' };
     }
     const near = (limit: number) => Math.abs(v - limit) <= Math.abs(limit || 1) * .1;
-    if (l.above != null && v <= l.above && near(l.above)) return { cls: 'watch', word: 'WATCH' };
-    if (l.below != null && v >= l.below && near(l.below) && !m.belowIsGood) return { cls: 'watch', word: 'WATCH' };
-    return { cls: 'ok', word: 'OK' };
+    if (l.above != null && v <= l.above && near(l.above)) return { cls: 'ms-watch', word: 'WATCH' };
+    if (l.below != null && v >= l.below && near(l.below) && !m.belowIsGood) return { cls: 'ms-watch', word: 'WATCH' };
+    return { cls: 'ms-ok', word: 'OK' };
   };
   const crossed = (m: Metric): 'warn' | 'opportunity' | null => {
     const v = val(m), l = line(m);
@@ -371,6 +373,9 @@ export function initMarket(root: HTMLElement) {
     else if (a.state === 'fired' && a.easing) { st.values[m.key] = round(inside(st.hyst / 100 + .02), m.dec); st.play[m.key] = 3; }
     else { const was = st.play[m.key + ':was']; if (was != null) st.values[m.key] = was; st.play[m.key] = 0; delete st.play[m.key + ':was']; }
     evaluate(m); put();
+    /* the banner, the grid tile and the detail card all come from one state
+       read, so the app can never disagree with itself */
+    paintTiles(); paintStrip(); paintLog();
     openDetail(m.key);
     detail.querySelector<HTMLElement>('[data-ms-play]')?.focus({ preventScroll: true });
   };

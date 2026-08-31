@@ -87,7 +87,7 @@ const pins = [
   .sf-still.is-gone { opacity: 0; pointer-events: none; }
   /* the film keeps the old figure's own pixels and is scaled to the pane */
   .sf-film { position: absolute; left: 50%; top: 50%; width: 1060px; height: 606px; transform: translate(-50%, -50%) scale(var(--s, 1)); overflow: clip; background: #f6f3ee; }
-  .vb-tabs { position: absolute; right: 14px; bottom: 14px; z-index: 3; display: inline-flex; gap: 2px; padding: 2px; border-radius: 8px; background: rgb(255 255 255 / .85); box-shadow: 0 1px 2px rgb(0 0 0 / .12), 0 0 0 .5px rgb(0 0 0 / .08); backdrop-filter: blur(8px); }
+  .vb-tabs { position: absolute; right: 14px; bottom: 14px; z-index: 3; display: inline-flex; gap: 2px; padding: 2px; border-radius: 8px; background: rgb(255 255 255 / .85); box-shadow: 0 1px 2px rgb(0 0 0 / .12), 0 0 0 .5px rgb(0 0 0 / .08); --bf: blur(8px); backdrop-filter: var(--bf); }
   .vb-tab { padding: 4px 10px; border-radius: 6px; font-size: 11px; color: #6b655e; transition: background-color var(--t-fast) var(--soft); }
   .vb-tab.is-on { background: #2b2622; color: #fff; }
   .vb-tab:active { transform: scale(.98); }
@@ -117,4 +117,7 @@ const pins = [
   :global(.is-narrow) .vb-list { width: 160px; }
   :global(.is-narrow) .vb-card { grid-template-columns: 40px 1fr; padding: 7px 9px; font-size: 10.5px; }
   :global(.is-narrow) .vb-sort { display: none; }
+
+  /* the alias sits apart so the CSS minifier keeps both properties */
+  .vb-tabs { -webkit-backdrop-filter: var(--bf); }
 </style>

@@ -35,9 +35,9 @@ const KEY = 'kyou';
 const H = 60;
 const seed = (): State => ({
   items: [
-    { id: 1, day: -1, kind: 'event', title: 'Lab', min: 13 * H, end: 14 * H + 30, place: 'room 214' },
+    { id: 1, day: -1, kind: 'event', title: 'Lab', min: 13 * H, end: 14 * H + 30 },
     { id: 2, day: -1, kind: 'todo', title: 'Return the library book', min: -1, end: -1, done: true },
-    { id: 3, day: 0, kind: 'event', title: 'Physics', min: 8 * H, end: 8 * H + 50, place: 'room 214' },
+    { id: 3, day: 0, kind: 'event', title: 'Physics', min: 8 * H, end: 8 * H + 50 },
     { id: 4, day: 0, kind: 'todo', title: 'Physics set', min: 10 * H + 15, end: -1, tag: 'school' },
     { id: 5, day: 0, kind: 'event', title: 'Lunch', min: 12 * H + 30, end: 13 * H + 15 },
     { id: 6, day: 0, kind: 'event', title: 'Climbing', min: 16 * H, end: 18 * H, place: 'the gym' },

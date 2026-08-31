@@ -158,6 +158,15 @@ export class Desk {
     bar.querySelector('.lt-c')!.addEventListener('click', (e) => { e.stopPropagation(); this.close(win); });
     bar.querySelector('.lt-m')!.addEventListener('click', (e) => { e.stopPropagation(); this.minimize(win); });
     bar.querySelector('.lt-z')!.addEventListener('click', (e) => { e.stopPropagation(); this.zoom(win); });
+    /* macOS has zoomed on a title-bar double click since Ventura, and it is
+       muscle memory; the lights and the toolbar controls keep their own jobs */
+    el.addEventListener('dblclick', (e) => {
+      if (o.fixed) return;
+      const t = e.target as HTMLElement;
+      if (!t.closest('[data-drag]')) return;
+      if (t.closest('.lt, button, a, input, select, textarea, [contenteditable], [data-nodrag]')) return;
+      this.zoom(win);
+    });
     this.wireFocus(win);
     this.drag(win);
     if (!o.fixed && !o.zoomOnly) this.resize(win);
@@ -370,14 +379,13 @@ export class Desk {
 
   /* Drag by any chrome surface marked data-drag. The pointer is captured
      only once the hand has actually moved, so a plain click on the bar stays
-     a click and a second press within a third of a second is the zoom; once
-     captured, the window keeps receiving moves even when the cursor outruns
-     it, and the only thing written per frame is a transform. */
+     a click and a double click can reach the zoom; once captured, the window
+     keeps receiving moves even when the cursor outruns it, and the only thing
+     written per frame is a transform. */
   private drag(win: Win) {
     const vel = new Velocity();
     let px = 0, py = 0, ox = 0, oy = 0, id = -1;
     let pending = false, nx = 0, ny = 0, started = false;
-    let lastDown = 0, lastX = 0, lastY = 0;
 
     const flush = () => {
       pending = false;
@@ -437,13 +445,6 @@ export class Desk {
       const t = e.target as HTMLElement;
       const hit = t.closest('[data-drag], [data-nodrag], button, a, input, textarea, select, [contenteditable]');
       if (!hit || !(hit as HTMLElement).hasAttribute('data-drag')) return;
-      /* two presses in the same spot: the title bar's double click, the zoom */
-      if (e.timeStamp - lastDown < 350 && Math.hypot(e.clientX - lastX, e.clientY - lastY) < 4) {
-        lastDown = 0;
-        this.zoom(win);
-        return;
-      }
-      lastDown = e.timeStamp; lastX = e.clientX; lastY = e.clientY;
       if (win.stop) {
         /* grabbed mid-open: the spring is over, the hand wins */
         win.stop(); win.stop = undefined;

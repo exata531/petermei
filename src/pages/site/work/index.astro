@@ -13,7 +13,7 @@ import { projects, copy } from '../../../data/site';
       <ul class="list">
         {projects.map((p) => (
           <li class="entry">
-            <Tile p={p} wide />
+            <Tile p={p} wide caption={false} />
             <div class="entry-t">
               <b>{p.name}</b>
               <p class="body">{p.blurb}</p>

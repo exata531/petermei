@@ -1,15 +1,16 @@
 ---
 /* One product tile: a pastel field with the product drawn as an object on
    it (a browser window for volbase, a phone for Kyou, a dark panel for Rin
-   and Market Station), the icon above it, and a frosted overlay with the
-   name and one line that shows on hover. */
+   and Market Station), the icon above it, and the name and the two sentences
+   printed under it, where a caption goes and where they stay. */
 import Icon from '../mac/Icon.astro';
 import type { Project } from '../../data/site';
-interface Props { p: Project; wide?: boolean; href?: string; line?: string }
-const { p, wide = false, href = `/site/work/${p.slug}`, line = p.blurb.split('. ')[0] + '.' } = Astro.props;
+interface Props { p: Project; wide?: boolean; href?: string; line?: string; caption?: boolean }
+const { p, wide = false, href = `/site/work/${p.slug}`, line = p.blurb, caption = true } = Astro.props;
 const tint: Record<string, string> = { volbase: 'var(--c-peri)', rin: 'var(--c-lemon)', kyou: 'var(--c-apri)', market: 'var(--c-green)' };
 ---
-<a class:list={['tile', wide ? 'is-wide' : 'is-narrow']} href={href} style={`--tile-tint:${tint[p.slug]}`} data-tile data-cursor-label="Read about it" aria-label={`${p.name}. ${line}`}>
+<div class:list={['tile-cell', wide ? 'is-wide' : 'is-narrow']}>
+<a class="tile" href={href} style={`--tile-tint:${tint[p.slug]}`} data-tile data-cursor-label="Read about it" aria-label={`${p.name}. ${line}`}>
   <span class="tile-ico"><Icon id={p.slug} /></span>
   {p.slug === 'volbase' && (
     <span class="tile-device" aria-hidden="true">
@@ -24,5 +25,11 @@ const tint: Record<string, string> = { volbase: 'var(--c-peri)', rin: 'var(--c-l
       <svg viewBox="0 0 100 28" preserveAspectRatio="none"><polyline points="0,20 12,17 24,19 36,13 48,15 60,9 72,12 84,7 100,10" /></svg>
     </span>
   )}
-  <span class="tile-over"><b>{p.name}</b><span>{line}</span></span>
 </a>
+  {caption && (
+    <div class="tile-say">
+      <b>{p.name}</b>
+      <p>{line}</p>
+    </div>
+  )}
+</div>

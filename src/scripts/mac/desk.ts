@@ -113,7 +113,13 @@ const dock = initDock(dockRoot as HTMLElement);
 desk.dockTop = () => dock.top() - 8;
 const open = new Set<string>();
 const mission = initMission(desk, deskEl);
-const stickies = initStickies($('[data-stickies]') ?? deskEl);
+let stickyFront = false;
+/* which of Safari's two tabs is in front, so the Dock can tell them apart */
+let sfTab = 'volbase';
+const stickies = initStickies($('[data-stickies]') ?? deskEl, {
+  onFront: () => { stickyFront = true; rinFront = false; desk.blur(); sync(); },
+  onCount: (n) => { if (!n) stickyFront = false; sync(); },
+});
 
 function returnBody(id: string) {
   const el = body(id);
@@ -154,7 +160,7 @@ function rinOpen() {
   p.setAttribute('aria-label', 'Rin');
   p.appendChild(el);
   winRoot.appendChild(p);
-  p.addEventListener('pointerdown', () => { rinFront = true; desk.blur(); sync(); });
+  p.addEventListener('pointerdown', () => { rinFront = true; stickyFront = false; desk.blur(); sync(); });
   rinPanel = p;
   rinFront = true;
   rinStatus.hidden = false;
@@ -331,9 +337,9 @@ const TITLES: Record<string, string> = {
   terminal: 'visitor — fake-zsh — 80×24',
 };
 const SIZES: Record<string, { w: number; h: number; min?: number; klass?: string }> = {
-  finder: { w: 700, h: 440, min: 460, klass: 'win-finder' },
+  finder: { w: 700, h: 512, min: 460, klass: 'win-finder' },
   photos: { w: 920, h: 600, min: 420, klass: 'win-photos' },
-  textedit: { w: 560, h: 300, min: 300, klass: 'win-text' },
+  textedit: { w: 560, h: 268, min: 300, klass: 'win-text' },
   trash: { w: 620, h: 360, min: 420, klass: 'win-finder' },
   terminal: { w: 585, h: 400, min: 400, klass: 'win-term' },
 };
@@ -379,7 +385,7 @@ function openApp(id: string) {
     body: el,
     w: size.w, h: size.h, min: size.min, klass: size.klass, tool, side,
     onClose: () => { open.delete(id); lives.get(id)?.scene.leave?.(); returnBody(id); sync(); },
-    onFocus: () => { rinFront = false; sync(); },
+    onFocus: () => { rinFront = false; stickyFront = false; sync(); },
     /* minimized: a thumbnail goes into the Dock beside the Trash, and the
        window folds into it instead of into the app's icon */
     onMin: () => {
@@ -460,6 +466,8 @@ function openApp(id: string) {
         const a = w?.el.querySelector<HTMLAnchorElement>('[data-vb-open]');
         if (a) { a.href = d.href; a.title = `Open ${d.title} in a new tab`; }
         w?.el.setAttribute('aria-label', d.title);
+        sfTab = d.tab;
+        sync();
       });
       el.addEventListener('sf:gated', () => notify('Safari', 'volbase opened in a new tab so you can sign in.', 'volbase'));
       el.addEventListener('sf:open', (e) => openApp((e as CustomEvent<string>).detail));
@@ -592,8 +600,9 @@ function quickLookClose() {
 function closeFront() {
   if (rinPanel && (rinFront || !desk.front)) { rinClose(); return; }
   const f = desk.front;
-  if (f) desk.close(f);
-  else if (rinPanel) rinClose();
+  if (f) { desk.close(f); return; }
+  if (rinPanel) { rinClose(); return; }
+  if (stickyFront) stickies.closeFront();
 }
 
 /* ── the menu bar follows whatever is in front ──────────────────────────── */
@@ -675,6 +684,20 @@ const FINDER_MENUS: Menu[] = [
 /* the app in the menu bar, and the name its About row and Quit row use */
 function currentApp(): { name: string; about: string; menus: Menu[] } {
   const f = desk.front;
+  if (stickies.count() && stickyFront && !f && !rinPanel) {
+    return {
+      name: 'Stickies', about: 'Stickies',
+      menus: [
+        { label: 'File', items: [
+          { label: 'New Note', key: '⌘N', action: 'open:stickies' },
+          { label: '', sep: true },
+          { label: 'Close', key: '⌘W', action: 'close' },
+        ] },
+        EDIT, VIEW, WINDOW,
+        { label: 'Help', items: [{ label: 'Spotlight', key: '⌘K', action: 'spot' }] },
+      ],
+    };
+  }
   const id = rinPanel && (rinFront || !f) ? 'rin' : f?.id;
   const known = id ? byId(id) : null;
   if (known) return { name: known.name, about: known.label, menus: known.menus };
@@ -732,7 +755,19 @@ function sync() {
   appMenus.innerHTML = menus
     .map((m, i) => `<button class="mb-item" type="button" data-menu="app-${i + 1}" aria-haspopup="true" aria-expanded="false">${m.label}</button>`)
     .join('');
-  dock.running([...open, ...(open.has('volbase') ? ['safari'] : [])]);
+  /* Finder is always running on a Mac, and a note on the desk means Stickies
+     is too. The one window is Safari; volbase only counts as running while
+     its own tab is the one in front. */
+  /* a note in front comes over the windows, the way an app's own window would */
+  document.documentElement.classList.toggle('sticky-front', stickyFront && stickies.count() > 0);
+  const running = new Set(open);
+  running.add('finder');
+  if (stickies.count()) running.add('stickies');
+  if (running.has('volbase')) {
+    running.add('safari');
+    if (sfTab !== 'volbase') running.delete('volbase');
+  }
+  dock.running([...running]);
 }
 
 /* ── the drop-down menus ───────────────────────────────────────────────── */
@@ -760,11 +795,11 @@ function menuFor(key: string): MenuItem[] {
     { label: 'Settings…', key: '⌘,', dis: true },
     { label: 'Services', dis: true },
     { label: '', sep: true },
-    { label: `Hide ${name}`, key: '⌘H', action: 'min' },
+    { label: `Hide ${name}`, key: '⌘H', action: 'hide' },
     { label: 'Hide Others', key: '⌥⌘H', dis: true },
     { label: 'Show All', dis: true },
     { label: '', sep: true },
-    { label: `Quit ${name}`, key: '⌘Q', action: 'close' },
+    { label: `Quit ${name}`, key: '⌘Q', action: 'quit-front' },
   ];
   const m = menus[i - 1];
   if (!m) return [];
@@ -993,6 +1028,9 @@ function run(act: string) {
   const f = desk.front;
   switch (act) {
     case 'close': closeFront(); break;
+    case 'quit-front': quitFront(); break;
+    /* hide puts the app's windows away without a thumbnail, the way ⌘H does */
+    case 'hide': hideFront(); break;
     case 'min': if (f) desk.minimize(f); break;
     case 'zoom': if (f) desk.zoom(f); break;
     case 'cycle': desk.cycle(); break;
@@ -1004,6 +1042,23 @@ function run(act: string) {
     case 'vb': window.open(lives.get('volbase')?.scene.href?.() ?? links.volbase, '_blank', 'noopener'); break;
     case 'rin-gh': window.open(links.rin, '_blank', 'noopener'); break;
   }
+}
+
+/* ⌘Q: every window the front app has goes, the way quitting an app does.
+   Finder is never quit, because a Mac's Finder is always running. */
+function quitFront() {
+  if (rinPanel && (rinFront || !desk.front)) { rinClose(); return; }
+  if (stickyFront && stickies.count() && !desk.front) { stickies.closeAll(); return; }
+  const f = desk.front;
+  if (!f) return;
+  const id = f.id;
+  [...desk.wins].filter((w) => w.id === id).forEach((w) => desk.close(w));
+}
+
+/* ⌘H: the front window goes away and the app keeps its Dock dot */
+function hideFront() {
+  const f = desk.front;
+  if (f) desk.minimize(f);
 }
 
 function aboutFront() {
@@ -1239,6 +1294,9 @@ function openAboutMac() {
   if (!el) return;
   amcFill();
   if (phone()) { sheetOpen('about-mac', 'About This Mac'); return; }
+  /* the menu-bar panel floats over every window, so it goes up first rather
+     than covering the box that was just asked for */
+  if (rinPanel) rinClose();
   const w = desk.open({
     id: 'about-mac', title: '', body: el, w: 336, h: 430, klass: 'win-about', fixed: true,
     onClose: () => { returnBody('about-mac'); sync(); },
@@ -1261,7 +1319,11 @@ async function shoot() {
   secrets.found('screenshot');
   addShotIcon(s);
 }
+/* the desktop wraps into columns, and three columns is where a real one stops
+   being a desktop, so the screenshots stop there too */
+const SHOT_MAX = 16;
 function addShotIcon(s: Shot) {
+  if (itemsEl.querySelectorAll('.item-file').length >= SHOT_MAX) return;
   const li = document.createElement('li');
   li.innerHTML =
     `<button class="item item-file" type="button">
@@ -1440,7 +1502,7 @@ const hits = (): Hit[] => [
     run: () => { openApp('photos'); photosApp.setView('album', slug(p)); },
   })),
 ];
-const spot = initSpotlight(spotEl, hits);
+const spot = initSpotlight(spotEl, hits, () => { closeMenu(); closeCtx(); });
 $('[data-spot-open]')?.addEventListener('click', () => spot.show());
 
 /* ── the phone ─────────────────────────────────────────────────────────── */
@@ -1606,7 +1668,9 @@ addEventListener('keydown', (e) => {
   if ((e.target as HTMLElement)?.matches?.('input, textarea') && k !== 'w') return;
   const f = desk.front;
   if (k === 'w') { e.preventDefault(); closeFront(); }
-  else if (k === 'm' || k === 'h') { e.preventDefault(); if (f) desk.minimize(f); }
+  else if (k === 'q') { e.preventDefault(); quitFront(); }
+  else if (k === 'm') { e.preventDefault(); if (f) desk.minimize(f); }
+  else if (k === 'h') { e.preventDefault(); hideFront(); }
   else if (k === 'n') { e.preventDefault(); openApp('finder'); }
   else if (k === 'i') { e.preventDefault(); openApp('finder'); }
   else if (k === 'f' && e.ctrlKey && e.metaKey) { e.preventDefault(); if (f) desk.zoom(f); }

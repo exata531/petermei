@@ -45,11 +45,15 @@ type Hooks = { onEnter?: () => void; beforeLeave?: (kind: Power) => void; onLeav
 
 /* what the screen in the picture is doing, and the caption under it */
 type Screen = 'on' | 'off' | 'asleep';
-const CUE: Record<Screen, { text: string; verb: string }> = {
-  on: { text: 'Click the screen to have a look around.', verb: 'Look around' },
-  off: { text: 'Click the screen to turn it on.', verb: 'Turn on' },
-  asleep: { text: 'Click the screen to wake it.', verb: 'Wake' },
+/* on a phone the hand taps, and the machine in the picture is a phone */
+const CUE: Record<Screen, { text: (tap: boolean) => string; verb: string }> = {
+  on: { text: (t) => `${t ? 'Tap' : 'Click'} the screen to have a look around.`, verb: 'Look around' },
+  off: { text: (t) => `${t ? 'Tap' : 'Click'} the screen to turn it on.`, verb: 'Turn on' },
+  asleep: { text: (t) => `${t ? 'Tap' : 'Click'} the screen to wake it.`, verb: 'Wake' },
 };
+/* the line under his name says which machine the visitor is holding */
+const LEDE = (phone: boolean) =>
+  `I am a senior in high school and I make software. Everything I have built so far is on this ${phone ? 'phone' : 'Mac'}, so ${phone ? 'tap' : 'click'} around.`;
 
 export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hooks = {}): Intro {
   if (!land) { mac.classList.remove('is-pending'); return { get active() { return false; }, power() {} }; }
@@ -60,6 +64,7 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
   const fill = $('[data-land-fill]');
   const bar = $('[data-land-bar]');
   const cue = $('[data-land-cue-text]');
+  const lede = $('.land-line');
   const isle = mac.querySelector<HTMLElement>('[data-mac-isle]');
   const blank = mac.querySelector<HTMLElement>('[data-mac-blank]')!;
   const phoneMq = matchMedia('(max-width: 767px)');
@@ -123,7 +128,8 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
   function setScreen(s: Screen) {
     screen = s;
     land.classList.toggle('is-dark', s !== 'on');
-    cue.textContent = CUE[s].text;
+    cue.textContent = CUE[s].text(phoneMq.matches);
+    lede.textContent = LEDE(phoneMq.matches);
     screenOf('desk').setAttribute('aria-label', `${CUE[s].verb} the Mac`);
     screenOf('phone').setAttribute('aria-label', `${CUE[s].verb} the phone`);
   }
@@ -343,6 +349,8 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     cancelAnimationFrame(raf);
     raf = requestAnimationFrame(place);
   });
+  /* the words follow the machine across the breakpoint */
+  phoneMq.addEventListener('change', () => { if (state === 'loading' || state === 'ready' || state === 'off') setScreen(screen); });
 
   if (document.documentElement.classList.contains('in')) {
     land.remove();
@@ -352,6 +360,7 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     let off = false;
     try { off = sessionStorage.getItem('mac-power') === 'off'; } catch {}
     if (off) { blank.style.opacity = '1'; setScreen('off'); }
+    else setScreen('on');
     load();
   }
 

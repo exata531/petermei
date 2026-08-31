@@ -74,8 +74,14 @@ html:not(.js) body { background: var(--surface); }
 /* ── desktop items: 64px icons, white labels with a shadow, chip on select ── */
 .items {
   position: absolute; top: calc(var(--bar) + 8px); right: 16px; z-index: 2;
-  display: grid; gap: 4px; justify-items: center;
+  /* a Finder desktop fills a column and then starts the next one to its left,
+     so the icons never run down behind the dock */
+  display: flex; flex-flow: column wrap; align-content: flex-start;
+  direction: rtl;
+  gap: 4px;
+  max-height: calc(100vh - var(--bar) - 130px);
 }
+.items > * { direction: ltr; }
 .item {
   display: grid; justify-items: center; gap: 3px;
   width: 100px; padding: 4px 2px 4px;
@@ -121,8 +127,8 @@ html:not(.js) body { background: var(--surface); }
   justify-content: space-between; gap: 8px;
   padding: 0 10px 0 6px;
   background: var(--glass-bar);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  --bf: blur(24px) saturate(180%);
+  backdrop-filter: var(--bf);
   box-shadow: 0 .5px 0 var(--glass-edge);
   color: var(--bar-ink);
   font-size: 13px;
@@ -176,8 +182,8 @@ button.mb-item:active { background: var(--chip-2); }
   min-width: 220px; padding: 4px;
   border-radius: var(--r-menu);
   background: var(--glass-menu);
-  backdrop-filter: blur(25px) saturate(180%);
-  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  --bf: blur(25px) saturate(180%);
+  backdrop-filter: var(--bf);
   box-shadow: var(--sh-menu), 0 0 0 .5px var(--glass-edge), inset 0 0 0 .5px var(--glass-hi);
   transform-origin: top left;
   opacity: 0;
@@ -444,8 +450,8 @@ button.mb-item:active { background: var(--chip-2); }
    an inactive one goes opaque, the way the HIG has it */
 .win.is-front .fnd-side {
   background: color-mix(in srgb, var(--side) 70%, transparent);
-  backdrop-filter: blur(40px) saturate(160%);
-  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  --bf: blur(40px) saturate(160%);
+  backdrop-filter: var(--bf);
 }
 .fnd-h { font-size: 11px; font-weight: 600; color: var(--ink-3); padding: 10px 8px 3px; }
 .fnd-h:first-child { padding-top: 2px; }
@@ -604,7 +610,8 @@ a.fnd-tab:hover { text-decoration: underline; text-underline-offset: 3px; }
   width: 44px; height: 44px; border-radius: 50%;
   display: grid; place-items: center;
   background: rgb(255 255 255 / .14); color: #fff;
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  --bf: blur(12px);
+  backdrop-filter: var(--bf);
   box-shadow: 0 0 0 .5px rgb(255 255 255 / .18);
   transition: background var(--t-fast) var(--soft), opacity var(--t-fast) var(--soft), transform var(--t-press) var(--soft);
 }
@@ -738,8 +745,8 @@ html:not(.js) .pho-side, html:not(.js) .pho-main, html:not(.js) .pho-view { disp
   padding: var(--dock-pad) calc(8px + var(--grow-r, 0px)) var(--dock-pad) calc(8px + var(--grow-l, 0px));
   border-radius: 18px;
   background: var(--glass-dock);
-  backdrop-filter: blur(26px) saturate(180%);
-  -webkit-backdrop-filter: blur(26px) saturate(180%);
+  --bf: blur(26px) saturate(180%);
+  backdrop-filter: var(--bf);
   box-shadow: var(--sh-dock), 0 0 0 .5px var(--glass-edge), inset 0 0 0 .5px var(--glass-hi);
   max-width: 100%;
   transform: translateX(calc((var(--grow-r, 0px) - var(--grow-l, 0px)) / 2));
@@ -759,6 +766,11 @@ html:not(.js) .pho-side, html:not(.js) .pho-main, html:not(.js) .pho-view { disp
   pointer-events: none;
 }
 .dock:not(.is-mag) .dock-tile, .dock:not(.is-mag) .dock-sep { transition: transform 200ms var(--out); }
+/* after dark the near-black icons get a hairline so they are still tiles */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .dock-tile .ico, :root:not([data-theme='light']) .pad-tile .ico { outline: .5px solid rgb(255 255 255 / .16); outline-offset: -6px; border-radius: 22%; }
+}
+:root[data-theme='dark'] .dock-tile .ico, :root[data-theme='dark'] .pad-tile .ico { outline: .5px solid rgb(255 255 255 / .16); outline-offset: -6px; border-radius: 22%; }
 .dock-i:active .dock-tile { filter: var(--sh-icon) brightness(.8); transform: translateX(var(--dx, 0)) scale(calc(var(--s, 1) * .98)); }
 .dock-name {
   position: absolute; left: 50%; bottom: calc(var(--dock-i) * var(--s, 1) + 12px);
@@ -766,7 +778,8 @@ html:not(.js) .pho-side, html:not(.js) .pho-main, html:not(.js) .pho-view { disp
   translate: -50% 0; white-space: nowrap;
   padding: 3px 9px; border-radius: 6px; font-size: 13px;
   background: var(--glass-menu); color: var(--ink);
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  --bf: blur(20px);
+  backdrop-filter: var(--bf);
   box-shadow: var(--sh-menu), 0 0 0 .5px var(--glass-edge);
   opacity: 0;
   transition: none;
@@ -812,7 +825,8 @@ html:not(.js) .pho-side, html:not(.js) .pho-main, html:not(.js) .pho-view { disp
   display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 10px;
   width: min(360px, calc(100vw - 24px)); padding: 10px 12px; border-radius: 14px;
   background: var(--glass-menu); color: var(--ink);
-  backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%);
+  --bf: blur(24px) saturate(180%);
+  backdrop-filter: var(--bf);
   box-shadow: var(--sh-notif), 0 0 0 .5px var(--glass-edge), inset 0 0 0 .5px var(--glass-hi);
   transform: translateX(calc(100% + 24px));
   transition: transform 200ms var(--ease);
@@ -838,8 +852,8 @@ html:not(.js) .pho-side, html:not(.js) .pho-main, html:not(.js) .pho-view { disp
   width: min(680px, calc(100vw - 32px));
   border-radius: 10px; overflow: hidden;
   background: var(--glass-menu);
-  backdrop-filter: blur(30px) saturate(180%);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  --bf: blur(30px) saturate(180%);
+  backdrop-filter: var(--bf);
   box-shadow: var(--sh-spot), 0 0 0 .5px var(--glass-edge), inset 0 0 0 .5px var(--glass-hi);
   transform: scale(.98);
   transition: transform 150ms var(--out);
@@ -877,9 +891,12 @@ html:not(.js) .pho-side, html:not(.js) .pho-main, html:not(.js) .pho-view { disp
   width: 300px; max-width: 100%;
   padding: 20px 16px 16px; border-radius: 12px;
   display: grid; justify-items: center; gap: 12px; text-align: center;
-  background: var(--glass-menu); color: var(--ink);
-  backdrop-filter: blur(25px) saturate(180%);
-  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  /* an alert carries its own paper. it sits over a window's own contents, so
+     it can never be the thin glass the menus are. */
+  background: light-dark(rgb(246 243 239 / .98), rgb(38 36 35 / .98));
+  color: var(--ink);
+  --bf: blur(25px) saturate(180%);
+  backdrop-filter: var(--bf);
   box-shadow: var(--sh-menu), 0 0 0 .5px var(--glass-edge), inset 0 0 0 .5px var(--glass-hi);
   transform: scale(.96); transition: transform 140ms var(--out);
   user-select: none; -webkit-user-select: none;
@@ -935,8 +952,12 @@ html:not(.js) .pho-side, html:not(.js) .pho-main, html:not(.js) .pho-view { disp
   }
   .widget-h { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--a-yellow); }
   .widget-h svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-  .widget p { font-size: 13px; line-height: 1.35; }
-  .widget p + p { color: var(--ink-2); }
+  /* the note truncates on a whole line, never through the middle of one */
+  .widget p {
+    font-size: 13px; line-height: 1.35;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6;
+    overflow: hidden;
+  }
   .pad {
     display: grid; grid-template-columns: repeat(4, 1fr);
     gap: 24px 0; justify-items: center;
@@ -954,8 +975,8 @@ html:not(.js) .pho-side, html:not(.js) .pho-main, html:not(.js) .pho-view { disp
     display: grid; grid-template-columns: repeat(4, 1fr); justify-items: center;
     margin: 18px 16px 8px; padding: 14px 10px; border-radius: 34px;
     background: var(--glass-dock);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    --bf: blur(24px) saturate(180%);
+    backdrop-filter: var(--bf);
     box-shadow: inset 0 0 0 .5px var(--glass-hi), 0 0 0 .5px var(--glass-edge);
   }
   .pdock .pad-i { width: auto; }
@@ -1179,32 +1200,36 @@ html.in .land, html:not(.js) .land { display: none !important; }
   }
 }
 
-/* ══ Terminal: paper, mono, a prompt that answers ══════════════════════ */
+/* ══ Terminal: paper, mono, a prompt that answers ══════════════════════
+   Every rule here is keyed to Terminal.app's own root. Rin's panel uses the
+   same class names for its own dark transcript, so an unkeyed .term rule
+   paints her cream and leaves her text invisible on it. */
 .win-term .win-body { background: light-dark(#fdfbf7, #1b1a19); }
-.term {
+[data-vterm] {
   position: relative; display: grid; grid-template-rows: minmax(0, 1fr);
   height: 100%; min-height: 240px;
   font-family: var(--mono); font-size: 12px; line-height: 1.55;
   color: light-dark(#2c2b27, #e8e4de);
   background: light-dark(#fdfbf7, #1b1a19);
 }
-.term-scroll { overflow: auto; padding: 10px 12px 12px; overscroll-behavior: contain; cursor: text; }
-.term-out { margin: 0; font: inherit; white-space: pre-wrap; word-break: break-word; }
-.term-out:empty { display: none; }
-.term .dim { color: light-dark(rgb(44 43 39 / .55), rgb(232 228 222 / .55)); }
-.term-dir { color: var(--link); font-weight: 600; }
-.term-acc { color: light-dark(#b25620, #f6cb98); font-weight: 600; }
-.term-art { color: light-dark(#4b68c3, #8fa6ec); }
-.term-ps { color: light-dark(#3f8850, #9bd8a9); font-weight: 600; }
-.term-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 7px; }
-.term-mirror { white-space: pre-wrap; word-break: break-all; min-height: 1em; }
-.term-caret { width: 7px; height: 13px; align-self: center; box-shadow: inset 0 0 0 1px currentColor; opacity: .5; }
-.term:focus-within .term-caret { background: currentColor; opacity: .8; }
-.term-in { position: absolute; left: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; border: 0; padding: 0; }
+[data-vterm] .term-scroll { overflow: auto; padding: 10px 12px 12px; overscroll-behavior: contain; cursor: text; }
+[data-vterm] .term-out { margin: 0; font: inherit; white-space: pre-wrap; word-break: break-word; }
+[data-vterm] .term-out:empty { display: none; }
+[data-vterm] .dim { color: light-dark(rgb(44 43 39 / .78), rgb(232 228 222 / .72)); }
+[data-vterm] .term-dir { color: var(--link); font-weight: 600; }
+[data-vterm] .term-acc { color: light-dark(#b25620, #f6cb98); font-weight: 600; }
+[data-vterm] .term-art { color: light-dark(#4b68c3, #8fa6ec); }
+[data-vterm] .term-ps { color: light-dark(#3f8850, #9bd8a9); font-weight: 600; }
+[data-vterm] .term-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 7px; }
+[data-vterm] .term-mirror { white-space: pre-wrap; word-break: break-all; min-height: 1em; }
+[data-vterm] .term-caret { width: 7px; height: 13px; align-self: center; box-shadow: inset 0 0 0 1px currentColor; opacity: .5; }
+[data-vterm]:focus-within .term-caret { background: currentColor; opacity: .8; }
+[data-vterm] .term-in { position: absolute; left: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; border: 0; padding: 0; }
 html:not(.js) .stash-js-only { display: none; }
 
 /* ══ Stickies: paper squares the visitor leaves on the desk ════════════ */
 .stickies { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+html.sticky-front .stickies { z-index: 6; }
 @media (max-width: 767px) { .stickies { display: none; } }
 .sticky {
   position: absolute; width: 184px; pointer-events: auto;
@@ -1255,6 +1280,27 @@ html:not(.js) .stash-js-only { display: none; }
 }
 .win.mc-win { transition: transform 320ms var(--ease); }
 html.is-mc .win .win-body, html.is-mc .win .rz, html.is-mc .win .lights { pointer-events: none; }
+/* the desktop's own icons go away while the windows are spread, the way they do */
+.items { transition: opacity 240ms var(--soft); }
+html.is-mc .items, html.is-mc .stickies { opacity: 0; pointer-events: none; }
+.stickies { transition: opacity 240ms var(--soft); }
+.mc-spaces {
+  position: absolute; top: calc(var(--bar) + 8px); left: 0; right: 0;
+  display: flex; justify-content: center; gap: 8px;
+  animation: mc-in 240ms var(--soft) both;
+}
+.mc-space {
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 34px; padding: 0 14px; border-radius: 7px; font-size: 12px;
+  background: rgb(0 0 0 / .35); color: #fff;
+  box-shadow: inset 0 0 0 .5px rgb(255 255 255 / .18);
+}
+.mc-space.is-on { box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / .8); }
+.mc-space i {
+  width: 28px; height: 18px; border-radius: 2.5px;
+  background: linear-gradient(160deg, var(--wall-a), var(--wall-b));
+  box-shadow: inset 0 0 0 .5px rgb(0 0 0 / .25);
+}
 
 /* ══ the screenshot flash ══════════════════════════════════════════════ */
 .shot-flash { position: fixed; inset: 0; z-index: 96; background: #fff; pointer-events: none; animation: shot-flash 260ms ease-out both; }
@@ -1263,7 +1309,13 @@ html.is-mc .win .win-body, html.is-mc .win .rz, html.is-mc .win .lights { pointe
 /* ══ the screensaver: the one thing allowed to move on its own ═════════ */
 .saver { position: fixed; inset: 0; z-index: 88; background: #000; opacity: 0; transition: opacity 800ms ease; cursor: none; }
 .saver.is-on { opacity: 1; }
-.sv-img { position: absolute; inset: -4%; width: 108%; height: 108%; object-fit: cover; opacity: 0; transition: opacity 1.8s ease; }
+/* the photograph is oversized well past the pan, so the drift can never slide
+   an edge of it onto the screen */
+.sv-img {
+  position: absolute; left: -6%; top: -6%; right: auto; bottom: auto;
+  width: 112%; height: 112%; max-width: none; max-height: none; object-fit: cover;
+  opacity: 0; transition: opacity 1.8s ease;
+}
 .sv-img.is-on { opacity: 1; animation: sv-drift 30s linear both; }
 @keyframes sv-drift {
   from { transform: translate3d(-1.4%, -.9%, 0) scale(1); }
@@ -1311,3 +1363,13 @@ html.pm-trash-empty .ico-paper { display: none; }
 
 /* while a screenshot renders, the grain layers hide their CSS-borne SVG */
 .is-shooting .wall-grain, .is-shooting .abt::after { background-image: none !important; }
+
+
+/* ══ the Liquid Glass alias, kept apart on purpose ═════════════════════
+   Safari still wants -webkit-backdrop-filter, and Firefox only takes the
+   standard property. Written in the same block, the CSS minifier folds the
+   two together and one of them is lost, so the alias lives down here in its
+   own rule and every glass surface above carries its blur in --bf. */
+.mbar, .menu, .win.is-front .fnd-side, .pho-nav, .dock, .dock-name,
+.notif, .spot-box, .alert { -webkit-backdrop-filter: var(--bf); }
+@media (max-width: 767px) { .pdock { -webkit-backdrop-filter: var(--bf); } }

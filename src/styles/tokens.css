@@ -55,18 +55,18 @@
   --chip-2: light-dark(rgb(3 3 2 / .09), rgb(255 255 255 / .12));
 
   /* ── the wallpaper: one family, two stops, the way Craft lays a hero ── */
-  --wall-a:     light-dark(var(--c-sky), #0f1320);      /* the top of the sky */
-  --wall-b:     light-dark(var(--c-sky-2), #1c2f3a);    /* the bottom of it */
-  --wall-bloom: light-dark(rgb(253 246 238 / .45), rgb(143 166 236 / .1));
-  --wall-flat:  light-dark(#b9e0f4, #151f2c);
+  --wall-a:     light-dark(var(--c-sky), #131a2b);      /* the top of the sky */
+  --wall-b:     light-dark(var(--c-sky-2), #27404f);    /* the bottom of it */
+  --wall-bloom: light-dark(rgb(253 246 238 / .45), rgb(143 166 236 / .16));
+  --wall-flat:  light-dark(#b9e0f4, #1b2837);
   --wall-ink:   #ffffff;               /* a desktop label, on any wallpaper */
   --wall-ink-sh: rgb(0 0 0 / .55);
-  --grain:      light-dark(.05, 0);     /* an overlay, so this reads far lighter than it sounds */
+  --grain:      .05;                    /* an overlay, so this reads far lighter than it sounds */
 
   /* ── glass: Liquid Glass Regular, in Craft's paper ───────────────── */
   --glass-bar:   light-dark(rgb(252 249 247 / .62), rgb(20 19 18 / .58));
   --glass-menu:  light-dark(rgb(252 249 247 / .78), rgb(38 36 35 / .8));
-  --glass-dock:  light-dark(rgb(252 249 247 / .5), rgb(30 29 28 / .52));
+  --glass-dock:  light-dark(rgb(252 249 247 / .5), rgb(255 255 255 / .1));
   --glass-edge:  light-dark(rgb(3 3 2 / .12), rgb(255 255 255 / .12));
   --glass-hi:    light-dark(rgb(255 255 255 / .55), rgb(255 255 255 / .1));
   --bar-ink:     light-dark(var(--c-ink), #f2eeea);
@@ -116,17 +116,18 @@
   --vb-page:  #f6f3ee;
 
   /* ── shadows: Craft's four-layer float, and the inactive half of it ─ */
-  --sh-menu: light-dark(
-    0 10px 30px rgb(3 3 2 / .18), 0 12px 34px rgb(0 0 0 / .55));
-  --sh-dock: light-dark(
-    0 12px 28px rgb(3 3 2 / .16), 0 12px 30px rgb(0 0 0 / .5));
-  --sh-spot: light-dark(
-    0 30px 70px rgb(3 3 2 / .28), 0 30px 70px rgb(0 0 0 / .7));
-  --sh-notif: light-dark(
-    0 12px 30px rgb(3 3 2 / .18), 0 12px 32px rgb(0 0 0 / .55));
-  --sh-icon: light-dark(
-    drop-shadow(0 4px 8px rgb(3 3 2 / .22)),
-    drop-shadow(0 4px 10px rgb(0 0 0 / .55)));
+  /* light-dark() only carries a colour, so the colour is the only part inside it
+     and the geometry is written once, outside. */
+  --sh-menu-c:  light-dark(rgb(3 3 2 / .18), rgb(0 0 0 / .55));
+  --sh-dock-c:  light-dark(rgb(3 3 2 / .16), rgb(0 0 0 / .5));
+  --sh-spot-c:  light-dark(rgb(3 3 2 / .28), rgb(0 0 0 / .7));
+  --sh-notif-c: light-dark(rgb(3 3 2 / .18), rgb(0 0 0 / .55));
+  --sh-icon-c:  light-dark(rgb(3 3 2 / .22), rgb(0 0 0 / .55));
+  --sh-menu:  0 10px 30px var(--sh-menu-c);
+  --sh-dock:  0 12px 28px var(--sh-dock-c);
+  --sh-spot:  0 30px 70px var(--sh-spot-c);
+  --sh-notif: 0 12px 30px var(--sh-notif-c);
+  --sh-icon:  drop-shadow(0 4px 8px var(--sh-icon-c));
 
   /* ── type: the system font, because a Mac window in anything else is a
      costume. Mono is for the one terminal. ─────────────────────────── */
@@ -175,6 +176,7 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
+    --grain: .03;
     --sh-win:
       0 0 0 .5px rgb(255 255 255 / .14),
       0 3px 10px rgb(0 0 0 / .4),
@@ -189,6 +191,7 @@
   }
 }
 :root[data-theme='dark'] {
+  --grain: .03;
   --sh-win:
     0 0 0 .5px rgb(255 255 255 / .14),
     0 3px 10px rgb(0 0 0 / .4),

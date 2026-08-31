@@ -144,10 +144,10 @@ export function initTerminal(root: HTMLElement, hooks: TermHooks) {
     `  help                ${dim('this list')}`,
     `  ls ${dim('[folder]')}         ${dim('what is in a folder')}`,
     `  cd ${dim('[folder]')}         ${dim('go there (cd .. goes back)')}`,
-    `  cat ${dim('<file>')}          ${dim('read a file')}`,
-    `  open ${dim('<app>')}          ${dim('really opens it: volbase, rin, kyou, market, photos…')}`,
+    `  cat ${dim('&lt;file&gt;')}          ${dim('read a file')}`,
+    `  open ${dim('&lt;app&gt;')}          ${dim('really opens it: volbase, rin, kyou, market, photos…')}`,
     `  neofetch            ${dim('this machine, truthfully')}`,
-    `  say ${dim('<words>')}         ${dim('the Mac says them out loud')}`,
+    `  say ${dim('&lt;words&gt;')}         ${dim('the Mac says them out loud')}`,
     `  date · clear · pwd · whoami · history`,
   ].join('\n');
 
@@ -186,9 +186,13 @@ export function initTerminal(root: HTMLElement, hooks: TermHooks) {
   };
 
   /* ── the commands ───────────────────────────────────────────────────── */
+  /* a hand with shell habits quotes a name that has a space in it, so a
+     matched pair of surrounding quotes comes off before anything looks it up */
+  const unquote = (s: string) => s.replace(/^(['"])([\s\S]*)\1$/, '$2');
+
   const run = (raw: string): string => {
     const [cmd, ...restA] = raw.trim().split(/\s+/);
-    const rest = raw.trim().slice(cmd.length).trim();
+    const rest = unquote(raw.trim().slice(cmd.length).trim());
     const c = cmd.toLowerCase();
     switch (c) {
       case 'help': case '?': return HELP;
@@ -207,14 +211,14 @@ export function initTerminal(root: HTMLElement, hooks: TermHooks) {
       }
       case 'pwd': return `/Users/visitor${cwd.length ? '/' + cwd.join('/') : ''}`;
       case 'cat': {
-        if (!rest) return 'usage: cat <file>';
+        if (!rest) return 'usage: cat &lt;file&gt;';
         const r = resolve(rest);
         if (!r) return `cat: ${esc(rest)}: No such file or directory`;
         if (!Array.isArray(r.node)) return `cat: ${esc(rest)}: Is a directory`;
         return r.node.map(esc).join('\n') || dim('(an empty file)');
       }
       case 'open': {
-        if (!rest) return 'usage: open <app>';
+        if (!rest) return 'usage: open &lt;app&gt;';
         const k = rest.toLowerCase().replace(/\s+app$/, '');
         const hit = OPENS[k] ?? OPENS[Object.keys(OPENS).find((x) => k.includes(x)) ?? ''];
         if (!hit) return `open: ${esc(rest)}: nothing by that name on this Mac. ${dim('try: open volbase')}`;
@@ -223,7 +227,7 @@ export function initTerminal(root: HTMLElement, hooks: TermHooks) {
       }
       case 'neofetch': return neofetch();
       case 'say': {
-        if (!rest) return 'usage: say <words>';
+        if (!rest) return 'usage: say &lt;words&gt;';
         try {
           const u = new SpeechSynthesisUtterance(rest.slice(0, 200));
           speechSynthesis.speak(u);
@@ -325,7 +329,7 @@ export function initTerminal(root: HTMLElement, hooks: TermHooks) {
   });
 
   if (!st.lines.length) {
-    st.lines.push(dim(`Last login: never. type ${'help'} to see what this thing answers.`));
+    st.lines.push(`${dim('Last login: never.')} type <b class="term-acc">help</b> to see what this thing answers.`);
   }
   paint();
 

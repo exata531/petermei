@@ -62,7 +62,7 @@ export function initVolbase(root: HTMLElement) {
   const hrefOf = (t: Tab) => (t.id === 'site' ? location.origin + t.here : VB + t.here);
   const shown = (t: Tab) => {
     if (t.id === 'site') return 'petermei.com' + (t.here === SITE_START ? '' : t.here.replace(/^\/site/, ''));
-    return 'volbase.app' + (t.here === VB_START ? '' : t.here);
+    return 'volbase.app' + t.here;
   };
 
   function paint() {

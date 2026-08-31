@@ -16,6 +16,9 @@ export type Hit = {
 export function initSpotlight(
   el: HTMLElement,
   source: () => Hit[],
+  /* whatever else is on screen closes first: a Mac never shows Spotlight and
+     an open menu or Control Center at the same time */
+  clearOthers: () => void = () => {},
 ) {
   const field = el.querySelector<HTMLInputElement>('[data-sp-in]')!;
   const list = el.querySelector<HTMLElement>('[data-sp-list]')!;
@@ -53,6 +56,7 @@ export function initSpotlight(
 
   const show = () => {
     if (open) { hide(); return; }
+    clearOthers();
     open = true;
     el.hidden = false;
     field.value = '';
@@ -90,6 +94,14 @@ export function initSpotlight(
     if (b) fire(Number(b.dataset.i));
   });
   el.addEventListener('pointerdown', (e) => { if (e.target === el) hide(); });
+  /* a press anywhere outside the field closes it, the way every macOS overlay
+     goes away when the hand lands somewhere else */
+  addEventListener('pointerdown', (e) => {
+    if (!open) return;
+    const t = e.target as HTMLElement | null;
+    if (t && t.closest('.spot-box')) return;
+    hide();
+  }, true);
 
   addEventListener('keydown', (e) => {
     if (document.body.classList.contains('is-landing')) return;

@@ -14,7 +14,9 @@ import { blurbs, links } from '../../data/apps';
 type Tab = { name: string; lines: string[]; n: number };
 type State = { tabs: Tab[]; active: number; seq: number };
 const KEY = 'rin';
-const seed = (): State => ({ tabs: [{ name: 'brain', lines: [], n: 1 }, { name: 'school', lines: [], n: 2 }], active: 0, seq: 2 });
+/* the line the panel opens on, so it is never an empty rectangle */
+const GREET = `<span class="dim">I read the notes folder before you type anything. ask me something, or tap one of the lines under the prompt.</span>`;
+const seed = (): State => ({ tabs: [{ name: 'brain', lines: [GREET], n: 1 }, { name: 'school', lines: [GREET], n: 2 }], active: 0, seq: 2 });
 
 const dim = (s: string) => `<span class="dim">${s}</span>`;
 const cmd = (s: string) => `<span class="cmd">${s}</span>`;
@@ -37,7 +39,7 @@ export function initRin(root: HTMLElement) {
   const mood = (f: string) => { face.textContent = f; emit('rin:face', f); };
 
   /* ── what she answers ── */
-  const HELP = `${dim('things I answer:')}\n  who is peter · who are you · what is on the desktop\n  what is volbase · what is rin · what is kyou · what is market station\n  open ${dim('<volbase, kyou, market station, photos, read me, about, safari>')}\n  dark · light · sleep · lock · date · clear\n${dim('type one, or tap one under the prompt. anything else gets a shrug.')}`;
+  const HELP = `${dim('things I answer:')}\n  who is peter · who are you · what is on the desktop\n  what is volbase · what is rin · what is kyou · what is market station\n  open ${dim('&lt;volbase, kyou, market station, photos, read me, about, safari&gt;')}\n  dark · light · sleep · lock · date · clear\n${dim('type one, or tap one under the prompt. anything else gets a shrug.')}`;
   const answer = (raw: string): { html: string; face?: string; act?: () => void } => {
     const q = raw.toLowerCase().replace(/[?!.]+$/g, '').replace(/\s+/g, ' ').trim();
     const has = (...w: string[]) => w.some((x) => q === x || q.startsWith(x + ' ') || q.includes(' ' + x));
@@ -127,14 +129,14 @@ export function initRin(root: HTMLElement) {
     const x = t.closest<HTMLElement>('[data-rin-x]');
     if (x) {
       const i = Number(x.dataset.rinX);
-      if (st.tabs.length === 1) { st.tabs[0].lines = []; put(); paintOut(); return; }
+      if (st.tabs.length === 1) { st.tabs[0].lines = [GREET]; put(); paintOut(); return; }
       st.tabs.splice(i, 1);
       pick(st.active >= i ? st.active - 1 : st.active);
       return;
     }
     if (t.closest('[data-rin-add]')) {
       st.seq++;
-      st.tabs.push({ name: `tab ${st.seq}`, lines: [], n: st.seq });
+      st.tabs.push({ name: `tab ${st.seq}`, lines: [GREET], n: st.seq });
       pick(st.tabs.length - 1);
       real.focus({ preventScroll: true });
       return;

@@ -19,8 +19,23 @@ const loadNotes = (): Note[] => {
   return [];
 };
 
-export function initStickies(layer: HTMLElement) {
+/* the first note a visitor ever makes already has something in it, because a
+   blank yellow square is not worth opening */
+const FIRST = `I keep the real ones on my own Mac, and this is the same kind of note.
+Type over this if you want to. It stays in your browser and I never see it.`;
+const SEEDED = 'pm-stickies-seeded';
+
+export type StickyHooks = {
+  /* a note taken by the hand: Stickies is the front app now */
+  onFront?(): void;
+  /* a note made or thrown away: the Dock's running dot follows the count */
+  onCount?(n: number): void;
+};
+
+export function initStickies(layer: HTMLElement, hooks: StickyHooks = {}) {
   let notes = loadNotes();
+  let seeded = notes.length > 0;
+  try { seeded = seeded || localStorage.getItem(SEEDED) === '1'; } catch {}
   let seq = notes.reduce((m, n) => Math.max(m, n.id), 0) + 1;
   const els = new Map<number, HTMLElement>();
 
@@ -40,7 +55,7 @@ export function initStickies(layer: HTMLElement) {
          <span class="sticky-dots">${Array.from({ length: COLORS }, (_, i) =>
            `<button class="sticky-dot sticky-dc${i}" type="button" data-c="${i}" aria-label="Colour ${i + 1}"${i === n.c ? ' aria-current="true"' : ''}></button>`).join('')}</span>
        </div>
-       <textarea aria-label="Sticky note" spellcheck="false" placeholder=""></textarea>`;
+       <textarea aria-label="Sticky note" spellcheck="false" placeholder="Write something. It stays in your browser and I never see it."></textarea>`;
     const ta = el.querySelector<HTMLTextAreaElement>('textarea')!;
     ta.value = n.t;
     ta.addEventListener('input', () => { n.t = ta.value.slice(0, 2000); put(); });
@@ -50,6 +65,7 @@ export function initStickies(layer: HTMLElement) {
       els.delete(n.id);
       put();
       el.remove();
+      hooks.onCount?.(notes.length);
     });
     el.addEventListener('click', (e) => {
       const dot = (e.target as HTMLElement).closest<HTMLElement>('.sticky-dot');
@@ -63,7 +79,10 @@ export function initStickies(layer: HTMLElement) {
       put();
     });
     /* the clicked note comes to the front of its siblings */
-    el.addEventListener('pointerdown', () => { if (el !== layer.lastElementChild) layer.appendChild(el); });
+    el.addEventListener('pointerdown', () => {
+      if (el !== layer.lastElementChild) layer.appendChild(el);
+      hooks.onFront?.();
+    });
 
     /* drag by the bar, pointer captured, position written on release */
     const bar = el.querySelector<HTMLElement>('[data-sticky-drag]')!;
@@ -105,6 +124,15 @@ export function initStickies(layer: HTMLElement) {
 
   return {
     count() { return notes.length; },
+    /* quitting takes every note with it */
+    closeAll() {
+      [...els.values()].forEach((el) => el.querySelector<HTMLButtonElement>('.sticky-x')?.click());
+    },
+    /* the note on top is the one command-W throws away */
+    closeFront() {
+      const el = layer.lastElementChild as HTMLElement | null;
+      el?.querySelector<HTMLButtonElement>('.sticky-x')?.click();
+    },
     /* a new note lands in a short cascade from the last one */
     create() {
       if (notes.length >= MAX) {
@@ -118,12 +146,15 @@ export function initStickies(layer: HTMLElement) {
         x: clampX(Math.round(innerWidth * 0.3) + at * 28),
         y: clampY(96 + at * 28),
         c: at % COLORS,
-        t: '',
+        t: at === 0 && !seeded ? FIRST : '',
       };
+      if (at === 0 && !seeded) { seeded = true; try { localStorage.setItem(SEEDED, '1'); } catch {} }
       notes.push(n);
       put();
       const el = render(n);
       el.querySelector<HTMLTextAreaElement>('textarea')?.focus();
+      hooks.onCount?.(notes.length);
+      hooks.onFront?.();
       return el;
     },
   };

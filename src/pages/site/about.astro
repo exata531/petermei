@@ -1,10 +1,11 @@
 ---
 /* About: the long one, pinned, with four of his photos as paper on the
-   right; then the rows of what he has done; then the last two paragraphs. */
+   right; then one paragraph of what he has done; then the last two. */
 import Site from '../../layouts/Site.astro';
 import { copy, pile } from '../../data/site';
+/* the four sit clear of each other's caption strips, so every label reads */
 const spots = [
-  { x: 20, y: 20, r: -2.06 }, { x: 250, y: 60, r: -8.7 }, { x: 60, y: 210, r: 5.47 }, { x: 260, y: 240, r: 3.06 },
+  { x: 6, y: 0, r: -2.06 }, { x: 250, y: 34, r: -6.5 }, { x: 60, y: 212, r: 4.4 }, { x: 288, y: 246, r: 2.6 },
 ];
 ---
 <Site title="About" desc="Peter Mei, a senior at the school outside Detroit, on why he makes software, the robotics team, climbing, and what is next." route="about">
@@ -29,19 +30,9 @@ const spots = [
   </section>
 
   <section class="done-sec" data-nav-tone="light" aria-label="What I have done">
-    <div class="crest" aria-hidden="true"></div>
     <div class="wrap">
-      <div class="done-grid">
-        <span class="done-label" aria-hidden="true">What I have done</span>
-        <div class="rows">
-          {copy.done.map((d, i) => (
-            <details class="rowx" open={i === 0}>
-              <summary><span>{d.name}</span><span class="plus" aria-hidden="true"></span></summary>
-              <p>{d.text}</p>
-            </details>
-          ))}
-        </div>
-      </div>
+      <h2 class="h-section">{copy.doneHead}</h2>
+      <p class="done-p">{copy.done}</p>
       <div class="about-after">
         <p>{copy.about[3]}</p>
         <p class="now">{copy.about[4]}</p>

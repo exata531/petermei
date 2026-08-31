@@ -22,7 +22,7 @@ export function initMission(desk: Desk, deskEl: HTMLElement) {
 
   function tileTargets(list: Win[]) {
     const x0 = 48, x1 = innerWidth - 48;
-    const y0 = BAR + 48, y1 = desk.dockTop() - 44;
+    const y0 = BAR + 84, y1 = desk.dockTop() - 44;
     const cols = Math.ceil(Math.sqrt(list.length));
     const rows = Math.ceil(list.length / cols);
     const gw = (x1 - x0) / cols, gh = (y1 - y0) / rows;
@@ -45,6 +45,11 @@ export function initMission(desk: Desk, deskEl: HTMLElement) {
     deskEl.appendChild(veil);
     labels = document.createElement('div');
     labels.className = 'mc-labels';
+    /* the Spaces strip across the top, with the one desktop this Mac has */
+    const strip = document.createElement('div');
+    strip.className = 'mc-spaces';
+    strip.innerHTML = '<span class="mc-space is-on"><i></i>Desktop</span>';
+    labels.appendChild(strip);
     desk.root.appendChild(labels);
     document.documentElement.classList.add('is-mc');
     const targets = tileTargets(list);

@@ -157,7 +157,7 @@ export const apps: App[] = [
     label: 'Kyou',
     title: 'iPhone 17 Pro',
     kind: 'sim',
-    w: 330, h: 700,
+    w: 330, h: 726,
     scene: 'kyou', sw: 300, sh: 620, mw: 390, mh: 720,
     toolbar: [
       { label: 'Light', action: 'kyou-light' },
@@ -222,11 +222,7 @@ export const finder: FinderSection[] = [
 
 /* ── the Read me, in TextEdit ──────────────────────────────────────────── */
 export const readme = [
-  'I am a senior at the school, outside Detroit, and I make software.',
-  'I taught myself most of it from the docs and by breaking things, because none of my projects came with a mentor.',
-  'Four of the things I built are on this desktop, and each one runs when you open it.',
-  'Open whichever one looks interesting and click around.',
-  'If something is a demo it says so in the corner.',
+  'I am a senior at the school, outside Detroit, and I make software. I taught myself most of it from the docs and by breaking things, because none of my projects came with a mentor. Four of the things I built are on this desktop, and each one runs when you open it. Open whichever one looks interesting and click around, and if something is a demo it says so in the corner.',
 ];
 
 /* the About Peter panel's own sentence */
