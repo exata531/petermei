@@ -1,14 +1,16 @@
-/* The two machines on the landing, drawn.
+/* The machine on the landing, drawn.
 
-   Both are plain SVG in Craft's illustrated register: flat fills, a vertical
-   gradient of a few percent for the one light that falls from above, a
-   hairline edge, and a soft shadow straight down. The screen is left as a
-   flat sky because the real desktop sits over it, live and scaled. The
-   screen's shape follows the visitor's viewport so the desktop fits it
-   exactly; everything around it keeps Apple's proportions, a 24-inch iMac
-   (a bezel about two percent of the display, a chin one seventh of its
-   height, the L-shaped stand) and the current iPhone (the frame, the black
-   border, the corner radius, the buttons on both sides).
+   Plain SVG in Craft's illustrated register: flat fills, a vertical gradient
+   of a few percent for the one light that falls from above, a hairline edge,
+   and a soft shadow straight down. The screen is left as a flat sky because
+   the real desktop sits over it, live and scaled. The screen's shape follows
+   the visitor's viewport so the desktop fits it exactly; everything around it
+   keeps Apple's proportions for a 24-inch iMac, a bezel about two percent of
+   the display, a chin one seventh of its height, the L-shaped stand.
+
+   There is no drawn phone. A phone inside a phone spends the whole screen
+   saying what the visitor is already holding, so under the breakpoint the
+   landing is a cover with a button instead of a picture.
 
    This runs at build time for the first paint and again in the browser
    whenever the viewport's shape changes. */
@@ -55,38 +57,4 @@ ${shade('im-sh', '--im-shadow')}
 <rect class="dev-screen" x="${b}" y="${b}" width="${sw}" height="${sh}" fill="var(--wall-flat)"/>
 </svg>`;
   return { svg, vbW: W, vbH: H, screen: { x: b, y: b, w: sw, h: sh, r: 0 } };
-}
-
-export function iphone(aspect: number): Draw {
-  const W = 1000;
-  const f = 40;                       // body edge to the screen
-  const ring = 18;                    // the frame's own width; black inside it
-  const sw = W - 2 * f;
-  const sh = n(sw / aspect);
-  const bh = n(sh + 2 * f);
-  const r = 150;
-  const sr = 112;
-  const H = n(bh + 56);
-  const btn = 10;
-  const side = (x: number, y: number, h: number) =>
-    `<rect x="${x}" y="${n(y)}" width="${btn + 8}" height="${h}" rx="4" fill="var(--ip-btn)"/>`;
-
-  const svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" style="overflow:visible">
-<defs>
-${grad('ip-fr', '--im-chin-a', '--im-chin-b')}
-${shade('ip-sh', '--im-shadow')}
-<clipPath id="ip-body"><rect x="0" y="0" width="${W}" height="${bh}" rx="${r}"/></clipPath>
-</defs>
-<ellipse cx="${W / 2}" cy="${bh + 26}" rx="${W * 0.42}" ry="18" fill="url(#ip-sh)"/>
-${side(-btn, bh * 0.165, 44)}
-${side(-btn, bh * 0.228, 92)}
-${side(-btn, bh * 0.285, 92)}
-${side(W - 8, bh * 0.24, 132)}
-${side(W - 8, bh * 0.6, 68)}
-<rect x=".5" y=".5" width="${W - 1}" height="${bh - 1}" rx="${r}" fill="url(#ip-fr)" stroke="var(--im-edge)" stroke-width="1"/>
-<rect x="${ring}" y="${ring}" width="${W - 2 * ring}" height="${bh - 2 * ring}" rx="${r - ring}" fill="var(--ip-bezel)"/>
-<g clip-path="url(#ip-body)"><rect x="0" y="1" width="${W}" height="1" fill="#fff" fill-opacity=".4"/></g>
-<rect class="dev-screen" x="${f}" y="${f}" width="${sw}" height="${sh}" rx="${sr}" fill="var(--wall-flat)"/>
-</svg>`;
-  return { svg, vbW: W, vbH: H, screen: { x: f, y: f, w: sw, h: sh, r: sr } };
 }

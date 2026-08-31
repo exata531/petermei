@@ -2,19 +2,22 @@
 /* The landing.
 
    A page of Craft's paper that is also the loading screen. The name, one
-   line, a drawn machine with the real desktop inside its screen, and under
-   it a thin bar that fills as the page actually settles, then hands over to
-   the one instruction. On a phone the machine is an iPhone and the screen
-   holds the real home screen.
+   line, and a thin bar that fills as the page actually settles.
 
-   Both drawings are rendered here for the first paint at the shapes a
-   desktop window and a phone usually have; the script redraws whichever is
-   showing if the visitor's window is shaped differently. Without JavaScript
-   none of this exists: the plain page is the whole site. */
-import { imac, iphone } from '../../scripts/mac/devices';
+   On a desktop the middle of it is a drawn iMac with the real desktop live
+   inside its screen: what is in the picture is what is about to fill the
+   window, and the screen itself is the way in. The drawing is rendered here
+   for the first paint at the shape a desktop window usually has; the script
+   redraws it if the visitor's window is shaped differently.
+
+   On a phone there is no drawn machine. A phone inside a phone wastes the
+   whole screen to say something the visitor can already see, so the phone
+   gets a plain cover: the name, the line, and one button big enough to hit
+   with a thumb. Without JavaScript none of this exists: the plain page is
+   the whole site. */
+import { imac } from '../../scripts/mac/devices';
 
 const mac = imac(1.6);
-const phone = iphone(390 / 844);
 const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(3)}%`;
 const screenStyle = (d: typeof mac) =>
   `left:${pct(d.screen.x, d.vbW)};top:${pct(d.screen.y, d.vbH)};width:${pct(d.screen.w, d.vbW)};height:${pct(d.screen.h, d.vbH)}`;
@@ -33,11 +36,7 @@ const screenStyle = (d: typeof mac) =>
               data-r="0" style={screenStyle(mac)}></button>
     </div>
 
-    <div class="land-mac land-iphone" data-land-iphone data-aspect={(390 / 844).toFixed(4)} style={`--ar:${(phone.vbW / phone.vbH).toFixed(4)}`}>
-      <Fragment set:html={phone.svg} />
-      <button class="land-screen" type="button" data-land-enter disabled aria-label="Look around the phone"
-              data-r={(phone.screen.r / phone.screen.w).toFixed(4)} style={screenStyle(phone)}></button>
-    </div>
+    <button class="land-tap" type="button" data-land-tap disabled>Tap to have a look around</button>
 
     <div class="land-foot">
       <p class="land-load" data-land-load>

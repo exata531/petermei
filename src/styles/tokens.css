@@ -101,8 +101,6 @@
   --im-base:    light-dark(#d4cec7, #282523);
   --im-edge:    light-dark(rgb(3 3 2 / .16), rgb(255 255 255 / .12));
   --im-shadow:  light-dark(rgb(3 3 2 / .2), rgb(0 0 0 / .6));
-  --ip-bezel:   #141415;
-  --ip-btn:     light-dark(#86c3e2, #172733);
 
   --lt-off:     light-dark(#dcdad8, #4a4846);
   --lt-off-ring: light-dark(rgb(0 0 0 / .12), rgb(255 255 255 / .06));

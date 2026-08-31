@@ -713,18 +713,25 @@ html:not(.js) .pho-side, html:not(.js) .pho-main, html:not(.js) .pho-view { disp
 .win-text .win-body { background: var(--surface); }
 .txt { padding: 24px; display: grid; gap: 12px; font-size: 16px; line-height: 1.2; max-width: 52ch; cursor: text; }
 
-/* ══ Rin's panel: it drops out of the menu bar, because that is where it lives ══ */
+/* ══ Rin's panel: it hangs off its own menu bar item, the way it does on
+   Peter's Mac ═════════════════════════════════════════════════════════════
+   The numbers are the real app's, read out of its own source: 760 wide, six
+   pixels of air under the bar, centred on the status item and then pulled
+   back twelve pixels inside the screen edge, rounded on all four corners
+   because it is a window and not the bar unrolling. The script sets `left`
+   and `--px` on open and on every resize, so the panel grows out of the item
+   it belongs to instead of out of the middle of the screen. */
 .panel {
-  position: fixed; top: var(--bar); left: 0; right: 0;
-  width: min(760px, calc(100vw - 40px)); height: 372px;
-  margin-inline: auto;
+  position: fixed; top: calc(var(--bar) + 6px); left: 0;
+  width: min(760px, calc(100vw - 24px)); height: 372px;
+  max-height: calc(100dvh - var(--bar) - 18px);
   z-index: 40;
-  border-radius: 0 0 var(--r-win) var(--r-win); overflow: hidden;
+  border-radius: var(--r-win); overflow: hidden;
   background: var(--slate);
-  box-shadow: var(--sh-win);
-  transform-origin: top center;
-  transform: scaleY(max(.02, var(--drop, 0))) translateY(calc((var(--drop, 0) - 1) * 8px));
-  opacity: clamp(0, calc(var(--drop, 0) * 6), 1);
+  box-shadow: var(--sh-win), 0 0 0 .5px var(--glass-edge), inset 0 0 0 .5px rgb(255 255 255 / .07);
+  transform-origin: var(--px, 50%) top;
+  transform: translateY(calc((var(--drop, 0) - 1) * 10px)) scale(calc(.93 + .07 * var(--drop, 0)));
+  opacity: clamp(0, calc(var(--drop, 0) * 4), 1);
   will-change: transform;
 }
 .panel .sframe .rin, .sheet[data-app='rin'] .sframe .rin { grid-template-rows: 0 1fr; }
@@ -929,40 +936,31 @@ html:not(.js) .pho-side, html:not(.js) .pho-main, html:not(.js) .pho-view { disp
   .desk { position: fixed; }
   .home {
     position: fixed; inset: 0; z-index: 6; display: grid;
-    grid-template-rows: auto 1fr auto auto;
-    padding: max(14px, env(safe-area-inset-top)) 0 max(8px, env(safe-area-inset-bottom));
+    grid-template-rows: 1fr auto auto;
+    padding: max(28px, calc(env(safe-area-inset-top) + 12px)) 0 max(10px, env(safe-area-inset-bottom));
   }
-  /* the status bar: the time on the left, the radios on the right */
-  .home-status {
-    display: flex; justify-content: space-between; align-items: center;
-    height: 24px; padding: 0 28px; margin-bottom: 8px;
-    font-size: 17px; font-weight: 600; color: var(--wall-ink);
-    text-shadow: 0 1px 3px rgb(0 0 0 / .4);
-  }
-  .home-status svg { height: 12px; width: auto; fill: currentColor; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; filter: drop-shadow(0 1px 2px rgb(0 0 0 / .4)); }
-  .home-status .hs-icons { display: inline-flex; align-items: center; gap: 6px; }
-  .home-pad { display: grid; align-content: start; gap: 24px; padding: 0 24px; }
-  /* a medium widget, the Notes one: the Read me, so the page is not empty */
+  .home-pad { display: grid; align-content: start; gap: 22px; padding: 0 22px; }
+  /* a medium widget, the Notes one: the Read me. It holds two whole
+     sentences and says where the rest is, because a widget that stops in
+     the middle of a word reads as broken rather than as a preview */
   .widget {
-    display: grid; gap: 6px; align-content: start;
-    height: 160px; padding: 16px; border-radius: 22px;
+    display: grid; gap: 7px; align-content: start; text-align: left;
+    padding: 15px 16px 14px; border-radius: 22px;
     background: var(--surface); color: var(--ink);
-    box-shadow: 0 8px 24px rgb(3 3 2 / .14), 0 0 0 .5px rgb(3 3 2 / .08);
-    overflow: hidden;
+    box-shadow: 0 8px 24px rgb(3 3 2 / .16), 0 0 0 .5px rgb(3 3 2 / .08);
+    transition: transform var(--t-press) var(--soft), filter var(--t-fast) var(--soft);
   }
-  .widget-h { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--a-yellow); }
-  .widget-h svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-  /* the note truncates on a whole line, never through the middle of one */
-  .widget p {
-    font-size: 13px; line-height: 1.35;
-    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6;
-    overflow: hidden;
-  }
+  .widget:active { transform: scale(.98); filter: brightness(.97); }
+  .widget:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+  .widget-h { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--a-yellow); }
+  .widget-h svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .widget-p { display: block; font-size: 14px; line-height: 1.4; }
+  .widget-more { display: block; font-size: 13px; line-height: 1.2; color: var(--ink-2); }
   .pad {
     display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 24px 0; justify-items: center;
+    gap: 20px 0; justify-items: center;
   }
-  .pad-i { display: grid; justify-items: center; gap: 5px; width: 100%; }
+  .pad-i { display: grid; justify-items: center; gap: 6px; width: 100%; }
   .pad-tile {
     width: 60px; height: 60px; display: block;
     filter: drop-shadow(0 4px 10px rgb(0 0 0 / .18));
@@ -970,20 +968,32 @@ html:not(.js) .pho-side, html:not(.js) .pho-main, html:not(.js) .pho-view { disp
   }
   .pad-tile .ico { transform: scale(1.19); }
   .pad-i:active .pad-tile { filter: drop-shadow(0 4px 10px rgb(0 0 0 / .18)) brightness(.75); transform: scale(.98); }
-  .pad-lbl { font-size: 11px; font-weight: 500; color: var(--wall-ink); white-space: nowrap; text-shadow: 0 0 1px rgb(0 0 0 / .9), 0 1px 2px rgb(0 0 0 / .85), 0 0 6px rgb(0 0 0 / .6), 0 2px 8px rgb(0 0 0 / .45); }
+  .pad-i:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 14px; }
+  /* iOS writes these in white, which works because an iOS wallpaper is dark
+     under the grid. This one is a pale sky in the light appearance, and white
+     on pale sky is unreadable at any shadow, so the label takes the ink the
+     wallpaper can actually carry and a halo in the opposite value */
+  .pad-lbl {
+    font-size: 12px; font-weight: 500; line-height: 1.2;
+    max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    color: light-dark(rgb(3 3 2 / .86), rgb(255 255 255 / .96));
+    text-shadow: 0 1px 2px light-dark(rgb(255 255 255 / .6), rgb(0 0 0 / .55));
+  }
   .pdock {
     display: grid; grid-template-columns: repeat(4, 1fr); justify-items: center;
-    margin: 18px 16px 8px; padding: 14px 10px; border-radius: 34px;
+    margin: 16px 14px 10px; padding: 13px 10px; border-radius: 34px;
     background: var(--glass-dock);
     --bf: blur(24px) saturate(180%);
     backdrop-filter: var(--bf);
     box-shadow: inset 0 0 0 .5px var(--glass-hi), 0 0 0 .5px var(--glass-edge);
   }
   .pdock .pad-i { width: auto; }
-  .home-ind {
-    justify-self: center;
+  /* drawn only where the phone is not already drawing one of its own */
+  .home-ind { display: none; }
+  html.no-inset .home-ind {
+    display: block; justify-self: center; margin-top: 2px;
     width: 134px; height: 5px; border-radius: 999px;
-    background: var(--wall-ink); opacity: .6;
+    background: light-dark(rgb(3 3 2 / .5), rgb(255 255 255 / .65));
   }
 
   .sheet {
@@ -1023,6 +1033,8 @@ html:not(.js) .pho-side, html:not(.js) .pho-main, html:not(.js) .pho-view { disp
   .sheet-body .fnd-status { display: none; }
   .sheet-body .abt { padding: 24px 22px 32px; }
   .sheet-body .txt { padding: 24px 20px; font-size: 17px; max-width: none; }
+  /* a terminal on a phone is still a terminal, one step up so it is readable */
+  .sheet-body [data-vterm] { font-size: 13px; }
   /* the sheet wears the demo's own surface under the demo, so nothing sits empty */
   .sheet[data-app='rin'] .sheet-body { background: var(--slate); }
   .sheet[data-app='kyou'] .sheet-body { background: #000; }
@@ -1084,6 +1096,12 @@ html:not(.js) .pho-side, html:not(.js) .pho-main, html:not(.js) .pho-view { disp
 html:not(.js) .mac { display: none; }
 html:not(.in) .mac.is-pending { visibility: hidden; }
 .mac.is-far, .mac.is-moving { z-index: 90; }
+/* the desktop sits ABOVE the paper because it has to show through the drawn
+   screen. A phone has no drawn screen and nothing to sit inside, so there the
+   machine waits underneath the cover until the move actually starts */
+@media (max-width: 767px) {
+  .mac.is-far:not(.is-moving) { z-index: 1; }
+}
 .mac.is-moving { overflow: hidden; }
 /* the lift is its own property so a window resize moves the desktop at once
    and only the hover eases */
@@ -1095,8 +1113,8 @@ html:not(.in) .mac.is-pending { visibility: hidden; }
 }
 /* the paper grain aliases into static at a third of its size */
 .mac.is-far .wall-grain, .mac.is-moving .wall-grain { opacity: 0; }
-/* the screen's black, above the bar and the dock, under the phone's island;
-   the script fades it. Off in the picture, the glass keeps one faint light */
+/* the screen's black, above the bar and the dock; the script fades it. Off
+   in the picture, the glass keeps one faint light */
 .mac-blank { position: absolute; inset: 0; z-index: 97; background: #000; opacity: 0; pointer-events: none; }
 .mac-blank::after {
   content: ''; position: absolute; inset: 0; opacity: 0;
@@ -1107,14 +1125,8 @@ html:not(.in) .mac.is-pending { visibility: hidden; }
 .mac.is-far, .mac.is-far * { pointer-events: none !important; }
 body.is-land-hover .mac.is-far { --lift: -3px; filter: brightness(1.06); }
 .desk:focus, .desk:focus-visible { outline: none; }
-.mac-isle {
-  display: none; position: absolute; z-index: 99;
-  left: 50%; top: 1.3%; translate: -50% 0;
-  width: 31%; height: 4.2%; border-radius: 999px;
-  background: #000;
-}
 
-/* ══ the landing: paper, a drawn machine, the real desktop in its screen ══ */
+/* ══ the landing: paper, a drawn machine on a desktop, a cover on a phone ══ */
 .land {
   position: fixed; inset: 0; z-index: 85; overflow: hidden;
   display: grid; place-items: center;
@@ -1139,7 +1151,6 @@ html.in .land, html:not(.js) .land { display: none !important; }
 .land-mac svg { display: block; width: 100%; height: 100%; overflow: visible; }
 /* the drawn screen goes black under a dark desktop, so no edge of sky shows */
 .land.is-dark .dev-screen { fill: #000; }
-.land-iphone { display: none; }
 .land.is-hover .land-mac, body.is-land-hover .land-mac { transform: translateY(-3px); }
 .land.is-moving .land-mac { transition: none; transform: none; }
 .land.is-moving { pointer-events: none; }
@@ -1147,7 +1158,8 @@ html.in .land, html:not(.js) .land { display: none !important; }
 .land-screen { position: absolute; display: block; padding: 0; border-radius: 0; }
 .land-screen:not(:disabled) { cursor: pointer; }
 .land-screen:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; border-radius: 2px; }
-.land-iphone .land-screen:focus-visible { border-radius: 12%; }
+/* the phone's way in: one button instead of a picture of a phone */
+.land-tap { display: none; }
 .land-foot { position: relative; width: 100%; height: 24px; }
 .land-load, .land-cue {
   position: absolute; inset: 0;
@@ -1169,13 +1181,24 @@ html.in .land, html:not(.js) .land { display: none !important; }
 .land.is-ready.is-blank .land-cue { opacity: 0; }
 
 @media (max-width: 767px) {
-  .land-col { gap: 22px; padding: 20px; }
-  .land-name { font-size: 34px; }
-  .land-line { font-size: 16px; max-width: 30ch; }
-  .land-mac { width: min(62vw, calc((100dvh - 270px) * var(--ar, .47))); }
+  .land-col { gap: 28px; padding: 24px; align-content: center; }
+  .land-name { font-size: 38px; }
+  .land-line { font-size: 17px; line-height: 1.4; max-width: 32ch; }
   .land-imac { display: none; }
-  .land-iphone { display: block; }
-  .mac.is-far .mac-isle, .mac.is-moving .mac-isle { display: block; }
+  /* the whole way in, sized for a thumb and reading as one sentence */
+  .land-tap {
+    display: block; width: 100%; max-width: 340px;
+    min-height: 56px; padding: 17px 24px;
+    border-radius: 16px; background: var(--ink); color: var(--surface);
+    font-size: 17px; font-weight: 600; line-height: 1.25; text-align: center;
+    box-shadow: 0 8px 22px rgb(3 3 2 / .18);
+    transition: transform var(--t-press) var(--soft), opacity 220ms var(--soft), filter var(--t-fast) var(--soft);
+  }
+  .land-tap:disabled { opacity: .3; }
+  .land-tap:not(:disabled):active { transform: scale(.97); filter: brightness(1.15); }
+  .land-tap:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+  /* the button already says it, so the caption under the bar stays away */
+  .land-cue { display: none; }
   /* the sheet's last row: the phone's power control, Sleep and Shut Down */
   .sheet { grid-template-rows: auto 1fr auto; }
   .sheet-power { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }

@@ -127,7 +127,7 @@ export const apps: App[] = [
     title: 'Rin',
     kind: 'panel',
     w: 760, h: 372,
-    scene: 'rin', sw: 820, sh: 400, mw: 390, mh: 400,
+    scene: 'rin', sw: 820, sh: 400, mw: 390, mh: 780,
     toolbar: [{ label: 'Source on GitHub', href: 'https://github.com/exata531/Rin' }],
     about: {
       name: 'Rin',
@@ -158,7 +158,7 @@ export const apps: App[] = [
     title: 'iPhone 17 Pro',
     kind: 'sim',
     w: 330, h: 726,
-    scene: 'kyou', sw: 300, sh: 620, mw: 390, mh: 720,
+    scene: 'kyou', sw: 300, sh: 620, mw: 390, mh: 780,
     toolbar: [
       { label: 'Light', action: 'kyou-light' },
       { label: 'Dark', action: 'kyou-dark' },
@@ -179,7 +179,7 @@ export const apps: App[] = [
     title: 'Market Station',
     kind: 'window',
     w: 980, h: 640, min: 520,
-    scene: 'market', sw: 1100, sh: 720, mw: 390, mh: 640,
+    scene: 'market', sw: 1100, sh: 720, mw: 390, mh: 780,
     about: {
       name: 'Market Station',
       line: 'Market Station watches a set of public market readings all day, like the VIX, the yield curve, and how many stocks are above their own average, and sends a phone alert when one of them crosses a line. I built it for one non-technical reader at home, so every reading says in plain English what it means, and an alert fires once per crossing instead of every time the number wobbles. It has been running on an old laptop since August and writes a short briefing twice a day. It is a tool before it is pretty, and the only color on it is for warnings.',
@@ -224,6 +224,13 @@ export const finder: FinderSection[] = [
 export const readme = [
   'I am a senior at the school, outside Detroit, and I make software. I taught myself most of it from the docs and by breaking things, because none of my projects came with a mentor. Four of the things I built are on this desktop, and each one runs when you open it. Open whichever one looks interesting and click around, and if something is a demo it says so in the corner.',
 ];
+
+/* The phone's Read me widget shows as much of the note as a medium widget
+   actually holds, counted in whole sentences: a widget that stops mid-word
+   is a widget that lied about its size. The rest is one tap away, which is
+   what the real Notes widget does too. */
+const sentences = (s: string) => s.match(/[^.]+\.(?:\s|$)/g)?.map((t) => t.trim()) ?? [s];
+export const readmeCard = sentences(readme[0]).slice(0, 2).join(' ');
 
 /* the About Peter panel's own sentence */
 export const aboutPeter = 'I am a senior at the school, outside Detroit, and I taught myself all of this from the docs, mostly by getting it wrong first.';

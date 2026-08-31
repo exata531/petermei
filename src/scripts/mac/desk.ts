@@ -74,14 +74,40 @@ function initTheme() {
 }
 const theme = initTheme();
 
+/* ── the Read me names the machine it is being read on ──────────────────
+   The landing's line already does this. The note is the same sentence about
+   the same four things, so on a phone it says phone and tap, and it goes
+   back the moment the window is wide again. */
+{
+  const p = body('textedit')?.querySelector('p');
+  if (p) {
+    const wide = p.textContent ?? '';
+    const hand = wide.replace('on this desktop', 'on this phone').replace('click around', 'tap around');
+    const paint = () => { p.textContent = phone() ? hand : wide; };
+    paint();
+    matchMedia('(max-width: 767px)').addEventListener('change', paint);
+  }
+}
+
+/* ── does this device draw its own home indicator? ──────────────────────
+   A phone with a bottom safe area is already painting a bar down there, and
+   a second one under it is the kind of detail that gives a fake away. So the
+   inset is measured once and the drawn indicator is kept for the machines
+   that have none, which is every desktop browser at this width. */
+{
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;left:0;bottom:0;width:0;height:0;padding-bottom:env(safe-area-inset-bottom);pointer-events:none;visibility:hidden';
+  document.body.appendChild(probe);
+  if (probe.getBoundingClientRect().height < 1) document.documentElement.classList.add('no-inset');
+  probe.remove();
+}
+
 /* ── the clock ──────────────────────────────────────────────────────────── */
 function initClock() {
   const long = $<HTMLTimeElement>('[data-clock]');
-  const short = $$<HTMLElement>('[data-clock-short]');
   const paint = () => {
     const d = new Date();
     const t = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-    short.forEach((s) => { s.textContent = t.replace(/\s?[AP]M$/, ''); });
     if (long) {
       long.textContent =
         d.toLocaleDateString('en-US', { weekday: 'short' }) + ' ' +
@@ -145,12 +171,31 @@ function notify(title: string, text: string, iconId: string) {
   n.addEventListener('click', () => { clearTimeout(t); gone(); });
 }
 
-/* Rin is a menu bar app in real life, so it is one here: the face goes up into
-   the bar and the panel drops out of it. It is not a window and never was. */
+/* Rin is a menu bar app in real life, so it is one here: it sits in the bar
+   whether it is open or not, and the panel hangs off that item. It is not a
+   window and never was.
+
+   Where it hangs is the app's own arithmetic: the panel is centred on the
+   status item and then pulled back inside the screen edge by twelve pixels,
+   which on a wide screen leaves it tucked under the item near the right. --px
+   is where the item's centre falls inside the panel, so the open grows out of
+   the item rather than out of the middle of the screen. */
 const rinStatus = $('[data-rin-status]')!;
 let rinPanel: HTMLElement | null = null;
 let rinStop: (() => void) | null = null;
 let rinFront = false;
+function rinPlace() {
+  const p = rinPanel;
+  if (!p) return;
+  const r = rinStatus.getBoundingClientRect();
+  const w = p.offsetWidth;
+  const pad = 12;
+  const mid = r.width ? r.left + r.width / 2 : innerWidth - pad - w / 2;
+  const x = Math.min(Math.max(mid - w / 2, pad), Math.max(pad, innerWidth - w - pad));
+  p.style.left = `${Math.round(x)}px`;
+  p.style.setProperty('--px', `${Math.round(Math.min(Math.max(mid - x, 0), w))}px`);
+}
+addEventListener('resize', rinPlace);
 function rinOpen() {
   if (rinPanel) { rinClose(); return; }
   const el = body('rin')!;
@@ -163,7 +208,8 @@ function rinOpen() {
   p.addEventListener('pointerdown', () => { rinFront = true; stickyFront = false; desk.blur(); sync(); });
   rinPanel = p;
   rinFront = true;
-  rinStatus.hidden = false;
+  rinStatus.setAttribute('aria-expanded', 'true');
+  rinPlace();
   open.add('rin');
   sync();
   const l = live('rin');
@@ -189,7 +235,7 @@ function rinClose(back = false) {
   if (!p) return;
   rinPanel = null;
   rinFront = false;
-  rinStatus.hidden = true;
+  rinStatus.setAttribute('aria-expanded', 'false');
   open.delete('rin');
   lives.get('rin')?.scene.leave?.();
   sync();
@@ -222,6 +268,10 @@ function rinClose(back = false) {
     faceT = window.setTimeout(() => { faceEl.textContent = rest; }, 2600);
   });
 }
+/* the item in the bar is the app's own switch, the same as on a real Mac:
+   press it once for the panel, press it again to put it away */
+rinStatus.addEventListener('click', () => { if (!rinPanel) dock.bounce('rin'); rinOpen(); });
+
 /* the real panel closes when you click anywhere else */
 addEventListener('pointerdown', (e) => {
   if (!rinPanel) return;
@@ -1658,8 +1708,12 @@ addEventListener('keydown', (e) => {
     if (photoEsc()) return;
     if (sheetId) { sheetClose(); return; }
     if (ql) { quickLookClose(); return; }
+    /* the panel is checked BEFORE the typing guard: it hands the keyboard to
+       its own prompt the moment it drops, so every Escape it ever sees is an
+       Escape pressed inside a text field, and a dropdown that will not take
+       Escape is a dropdown with no way out but the mouse */
+    if (rinPanel && (rinFront || !desk.front)) { rinClose(true); return; }
     if ((e.target as HTMLElement)?.matches?.('input, textarea')) return;
-    if (rinPanel && (rinFront || !desk.front)) rinClose(true);
     return;
   }
   if (e.key === ' ' && ql && !(e.target as HTMLElement)?.matches?.('input, textarea, button.tb-btn')) { e.preventDefault(); quickLookClose(); return; }

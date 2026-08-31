@@ -6,7 +6,7 @@ import Dock from '../components/mac/Dock.astro';
 import Stash from '../components/mac/Stash.astro';
 import Landing from '../components/mac/Landing.astro';
 import Icon from '../components/mac/Icon.astro';
-import { readme } from '../data/apps';
+import { readmeCard } from '../data/apps';
 import { deskPhotos } from '../data/photos';
 
 const padApps = [
@@ -66,21 +66,16 @@ const padApps = [
     <div class="stickies" data-stickies></div>
   </div>
 
-  <!-- the phone: a home screen instead of a desktop -->
+  <!-- the phone: a home screen instead of a desktop. No status bar is drawn
+       up top: the phone holding this page already has one of its own, and
+       two clocks an inch apart is the tell that gives a fake away. -->
   <div class="home" data-home>
-    <div class="home-status" aria-hidden="true">
-      <span data-clock-short>9:41</span>
-      <span class="hs-icons">
-        <svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx=".8" stroke="none"/><rect x="5" y="5.5" width="3" height="6.5" rx=".8" stroke="none"/><rect x="10" y="3" width="3" height="9" rx=".8" stroke="none"/><rect x="15" y="0" width="3" height="12" rx=".8" stroke="none"/></svg>
-        <svg viewBox="0 0 16 12" fill="none"><path d="M1 4a10 10 0 0 1 14 0"/><path d="M3.8 6.8a6 6 0 0 1 8.4 0"/><path d="M6.4 9.4a2.4 2.4 0 0 1 3.2 0"/></svg>
-        <svg viewBox="0 0 27 12" fill="none"><rect x=".75" y=".75" width="22" height="10.5" rx="3"/><path d="M25.5 4v4"/><rect x="2.5" y="2.5" width="17" height="7" rx="1.5" fill="currentColor" stroke="none"/></svg>
-      </span>
-    </div>
     <div class="home-pad">
-      <div class="widget" aria-label="Read me">
+      <button class="widget" type="button" data-open="textedit">
         <span class="widget-h"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2.5h10v11H3z"/><path d="M5.5 6h5M5.5 9h5"/></svg>Read me</span>
-        {readme.map((l) => <p>{l}</p>)}
-      </div>
+        <span class="widget-p">{readmeCard}</span>
+        <span class="widget-more">Tap to read the rest</span>
+      </button>
       <ul class="pad">
         {padApps.map((a) => (
           <li>
@@ -108,6 +103,8 @@ const padApps = [
       </a>
     </nav>
 
+    <!-- the home indicator is drawn only where the device is not drawing one
+         of its own; the script measures the bottom inset and decides -->
     <span class="home-ind" aria-hidden="true"></span>
 
     <div class="sheet" data-sheet hidden>
@@ -129,8 +126,6 @@ const padApps = [
   <MenuBar />
   <Dock />
 
-  <!-- the phone's Dynamic Island, only while the home screen sits in the landing's picture -->
-  <span class="mac-isle" data-mac-isle aria-hidden="true"></span>
   <!-- the screen's black: inside the machine so it scales with the screen -->
   <div class="mac-blank" data-mac-blank aria-hidden="true"></div>
   </div>

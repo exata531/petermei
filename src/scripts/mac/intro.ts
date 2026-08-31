@@ -20,14 +20,23 @@
    leave with the desktop still showing. The black is a layer inside the
    machine, so it scales with the screen instead of covering the paper.
 
+   A phone gets none of the camera move. Drawing a phone inside a phone
+   spends the whole screen saying something the visitor is already holding,
+   so under 768px the landing is a plain cover: the name, the line, the same
+   honest bar, and one button big enough for a thumb. Tapping it opens the
+   way an app opens on iOS, growing out of the point the finger touched.
+
    Once entered, the landing stays out of the way for the rest of the tab
    session; Shut Down, Restart and Log Out end that, Sleep and Lock Screen
    keep it. With reduced motion every move is a short crossfade. */
-import { imac, iphone } from './devices';
+import { imac } from './devices';
 import { reduced } from './motion';
 
 const EASE = 'cubic-bezier(.7, 0, .15, 1)';
 const DUR = 900;
+/* the phone's way in: an app opening, not a camera pushing in */
+const ZOOM = 420;
+const ZOOM_EASE = 'cubic-bezier(.32, .72, 0, 1)';
 const FADE = 300;
 const FLOOR = 600;
 const CAP = 2500;
@@ -43,13 +52,14 @@ export type Intro = { readonly active: boolean; power(kind: Power): void };
 
 type Hooks = { onEnter?: () => void; beforeLeave?: (kind: Power) => void; onLeave?: (kind: Power) => void };
 
-/* what the screen in the picture is doing, and the caption under it */
+/* what the screen in the picture is doing, and the caption under it. The
+   phone has no picture and no screen to point at, so its button says the
+   same thing about itself */
 type Screen = 'on' | 'off' | 'asleep';
-/* on a phone the hand taps, and the machine in the picture is a phone */
-const CUE: Record<Screen, { text: (tap: boolean) => string; verb: string }> = {
-  on: { text: (t) => `${t ? 'Tap' : 'Click'} the screen to have a look around.`, verb: 'Look around' },
-  off: { text: (t) => `${t ? 'Tap' : 'Click'} the screen to turn it on.`, verb: 'Turn on' },
-  asleep: { text: (t) => `${t ? 'Tap' : 'Click'} the screen to wake it.`, verb: 'Wake' },
+const CUE: Record<Screen, { text: (tap: boolean) => string; verb: string; tap: string }> = {
+  on: { text: (t) => `${t ? 'Tap' : 'Click'} the screen to have a look around.`, verb: 'Look around', tap: 'Tap to have a look around' },
+  off: { text: (t) => `${t ? 'Tap' : 'Click'} the screen to turn it on.`, verb: 'Turn on', tap: 'Tap to turn it on' },
+  asleep: { text: (t) => `${t ? 'Tap' : 'Click'} the screen to wake it.`, verb: 'Wake', tap: 'Tap to wake it' },
 };
 /* the line under his name says which machine the visitor is holding */
 const LEDE = (phone: boolean) =>
@@ -60,55 +70,54 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
 
   const $ = <T extends HTMLElement = HTMLElement>(s: string, r: ParentNode = land) => r.querySelector<T>(s)!;
   const col = $('[data-land-col]');
-  const hosts = { desk: $('[data-land-imac]'), phone: $('[data-land-iphone]') };
+  const host = $('[data-land-imac]');
+  const deskBtn = $<HTMLButtonElement>('[data-land-enter]', host);
+  const tapBtn = $<HTMLButtonElement>('[data-land-tap]');
   const fill = $('[data-land-fill]');
   const bar = $('[data-land-bar]');
   const cue = $('[data-land-cue-text]');
   const lede = $('.land-line');
-  const isle = mac.querySelector<HTMLElement>('[data-mac-isle]');
   const blank = mac.querySelector<HTMLElement>('[data-mac-blank]')!;
   const phoneMq = matchMedia('(max-width: 767px)');
-  const device = () => (phoneMq.matches ? 'phone' : 'desk');
+  /* under the breakpoint there is no machine in the picture, only a cover */
+  const cover = () => phoneMq.matches;
+  const enterBtn = () => (cover() ? tapBtn : deskBtn);
   const ms = (n: number) => (reduced() ? Math.min(n, 80) : n);
 
   let state: 'off' | 'loading' | 'ready' | 'moving' = 'off';
   let screen: Screen = 'on';
   /* where the screen is: the desktop's transform while it sits in the picture */
   let fx = 0, fy = 0, k = 1, sr = 0;
-  const drawn = {
-    desk: Number(hosts.desk.dataset.aspect) || NaN,
-    phone: Number(hosts.phone.dataset.aspect) || NaN,
-  };
+  let drawn = Number(host.dataset.aspect) || NaN;
+  /* the point the finger landed on, so the phone's open grows out of it */
+  let tap: { x: number; y: number } | null = null;
   let anims: Animation[] = [];
   let blankAnim: Animation | null = null;
 
-  const screenOf = (which: 'desk' | 'phone') => hosts[which].querySelector<HTMLButtonElement>('[data-land-enter]')!;
-
   /* redraw the machine when the window's shape has changed enough to show */
-  function draw(which: 'desk' | 'phone', aspect: number) {
-    const d = which === 'phone' ? iphone(aspect) : imac(aspect);
-    const host = hosts[which];
+  function draw(aspect: number) {
+    const d = imac(aspect);
     host.style.setProperty('--ar', (d.vbW / d.vbH).toFixed(4));
     host.querySelector('svg')!.outerHTML = d.svg;
-    const b = screenOf(which);
     const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(3)}%`;
-    b.style.left = pct(d.screen.x, d.vbW);
-    b.style.top = pct(d.screen.y, d.vbH);
-    b.style.width = pct(d.screen.w, d.vbW);
-    b.style.height = pct(d.screen.h, d.vbH);
-    b.dataset.r = String(d.screen.r / d.screen.w);
-    drawn[which] = aspect;
+    deskBtn.style.left = pct(d.screen.x, d.vbW);
+    deskBtn.style.top = pct(d.screen.y, d.vbH);
+    deskBtn.style.width = pct(d.screen.w, d.vbW);
+    deskBtn.style.height = pct(d.screen.h, d.vbH);
+    deskBtn.dataset.r = String(d.screen.r / d.screen.w);
+    drawn = aspect;
   }
 
-  /* put the real desktop inside the picture's screen */
+  /* put the real desktop inside the picture's screen, or, on a phone, leave
+     it at full size behind the cover with no transform of its own */
   function place() {
-    const which = device();
+    if (cover()) { clearVars(); fx = 0; fy = 0; k = 1; sr = 0; return; }
     const aspect = innerWidth / innerHeight;
-    if (!(Math.abs(drawn[which] / aspect - 1) < 0.004)) draw(which, aspect);
-    const r = screenOf(which).getBoundingClientRect();
+    if (!(Math.abs(drawn / aspect - 1) < 0.004)) draw(aspect);
+    const r = deskBtn.getBoundingClientRect();
     k = r.width / innerWidth;
     fx = r.left; fy = r.top;
-    sr = r.width * (Number(screenOf(which).dataset.r) || 0);
+    sr = r.width * (Number(deskBtn.dataset.r) || 0);
     mac.style.setProperty('--fx', `${fx.toFixed(2)}px`);
     mac.style.setProperty('--fy', `${fy.toFixed(2)}px`);
     mac.style.setProperty('--fk', k.toFixed(5));
@@ -119,19 +128,25 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     for (const v of ['--fx', '--fy', '--fk', '--sr']) mac.style.removeProperty(v);
   }
 
+  /* the machine at rest, out of reach, behind the paper */
+  function frame() {
+    mac.classList.add('is-far');
+    place();
+  }
+
   function setProgress(p: number) {
     fill.style.setProperty('--p', p.toFixed(3));
     bar.setAttribute('aria-valuenow', String(Math.round(p * 100)));
   }
 
-  /* the caption and the screen's label follow what the screen is doing */
+  /* the caption, the button and the line all follow what the screen is doing */
   function setScreen(s: Screen) {
     screen = s;
     land.classList.toggle('is-dark', s !== 'on');
     cue.textContent = CUE[s].text(phoneMq.matches);
     lede.textContent = LEDE(phoneMq.matches);
-    screenOf('desk').setAttribute('aria-label', `${CUE[s].verb} the Mac`);
-    screenOf('phone').setAttribute('aria-label', `${CUE[s].verb} the phone`);
+    deskBtn.setAttribute('aria-label', `${CUE[s].verb} the Mac`);
+    tapBtn.textContent = CUE[s].tap;
   }
 
   /* the black over the screen, faded in or out; the resting value is set at
@@ -155,7 +170,7 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     setProgress(1);
     land.classList.add('is-ready');
     land.setAttribute('aria-busy', 'false');
-    for (const b of [screenOf('desk'), screenOf('phone')]) b.disabled = false;
+    for (const b of [deskBtn, tapBtn]) b.disabled = false;
   }
 
   /* the honest bar: fonts, the desktop's pictures, one painted frame */
@@ -163,8 +178,7 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     state = 'loading';
     document.body.classList.add('is-landing');
     mac.inert = true;
-    mac.classList.add('is-far');
-    place();
+    frame();
     mac.classList.remove('is-pending');
     const imgs = [...mac.querySelectorAll<HTMLImageElement>('.item-pic img, .pad img')];
     const jobs: Promise<unknown>[] = [
@@ -184,6 +198,11 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     anims.forEach((a) => a.cancel());
     anims = [];
   }
+
+  const centreOf = (el: HTMLElement) => {
+    const r = el.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  };
 
   /* the picture's transform that keeps its screen on the desktop's rectangle */
   function inverse() {
@@ -207,7 +226,10 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
       mac.classList.remove('is-moving', 'is-far');
       mac.style.willChange = '';
       mac.style.opacity = '';
+      mac.style.transformOrigin = '';
       col.style.willChange = '';
+      col.style.transform = '';
+      land.style.opacity = '';
       clearVars();
       mac.inert = false;
       land.remove();
@@ -217,6 +239,7 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
       try { if (remember) sessionStorage.setItem('mac-in', '1'); } catch {}
       setScreen('on');
       state = 'off';
+      tap = null;
       hooks.onEnter?.();
     };
     if (reduced()) {
@@ -224,6 +247,21 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
       const a = mac.animate([{ opacity: 0 }, { opacity: 1 }], { duration: FADE, easing: 'ease', fill: 'both' });
       anims = [a];
       a.onfinish = finish;
+      return;
+    }
+    /* the phone's way in: the home screen swells out of the finger and the
+       cover goes with it, which is what opening an app looks like on iOS */
+    if (cover()) {
+      const from = tap ?? centreOf(tapBtn);
+      mac.classList.remove('is-far');
+      mac.style.willChange = 'transform, opacity';
+      mac.style.transformOrigin = `${from.x.toFixed(1)}px ${from.y.toFixed(1)}px`;
+      const zo: KeyframeAnimationOptions = { duration: ZOOM, easing: ZOOM_EASE, fill: 'both' };
+      const z1 = mac.animate([{ transform: 'scale(.9)', opacity: 0 }, { opacity: 1, offset: 0.42 }, { transform: 'scale(1)', opacity: 1 }], zo);
+      const z2 = land.animate([{ opacity: 1 }, { opacity: 0, offset: 0.45 }, { opacity: 0 }], zo);
+      const z3 = col.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.04)' }], zo);
+      anims = [z1, z2, z3];
+      z1.onfinish = finish;
       return;
     }
     const opts: KeyframeAnimationOptions = { duration: DUR, easing: EASE, fill: 'both' };
@@ -239,12 +277,11 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
       [{ transform: home, opacity: 1 }, { opacity: 1, offset: 0.35 }, { opacity: 0, offset: 0.88 }, { transform: away, opacity: 0 }],
       opts,
     );
-    const a3 = hosts[device()].animate(
+    const a3 = host.animate(
       [{ filter: 'blur(0px)' }, { filter: 'blur(0px)', offset: 0.4 }, { filter: 'blur(7px)' }],
       opts,
     );
     anims = [a1, a2, a3];
-    if (isle && device() === 'phone') anims.push(isle.animate([{ opacity: 1 }, { opacity: 0, offset: 0.3 }, { opacity: 0 }], opts));
     a1.onfinish = finish;
   }
 
@@ -268,7 +305,7 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     land.classList.remove('is-moving');
     land.setAttribute('aria-busy', 'false');
     setProgress(1);
-    for (const b of [screenOf('desk'), screenOf('phone')]) b.disabled = false;
+    for (const b of [deskBtn, tapBtn]) b.disabled = false;
     state = 'moving';
     document.body.classList.add('is-landing');
     mac.inert = true;
@@ -278,7 +315,10 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
       mac.classList.remove('is-moving');
       mac.style.willChange = '';
       mac.style.opacity = '';
+      mac.style.transformOrigin = '';
       col.style.willChange = '';
+      col.style.transform = '';
+      land.style.opacity = '';
       stopAnims();
       if (kind === 'restart') {
         /* off for a moment, then on and back in, all from the one click */
@@ -286,13 +326,26 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
         return;
       }
       state = 'ready';
-      screenOf(device()).focus({ preventScroll: true });
+      enterBtn().focus({ preventScroll: true });
       hooks.onLeave?.(kind);
     };
     if (reduced()) {
       const a = mac.animate([{ opacity: 1 }, { opacity: 0 }], { duration: FADE, easing: 'ease', fill: 'both' });
       anims = [a];
       a.onfinish = finish;
+      return;
+    }
+    /* the phone's way out: the home screen shrinks away and the cover
+       comes back up through it */
+    if (cover()) {
+      mac.classList.add('is-moving');
+      mac.style.willChange = 'transform, opacity';
+      mac.style.transformOrigin = '50% 42%';
+      const zo: KeyframeAnimationOptions = { duration: ZOOM, easing: ZOOM_EASE, fill: 'both' };
+      const z1 = mac.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(.9)', opacity: 0 }], zo);
+      const z2 = land.animate([{ opacity: 0 }, { opacity: 1, offset: 0.55 }, { opacity: 1 }], zo);
+      anims = [z1, z2];
+      z1.onfinish = finish;
       return;
     }
     const opts: KeyframeAnimationOptions = { duration: DUR, easing: EASE, fill: 'both' };
@@ -308,12 +361,11 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
       [{ transform: away, opacity: 0 }, { opacity: 0, offset: 0.12 }, { opacity: 1, offset: 0.65 }, { transform: home, opacity: 1 }],
       opts,
     );
-    const a3 = hosts[device()].animate(
+    const a3 = host.animate(
       [{ filter: 'blur(7px)' }, { filter: 'blur(0px)', offset: 0.6 }, { filter: 'blur(0px)' }],
       opts,
     );
     anims = [a1, a2, a3];
-    if (isle && device() === 'phone') anims.push(isle.animate([{ opacity: 0 }, { opacity: 0, offset: 0.7 }, { opacity: 1 }], opts));
     a1.onfinish = finish;
   }
 
@@ -335,12 +387,15 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
   }
 
   /* the screen reads as a button: it lifts and brightens under the pointer */
-  for (const which of ['desk', 'phone'] as const) {
-    const b = screenOf(which);
-    b.addEventListener('click', enter);
-    b.addEventListener('pointerenter', () => { if (state === 'ready') document.body.classList.add('is-land-hover'); });
-    b.addEventListener('pointerleave', () => document.body.classList.remove('is-land-hover'));
-  }
+  deskBtn.addEventListener('click', enter);
+  deskBtn.addEventListener('pointerenter', () => { if (state === 'ready') document.body.classList.add('is-land-hover'); });
+  deskBtn.addEventListener('pointerleave', () => document.body.classList.remove('is-land-hover'));
+  /* the phone's button remembers where the finger was, so the open starts
+     there; a keyboard press has no point, so it starts at the button */
+  tapBtn.addEventListener('click', (e) => {
+    tap = e.clientX || e.clientY ? { x: e.clientX, y: e.clientY } : centreOf(tapBtn);
+    enter();
+  });
 
   /* the window changed shape: the picture follows, and the desktop with it */
   let raf = 0;
@@ -349,8 +404,13 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     cancelAnimationFrame(raf);
     raf = requestAnimationFrame(place);
   });
-  /* the words follow the machine across the breakpoint */
-  phoneMq.addEventListener('change', () => { if (state === 'loading' || state === 'ready' || state === 'off') setScreen(screen); });
+  /* crossing the breakpoint swaps the whole landing: the words, and whether
+     there is a machine in the picture at all */
+  phoneMq.addEventListener('change', () => {
+    if (state !== 'loading' && state !== 'ready' && state !== 'off') return;
+    setScreen(screen);
+    if (state !== 'off') frame();
+  });
 
   if (document.documentElement.classList.contains('in')) {
     land.remove();
