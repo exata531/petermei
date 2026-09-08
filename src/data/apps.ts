@@ -134,7 +134,9 @@ export const apps: App[] = [
       line: 'Rin is a Mac app that drops a terminal down from the menu bar, and it comes with a folder of notes already set up, so the assistant inside it knows your deadlines, your projects, and your week before you type anything. I built it for myself first, to run my own school life, and then took my own stuff out of it so anyone could use it. It is free, open source, and Mac only, and every tab survives quitting. What is left before I call it 1.0 is watching somebody who is not me install it cold.',
       built: 'Swift, SwiftUI, AppKit',
       state: 'Free and open source',
-      link: { label: 'github.com/exata531/Rin', href: 'https://github.com/exata531/Rin' },
+      /* Rin's own landing page now lives here too, and it is the better first
+         stop than the repo: it explains the app, then hands you GitHub. */
+      link: { label: 'petermei.com/rin', href: '/rin/' },
     },
     menus: std('Rin', { label: 'Source on GitHub', action: 'rin-gh' }),
   },
