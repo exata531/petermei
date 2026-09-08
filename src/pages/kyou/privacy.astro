@@ -1,0 +1,167 @@
+---
+/* Kyou's privacy policy. The App Store requires a link to this page from
+   inside the app and from the listing, so the route is short and it never
+   moves: petermei.com/kyou/privacy. The words are the ones in Kyou's own
+   docs/privacy.md; keep the two in step whenever the app changes what it
+   keeps. Plain prose on the site's paper, no games in the way of it. */
+import Site from '../../layouts/Site.astro';
+
+const updated = '8 September 2026';
+---
+
+<Site
+  title="Kyou Privacy Policy"
+  desc="What Kyou does with your information: nothing leaves your phone, there is no account and no server, and your events and to-dos stay in Apple's Calendar and Reminders."
+  route="project"
+  back="/site/work/kyou"
+>
+  <section class="legal" data-nav-tone="light" aria-label="Kyou privacy policy">
+    <div class="wrap">
+      <h1 class="h-title">Kyou Privacy Policy</h1>
+      <p class="legal-date">Last updated {updated}</p>
+
+      <p class="legal-lead">
+        I'm Peter, and I made Kyou by myself. This page is everything the app does with your
+        information.
+      </p>
+
+      <p class="legal-lead">Kyou collects nothing. There is no account, no sign-in, and no server of mine anywhere.</p>
+
+      <p>
+        The reason that holds is boring. There is no network code in the app: no requests, no web
+        view, no outside libraries that could carry one in. Careful handling does not come into it.
+        There is nowhere for your data to go.
+      </p>
+
+      <p>
+        Some buttons take you out of Kyou. They go to its App Store listing, to iOS Settings, and to
+        this page. Tell a friend hands the line “Kyou. Your whole day on one screen.” to whatever you
+        share it with. Nothing about you goes along.
+      </p>
+
+      <h2>Calendar and Reminders</h2>
+      <p>
+        Kyou needs your calendar and your reminders. iOS asks you before it gets either. It reads the
+        days it is drawing, plus the month sitting behind the date strip, so your events and to-dos
+        can go on the timeline. It writes back when you add, edit, move, tick off or delete something
+        yourself.
+      </p>
+      <p>
+        None of it lives in Kyou. It lives in Apple's Calendar and Reminders on your phone, where it
+        already was. Delete Kyou and every event and to-do it ever showed you is still sitting there,
+        untouched.
+      </p>
+      <p>
+        You can hide individual calendars and lists inside Kyou. That changes nothing in Apple's apps;
+        those items just stop appearing here. Either permission can be switched off in iOS Settings
+        whenever you want.
+      </p>
+
+      <h2>What Kyou keeps on your phone</h2>
+      <p>
+        Your settings. Notification times, which calendars and lists you hid, and whether haptics are
+        on.
+      </p>
+      <p>
+        A copy of the next seven days, written into the app's own container so the home screen and
+        Lock Screen widgets have something to draw when the app isn't running. Names, times, colours,
+        and whether a thing is done.
+      </p>
+      <p>
+        Then the small bookkeeping: the colour a tag was given, the wording of a notification that was
+        already written, and the due date a repeating to-do was showing when you ticked it. Some of
+        those hold the name of an item. All of it sits inside the app and goes when the app goes.
+      </p>
+
+      <h2>Notifications</h2>
+      <p>
+        The app schedules its alerts on your phone. Nothing is pushed from anywhere, because there is
+        nowhere to push from. An alert says the name of the thing it is about, so it turns up on your
+        Lock Screen the way any notification does. Each kind can be turned off in Kyou's settings, and
+        all of them in iOS Settings.
+      </p>
+
+      <h2>Siri, Shortcuts and Spotlight</h2>
+      <p>
+        Use one of Kyou's shortcuts and the app hands the coming week to your iPhone's Spotlight
+        index: the day, and the names of the things on it. That is what makes searching for “chem lab”
+        turn up the day it sits on. The index belongs to your phone and stays there, and Kyou clears
+        out the days behind it as they go past.
+      </p>
+      <p>Whatever you say to Siri is between you and Apple. It arrives at Kyou as typed text and I never see it.</p>
+
+      <h2>Apple Intelligence</h2>
+      <p>
+        On phones that have it, Apple's model does two small jobs, both on the phone: reading the
+        sentence you type into quick add, and wording a notification. The text goes nowhere and trains
+        nothing. On phones without it, Kyou's own parser reads the sentence and a set of written lines
+        covers the notifications.
+      </p>
+
+      <h2>The tip jar</h2>
+      <p>
+        Kyou is free, all of it. If you leave a tip, the App Store handles the payment. Your name,
+        address and card details never reach me. I learn that somebody tipped. That's it.
+      </p>
+
+      <h2>What Kyou has never had</h2>
+      <p>
+        No ads. No analytics, no crash reporting service, no tracking, no advertising identifier, no
+        outside code of any kind. It never asks for your location, photos, contacts or health data, so
+        there is nothing there to switch off.
+      </p>
+
+      <h2>Two exceptions</h2>
+      <p>
+        Email me and I have your email address and whatever you wrote in it. It's an ordinary email and
+        I do nothing else with it.
+      </p>
+      <p>
+        If Kyou crashes and you have iOS set to share crash reports with developers, Apple may show me
+        a crash log. Apple decides what goes in one, and I read it in App Store Connect. The app sends
+        me nothing.
+      </p>
+
+      <h2>If this changes</h2>
+      <p>
+        A version of Kyou that starts collecting something gets a new date at the top of this page and
+        a line here saying what it collects and why. There is nothing to list yet.
+      </p>
+      <p>Questions go to the address on Kyou's App Store listing.</p>
+
+      <p class="legal-sign">Peter</p>
+    </div>
+  </section>
+</Site>
+
+<style>
+  .legal {
+    padding: clamp(96px, 12vw, 168px) 0 clamp(72px, 9vw, 120px);
+    background: var(--paper, #fcf9f7);
+  }
+  .legal .wrap { max-width: 72ch; }
+  .legal-date {
+    margin-top: 14px;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    opacity: 0.62;
+  }
+  .legal p {
+    margin-top: 18px;
+    max-width: 68ch;
+    font-size: clamp(16px, 1.15vw, 18px);
+    line-height: 1.62;
+    letter-spacing: -0.011em;
+  }
+  .legal-lead {
+    font-size: clamp(18px, 1.5vw, 21px) !important;
+    line-height: 1.5 !important;
+  }
+  .legal h2 {
+    margin-top: 44px;
+    font-size: clamp(20px, 1.9vw, 25px);
+    font-weight: 600;
+    letter-spacing: -0.022em;
+  }
+  .legal-sign { margin-top: 40px; opacity: 0.62; }
+</style>
