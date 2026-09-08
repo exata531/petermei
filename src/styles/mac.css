@@ -679,7 +679,9 @@ html.pm-trash-empty .ico-paper { display: none; }
 [data-vterm].term .term-scroll { overflow: auto; padding: var(--u4) var(--u6) var(--u6); overscroll-behavior: contain; cursor: text; font-size: var(--fs-9); line-height: var(--lh-9); }
 [data-vterm].term .term-out a { color: var(--navy); }
 [data-vterm].term .term-out .ok, [data-vterm].term .term-out .amber, [data-vterm].term .term-out .cmd { color: var(--ink); }
-[data-vterm].term .term-out { margin: 0; font: inherit; white-space: pre-wrap; word-break: break-word; }
+/* Rin's own panel sets a pale colour on .term-out, and a rule on the element
+   beats a colour inherited from its parent, so the Terminal states its own */
+[data-vterm].term .term-out, [data-vterm].term .term-mirror, [data-vterm].term .term-line { margin: 0; font: inherit; white-space: pre-wrap; word-break: break-word; color: var(--ink); }
 [data-vterm].term .term-out:empty { display: none; }
 [data-vterm].term .dim { color: var(--ink); }
 [data-vterm].term .term-dir { color: var(--navy); }
