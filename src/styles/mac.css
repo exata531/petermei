@@ -522,7 +522,7 @@ html:not(.js) body { background: var(--paper); }
   padding: calc(var(--bar) + calc(30 * var(--u))) 16px 0;
 }
 .alert {
-  width: calc(260 * var(--u)); max-width: 100%;
+  width: min(calc(260 * var(--u)), calc(100vw - var(--u16)));
   padding: calc(10 * var(--u)) calc(12 * var(--u)) calc(12 * var(--u));
   display: grid; grid-template-columns: var(--icon) 1fr; gap: var(--u4) calc(10 * var(--u)); align-items: start; text-align: left;
   background: var(--paper); color: var(--ink);
