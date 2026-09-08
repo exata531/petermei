@@ -6,7 +6,7 @@
    wavy edge, and a footer with something to click. The system font, no web
    fonts, and the appearance follows the Mac's: the frame is told when the
    desktop switches, and a page standing on its own reads the same setting. */
-import '../styles/tokens.css';
+import '../styles/mac-tokens.css';
 import '../styles/site.css';
 import { copy, links } from '../data/site';
 
@@ -58,7 +58,7 @@ const holds = ['sky', 'green', 'peri', 'apri', 'lemon', 'sky', 'apri', 'green', 
         <span class="pill-status"><i aria-hidden="true"></i>{copy.status}</span>
       </nav>
       <div class="nav-r">
-        <a class="nav-mac" href="/?open=safari" data-mac-link title="Open this page inside the Mac">
+        <a class="nav-mac" href="/mac?open=safari" data-mac-link title="Open this page inside the Mac">
           <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2" y="3.5" width="16" height="10.5" rx="2"/><path d="M7 17h6M10 14v3"/></svg><span>The Mac</span>
         </a>
       </div>

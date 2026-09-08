@@ -1,48 +1,26 @@
 ---
 import Mac from '../layouts/Mac.astro';
-import Wallpaper from '../components/mac/Wallpaper.astro';
 import Icon from '../components/mac/Icon.astro';
 ---
-<Mac title="Not here, Peter Mei" desc="That page does not exist on this desktop.">
-  <div class="desk lost-desk">
-    <Wallpaper />
-  </div>
+<Mac title="Not here, Peter Mei" desc="That page does not exist on this Macintosh.">
+  <div class="desk lost-desk"></div>
 
   <div class="lost">
-    <section class="win is-front lost-win">
-      <header class="win-bar">
-        <span class="lights">
-          <span class="lt lt-c"></span><span class="lt lt-m"></span><span class="lt lt-z"></span>
-        </span>
-        <span class="win-title"></span>
-        <span class="win-pad"></span>
-      </header>
-      <div class="win-body lost-body">
-        <span class="lost-ico"><Icon id="finder" /></span>
-        <div>
-          <h1 class="lost-h">The item can’t be found.</h1>
-          <p class="lost-p">There is no such thing on this desktop.</p>
-          <a class="lost-btn" href="/">Go to the desktop</a>
-        </div>
+    <section class="alert lost-box" role="alertdialog" aria-labelledby="lost-h">
+      <span class="alert-ico"><Icon id="stop" /></span>
+      <div>
+        <h1 class="alert-title" id="lost-h">The item could not be found.</h1>
+        <p class="alert-wait">There is no such thing on this Macintosh.</p>
       </div>
+      <div class="alert-btns"><a class="alert-btn is-default" href="/">OK</a></div>
     </section>
   </div>
 </Mac>
 
 <style is:global>
-  .lost {
-    position: fixed; inset: 0; z-index: 5;
-    display: grid; place-items: center; padding: 20px;
-  }
-  .lost-win { position: relative; width: min(440px, 100%); height: auto; }
-  .lost-win .win-bar { background: var(--surface); box-shadow: none; }
-  .lost-body { display: grid; grid-template-columns: 64px 1fr; gap: 18px; align-items: start; padding: 8px 24px 24px; }
-  .lost-ico { width: 64px; height: 64px; filter: var(--sh-icon); }
-  .lost-h { font-size: 13px; font-weight: 700; }
-  .lost-p { margin-top: 4px; font-size: 11px; color: var(--ink-2); }
-  .lost-btn {
-    display: inline-block; margin-top: 16px; padding: 4px 14px; border-radius: 6px;
-    background: var(--accent); color: var(--accent-fg); font-size: 13px;
-    box-shadow: 0 1px 2px rgb(3 3 2 / .2);
-  }
+  html { background: var(--paper) var(--dither); background-size: var(--dither-size); }
+  .lost { position: fixed; inset: 0; z-index: 5; display: grid; place-items: center; padding: 20px; }
+  .lost-box { grid-template-columns: var(--icon) 1fr; }
+  .lost-box .alert-ico { grid-row: 1; }
+  .lost-box .alert-wait { margin-top: var(--u2); }
 </style>

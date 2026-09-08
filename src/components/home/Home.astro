@@ -1,0 +1,268 @@
+---
+/* petermei.com: a magazine that goes to the movies in the middle.
+
+   Paper where Peter is talking (masthead, index, About, photos, footer),
+   dark where the products are (the four chapters). One page; /work/<slug>
+   renders the same page with that row open. */
+import '../../styles/tokens.css';
+import '../../styles/home.css';
+import { products, copy, links, pile, strip, tilt, pair, type Slug } from '../../data/home';
+import { mark, glyph, spot, crestMask, tornMask } from './marks';
+import Pic from './Pic.astro';
+
+interface Props { open?: Slug }
+const { open } = Astro.props;
+
+const url = new URL(Astro.url.pathname, Astro.site ?? 'https://petermei.com');
+const title = open ? `${products.find((p) => p.slug === open)!.name} · Peter Mei` : 'Peter Mei';
+const desc = 'Peter Mei is a senior in high school and makes software: volbase, Rin, Kyou and Market Station.';
+const buildDate = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+const marks: Record<Slug, (s?: number) => string> = { volbase: mark.volbase, rin: mark.rin, kyou: mark.kyou, market: mark.market };
+const rowClass: Record<Slug, string> = { volbase: 'c-vb', rin: 'c-rin', kyou: 'c-kyou', market: 'c-mo' };
+const chapterFrame: Record<Slug, string> = { volbase: 'browser', rin: 'mac', kyou: 'phone', market: 'wide' };
+const chapterTilt: Record<Slug, [number, number]> = { volbase: [14, -22], rin: [12, 24], kyou: [10, -30], market: [22, 0] };
+const mockOf = (p: (typeof products)[number], name: string) => p.gallery.find((g) => g.name === name) ?? (p.peek.name === name ? p.peek : pair(name, ''));
+const placeLabel = (place: string) => place.replace(/, .*$/, '').replace('Rocky Mountain National Park', 'Estes Park');
+---
+<!doctype html>
+<html lang="en" data-open={open}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={desc} />
+    <link rel="canonical" href={url.href} />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="theme-color" content="#fff7ed" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#171310" media="(prefers-color-scheme: dark)" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={url.href} />
+    <meta property="og:image" content={new URL('/og.png', url).href} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script is:inline>document.documentElement.classList.add('js');</script>
+    <style is:inline set:html={`:root{--crest:${crestMask};--torn:${tornMask}}`}></style>
+  </head>
+  <body>
+    <a class="skip" href="#work">Skip to the work</a>
+
+    <!-- the loader: one face, one blink, gone -->
+    <div class="loader" data-loader aria-hidden="true"><span class="face" data-face>(｡•ᴗ•｡)</span></div>
+
+    <!-- the washes: cream, four chapters, cream. Opacity only. -->
+    <div class="wash" data-wash aria-hidden="true">
+      <div class="wl w0"></div><div class="wl w1"></div><div class="wl w2"></div>
+      <div class="wl w3"></div><div class="wl w4"></div><div class="wl w5"></div>
+    </div>
+    <div class="grain" data-grain aria-hidden="true"></div>
+
+    <div class="spacer" data-spacer aria-hidden="true"></div>
+    <div class="wrap" data-wrap>
+
+      <!-- ── 1. masthead ─────────────────────────────────────────── -->
+      <header class="masthead" data-masthead>
+        <div class="running" data-rule>
+          <span class="date" data-date>{buildDate}</span>
+          <em>{copy.city}</em>
+        </div>
+        <h1 class="name" data-name aria-label="Peter Mei"><span class="w"><span>Peter</span></span> <span class="w"><span>Mei</span></span></h1>
+        <div class="lede">
+          <p class="fold rise">I am a <i>senior</i> at the school, outside Detroit. I taught myself all of this from the docs, mostly by getting it wrong first.</p>
+          <p class="quote rise">I am a senior in high school and I make software. These are the four things I have built that are <span class="hl"><i class="hl-bar" aria-hidden="true"></i>real enough</span> to show. Each one is running somewhere right now, and each one exists because I needed it first.</p>
+        </div>
+        <div class="cluster" aria-hidden="true">
+          <span class="cl cl-plane rise" set:html={spot.plane} />
+          <span class="cl cl-cloud rise" set:html={spot.cloud('m')} />
+          <span class="cl cl-sun rise" set:html={spot.sun} />
+        </div>
+      </header>
+
+      <!-- ── 2. the lights go down ───────────────────────────────── -->
+      <div class="runway down" aria-hidden="true"></div>
+
+      <!-- ── 3 to 6. the chapters ────────────────────────────────── -->
+      {products.map((p, i) => {
+        const pin = mockOf(p, p.chapter.pin);
+        const swaps = p.chapter.swaps.map((n) => mockOf(p, n));
+        const [rx, ry] = chapterTilt[p.slug];
+        return (
+          <section class={`ch ch-${i + 1} ${i === 1 ? 'flip' : ''} ${i === 3 ? 'wide tail' : ''}`} id={`ch-${p.slug}`} data-ch={i + 1} aria-label={p.name}>
+            <div class="stage" data-stage>
+              <div class="copy rv" data-copy>
+                <span class="ico" data-ico set:html={marks[p.slug](40)} />
+                <p class="txt" data-txt>
+                  {p.slug === 'volbase' && <>Organizations post volunteer, internship, and summer program openings, and students apply to the ones closest to them. It is live at <a href={links.volbase} target="_blank" rel="noopener">volbase.app</a> with real users.</>}
+                  {p.slug === 'rin' && <>A Mac app that drops a terminal down from the menu bar, with a folder of notes it has already read, so the assistant inside knows your deadlines before you type. It is <a href={links.rin} target="_blank" rel="noopener">free and open source</a>, and it only runs on a Mac.</>}
+                  {p.slug === 'kyou' && <>{p.blurb}</>}
+                  {p.slug === 'market' && <>{p.blurb}</>}
+                </p>
+              </div>
+              <div class="scene rv">
+                <div class={`dev ${chapterFrame[p.slug]}`} data-dev data-rx={rx} data-ry={ry} style={`aspect-ratio:${pin.dark.width}/${pin.dark.height}`}>
+                  <div class="scr">
+                    <img src={pin.dark.src} width={pin.dark.width} height={pin.dark.height} alt={pin.caption} fetchpriority={i === 0 ? 'high' : undefined} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" draggable="false" />
+                    {swaps.map((s) => <img class="alt" src={s.dark.src} width={s.dark.width} height={s.dark.height} alt={s.caption} loading="lazy" decoding="async" draggable="false" />)}
+                  </div>
+                  <div class="glare" data-glare></div>
+                </div>
+              </div>
+            </div>
+            {i === 3 && <div class="crest lights" aria-hidden="true"></div>}
+          </section>
+        );
+      })}
+
+      <!-- ── 8. the index ────────────────────────────────────────── -->
+      <section class="index" id="work" aria-label="Work">
+        {products.map((p) => {
+          const peek = p.peek;
+          const isOpen = open === p.slug;
+          return (
+            <article class={`spread ${rowClass[p.slug]} ${isOpen ? 'open' : ''}`} id={p.slug} data-spread={p.slug}>
+              <button class="row" type="button" aria-expanded={isOpen ? 'true' : 'false'} aria-controls={`panel-${p.slug}`} data-row>
+                <span class="row-in">
+                  <span class="title">{p.name}</span>
+                  <em class="kicker">{p.kicker}{p.slug === 'rin' && <span class="mb" set:html={spot.menubar} />}</em>
+                </span>
+                <span class={`peek ${peek.portrait ? 'portrait' : ''}`} aria-hidden="true"><Pic pair={peek} eager /></span>
+                <span class="mark" aria-hidden="true"><span class="mark-in" set:html={glyph.plus(12)} /></span>
+              </button>
+              <div class="panel" id={`panel-${p.slug}`} data-panel style={isOpen ? 'height:auto' : undefined}>
+                <div class="panel-in">
+                  <div class="gallery" data-gallery>
+                    {p.gallery.map((g) => (
+                      <figure class={`shot ${g.portrait ? 'portrait' : ''}`}>
+                        <Pic pair={g} />
+                        <figcaption>{g.caption}</figcaption>
+                      </figure>
+                    ))}
+                  </div>
+                  <div class="text">
+                    <p class="colophon">{p.facts}</p>
+                    <div class="study">
+                      <p class="head">{p.headline}</p>
+                      {p.study.map((s) => <p>{s}</p>)}
+                      <p class="aside">{p.aside}</p>
+                      {p.link && <a class="btn btn--black" href={p.link.href} target="_blank" rel="noopener">{p.link.label}<span class="gl" set:html={glyph.external(16)} /></a>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </section>
+
+      <!-- ── 9. elsewhere ────────────────────────────────────────── -->
+      <div class="marquee" data-marquee aria-label="Elsewhere">
+        <div class="track" data-track><span>{copy.elsewhere}</span><span aria-hidden="true">{copy.elsewhere}</span></div>
+      </div>
+
+      <!-- ── 10. about ───────────────────────────────────────────── -->
+      <section class="about" id="about" aria-label="About">
+        <div class="field up" data-up>
+          <div class="ab-l">
+            <h2 class="ab-h">{copy.aboutHead[0]}<i>{copy.aboutHead[1]}</i></h2>
+            {copy.about.map((s) => <p class="ab-p">{s}</p>)}
+            <ul class="ab-list">
+              {copy.list.map((r, i) => (
+                <li>
+                  <span class="ab-spot" aria-hidden="true" set:html={i === 1 ? spot.robot : i === 2 ? spot.hold : ''} />
+                  <span class="ab-n">{r.name}</span>
+                  <span class="ab-t">{r.line}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="ab-r">
+            <div class="pile" data-pile>
+              {pile.map((ph, i) => (
+                <figure class="pol" data-pol style={`--rot:${[-2.06, -8.7, 5.47, 3.06][i]}deg;--i:${i}`}>
+                  <img src={ph.file} width={ph.w} height={ph.h} alt={ph.alt} loading="lazy" decoding="async" draggable="false" />
+                  <figcaption>{placeLabel(ph.place)}</figcaption>
+                </figure>
+              ))}
+              <button class="reset" type="button" data-reset aria-label="Tidy the photos"><span set:html={glyph.reset(20)} /></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── 11. photos ──────────────────────────────────────────── -->
+      <section class="photos" id="photos" aria-label="Photos">
+        <span class="cloud-a" aria-hidden="true" set:html={spot.cloud('a')} />
+        <span class="cloud-b" aria-hidden="true" set:html={spot.cloud('b')} />
+        <h2 class="ph-h">{copy.photosHead}</h2>
+        <div class="gallery strip" data-gallery data-strip>
+          {strip.map((ph, i) => (
+            <figure class="card" style={`--rot:${tilt(i)}deg;--d:${i * 60}ms`}>
+              <img src={ph.file} width={ph.w} height={ph.h} alt={ph.alt} loading="lazy" decoding="async" draggable="false" />
+              <figcaption>{placeLabel(ph.place)}{ph.place.startsWith('Red Rocks') || ph.place.startsWith('Rocky') ? <span class="bag" aria-hidden="true" set:html={spot.chalkbag} /> : null}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+
+      <!-- ── 12. footer ──────────────────────────────────────────── -->
+      <footer class="foot">
+        <div class="notes">
+          {copy.notes.map((n) => <p class="note">{n}</p>)}
+        </div>
+        <div class="band">
+          <div class="crest apricot" aria-hidden="true"></div>
+          <div class="cols">
+            <div class="about-col">
+              <span class="fmark" set:html={mark.rin(24)} />
+              <p>{copy.footAbout}</p>
+            </div>
+            <ul>
+              {products.map((p) => <li>{p.link ? <a href={p.link.href} target="_blank" rel="noopener">{p.name}</a> : <a href={`/work/${p.slug}`} data-open-row={p.slug}>{p.name}</a>}</li>)}
+            </ul>
+            <ul>
+              <li><a href={links.github} rel="me noopener" target="_blank">GitHub</a></li>
+              <li><a href="/">The Mac version</a></li>
+            </ul>
+            <p class="fine">{copy.fine}</p>
+          </div>
+          <div class="giant" data-giant aria-hidden="true">Peter</div>
+          <div class="bar">
+            <span>{copy.bar}</span>
+            <span class="bar-links"><a href={links.github} rel="me noopener" target="_blank">GitHub</a><a href={links.volbase} rel="noopener" target="_blank">volbase</a></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- the pill -->
+    <nav class="pill" data-pill aria-label="Site">
+      <a class="avatar" href="/" aria-label="Peter Mei"><span class="f1" aria-hidden="true">(｡•ᴗ•｡)</span><span class="f2" aria-hidden="true">(¬‿¬)</span></a>
+      <span class="links">
+        <a class="pl" href="#work">Work</a>
+        <a class="pl" href="#about">About</a>
+        <a class="pl" href="#photos">Photos</a>
+      </span>
+      <span class="status"><i aria-hidden="true"></i>{copy.status}</span>
+    </nav>
+    <button class="burger" type="button" data-burger aria-label="Menu" aria-expanded="false"><span set:html={glyph.burger(18)} /></button>
+    <div class="menu" data-menu aria-hidden="true">
+      <a href="#work">Work</a><a href="#about">About</a><a href="#photos">Photos</a>
+    </div>
+
+    <!-- the rail -->
+    <nav class="rail" data-rail aria-label="Chapters">
+      <div class="track"><div class="fill" data-fill></div>
+        <div class="dots">
+          {products.map((p, i) => <button class="dot" type="button" data-go={i + 1} style={`top:${12.5 + i * 25}%`} aria-label={p.name}><i></i></button>)}
+        </div>
+      </div>
+    </nav>
+
+    <div class="cur" data-cur aria-hidden="true"><div class="r" data-cur-r></div><div class="d" data-cur-d></div></div>
+    <div class="blob" data-blob aria-hidden="true"></div>
+
+    <script>import '../../scripts/home/main';</script>
+  </body>
+</html>

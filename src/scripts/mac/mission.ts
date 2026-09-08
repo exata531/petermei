@@ -9,7 +9,7 @@
 import type { Desk, Win } from './windows';
 import { reduced } from './motion';
 
-const BAR = 24;
+const BAR = 40;
 
 export function initMission(desk: Desk, deskEl: HTMLElement) {
   let active = false;

@@ -29,9 +29,11 @@ export function initSpotlight(
   const render = () => {
     const q = field.value.trim().toLowerCase();
     const all = source();
+    /* an empty field is not an empty panel: the real one already has the list
+       of apps under it the moment it opens, so there is something to arrow to */
     hits = q
       ? all.filter((h) => h.label.toLowerCase().includes(q) || h.kind.toLowerCase().includes(q))
-      : [];
+      : all.slice(0, 7);
     sel = 0;
     list.innerHTML = hits
       .map(
@@ -44,7 +46,7 @@ export function initSpotlight(
       )
       .join('');
     if (q && !hits.length) list.innerHTML = '<li class="sp-none" aria-live="polite">No Results</li>';
-    el.classList.toggle('has-hits', q.length > 0);
+    el.classList.toggle('has-hits', q.length > 0 || hits.length > 0);
   };
 
   const mark = () => {

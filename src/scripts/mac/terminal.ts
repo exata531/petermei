@@ -328,8 +328,15 @@ export function initTerminal(root: HTMLElement, hooks: TermHooks) {
     if (!(e.target as HTMLElement).closest('a')) real.focus({ preventScroll: true });
   });
 
+  /* the first frame prints a used window rather than one line on a blank sheet:
+     who you are, what this is, and the four commands worth trying first */
   if (!st.lines.length) {
-    st.lines.push(`${dim('Last login: never.')} type <b class="term-acc">help</b> to see what this thing answers.`);
+    st.lines.push(
+      `${dim('Last login: never.')}`,
+      `This is a small shell I wrote for this desktop, and every command below really runs.`,
+      `Try <b class="term-acc">ls</b> to see what is here, <b class="term-acc">cat</b> a file to read it, <b class="term-acc">open kyou</b> to launch an app, or <b class="term-acc">neofetch</b> for the machine.`,
+      `${dim('Type')} <b class="term-acc">help</b> ${dim('for the whole list.')}`,
+    );
   }
   paint();
 

@@ -1,0 +1,152 @@
+/* petermei.com — the machine's numbers, once.
+
+   System 7 on a colour Macintosh, drawn at twice its size so the pixels
+   read: one unit (--u) is one of the original's pixels and is two of ours.
+   Everything on the desktop is measured in units, so the whole machine can
+   be shrunk to one to one by changing a single number here.
+
+   There is no dark appearance. A Macintosh had one. */
+
+/* ── the fonts: Giles Booth's bitmap recreations of Chicago 12 and Geneva 9,
+   Jamie Place's Monaco 9, and Robin Casady's outline ChicagoFLF for the one
+   or two symbols the bitmaps do not carry. Credits in /fonts/LICENSE-system7.txt.
+   The three bitmap faces sit on a sixteen unit grid, so their pixel size is
+   sixteen units, whatever the point size in their name. ── */
+@font-face {
+  font-family: 'ChiKareGo2';
+  src: url('/fonts/ChiKareGo2.woff2') format('woff2'), url('/fonts/ChiKareGo2.woff') format('woff');
+  font-weight: normal; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: 'FindersKeepers';
+  src: url('/fonts/FindersKeepers.woff2') format('woff2'), url('/fonts/FindersKeepers.woff') format('woff');
+  font-weight: normal; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: 'MonacoBitmap';
+  src: url('/fonts/monaco.woff2') format('woff2'), url('/fonts/monaco.woff') format('woff');
+  font-weight: normal; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: 'ChicagoFLF';
+  src: url('/fonts/ChicagoFLF-v2.1.woff2') format('woff2'), url('/fonts/ChicagoFLF-v2.1.woff') format('woff');
+  font-weight: normal; font-style: normal; font-display: block;
+}
+
+:root {
+  color-scheme: light;
+
+  /* ── the pixel ────────────────────────────────────────────────────── */
+  --u: 2px;
+  --u2: calc(2 * var(--u));
+  --u3: calc(3 * var(--u));
+  --u4: calc(4 * var(--u));
+  --u6: calc(6 * var(--u));
+  --u8: calc(8 * var(--u));
+  --u16: calc(16 * var(--u));
+
+  /* ── the palette: black, white, the four greys, and the Finder's colours ── */
+  --ink:    #000000;
+  --paper:  #ffffff;
+  --grey-1: #dddddd;  /* light grey: a button face, a disabled track */
+  --grey-2: #bbbbbb;  /* grey: the desktop pattern's average, a shade */
+  --grey-3: #888888;  /* dark grey: greyed text reads as this */
+  --grey-4: #555555;
+  --manila: #ffffcc;
+  --tan:    #ffcc99;
+  --sky:    #99ccff;
+  --navy:   #3366cc;
+  --red:    #dd3333;
+  --orange: #ff9933;
+  --yellow: #ffdd33;
+  --green:  #33aa55;
+  --purple: #9966cc;
+
+  /* what the old tokens meant, so a scene that still asks for them gets an answer */
+  --surface: var(--paper);
+  --chrome:  var(--paper);
+  --side:    var(--paper);
+  --well:    var(--grey-1);
+  --ink-2:   var(--grey-4);
+  --ink-3:   var(--grey-3);
+  --line:    var(--ink);
+  --line-2:  var(--ink);
+  --chip:    var(--grey-1);
+  --chip-2:  var(--grey-2);
+  --field:   var(--paper);
+  --accent:  var(--ink);
+  --accent-fg: var(--paper);
+  --accent-soft: var(--grey-1);
+  --focus:   var(--ink);
+  --link:    var(--navy);
+  --sys-blue: var(--ink);
+  --sys-blue-ring: var(--ink);
+  --bar-ink: var(--ink);
+  --wall-flat: #bbbbbb;
+  --wall-ink: var(--ink);
+  --veil:    rgb(0 0 0 / .1);
+  --dim-veil: rgb(0 0 0 / .6);
+  --row-alt: transparent;
+
+  /* ── the patterns, in units, so they stay on the pixel grid ─────────
+     the 50 percent dither: the desktop, a scroll bar's track, a shade */
+  --dither: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2' shape-rendering='crispEdges'%3E%3Crect width='1' height='1' fill='%23000'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23000'/%3E%3C/svg%3E");
+  --dither-size: var(--u2) var(--u2);
+  /* the same pattern in white, for a dimmed icon */
+  --dither-w: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2' shape-rendering='crispEdges'%3E%3Crect width='1' height='1' fill='%23fff'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23fff'/%3E%3C/svg%3E");
+  /* a 25 percent dither, for a lighter grey */
+  --dither-25: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2' shape-rendering='crispEdges'%3E%3Crect width='1' height='1' fill='%23000'/%3E%3C/svg%3E");
+  /* the title bar's stripes: one black line, one white, six times */
+  --stripes: repeating-linear-gradient(to bottom, var(--ink) 0 var(--u), transparent var(--u) var(--u2));
+
+  /* ── the product demos keep their own surfaces ───────────────────── */
+  --slate:    #242a36;
+  --slate-fg: #dde0e5;
+  --slate-2:  #2e3543;
+  --tool:     #1a1b1f;
+  --tool-2:   #232529;
+  --vb-page:  #f6f3ee;
+
+  /* ── type: Chicago for everything the system says, Geneva for what a
+     document says, Monaco for the one terminal ────────────────────── */
+  --chicago: 'ChiKareGo2', 'ChicagoFLF', 'Geneva', 'Verdana', system-ui, sans-serif;
+  --geneva:  'FindersKeepers', 'Geneva', 'Verdana', 'Tahoma', system-ui, sans-serif;
+  --monaco:  'MonacoBitmap', 'Monaco', 'Menlo', ui-monospace, monospace;
+  --symbols: 'ChicagoFLF', 'ChiKareGo2', system-ui, sans-serif;   /* the command key and its friends */
+  --ui:      var(--chicago);
+  --mono:    var(--monaco);
+  --fs-12:   calc(16 * var(--u));   /* Chicago 12 on its sixteen unit grid */
+  --fs-9:    calc(16 * var(--u));   /* Geneva 9, the same grid */
+  --fs-10:   calc(16 * var(--u));   /* a document's body is Geneva 9 too: there is one bitmap */
+  --fs-sym:  calc(12 * var(--u));   /* ChicagoFLF is an outline face: twelve units reads as Chicago 12 */
+  --lh-12:   calc(16 * var(--u));   /* Chicago 12's line: 16 pixels */
+  --lh-9:    calc(13 * var(--u));   /* Geneva 9's line, with one unit of air for descenders */
+
+  /* ── geometry, from the spec, in units ───────────────────────────── */
+  --bar:     calc(20 * var(--u));   /* the menu bar */
+  --tbar:    calc(20 * var(--u));   /* a title bar, its bottom line included */
+  --tool-h:  calc(24 * var(--u));   /* a strip of buttons under a title bar */
+  --box:     calc(11 * var(--u));   /* the close box and the zoom box */
+  --sbar:    calc(16 * var(--u));   /* a scroll bar, its border included */
+  --menu-row: calc(16 * var(--u));
+  --icon:    calc(32 * var(--u));
+  --icon-s:  calc(16 * var(--u));
+  --side-w:  calc(120 * var(--u));
+
+  /* the hard shadow every window, menu and dialog casts: one unit, no blur */
+  --shadow:  var(--u) var(--u) 0 0 var(--ink);
+  --sh-win:  var(--shadow);
+  --sh-win-back: var(--shadow);
+  --sh-win-lift: var(--shadow);
+  --sh-menu: var(--shadow);
+  --sh-icon: none;
+
+  /* ── motion: a Macintosh drew its moves in a handful of frames ────── */
+  --ease:    steps(4, end);
+  --soft:    linear;
+  --out:     linear;
+  --t-press: 0ms;
+  --t-fast:  0ms;
+  --t-base:  120ms;
+  --t-slow:  160ms;
+}

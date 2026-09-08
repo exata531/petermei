@@ -1,204 +1,218 @@
-/* petermei.com — every colour, once.
+/* petermei.com, the tokens, once.
 
-   The desktop has a Light and a Dark, the way the machine it imitates does.
-   The palette is Craft's: one paper, one ink, and the ink diluted through an
-   alpha ramp for every line and muted label, so the grey scale is not a set
-   of stored greys at all. Five section pastels colour the wallpaper, the icon
-   fills and the About panels. The seven muted accents are Craft's collaborator
-   colours and each one belongs to one icon. Nothing else in the project
-   carries a colour literal except the three traffic lights, which are Apple's,
-   and the four product demos, which are pictures of real apps and keep their
-   own surfaces.
+   Paper is the Rin site's block, byte for byte, with Craft's pastels and the
+   four product hues on top. The chapters have their own dark set and never
+   change with the appearance. The page follows the system with no toggle:
+   light on :root, dark under prefers-color-scheme (guarded so a data-theme
+   of light still wins) and again under data-theme="dark". */
 
-   Every pair is written once with light-dark(): the first value is the day
-   desktop, the second is the same desktop after dark. */
-
-:root {
-  color-scheme: light dark;
-
-  /* ── Craft's raw palette ─────────────────────────────────────────── */
-  --c-paper: #fcf9f7;
-  --c-ink:   #030302;
-  --c-sky:   #9ed4ef;  --c-sky-2:   #d1eef9;
-  --c-green: #9bd8a9;  --c-green-2: #d6f0dc;
-  --c-peri:  #b8caf5;  --c-peri-2:  #dde5fb;
-  --c-apri:  #f6cb98;  --c-apri-2:  #fbe6cf;
-  --c-lemon: #fde99b;  --c-lemon-2: #fef4d0;
-  --a-green:  #3f8850;
-  --a-blue:   #427e8a;
-  --a-purple: #4b68c3;
-  --a-pink:   #a549ab;
-  --a-red:    #bb433a;
-  --a-orange: #b25620;
-  --a-yellow: #987e1b;
-
-  /* the same paper and ink after dark: the ink, lifted, and the paper, dimmed */
-  --c-night:   #141312;
-  --c-night-2: #1d1c1b;
-  --c-night-3: #262423;
-  --c-night-4: #302d2b;
-
-  /* ── the ground ──────────────────────────────────────────────────── */
-  --surface:  light-dark(var(--c-paper), var(--c-night-2));  /* a window's content */
-  --chrome:   light-dark(#f4f0ec, var(--c-night-3));         /* a title bar or toolbar */
-  --side:     light-dark(#f0ebe6, var(--c-night));           /* a sidebar sits back */
-  --well:     light-dark(#e9e3dd, #0c0b0b);                  /* the pit a demo sits in */
-  --row-alt:  light-dark(rgb(3 3 2 / .03), rgb(255 255 255 / .03));
-  --field:    light-dark(rgb(3 3 2 / .05), rgb(255 255 255 / .07));
-
-  --ink:    light-dark(var(--c-ink), #f2eeea);
-  --ink-2:  light-dark(rgb(3 3 2 / .6), rgb(242 238 234 / .62));   /* a muted label */
-  --ink-3:  light-dark(rgb(3 3 2 / .56), rgb(242 238 234 / .62));  /* a greyed item, still 4.5:1 */
-  --line:   light-dark(rgb(3 3 2 / .1), rgb(255 255 255 / .09));
-  --line-2: light-dark(rgb(3 3 2 / .15), rgb(255 255 255 / .14));
-  --chip:   light-dark(rgb(3 3 2 / .05), rgb(255 255 255 / .07));
-  --chip-2: light-dark(rgb(3 3 2 / .09), rgb(255 255 255 / .12));
-
-  /* ── the wallpaper: one family, two stops, the way Craft lays a hero ── */
-  --wall-a:     light-dark(var(--c-sky), #131a2b);      /* the top of the sky */
-  --wall-b:     light-dark(var(--c-sky-2), #27404f);    /* the bottom of it */
-  --wall-bloom: light-dark(rgb(253 246 238 / .45), rgb(143 166 236 / .16));
-  --wall-flat:  light-dark(#b9e0f4, #1b2837);
-  --wall-ink:   #ffffff;               /* a desktop label, on any wallpaper */
-  --wall-ink-sh: rgb(0 0 0 / .55);
-  --grain:      .05;                    /* an overlay, so this reads far lighter than it sounds */
-
-  /* ── glass: Liquid Glass Regular, in Craft's paper ───────────────── */
-  --glass-bar:   light-dark(rgb(252 249 247 / .62), rgb(20 19 18 / .58));
-  --glass-menu:  light-dark(rgb(252 249 247 / .78), rgb(38 36 35 / .8));
-  --glass-dock:  light-dark(rgb(252 249 247 / .5), rgb(255 255 255 / .1));
-  --glass-edge:  light-dark(rgb(3 3 2 / .12), rgb(255 255 255 / .12));
-  --glass-hi:    light-dark(rgb(255 255 255 / .55), rgb(255 255 255 / .1));
-  --bar-ink:     light-dark(var(--c-ink), #f2eeea);
-  --veil:        light-dark(rgb(3 3 2 / .12), rgb(0 0 0 / .4));
-  --dim-veil:    light-dark(rgb(3 3 2 / .6), rgb(0 0 0 / .78));
-
-  /* ── selection, focus, links: Craft's periwinkle accent ──────────── */
-  --accent:     light-dark(var(--a-purple), #8fa6ec);
-  --accent-fg:  light-dark(#ffffff, var(--c-ink));
-  --accent-soft: light-dark(rgb(75 104 195 / .16), rgb(143 166 236 / .2));
-  --focus:      light-dark(rgb(75 104 195 / .55), rgb(143 166 236 / .6));
-  /* the system's own blue: the default button in an alert is always this */
-  --sys-blue:      light-dark(#0a7aff, #0a84ff);
-  --sys-blue-ring: light-dark(rgb(10 122 255 / .45), rgb(10 132 255 / .55));
-  --link:       light-dark(var(--a-purple), #8fa6ec);
-
-  /* one pastel per product: the About panel's field and the icon's tint */
-  --tint-volbase: light-dark(var(--c-peri-2), #232a40);
-  --tint-rin:     light-dark(var(--c-lemon-2), #2e2b1e);
-  --tint-kyou:    light-dark(var(--c-apri-2), #3a2c22);
-  --tint-market:  light-dark(var(--c-green-2), #1f3327);
-  --tint-peter:   light-dark(var(--c-sky-2), #1c2f3a);
-
-  /* the landing's drawn machines: paper for the bezel, one aluminium for
-     the stand, the sky for the chin and the phone's frame, ink for the edges */
-  --im-bezel-a: light-dark(#f9f6f2, #2b2927);
-  --im-bezel-b: light-dark(#f0ebe6, #232120);
-  --im-chin-a:  light-dark(#a9dbf2, #24414f);
-  --im-chin-b:  light-dark(var(--c-sky), #1c2f3a);
-  --im-stand-a: light-dark(#ebe7e2, #3b3836);
-  --im-stand-b: light-dark(#ded9d3, #302d2b);
-  --im-base:    light-dark(#d4cec7, #282523);
-  --im-edge:    light-dark(rgb(3 3 2 / .16), rgb(255 255 255 / .12));
-  --im-shadow:  light-dark(rgb(3 3 2 / .2), rgb(0 0 0 / .6));
-
-  --lt-off:     light-dark(#dcdad8, #4a4846);
-  --lt-off-ring: light-dark(rgb(0 0 0 / .12), rgb(255 255 255 / .06));
-
-  /* ── the product demos keep their own surfaces ───────────────────── */
-  --slate:    #242a36;
-  --slate-fg: #dde0e5;
-  --slate-2:  #2e3543;
-  --tool:     #1a1b1f;
-  --tool-2:   #232529;
-  --vb-page:  #f6f3ee;
-
-  /* ── shadows: Craft's four-layer float, and the inactive half of it ─ */
-  /* light-dark() only carries a colour, so the colour is the only part inside it
-     and the geometry is written once, outside. */
-  --sh-menu-c:  light-dark(rgb(3 3 2 / .18), rgb(0 0 0 / .55));
-  --sh-dock-c:  light-dark(rgb(3 3 2 / .16), rgb(0 0 0 / .5));
-  --sh-spot-c:  light-dark(rgb(3 3 2 / .28), rgb(0 0 0 / .7));
-  --sh-notif-c: light-dark(rgb(3 3 2 / .18), rgb(0 0 0 / .55));
-  --sh-icon-c:  light-dark(rgb(3 3 2 / .22), rgb(0 0 0 / .55));
-  --sh-menu:  0 10px 30px var(--sh-menu-c);
-  --sh-dock:  0 12px 28px var(--sh-dock-c);
-  --sh-spot:  0 30px 70px var(--sh-spot-c);
-  --sh-notif: 0 12px 30px var(--sh-notif-c);
-  --sh-icon:  drop-shadow(0 4px 8px var(--sh-icon-c));
-
-  /* ── type: the system font, because a Mac window in anything else is a
-     costume. Mono is for the one terminal. ─────────────────────────── */
-  --ui: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
-  --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-
-  /* ── geometry, from the spec ──────────────────────────────────────── */
-  --bar:     24px;   /* the menu bar */
-  --tbar:    28px;   /* a plain window's title bar */
-  --tool-h:  52px;   /* a title bar that carries a toolbar */
-  --r-win:   12px;
-  --r-menu:  8px;
-  --dock-i:  50px;
-  --dock-pad: 8px;
-  --side-w:  192px;  /* a Finder or Photos sidebar */
-
-  /* ── motion: two speeds, Craft's rule ─────────────────────────────── */
-  --ease:    cubic-bezier(.22, 1, .36, 1);
-  --soft:    cubic-bezier(.4, 0, .2, 1);
-  --out:     cubic-bezier(.25, 1, .5, 1);
-  --in-fast: cubic-bezier(.7, 0, .84, 0);
-  --t-press: 120ms;
-  --t-fast:  150ms;
-  --t-base:  250ms;
-  --t-slow:  200ms;
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/InstrumentSerif-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/InstrumentSerif-Italic.woff2') format('woff2');
 }
 
-/* the toggle writes one of these onto the root and the whole palette follows */
-:root[data-theme='light'] { color-scheme: light; }
-:root[data-theme='dark']  { color-scheme: dark; }
-
-/* the window shadows, too long to stay readable inside light-dark() */
 :root {
-  --sh-win:
-    0 0 0 .5px rgb(0 0 0 / .28),
-    0 3px 10px rgb(0 0 0 / .16),
-    0 20px 60px rgb(0 0 0 / .36);
-  --sh-win-back:
-    0 0 0 .5px rgb(0 0 0 / .18),
-    0 3px 10px rgb(0 0 0 / .08),
-    0 20px 60px rgb(0 0 0 / .18);
-  --sh-win-lift:
-    0 0 0 .5px rgb(0 0 0 / .28),
-    0 6px 14px rgb(0 0 0 / .18),
-    0 30px 70px rgb(0 0 0 / .42);
+  color-scheme: light;
+
+  /* ── paper ─────────────────────────────────────────────────────── */
+  --cream:    #fff7ed;
+  --cream-2:  #f7ecdc;
+  --paper:    #fffdf8;
+  --line:     #eee0cc;
+  --rule:     #292524;
+  --ink:      #292524;
+  --ink-2:    #6b6560;
+  --ink-3:    #78716c;
+  --hair:     #cfc5b8;
+  --solid:    #1c1917;
+  --solid-fg: #ffffff;
+  --mark:     rgba(126, 231, 135, .5);
+  --wordmark: rgba(68, 19, 6, .17);
+
+  --sky:        #9ed4ef;
+  --periwinkle: #b8caf5;
+  --mint:       #9bd8a9;
+  --apricot:    #f6cb98;
+  --butter:     #fde99b;
+
+  --vb:   #4c67b8;
+  --rin:  #292524;
+  --kyou: #ff3b30;
+  --mo:   #e07a14;
+  --accent: var(--vb);
+
+  --hair-8:  color-mix(in oklab, #292524 8%, transparent);
+  --hair-12: color-mix(in oklab, #292524 12%, transparent);
+  --hair-20: color-mix(in oklab, #292524 20%, transparent);
+
+  --field-edge: var(--periwinkle);
+  --sun-o: 1;
+  --grain: url('/img/paper-grain.webp');
+  --grain-o: .08;
+
+  /* ── the stage, the same in both appearances ───────────────────── */
+  --stage:    #0a0a0c;
+  --stage-fg: #f2f1ee;
+  --wash-vb:   radial-gradient(120% 80% at 80% 60%, rgba(126,153,214,.28), rgba(126,153,214,0) 60%), #0f141a;
+  --wash-rin:  radial-gradient(90% 70% at 20% 40%, rgba(243,237,226,.07), rgba(243,237,226,0) 60%), #14120f;
+  --wash-kyou: radial-gradient(100% 90% at 75% 55%, rgba(255,59,48,.34), rgba(255,59,48,0) 62%), #1a0705;
+  --wash-mo:   radial-gradient(120% 60% at 50% 80%, rgba(255,138,31,.10), rgba(255,138,31,0) 60%), #0c0c0c;
+  --vb-stage:  #7e99d6;
+  --rin-stage: #f3ede2;
+  --mo-stage:  #ff8a1f;
+  --c1-fg: #f2f1ee;
+  --c2-fg: #f3ede2;
+  --c3-fg: #ffe9e6;
+  --c4-fg: #e9e9e9;
+  --shadow-device: 0 60px 120px -30px rgba(0,0,0,.75), 0 20px 40px -20px rgba(0,0,0,.6);
+  --device-edge: rgba(255,255,255,.14);
+  --glare: linear-gradient(115deg, rgba(255,255,255,.09), rgba(255,255,255,0) 38%);
+
+  /* ── type ──────────────────────────────────────────────────────── */
+  --serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --t-name:    clamp(84px, 16vw, 240px);
+  --t-row:     clamp(64px, 9.6vw, 156px);
+  --t-display: clamp(50px, 8.4vw, 104px);
+  --t-quote:   clamp(26px, 3vw, 46px);
+  --t-rowbody: clamp(24px, 2.4vw, 36px);
+  --t-chapter: clamp(24px, 2.7vw, 44px);
+  --t-title:   clamp(31px, 4vw, 52px);
+  --t-card:    clamp(23px, 2.4vw, 30px);
+  --t-kicker:  clamp(18px, 1.6vw, 24px);
+  --t-lead:    18px;
+  --t-body:    17px;
+  --t-copy:    16px;
+  --t-ui:      15.5px;
+  --t-small:   14.5px;
+  --t-fine:    13.5px;
+  --t-tiny:    12.5px;
+
+  /* ── space, radii, frame ───────────────────────────────────────── */
+  --gut:    clamp(20px, 4vw, 30px);
+  --gutter: clamp(20px, 4vw, 64px);
+  --sec:    clamp(80px, 10vw, 140px);
+  --nav-h:  72px;
+  --wrap:   1140px;
+  --r-code:  6px;
+  --r-chip:  8px;
+  --r-tile:  12px;
+  --r-btn:   14px;
+  --r-card:  22px;
+  --r-field: 24px;
+  --r-stage: clamp(20px, 2.6vw, 34px);
+  --r-pill:  999px;
+
+  /* ── shadows, all from straight above ──────────────────────────── */
+  --shadow-btn:   0 2px 4px rgba(68,19,6,.12), 0 12px 24px -10px rgba(68,19,6,.35);
+  --shadow-card:  0 1px 2px rgba(68,19,6,.05), 0 18px 40px -28px rgba(68,19,6,.3);
+  --shadow-block: 0 50px 40px #00000003, 0 50px 40px #00000005, 0 20px 40px #0000000d, 0 3px 10px #00000014;
+  --shadow-lift:  0 22px 48px rgba(0,0,0,.24);
+  --shadow-panel: 0 2px 10px rgba(68,19,6,.1), 0 40px 70px -34px rgba(68,19,6,.45);
+  --shadow-stage: 0 2px 10px rgba(68,19,6,.1), 0 50px 90px -40px rgba(68,19,6,.5);
+  --shadow-pill:  0 12px 12px 2px #0000001a, 0 2px 4px -1px #0000000f;
+
+  /* ── glass ─────────────────────────────────────────────────────── */
+  --glass:      rgba(255,255,255,.2);
+  --glass-edge: rgba(255,255,255,.5);
+  --glass-hi:   rgba(255,255,255,.25);
+
+  /* ── motion ────────────────────────────────────────────────────── */
+  --settle: cubic-bezier(0, 0, .2, 1);
+  --boing:  cubic-bezier(.34, 1.56, .64, 1);
+  --glide:  cubic-bezier(.22, .8, .2, 1);
+  --fold:   cubic-bezier(.4, 0, .2, 1);
 }
+
+/* the same paper after dark: the Rin site's dark block */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --grain: .03;
-    --sh-win:
-      0 0 0 .5px rgb(255 255 255 / .14),
-      0 3px 10px rgb(0 0 0 / .4),
-      0 20px 60px rgb(0 0 0 / .7);
-    --sh-win-back:
-      0 0 0 .5px rgb(255 255 255 / .09),
-      0 20px 60px rgb(0 0 0 / .5);
-    --sh-win-lift:
-      0 0 0 .5px rgb(255 255 255 / .14),
-      0 6px 14px rgb(0 0 0 / .5),
-      0 30px 70px rgb(0 0 0 / .75);
+    color-scheme: dark;
+    --cream:    #171310;
+    --cream-2:  #241e19;
+    --paper:    #1e1915;
+    --line:     #342c25;
+    --rule:     #f5ede2;
+    --ink:      #f5ede2;
+    --ink-2:    #b8ada0;
+    --ink-3:    #9a8d80;
+    --hair:     #4a4038;
+    --solid:    #f5ede2;
+    --solid-fg: #191410;
+    --mark:     rgba(126, 231, 135, .33);
+    --wordmark: rgba(245,237,226,.1);
+    --rin:      #f5ede2;
+    --vb:       #8ea4dc;
+    --mo:       #f0993f;
+    --hair-8:  color-mix(in oklab, #f5ede2 8%, transparent);
+    --hair-12: color-mix(in oklab, #f5ede2 12%, transparent);
+    --hair-20: color-mix(in oklab, #f5ede2 20%, transparent);
+    --grain-o: .05;
+    --field-edge: color-mix(in srgb, var(--periwinkle) 34%, transparent);
+    --sun-o: .5;
+    --shadow-btn:   0 2px 4px rgba(0,0,0,.4), 0 12px 24px -10px rgba(0,0,0,.7);
+    --shadow-card:  0 1px 2px rgba(0,0,0,.3), 0 18px 40px -28px rgba(0,0,0,.8);
+    --shadow-block: 0 50px 40px rgba(0,0,0,.12), 0 50px 40px rgba(0,0,0,.14), 0 20px 40px rgba(0,0,0,.3), 0 3px 10px rgba(0,0,0,.4);
+    --shadow-lift:  0 22px 48px rgba(0,0,0,.6);
+    --shadow-panel: 0 2px 10px rgba(0,0,0,.4), 0 40px 70px -34px rgba(0,0,0,.9);
+    --shadow-stage: 0 2px 10px rgba(0,0,0,.4), 0 50px 90px -40px rgba(0,0,0,.9);
+    --shadow-pill:  0 12px 12px 2px rgba(0,0,0,.4), 0 2px 4px -1px rgba(0,0,0,.3);
+    --glass:      rgba(30,25,21,.4);
+    --glass-edge: rgba(255,255,255,.14);
+    --glass-hi:   rgba(255,255,255,.06);
   }
 }
 :root[data-theme='dark'] {
-  --grain: .03;
-  --sh-win:
-    0 0 0 .5px rgb(255 255 255 / .14),
-    0 3px 10px rgb(0 0 0 / .4),
-    0 20px 60px rgb(0 0 0 / .7);
-  --sh-win-back:
-    0 0 0 .5px rgb(255 255 255 / .09),
-    0 20px 60px rgb(0 0 0 / .5);
-  --sh-win-lift:
-    0 0 0 .5px rgb(255 255 255 / .14),
-    0 6px 14px rgb(0 0 0 / .5),
-    0 30px 70px rgb(0 0 0 / .75);
+  color-scheme: dark;
+  --cream:    #171310;
+  --cream-2:  #241e19;
+  --paper:    #1e1915;
+  --line:     #342c25;
+  --rule:     #f5ede2;
+  --ink:      #f5ede2;
+  --ink-2:    #b8ada0;
+  --ink-3:    #9a8d80;
+  --hair:     #4a4038;
+  --solid:    #f5ede2;
+  --solid-fg: #191410;
+  --mark:     rgba(126, 231, 135, .33);
+  --wordmark: rgba(245,237,226,.1);
+  --rin:      #f5ede2;
+  --vb:       #8ea4dc;
+  --mo:       #f0993f;
+  --hair-8:  color-mix(in oklab, #f5ede2 8%, transparent);
+  --hair-12: color-mix(in oklab, #f5ede2 12%, transparent);
+  --hair-20: color-mix(in oklab, #f5ede2 20%, transparent);
+  --grain-o: .05;
+  --field-edge: color-mix(in srgb, var(--periwinkle) 34%, transparent);
+  --sun-o: .5;
+  --shadow-btn:   0 2px 4px rgba(0,0,0,.4), 0 12px 24px -10px rgba(0,0,0,.7);
+  --shadow-card:  0 1px 2px rgba(0,0,0,.3), 0 18px 40px -28px rgba(0,0,0,.8);
+  --shadow-block: 0 50px 40px rgba(0,0,0,.12), 0 50px 40px rgba(0,0,0,.14), 0 20px 40px rgba(0,0,0,.3), 0 3px 10px rgba(0,0,0,.4);
+  --shadow-lift:  0 22px 48px rgba(0,0,0,.6);
+  --shadow-panel: 0 2px 10px rgba(0,0,0,.4), 0 40px 70px -34px rgba(0,0,0,.9);
+  --shadow-stage: 0 2px 10px rgba(0,0,0,.4), 0 50px 90px -40px rgba(0,0,0,.9);
+  --shadow-pill:  0 12px 12px 2px rgba(0,0,0,.4), 0 2px 4px -1px rgba(0,0,0,.3);
+  --glass:      rgba(30,25,21,.4);
+  --glass-edge: rgba(255,255,255,.14);
+  --glass-hi:   rgba(255,255,255,.06);
 }
+
+/* a product picture exists in both appearances; the page shows one */
+.pic-dark { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .pic-light { display: none; }
+  :root:not([data-theme='light']) .pic-dark { display: block; }
+}
+:root[data-theme='dark'] .pic-light { display: none; }
+:root[data-theme='dark'] .pic-dark { display: block; }

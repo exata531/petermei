@@ -27,3 +27,15 @@ pnpm-debug.log*
 .vercel
 *.log
 .gstack/
+public/lab/
+
+# local QA
+.browse/
+shots/
+
+# scratch renders
+scratch/
+
+# raw captures for the staged mockups; the staged results live in public/img/mock
+capture/*
+!capture/stage/

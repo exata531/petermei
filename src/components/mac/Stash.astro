@@ -15,28 +15,34 @@ import Pictures from './Pictures.astro';
 import { apps, finder, readme, links, aboutPeter } from '../../data/apps';
 import { build } from '../../data/build';
 import { trashItems } from '../../data/trash';
-import { imac } from '../../scripts/mac/devices';
 import { photos } from '../../data/photos';
 
 /* what the scripts need to know about a photo, once, as JSON */
 const photoJson = JSON.stringify(photos.map((p) => ({ f: p.file, n: p.name, w: p.w, h: p.h, a: p.alt, p: p.place, d: p.dayLabel, m: p.month, ml: p.monthLabel })));
 const scenes = { volbase: Volbase, rin: Rin, kyou: Kyou, market: Market };
-const glyphs: Record<string, string> = {
-  person: '<circle cx="8" cy="5.2" r="2.8"/><path d="M2.8 13.6c.6-2.8 2.6-4.2 5.2-4.2s4.6 1.4 5.2 4.2"/>',
-  pictures: '<path d="M2.5 4.5h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1Z"/><path d="M2.5 11 6 7.5l2.5 2.5 2-1.5 3.5 2.5"/><circle cx="10.5" cy="7" r="1" fill="currentColor" stroke="none"/>',
-  hammer: '<path d="M9.5 3.5 12.5 6.5 5 14l-3-3Z"/><path d="M8 5 11 2l3 3-3 3"/>',
-  star: '<path d="M8 1.8l1.9 4 4.4.6-3.2 3 .8 4.4L8 11.7l-3.9 2.1.8-4.4-3.2-3 4.4-.6Z"/>',
-  chevrons: '<path d="M5.5 4 2 8l3.5 4M10.5 4 14 8l-3.5 4"/>',
-  built: '<path d="M2.5 11.5 8 14l5.5-2.5v-7L8 2 2.5 4.5Z"/><path d="M2.5 4.5 8 7l5.5-2.5M8 7v7"/>',
-  state: '<circle cx="8" cy="8" r="5.5"/><path d="M8 4.8V8l2.2 1.4"/>',
-};
-/* the same glyph the sidebar carries for a section, at row size */
-const glyph = (name: string) => `<svg class="fnd-glyph" viewBox="0 0 16 16" aria-hidden="true">${glyphs[name]}</svg>`;
+
+/* what sits on the hard disk, in the order the Finder lists them by name */
+/* a document's size is its own text, measured; an application's is left
+   blank rather than made up */
+const when = new Date(build.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+const kOf = (t: string[]) => `${Math.max(1, Math.ceil(new TextEncoder().encode(t.join('\n')).length / 1024))}K`;
+const disk = [
+  { open: 'textedit', icon: 'textedit', name: 'Read Me', kind: 'SimpleText document', size: kOf(readme) },
+  ...finder.map((s) => ({ open: `doc-${s.id}`, icon: 'doc', name: s.file.replace(/\.txt$/, ''), kind: 'SimpleText document', size: kOf(s.text) })),
+  { open: 'pictures', icon: 'folder', name: 'Pictures', kind: 'folder', size: `${photos.length} items` },
+  { open: 'volbase', icon: 'volbase', name: 'volbase', kind: 'application program', size: '' },
+  { open: 'rin', icon: 'rin', name: 'Rin', kind: 'application program', size: '' },
+  { open: 'kyou', icon: 'kyou', name: 'Kyou', kind: 'application program', size: '' },
+  { open: 'market', icon: 'market', name: 'Market Station', kind: 'application program', size: '' },
+  { open: 'photos', icon: 'photos', name: 'Photos', kind: 'application program', size: '' },
+  { open: 'terminal', icon: 'terminal', name: 'Terminal', kind: 'application program', size: '' },
+  { open: 'github', icon: 'github', name: 'GitHub', kind: 'alias', size: '' },
+];
 ---
 <div class="stash" data-stash>
   <div class="stash-head">
     <h1>Peter Mei</h1>
-    <p>I am a senior at the school, outside Detroit, and I make software. This page is normally a Mac desktop you can click around in, and it needs JavaScript for that. Everything that would be on it is below.</p>
+    <p>I am a senior at the school, outside Detroit, and I make software. This page is normally a Macintosh desktop you can click around in, and it needs JavaScript for that. Everything that would be on it is below.</p>
     <p class="stash-note">The same things are also on a plain website: <a href="/site">petermei.com</a>.</p>
   </div>
 
@@ -44,7 +50,7 @@ const glyph = (name: string) => `<svg class="fnd-glyph" viewBox="0 0 16 16" aria
     const Scene = a.scene ? scenes[a.scene] : null;
     return (
       <section class="stash-app" data-body={a.id} aria-label={a.name}>
-        <h2 class="stash-h">{a.name}</h2>
+        <h2 class="stash-h">{a.label}</h2>
         {a.about && <p class="stash-p">{a.about.line}</p>}
         {a.about && <p class="stash-meta">{a.about.built} · {a.about.state}</p>}
         {a.about?.link && <p><a href={a.about.link.href} rel="noopener">{a.about.link.label}</a></p>}
@@ -53,7 +59,7 @@ const glyph = (name: string) => `<svg class="fnd-glyph" viewBox="0 0 16 16" aria
             <figure class="sfig" data-scene={a.scene} data-w={a.sw} data-h={a.sh}
                     data-mw={a.mw} data-mh={a.mh} data-flat={a.id === 'volbase' ? '' : undefined}
                     style={`--w:${a.sw}px;--h:${a.sh}px`}>
-              <div class="sframe" data-scene-root role="group" aria-label={`A working demo of ${a.name}`}>
+              <div class="sframe" data-scene-root role="group" aria-label={`A working demo of ${a.label}`}>
                 <Scene />
               </div>
             </figure>
@@ -63,39 +69,46 @@ const glyph = (name: string) => `<svg class="fnd-glyph" viewBox="0 0 16 16" aria
     );
   })}
 
-  <section class="stash-app" data-body="finder" aria-label="About Peter">
-    <h2 class="stash-h">About</h2>
-    <div class="fnd is-list">
-      <nav class="fnd-side" aria-label="Sidebar">
-        <span class="fnd-h">Favorites</span>
-        {finder.map((s, i) => (
-          <button class:list={['fnd-tab', { 'is-on': i === 0 }]} type="button" data-fnd={s.id}>
-            <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs[s.glyph]} /><span>{s.label}</span>
-          </button>
+  {/* the hard disk: a folder window of everything on this Macintosh */}
+  <section class="stash-app" data-body="finder" aria-label="Macintosh HD">
+    <h2 class="stash-h">Macintosh HD</h2>
+    <div class="fnd" data-fnd-root>
+      <div class="fnd-head" aria-hidden="true"><span data-fnd-count>{disk.length} items</span><span>{build.mb} MB in disk</span><span></span></div>
+      <div class="fnd-cols" aria-hidden="true"><span>Name</span><span>Size</span><span>Kind</span><span>Last Modified</span></div>
+      <ul class="fnd-rows" role="listbox" aria-label="Macintosh HD">
+        {disk.map((d, i) => (
+          d.open === 'github' ? (
+            <li class="fnd-row" role="option" aria-selected="false" tabindex={i === 0 ? 0 : -1} data-fnd-open="github" data-href={links.github}>
+              <span class="fnd-name"><span class="fnd-row-ico"><Icon id={d.icon} /></span><b><i>{d.name}</i></b></span>
+              <small>{d.size}</small><small>{d.kind}</small><small>{when}</small>
+            </li>
+          ) : (
+            <li class="fnd-row" role="option" aria-selected="false" tabindex={i === 0 ? 0 : -1} data-fnd-open={d.open}>
+              <span class="fnd-name"><span class="fnd-row-ico"><Icon id={d.icon} /></span><b>{d.name}</b></span>
+              <small>{d.size}</small><small>{d.kind}</small><small>{when}</small>
+            </li>
+          )
         ))}
-        <button class="fnd-tab" type="button" data-fnd="pictures">
-          <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.pictures} /><span>Pictures</span>
-        </button>
-        <span class="fnd-h">Locations</span>
-        <a class="fnd-tab" href={links.github} rel="me noopener" target="_blank">
-          <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="9" rx="1.5"/><path d="M5.5 14h5M8 12v2"/></svg><span>GitHub</span>
-        </a>
-      </nav>
-      <div class="fnd-main">
-        {finder.map((s, i) => (
-          <div class:list={['fnd-pane', 'fnd-doc', { 'is-on': i === 0 }]} data-fnd-pane={s.id}>
-            <div class="fnd-file">
-              <span class="fnd-file-ico"><Icon id="doc" /></span>
-              <span class="fnd-file-name"><b>{s.file}</b><small>Plain Text Document</small></span>
-            </div>
-            <div class="fnd-sheet">
-              {s.text.map((t) => <p>{t}</p>)}
-            </div>
-          </div>
-        ))}
-        <Pictures />
-        <div class="fnd-status" data-fnd-status>1 item</div>
+      </ul>
+    </div>
+  </section>
+
+  {/* the four text files, each a SimpleText document of its own */}
+  {finder.map((s) => (
+    <section class="stash-app" data-body={`doc-${s.id}`} aria-label={s.file}>
+      <h2 class="stash-h">{s.label}</h2>
+      <div class="txt">
+        {s.text.map((t) => <p>{t}</p>)}
       </div>
+    </section>
+  ))}
+
+  {/* the Pictures folder */}
+  <section class="stash-app" data-body="pictures" aria-label="Pictures">
+    <h2 class="stash-h">Pictures</h2>
+    <div class="fnd">
+      <div class="fnd-head" aria-hidden="true"><span>{photos.length} items</span><span>{build.mb} MB in disk</span><span></span></div>
+      <Pictures />
     </div>
   </section>
 
@@ -105,8 +118,8 @@ const glyph = (name: string) => `<svg class="fnd-glyph" viewBox="0 0 16 16" aria
     <Photos />
   </section>
 
-  <section class="stash-app" data-body="textedit" aria-label="Read me">
-    <h2 class="stash-h">Read me</h2>
+  <section class="stash-app" data-body="textedit" aria-label="Read Me">
+    <h2 class="stash-h">Read Me</h2>
     <div class="txt">
       {readme.map((l) => <p>{l}</p>)}
     </div>
@@ -115,38 +128,20 @@ const glyph = (name: string) => `<svg class="fnd-glyph" viewBox="0 0 16 16" aria
   <section class="stash-app" data-body="trash" aria-label="Trash">
     <h2 class="stash-h">Trash</h2>
     <div class="fnd">
-      {/* the standard Finder sidebar; a row here opens the About window on that section */}
-      <nav class="fnd-side" aria-label="Sidebar">
-        <span class="fnd-h">Favorites</span>
-        {finder.map((s) => (
-          <button class="fnd-tab" type="button" data-open="finder" data-pane={s.id}>
-            <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs[s.glyph]} /><span>{s.label}</span>
-          </button>
-        ))}
-        <button class="fnd-tab" type="button" data-open="finder" data-pane="pictures">
-          <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.pictures} /><span>Pictures</span>
-        </button>
-        <span class="fnd-h">Locations</span>
-        <a class="fnd-tab" href={links.github} rel="me noopener" target="_blank">
-          <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="9" rx="1.5"/><path d="M5.5 14h5M8 12v2"/></svg><span>GitHub</span>
-        </a>
-      </nav>
-      <div class="fnd-main">
-        <div class="fnd-pane is-on" data-tr-items>
-          <ul class="fnd-rows pic-rows" role="listbox" aria-label="Trash">
-            {trashItems.map((t, i) => (
-              <li class="fnd-row pic-row" role="option" aria-selected="false" tabindex={i === 0 ? 0 : -1} data-tr={i} aria-label={`${t.name}, ${t.alt}`}>
-                <span class="pic-name">
-                  <span class="pic-ico" data-orient="l"><img data-src={t.thumb} width={t.w} height={t.h} alt="" decoding="async" draggable="false" /></span>
-                  <b><span class="stem">{t.name.replace(/\.jpeg$/, '')}</span><span class="ext">.jpeg</span></b>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div class="fnd-pane fnd-pane-empty" data-tr-empty><div class="fnd-empty">No Items</div></div>
-        <div class="fnd-status" data-tr-status>{trashItems.length} items</div>
+      <div class="fnd-head" aria-hidden="true"><span data-tr-status>{trashItems.length} items</span><span></span><span></span></div>
+      <div class="fnd-pane is-on" data-tr-items>
+        <ul class="fnd-rows pic-rows" role="listbox" aria-label="Trash">
+          {trashItems.map((t, i) => (
+            <li class="fnd-row pic-row" role="option" aria-selected="false" tabindex={i === 0 ? 0 : -1} data-tr={i} aria-label={`${t.name}, ${t.alt}`}>
+              <span class="pic-name">
+                <span class="pic-ico" data-orient="l"><img data-src={t.thumb} width={t.w} height={t.h} alt="" decoding="async" draggable="false" /></span>
+                <b><span class="stem">{t.name.replace(/\.jpeg$/, '')}</span><span class="ext">.jpeg</span></b>
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
+      <div class="fnd-pane fnd-pane-empty" data-tr-empty><div class="fnd-empty">The Trash is empty.</div></div>
     </div>
   </section>
 
@@ -160,33 +155,33 @@ const glyph = (name: string) => `<svg class="fnd-glyph" viewBox="0 0 16 16" aria
     </div>
   </section>
 
-  <section class="stash-app stash-js-only" data-body="about-mac" aria-label="About This Mac">
+  <section class="stash-app stash-js-only" data-body="about-mac" aria-label="About This Macintosh">
     <div class="abt abt-amc">
-      <span class="amc-art" aria-hidden="true" set:html={imac(1.6).svg} />
+      <span class="amc-art" aria-hidden="true"><Icon id="mac" /></span>
       <h3 class="abt-name">petermei.com</h3>
-      <button class="abt-ver amc-ver" type="button" data-amc-ver title="Click for more">Version 5 (the Mac)</button>
+      <button class="abt-ver amc-ver" type="button" data-amc-ver title="Click for more">System Software 7.5, version 6 (the old Mac)</button>
       <div class="abt-facts amc-facts">
-        <span><b>Chip</b> Astro {build.astro}, on Vercel</span>
-        <span><b>Memory</b> {build.mb} MB, mostly photographs</span>
+        <span><b>Built with</b> Astro {build.astro}, on Vercel</span>
+        <span><b>Total Memory</b> {build.mb} MB, mostly photographs</span>
         <span><b>Serial number</b> {build.commit}</span>
         <span><b>Display</b> <span data-amc-display>this window</span></span>
         <span><b>Built</b> {build.date}</span>
       </div>
-      <p class="amc-secrets"><b data-amc-count>0</b> of <b>5</b> secrets found on this Mac.</p>
+      <p class="amc-secrets"><b data-amc-count>0</b> of <b>5</b> secrets found on this Macintosh.</p>
       <p class="amc-hint" data-amc-hint></p>
     </div>
   </section>
 
   {apps.filter((a) => a.about).map((a) => (
-    <section class="stash-app" data-body={`about-${a.id}`} aria-label={`About ${a.name}`}>
+    <section class="stash-app" data-body={`about-${a.id}`} aria-label={`About ${a.label}`}>
       <div class:list={['abt', `abt-${a.id}`]}>
         <span class="abt-ico"><Icon id={a.id} /></span>
         <h3 class="abt-name">{a.about!.name}</h3>
         <p class="abt-ver">{a.about!.state}</p>
         <p class="abt-line">{a.about!.line}</p>
         <div class="abt-facts">
-          <span><svg viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.built} /><b>Built</b> {a.about!.built}</span>
-          <span><svg viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.state} /><b>Now</b> {a.about!.state}</span>
+          <span><b>Built with</b> {a.about!.built}</span>
+          <span><b>Now</b> {a.about!.state}</span>
         </div>
         <a class="abt-link" href={a.about!.link.href} rel="noopener" target="_blank">{a.about!.link.label}</a>
       </div>
@@ -200,8 +195,8 @@ const glyph = (name: string) => `<svg class="fnd-glyph" viewBox="0 0 16 16" aria
       <p class="abt-ver">Senior, class of 2027</p>
       <p class="abt-line">{aboutPeter}</p>
       <div class="abt-facts">
-        <span><svg viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.hammer} /><b>Made</b> volbase, Rin, Kyou, Market Station</span>
-        <span><svg viewBox="0 0 16 16" aria-hidden="true" set:html={glyphs.state} /><b>Now</b> Applying to college this fall</span>
+        <span><b>Made</b> volbase, Rin, Kyou, Market Station</span>
+        <span><b>Now</b> Applying to college this fall</span>
       </div>
       <a class="abt-link" href={links.github} rel="me noopener" target="_blank">github.com/exata531</a>
     </div>
@@ -210,8 +205,8 @@ const glyph = (name: string) => `<svg class="fnd-glyph" viewBox="0 0 16 16" aria
   <script type="application/json" data-ph-json set:html={photoJson} />
   <script type="application/json" data-build-json set:html={JSON.stringify({ commit: build.commit, astro: build.astro, date: build.date, mb: build.mb })} />
 
-  {/* icons the scripts clone into Spotlight rows and notifications */}
-  {['finder', 'volbase', 'rin', 'kyou', 'market', 'photos', 'textedit', 'trash', 'github', 'settings', 'folder', 'doc', 'safari', 'terminal', 'stickies'].map((id) => (
+  {/* icons the scripts clone into menus, Find File rows, alerts and the Application menu */}
+  {['finder', 'hd', 'volbase', 'rin', 'kyou', 'market', 'photos', 'textedit', 'trash', 'trash-full', 'github', 'settings', 'folder', 'doc', 'safari', 'terminal', 'stickies', 'caution', 'stop', 'note', 'mac', 'happy', 'app', 'pict', 'peter'].map((id) => (
     <template data-icon={id}><Icon id={id} /></template>
   ))}
 </div>

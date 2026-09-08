@@ -1,7 +1,7 @@
 /* The landing, the way in, and the ways out.
 
-   The first thing a fresh visitor sees is a page of paper with a drawn iMac
-   on it, and inside its screen the real desktop, live and scaled down: what
+   The first thing a fresh visitor sees is a white page with a drawn compact
+   Macintosh on it, and inside its screen the real desktop, live and scaled down: what
    is in the picture is exactly what is about to fill the window. The bar
    under it is honest: it waits for the fonts, the desktop's pictures and one
    painted frame, never less than a moment and never longer than a breath.
@@ -29,7 +29,7 @@
    Once entered, the landing stays out of the way for the rest of the tab
    session; Shut Down, Restart and Log Out end that, Sleep and Lock Screen
    keep it. With reduced motion every move is a short crossfade. */
-import { imac } from './devices';
+import { compact } from './devices';
 import { reduced } from './motion';
 
 const EASE = 'cubic-bezier(.7, 0, .15, 1)';
@@ -56,10 +56,10 @@ type Hooks = { onEnter?: () => void; beforeLeave?: (kind: Power) => void; onLeav
    phone has no picture and no screen to point at, so its button says the
    same thing about itself */
 type Screen = 'on' | 'off' | 'asleep';
-const CUE: Record<Screen, { text: (tap: boolean) => string; verb: string; tap: string }> = {
-  on: { text: (t) => `${t ? 'Tap' : 'Click'} the screen to have a look around.`, verb: 'Look around', tap: 'Tap to have a look around' },
-  off: { text: (t) => `${t ? 'Tap' : 'Click'} the screen to turn it on.`, verb: 'Turn on', tap: 'Tap to turn it on' },
-  asleep: { text: (t) => `${t ? 'Tap' : 'Click'} the screen to wake it.`, verb: 'Wake', tap: 'Tap to wake it' },
+const CUE: Record<Screen, { text: (tap: boolean) => string; verb: string; tap: (tap: boolean) => string }> = {
+  on: { text: (t) => `${t ? 'Tap' : 'Click'} the screen to have a look around.`, verb: 'Look around', tap: (t) => `${t ? 'Tap' : 'Click'} to have a look around` },
+  off: { text: (t) => `${t ? 'Tap' : 'Click'} the screen to turn it on.`, verb: 'Turn on', tap: (t) => `${t ? 'Tap' : 'Click'} to turn it on` },
+  asleep: { text: (t) => `${t ? 'Tap' : 'Click'} the screen to wake it.`, verb: 'Wake', tap: (t) => `${t ? 'Tap' : 'Click'} to wake it` },
 };
 /* the line under his name says which machine the visitor is holding */
 const LEDE = (phone: boolean) =>
@@ -79,8 +79,18 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
   const lede = $('.land-line');
   const blank = mac.querySelector<HTMLElement>('[data-mac-blank]')!;
   const phoneMq = matchMedia('(max-width: 767px)');
-  /* under the breakpoint there is no machine in the picture, only a cover */
-  const cover = () => phoneMq.matches;
+  const touchMq = matchMedia('(hover: none)');
+  /* a narrow window is a phone whatever the pointer says it is, so the verb in
+     the cue and the verb on the button never disagree with the line above them */
+  const tapping = () => touchMq.matches || phoneMq.matches;
+  /* An iMac's screen is landscape. Sizing the drawn one to the visitor's own
+     window is what keeps the live desktop inside it at one to one, so a
+     portrait window would draw a portrait screen on an iMac foot, which is a
+     machine that has never existed. Under the phone breakpoint, and at any
+     width where the window is taller than roughly four to five, the landing is
+     a cover instead of a picture. */
+  const MIN_AR = 1.25;
+  const cover = () => phoneMq.matches || innerWidth / innerHeight < MIN_AR;
   const enterBtn = () => (cover() ? tapBtn : deskBtn);
   const ms = (n: number) => (reduced() ? Math.min(n, 80) : n);
 
@@ -96,7 +106,7 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
 
   /* redraw the machine when the window's shape has changed enough to show */
   function draw(aspect: number) {
-    const d = imac(aspect);
+    const d = compact(aspect);
     host.style.setProperty('--ar', (d.vbW / d.vbH).toFixed(4));
     host.querySelector('svg')!.outerHTML = d.svg;
     const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(3)}%`;
@@ -111,7 +121,13 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
   /* put the real desktop inside the picture's screen, or, on a phone, leave
      it at full size behind the cover with no transform of its own */
   function place() {
-    if (cover()) { clearVars(); fx = 0; fy = 0; k = 1; sr = 0; return; }
+    const c = cover();
+    land.classList.toggle('is-cover', c);
+    /* the desktop normally floats ABOVE the paper because it has to show
+       through the drawn screen. With no screen to show through it belongs
+       under the cover instead, or it paints straight over it. */
+    document.documentElement.classList.toggle('is-cover', c);
+    if (cover()) { clearVars(); fx = 0; fy = 0; k = 1; sr = 0; mac.classList.remove('is-tiny'); return; }
     const aspect = innerWidth / innerHeight;
     if (!(Math.abs(drawn / aspect - 1) < 0.004)) draw(aspect);
     const r = deskBtn.getBoundingClientRect();
@@ -122,6 +138,9 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     mac.style.setProperty('--fy', `${fy.toFixed(2)}px`);
     mac.style.setProperty('--fk', k.toFixed(5));
     mac.style.setProperty('--sr', `${(sr / k).toFixed(2)}px`);
+    /* below about a half the desktop's own 12px labels render as grey smudges
+       inside the picture, so they step out and the icons speak for themselves */
+    mac.classList.toggle('is-tiny', k < 0.55);
   }
 
   function clearVars() {
@@ -143,10 +162,10 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
   function setScreen(s: Screen) {
     screen = s;
     land.classList.toggle('is-dark', s !== 'on');
-    cue.textContent = CUE[s].text(phoneMq.matches);
+    cue.textContent = CUE[s].text(tapping());
     lede.textContent = LEDE(phoneMq.matches);
     deskBtn.setAttribute('aria-label', `${CUE[s].verb} the Mac`);
-    tapBtn.textContent = CUE[s].tap;
+    tapBtn.textContent = CUE[s].tap(tapping());
   }
 
   /* the black over the screen, faded in or out; the resting value is set at
@@ -219,11 +238,17 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
   function go(remember: boolean) {
     state = 'moving';
     document.body.classList.remove('is-land-hover');
+    /* "Welcome to Macintosh." while the camera moves in, then the desktop */
+    const wel = mac.querySelector<HTMLElement>('[data-welcome]');
+    if (wel && !cover() && !reduced()) {
+      wel.hidden = false;
+      setTimeout(() => { wel.hidden = true; }, DUR + 700);
+    }
     land.classList.add('is-moving');
     mac.classList.add('is-moving');
     const finish = () => {
       stopAnims();
-      mac.classList.remove('is-moving', 'is-far');
+      mac.classList.remove('is-moving', 'is-far', 'is-tiny');
       mac.style.willChange = '';
       mac.style.opacity = '';
       mac.style.transformOrigin = '';
@@ -406,7 +431,7 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
   });
   /* crossing the breakpoint swaps the whole landing: the words, and whether
      there is a machine in the picture at all */
-  phoneMq.addEventListener('change', () => {
+  for (const mq of [phoneMq, touchMq]) mq.addEventListener('change', () => {
     if (state !== 'loading' && state !== 'ready' && state !== 'off') return;
     setScreen(screen);
     if (state !== 'off') frame();

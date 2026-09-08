@@ -42,7 +42,7 @@ export function initStickies(layer: HTMLElement, hooks: StickyHooks = {}) {
   const put = () => { try { localStorage.setItem(KEY, JSON.stringify(notes)); } catch {} };
 
   const clampX = (x: number) => Math.min(Math.max(8, x), Math.max(8, innerWidth - 190));
-  const clampY = (y: number) => Math.min(Math.max(32, y), Math.max(32, innerHeight - 140));
+  const clampY = (y: number) => Math.min(Math.max(44, y), Math.max(44, innerHeight - 140));
 
   function render(n: Note) {
     const el = document.createElement('div');
@@ -58,7 +58,11 @@ export function initStickies(layer: HTMLElement, hooks: StickyHooks = {}) {
        <textarea aria-label="Sticky note" spellcheck="false" placeholder="Write something. It stays in your browser and I never see it."></textarea>`;
     const ta = el.querySelector<HTMLTextAreaElement>('textarea')!;
     ta.value = n.t;
-    ta.addEventListener('input', () => { n.t = ta.value.slice(0, 2000); put(); });
+    /* the note grows to its own text instead of clipping the last line's
+       descenders on the bottom edge */
+    const fit = () => { ta.style.height = 'auto'; ta.style.height = `${ta.scrollHeight}px`; };
+    ta.addEventListener('input', () => { n.t = ta.value.slice(0, 2000); fit(); put(); });
+    requestAnimationFrame(fit);
 
     el.querySelector('.sticky-x')!.addEventListener('click', () => {
       notes = notes.filter((x) => x !== n);

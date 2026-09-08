@@ -23,6 +23,7 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
   const main = $('[data-ph-main]', el)!;
   const groups = $('[data-ph-pane="grid"]', el)!;
   const count = $('[data-ph-count]', el)!;
+  const status = $('[data-ph-status]', el);
   const view = $('[data-ph-view]', el)!;
   const stage = $('[data-ph-stage]', el)!;
   const big = $<HTMLImageElement>('[data-ph-big]', el)!;
@@ -122,6 +123,8 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
     groups.insertBefore(frag, count);
     count.textContent = plural(subset.length);
     count.hidden = vw === 'album';
+    /* the window ends on a rule with a count on it, the way Finder ends */
+    if (status) status.textContent = plural(subset.length).toLowerCase();
     shown = subset.map((c) => Number(c.dataset.phCell));
     if (!shown.includes(sel)) select(shown[0] ?? 0, false);
     main.scrollTop = 0;

@@ -1,0 +1,488 @@
+[
+  {
+    "name": "kyou-day",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-day-dark.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Kyou's day view on an iPhone, light and dark"
+  },
+  {
+    "name": "kyou-day-darkmode",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-day-darkmode-dark.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Kyou's day view, dark appearance"
+  },
+  {
+    "name": "kyou-day-darkmode",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-day-darkmode-light.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Kyou's day view, dark appearance"
+  },
+  {
+    "name": "kyou-day",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-day-light.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Kyou's day view on an iPhone, light and dark"
+  },
+  {
+    "name": "kyou-day-lightmode",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-day-lightmode-dark.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Kyou's day view, light appearance"
+  },
+  {
+    "name": "kyou-day-lightmode",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-day-lightmode-light.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Kyou's day view, light appearance"
+  },
+  {
+    "name": "kyou-evening",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-evening-dark.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Kyou closing out the evening"
+  },
+  {
+    "name": "kyou-evening",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-evening-light.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Kyou closing out the evening"
+  },
+  {
+    "name": "kyou-month",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-month-dark.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Kyou's month calendar"
+  },
+  {
+    "name": "kyou-month",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-month-light.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Kyou's month calendar"
+  },
+  {
+    "name": "kyou-notification",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-notification-dark.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "A Kyou notification on the Home Screen"
+  },
+  {
+    "name": "kyou-notification",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-notification-light.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "A Kyou notification on the Home Screen"
+  },
+  {
+    "name": "kyou-overlap",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-overlap-dark.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Overlapping events in Kyou's timeline"
+  },
+  {
+    "name": "kyou-overlap",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-overlap-light.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Overlapping events in Kyou's timeline"
+  },
+  {
+    "name": "kyou-pair",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-pair-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "Two Kyou phones, the day view and quick-add, overlapping"
+  },
+  {
+    "name": "kyou-pair",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-pair-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "Two Kyou phones, the day view and quick-add, overlapping"
+  },
+  {
+    "name": "kyou-quickadd",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-quickadd-dark.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Typing a plan into Kyou's quick-add"
+  },
+  {
+    "name": "kyou-quickadd",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-quickadd-light.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Typing a plan into Kyou's quick-add"
+  },
+  {
+    "name": "kyou-settings",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-settings-dark.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Kyou's settings"
+  },
+  {
+    "name": "kyou-settings",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-settings-light.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Kyou's settings"
+  },
+  {
+    "name": "kyou-ticked",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-ticked-dark.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "A to-do ticked off in Kyou"
+  },
+  {
+    "name": "kyou-ticked",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-ticked-light.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "A to-do ticked off in Kyou"
+  },
+  {
+    "name": "kyou-work",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-work-dark.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Kyou's work tab"
+  },
+  {
+    "name": "kyou-work",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-work-light.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Kyou's work tab"
+  },
+  {
+    "name": "market-alerts",
+    "theme": "dark",
+    "product": "market",
+    "src": "/img/mock/market-alerts-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "Alert lines drawn on Market Station's charts"
+  },
+  {
+    "name": "market-alerts",
+    "theme": "light",
+    "product": "market",
+    "src": "/img/mock/market-alerts-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "Alert lines drawn on Market Station's charts"
+  },
+  {
+    "name": "market-briefing",
+    "theme": "dark",
+    "product": "market",
+    "src": "/img/mock/market-briefing-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "The morning briefing in Market Station"
+  },
+  {
+    "name": "market-briefing",
+    "theme": "light",
+    "product": "market",
+    "src": "/img/mock/market-briefing-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "The morning briefing in Market Station"
+  },
+  {
+    "name": "market-dashboard",
+    "theme": "dark",
+    "product": "market",
+    "src": "/img/mock/market-dashboard-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "Market Station's dashboard on a bare monitor"
+  },
+  {
+    "name": "market-dashboard",
+    "theme": "light",
+    "product": "market",
+    "src": "/img/mock/market-dashboard-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "Market Station's dashboard on a bare monitor"
+  },
+  {
+    "name": "market-desk",
+    "theme": "dark",
+    "product": "market",
+    "src": "/img/mock/market-desk-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "Market Station on a monitor with the phone version in front"
+  },
+  {
+    "name": "market-desk",
+    "theme": "light",
+    "product": "market",
+    "src": "/img/mock/market-desk-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "Market Station on a monitor with the phone version in front"
+  },
+  {
+    "name": "market-mobile",
+    "theme": "dark",
+    "product": "market",
+    "src": "/img/mock/market-mobile-dark.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Market Station on an iPhone"
+  },
+  {
+    "name": "market-mobile",
+    "theme": "light",
+    "product": "market",
+    "src": "/img/mock/market-mobile-light.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Market Station on an iPhone"
+  },
+  {
+    "name": "market-reading",
+    "theme": "dark",
+    "product": "market",
+    "src": "/img/mock/market-reading-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "One reading pulled forward off the Market Station dashboard"
+  },
+  {
+    "name": "market-reading",
+    "theme": "light",
+    "product": "market",
+    "src": "/img/mock/market-reading-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "One reading pulled forward off the Market Station dashboard"
+  },
+  {
+    "name": "rin-hero",
+    "theme": "dark",
+    "product": "rin",
+    "src": "/img/mock/rin-hero-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "The Rin site's hero on a Mac display"
+  },
+  {
+    "name": "rin-hero",
+    "theme": "light",
+    "product": "rin",
+    "src": "/img/mock/rin-hero-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "The Rin site's hero on a Mac display"
+  },
+  {
+    "name": "rin-og",
+    "theme": "dark",
+    "product": "rin",
+    "src": "/img/mock/rin-og-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "Rin's social card in a browser window"
+  },
+  {
+    "name": "rin-og",
+    "theme": "light",
+    "product": "rin",
+    "src": "/img/mock/rin-og-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "Rin's social card in a browser window"
+  },
+  {
+    "name": "rin-reel",
+    "theme": "dark",
+    "product": "rin",
+    "src": "/img/mock/rin-reel-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "Rin dropping down from the menu bar, on a Mac display"
+  },
+  {
+    "name": "rin-reel-desktop",
+    "theme": "dark",
+    "product": "rin",
+    "src": "/img/mock/rin-reel-desktop-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "Rin's desktop reel on a Mac display"
+  },
+  {
+    "name": "rin-reel-desktop",
+    "theme": "light",
+    "product": "rin",
+    "src": "/img/mock/rin-reel-desktop-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "Rin's desktop reel on a Mac display"
+  },
+  {
+    "name": "rin-reel",
+    "theme": "light",
+    "product": "rin",
+    "src": "/img/mock/rin-reel-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "Rin dropping down from the menu bar, on a Mac display"
+  },
+  {
+    "name": "volbase-browse",
+    "theme": "dark",
+    "product": "volbase",
+    "src": "/img/mock/volbase-browse-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "volbase's Browse page in a browser window cropped at the right edge"
+  },
+  {
+    "name": "volbase-browse",
+    "theme": "light",
+    "product": "volbase",
+    "src": "/img/mock/volbase-browse-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "volbase's Browse page in a browser window cropped at the right edge"
+  },
+  {
+    "name": "volbase-landing",
+    "theme": "dark",
+    "product": "volbase",
+    "src": "/img/mock/volbase-landing-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "volbase landing page in a browser window, with the phone version in front"
+  },
+  {
+    "name": "volbase-landing",
+    "theme": "light",
+    "product": "volbase",
+    "src": "/img/mock/volbase-landing-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "volbase landing page in a browser window, with the phone version in front"
+  },
+  {
+    "name": "volbase-landing-solo",
+    "theme": "dark",
+    "product": "volbase",
+    "src": "/img/mock/volbase-landing-solo-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "volbase landing page in a browser window"
+  },
+  {
+    "name": "volbase-landing-solo",
+    "theme": "light",
+    "product": "volbase",
+    "src": "/img/mock/volbase-landing-solo-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "volbase landing page in a browser window"
+  },
+  {
+    "name": "volbase-organization",
+    "theme": "dark",
+    "product": "volbase",
+    "src": "/img/mock/volbase-organization-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "An organization page on volbase, the window cropped at the right edge"
+  },
+  {
+    "name": "volbase-organization",
+    "theme": "light",
+    "product": "volbase",
+    "src": "/img/mock/volbase-organization-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "An organization page on volbase, the window cropped at the right edge"
+  },
+  {
+    "name": "volbase-phone",
+    "theme": "dark",
+    "product": "volbase",
+    "src": "/img/mock/volbase-phone-dark.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "volbase landing page on an iPhone"
+  },
+  {
+    "name": "volbase-phone",
+    "theme": "light",
+    "product": "volbase",
+    "src": "/img/mock/volbase-phone-light.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "volbase landing page on an iPhone"
+  }
+]

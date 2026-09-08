@@ -148,15 +148,18 @@ export function initMarket(root: HTMLElement) {
   };
 
   /* ── paint ── */
-  const tiles = $('[data-ms-tiles]'), strip = $('[data-ms-strip]'), headline = $('[data-ms-headline]'), detailTxt = $('[data-ms-detail]');
+  const leads = $('[data-ms-leads]'), rows = $('[data-ms-rows]'), strip = $('[data-ms-strip]'), headline = $('[data-ms-headline]'), detailTxt = $('[data-ms-detail]');
   const clockEl = $('[data-ms-clock]'), freshEl = $('[data-ms-fresh]'), loadedEl = $('[data-ms-loaded]');
+  /* the alert line is drawn INSIDE the chart's own box, inset from both ends,
+     so it reads as a threshold on the chart rather than as an underline sitting
+     six pixels below the caption above it */
   const spark = (m: Metric) => {
     const pts = history(m, val(m)).filter((p) => p.d <= 90);
     const l = line(m); const th = l.above ?? l.below;
     const min = Math.min(...pts.map((p) => p.v), th ?? Infinity), max = Math.max(...pts.map((p) => p.v), th ?? -Infinity), span = max - min || 1;
     const y = (v: number) => 26 - ((v - min) / span) * 22 - 2;
     const poly = pts.map((p, i) => `${(i / (pts.length - 1)) * 100},${y(p.v).toFixed(1)}`).join(' ');
-    return `<svg class="ms-spark" viewBox="0 0 100 26" preserveAspectRatio="none" aria-hidden="true">${th != null ? `<line x1="0" x2="100" y1="${y(th).toFixed(1)}" y2="${y(th).toFixed(1)}"/>` : ''}<polyline points="${poly}"/></svg>`;
+    return `<svg class="ms-spark" viewBox="0 0 100 26" preserveAspectRatio="none" aria-hidden="true">${th != null ? `<line x1="6" x2="94" y1="${y(th).toFixed(1)}" y2="${y(th).toFixed(1)}"/>` : ''}<polyline points="${poly}"/></svg>`;
   };
   const prevLine = (m: Metric) => {
     const pts = history(m, val(m));
@@ -165,15 +168,87 @@ export function initMarket(root: HTMLElement) {
     const d = new Date(); d.setDate(d.getDate() - prev.d);
     return prev.v === val(m) ? `unchanged since ${dateOf(d.getTime())}` : `was ${fmt(prev.v, m.dec)}${m.unit} · ${dateOf(d.getTime())}`;
   };
-  const paintTiles = () => {
-    tiles.innerHTML = M.map((m) => {
+  /* ── the readings, said in sentences ──
+     A reading is a claim about the world, so it is written as one: the name,
+     the verb, the number in place, and what that means against the owner's own
+     line. The old shape was a big number over a tiny caption, twelve times. */
+  /* how each reading names itself inside a sentence. A tile can get away with a
+     bare label; a sentence cannot, so every one of them has a subject that
+     reads out loud, and the one plural takes its own verb. */
+  const SUBJ: Record<string, [string, string]> = {
+    vix: ['The VIX', 'is'],
+    fear_greed: ['The Fear and Greed index', 'is'],
+    qqq_drawdown: ['The Nasdaq-100 pullback', 'is'],
+    s5fi: ['Market breadth', 'is'],
+    cape: ['CAPE', 'is'],
+    unemployment: ['Unemployment', 'is'],
+    median_cpi: ['Inflation', 'is'],
+    tnx: ['The 10-year rate', 'is'],
+    yield_curve: ['The yield curve', 'is'],
+    credit_spreads: ['The high-yield spread', 'is'],
+    sahm: ['The Sahm Rule', 'is'],
+    lei: ['The leading indicators index', 'is'],
+  };
+  const the = (m: Metric) => SUBJ[m.key]?.[0] ?? m.title;
+  const be = (m: Metric) => SUBJ[m.key]?.[1] ?? 'is';
+  const nearestLine = (m: Metric) => {
+    const l = line(m), v = val(m);
+    const cands = [l.above, l.below].filter((x): x is number => x != null);
+    if (!cands.length) return null;
+    return cands.reduce((a, b) => (Math.abs(v - a) <= Math.abs(v - b) ? a : b));
+  };
+  /* how close a reading sits to its line, as a share of the line's own size,
+     so a VIX at 28 against 30 ranks beside a spread at 4.8 against 5 */
+  const nearness = (m: Metric) => {
+    const t = nearestLine(m);
+    if (t == null) return Infinity;
+    return Math.abs(val(m) - t) / Math.max(Math.abs(t), Math.abs(m.range[1] - m.range[0]) * .1);
+  };
+  const rank = (m: Metric) => {
+    const a = st.alerts[m.key];
+    if (a.state === 'fired') return -100 + nearness(m);
+    if (status(m).word === 'WATCH') return -50 + nearness(m);
+    return nearness(m);
+  };
+  /* the sentence: value in place, then where it stands against the line */
+  const sentence = (m: Metric) => {
+    const a = st.alerts[m.key], l = line(m), v = val(m);
+    const num = `<b>${fmt(v, m.dec)}${m.unit}</b>`;
+    const at = (x: number) => `${fmt(x, m.dec)}${m.unit}`;
+    if (a.state === 'fired' && a.easing) return `${the(m)} ${be(m)} back at ${num}, inside your line again but not clear of the re-arm margin at ${at(clearsAt(m))} yet.`;
+    if (a.state === 'fired' && a.kind === 'opportunity') return `${the(m)} ${be(m)} at ${num}, under your buy line of ${at(l.below!)}, which is the signal you asked to be told about.`;
+    if (a.state === 'fired') {
+      const t = l.above != null ? `above your line of ${at(l.above)}` : `below your line of ${at(l.below!)}`;
+      return `${the(m)} ${be(m)} at ${num}, ${t}, and the phone has been told once.`;
+    }
+    const t = nearestLine(m);
+    if (t == null) return `${the(m)} ${be(m)} at ${num}.`;
+    const side = v < t ? 'under' : 'over';
+    const close = nearness(m) <= .1;
+    return `${the(m)} ${be(m)} at ${num}, ${close ? 'close to' : `comfortably ${side}`} your line of ${at(t)}.`;
+  };
+  const WORD: Record<string, string> = {
+    OK: 'Nothing to do', WATCH: 'Getting close', ALERT: 'Past your line',
+    EASING: 'Easing back', 'GOOD SIGN': 'A buying signal',
+  };
+  const paintReadings = () => {
+    const order = [...M].sort((a, b) => rank(a) - rank(b));
+    const lead = order.slice(0, 2), rest = order.slice(2);
+    leads.innerHTML = lead.map((m) => {
       const s = status(m);
-      return `<button class="ms-tile" type="button" data-ms-open="${m.key}" aria-label="${esc(m.title)}, ${fmt(val(m), m.dec)}${m.unit}, ${s.word.toLowerCase()}. Open the reading.">
-        <span class="ms-tile-head"><span class="ms-name">${esc(m.title)}</span><span class="ms-chip ${s.cls}">${s.word}</span></span>
-        <span class="ms-val">${fmt(val(m), m.dec)}<small>${m.unit}</small></span>
-        <span class="ms-prev">${prevLine(m)}</span>
-        <span class="ms-plain">${esc(m.plain)}</span>
+      return `<button class="ms-lead" type="button" data-ms-open="${m.key}" aria-label="${esc(m.title)}, ${fmt(val(m), m.dec)}${m.unit}, ${esc((WORD[s.word] ?? s.word).toLowerCase())}. Open the reading.">
+        <span class="ms-lead-h"><span class="ms-lead-t">${esc(m.title)}</span><span class="ms-state ${s.cls}"><i></i>${esc(WORD[s.word] ?? s.word)}</span></span>
+        <span class="ms-say">${sentence(m)} <span class="ms-what">${esc(m.plain)}.</span></span>
         ${spark(m)}
+        <span class="ms-lead-src">${esc(m.source)}, checked ${rel(st.checked)}.</span>
+      </button>`;
+    }).join('');
+    rows.innerHTML = rest.map((m) => {
+      const s = status(m);
+      return `<button class="ms-row" type="button" data-ms-open="${m.key}" aria-label="${esc(m.title)}, ${fmt(val(m), m.dec)}${m.unit}, ${esc((WORD[s.word] ?? s.word).toLowerCase())}. Open the reading.">
+        <span class="ms-say">${sentence(m)}</span>
+        ${spark(m)}
+        <span class="ms-go" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M6 3.5 10.5 8 6 12.5"/></svg></span>
       </button>`;
     }).join('');
   };
@@ -221,7 +296,7 @@ export function initMarket(root: HTMLElement) {
     body.innerHTML = st.brief.html;
     time.textContent = `${dateOf(st.brief.ts)} ${when(st.brief.ts)}`;
   };
-  const paintAll = () => { paintTiles(); paintStrip(); paintClock(); paintLog(); paintBrief(); };
+  const paintAll = () => { paintReadings(); paintStrip(); paintClock(); paintLog(); paintBrief(); };
 
   /* ── the detail ── */
   const detail = $('[data-ms-detail]');
@@ -246,7 +321,7 @@ export function initMarket(root: HTMLElement) {
       <button class="ms-back" type="button" data-ms-back><svg viewBox="0 0 20 20"><path d="M12.5 4.5 7 10l5.5 5.5"/></svg>All readings</button>
       <div class="ms-d-grid">
         <div class="ms-d-card">
-          <h2>${esc(m.title)}<span class="ms-chip ${s.cls}" data-ms-d-chip>${s.word}</span></h2>
+          <h2>${esc(m.title)}<span class="ms-chip ${s.cls}" data-ms-d-chip><i></i>${esc(WORD[s.word] ?? s.word)}</span></h2>
           <div class="ms-d-val" data-ms-d-val>${fmt(v, m.dec)}<small>${m.unit}</small></div>
           <div class="ms-d-sub">${prevLine(m)}<br>${esc(m.plain)}.${ctx ? `<br>${ctx}` : ''}</div>
           <div class="ms-cond" aria-label="Where the reading sits between ${m.labels[0]} and ${m.labels[1]}">
@@ -262,7 +337,7 @@ export function initMarket(root: HTMLElement) {
           <div class="ms-rule">
             <div>${ruleTxt}</div>
             <div>Re-arm margin <b>${st.hyst}%</b>, so after it fires it clears at <b>${fmt(clearsAt(m), m.dec)}${m.unit}</b>. One push when it crosses, one when it recovers, never a stream.</div>
-            <div class="ms-states" aria-label="The alert's states">${['armed', 'fired', 'easing', 'recovered'].map((k) => `<span class="ms-state ${k}${st_ === k ? ' is-on' : ''}"><i></i>${k}</span>`).join('')}</div>
+            <div class="ms-states" aria-label="The alert's states">${['armed', 'fired', 'easing', 'recovered'].map((k) => `<span class="ms-machine ${k}${st_ === k ? ' is-on' : ''}"><i></i>${k}</span>`).join('')}</div>
             <div class="ms-state-line" data-ms-state-line>${STATE_LINES[st_](m)}</div>
             <div class="ms-play"><button class="ms-btn is-primary" type="button" data-ms-play>${PLAY[st_]}</button><small>demo: walks this rule one step, with the push the phone would get</small></div>
             <button class="ms-btn" type="button" data-ms-edit-line>Edit the line in Settings</button>
@@ -315,7 +390,7 @@ export function initMarket(root: HTMLElement) {
       const x = (i: number) => L + (i / Math.max(1, pts.length - 1)) * (w - L - R);
       const y = (v: number) => T + (1 - (v - lo) / (hi - lo)) * (h - T - B);
       c.clearRect(0, 0, w, h);
-      c.font = '9px ' + (cs.getPropertyValue('--mono') || 'monospace'); c.fillStyle = mute; c.strokeStyle = grid; c.lineWidth = 1;
+      c.font = '10px ' + (cs.getPropertyValue('--ui') || 'system-ui'); c.fillStyle = mute; c.strokeStyle = grid; c.lineWidth = 1;
       for (let i = 0; i <= 3; i++) { const v = lo + ((hi - lo) * i) / 3; const yy = y(v); c.beginPath(); c.moveTo(L, yy); c.lineTo(w - R, yy); c.stroke(); c.textAlign = 'right'; c.fillText(fmt(v, m.dec > 1 ? 1 : m.dec), L - 4, yy + 3); }
       const first = pts[0], mid = pts[Math.floor(pts.length / 2)], last = pts[pts.length - 1];
       c.textAlign = 'left'; const lbl = (p: Pt) => { const d = new Date(); d.setDate(d.getDate() - p.d); return days > 730 ? String(d.getFullYear()) : d.toLocaleDateString('en-US', { month: 'short', day: days > 120 ? undefined : 'numeric' }); };
@@ -350,10 +425,12 @@ export function initMarket(root: HTMLElement) {
     chartStop?.();
     chartStop = () => { ro.disconnect(); cv.removeEventListener('pointermove', onMove); };
   };
-  tiles.addEventListener('click', (e) => { const b = (e.target as HTMLElement).closest<HTMLElement>('[data-ms-open]'); if (b) openDetail(b.dataset.msOpen!); });
+  const openFromList = (e: Event) => { const b = (e.target as HTMLElement).closest<HTMLElement>('[data-ms-open]'); if (b) openDetail(b.dataset.msOpen!); };
+  leads.addEventListener('click', openFromList);
+  rows.addEventListener('click', openFromList);
   detail.addEventListener('click', (e) => {
     const t = e.target as HTMLElement;
-    if (t.closest('[data-ms-back]')) { closeDetail(); tiles.querySelector<HTMLElement>(`[data-ms-open="${st.view}"]`)?.focus(); return; }
+    if (t.closest('[data-ms-back]')) { const back = st.view; closeDetail(); root.querySelector<HTMLElement>(`[data-ms-open="${back}"]`)?.focus(); return; }
     const rb = t.closest<HTMLElement>('[data-ms-range]');
     if (rb) { st.ranges[st.view] = Number(rb.dataset.msRange); put(); openDetail(st.view); detail.querySelector<HTMLElement>(`[data-ms-range="${rb.dataset.msRange}"]`)?.focus(); return; }
     if (t.closest('[data-ms-edit-line]')) { openSettings(st.view); return; }
@@ -375,7 +452,7 @@ export function initMarket(root: HTMLElement) {
     evaluate(m); put();
     /* the banner, the grid tile and the detail card all come from one state
        read, so the app can never disagree with itself */
-    paintTiles(); paintStrip(); paintLog();
+    paintReadings(); paintStrip(); paintLog();
     openDetail(m.key);
     detail.querySelector<HTMLElement>('[data-ms-play]')?.focus({ preventScroll: true });
   };

@@ -1,0 +1,15 @@
+The System 7 fonts on this site
+
+ChiKareGo2 (a recreation of Chicago 12) and FindersKeepers (a recreation of
+Geneva 9) are by Giles Booth, http://www.suppertime.co.uk/blogmywiki/, and are
+licensed under Creative Commons Attribution (CC BY).
+
+monaco.woff2 and monaco.woff, a recreation of Monaco 9, are by Jamie Place and
+are licensed under Creative Commons Attribution-ShareAlike 3.0,
+http://creativecommons.org/licenses/by-sa/3.0/.
+
+ChicagoFLF is by Robin Casady, who released it into the public domain
+(statement by email, 2014-01-30).
+
+The packaged web font files came by way of system.css by Sakun Acharige,
+https://github.com/sakofchit/system.css, MIT License.

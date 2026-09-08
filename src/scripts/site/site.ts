@@ -191,7 +191,7 @@ ticks.forEach((t, i) => t.addEventListener('click', () => panels[i]?.scrollIntoV
   if (here) {
     here.innerHTML = framed
       ? '<b>Inside the Mac.</b> You are reading this in the Safari window of a desktop that is also a website.'
-      : '<b>On its own.</b> This page also runs inside a Mac. <a href="/?open=safari">Open it there.</a>';
+      : '<b>On its own.</b> This page also runs inside a Mac. <a href="/mac?open=safari">Open it there.</a>';
   }
 }
 

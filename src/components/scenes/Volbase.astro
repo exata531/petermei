@@ -67,16 +67,16 @@ const pins = [
 </div>
 
 <style>
-  .safari { position: absolute; inset: 0; display: grid; grid-template-rows: 34px 1fr; background: #f6f3ee; color: #2b2622; font-family: var(--ui); }
+  .safari { position: absolute; inset: 0; display: grid; grid-template-rows: 34px 1fr; background: #f6f3ee; color: #030302; font-family: var(--ui); }
   .sf-bar { display: flex; align-items: center; gap: 8px; padding: 0 8px; background: #ebe7e1; box-shadow: 0 .5px 0 rgb(0 0 0 / .14); }
   .sf-tabs { display: flex; gap: 1px; flex: 1; min-width: 0; height: 26px; }
-  .sf-tab { position: relative; display: inline-flex; align-items: center; gap: 7px; flex: 1; min-width: 0; padding: 0 12px; border-radius: 7px; font-size: 12px; color: #6b655e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background-color var(--t-fast) var(--soft), color var(--t-fast) var(--soft); cursor: default; justify-content: center; }
+  .sf-tab { position: relative; display: inline-flex; align-items: center; gap: 7px; flex: 1; min-width: 0; padding: 0 12px; border-radius: 7px; font-size: 12px; background: rgb(3 3 2 / .04); color: rgb(3 3 2 / .62); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background-color var(--t-fast) var(--soft), color var(--t-fast) var(--soft); cursor: default; justify-content: center; }
   .sf-tab span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
   .sf-tab::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; translate: 0 -50%; height: 44px; }
   .sf-tab:active { transform: scale(.98); }
   .sf-tab img { border-radius: 3px; flex: none; }
-  .sf-tab.is-on { background: #fbfaf7; color: #2b2622; box-shadow: 0 1px 2px rgb(0 0 0 / .12), 0 0 0 .5px rgb(0 0 0 / .08); }
-  .sf-tab:hover:not(.is-on) { background: rgb(0 0 0 / .05); }
+  .sf-tab.is-on { background: #fcf9f7; color: #030302; box-shadow: 0 1px 2px rgb(0 0 0 / .12), 0 0 0 .5px rgb(0 0 0 / .08); }
+  .sf-tab:hover:not(.is-on) { background: rgb(3 3 2 / .09); }
   .sf-demo { flex: none; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #5f5952; padding: 2px 7px; border-radius: 4px; box-shadow: inset 0 0 0 .5px rgb(0 0 0 / .18); }
   .sf-page { position: relative; overflow: clip; }
   .sf-pane { position: absolute; inset: 0; }
@@ -89,7 +89,7 @@ const pins = [
   .sf-film { position: absolute; left: 50%; top: 50%; width: 1060px; height: 606px; transform: translate(-50%, -50%) scale(var(--s, 1)); overflow: clip; background: #f6f3ee; }
   .vb-tabs { position: absolute; right: 14px; bottom: 14px; z-index: 3; display: inline-flex; gap: 2px; padding: 2px; border-radius: 8px; background: rgb(255 255 255 / .85); box-shadow: 0 1px 2px rgb(0 0 0 / .12), 0 0 0 .5px rgb(0 0 0 / .08); --bf: blur(8px); backdrop-filter: var(--bf); }
   .vb-tab { padding: 4px 10px; border-radius: 6px; font-size: 11px; color: #6b655e; transition: background-color var(--t-fast) var(--soft); }
-  .vb-tab.is-on { background: #2b2622; color: #fff; }
+  .vb-tab.is-on { background: #030302; color: #fcf9f7; }
   .vb-tab:active { transform: scale(.98); }
   .vb-landing { position: absolute; inset: 0; will-change: transform; transition: opacity var(--t-fast) var(--soft); }
   .vb-shot { width: 100%; height: auto; transform: translateY(var(--vb-scroll, 0px)); will-change: transform; }
@@ -105,7 +105,7 @@ const pins = [
   .vb-pin { position: absolute; left: var(--x); top: var(--y); transform: translate(-50%, -100%) translateY(-24px) scale(.6); opacity: 0; display: grid; justify-items: center; gap: 4px; }
   .vb-pin.is-in { transform: translate(-50%, -100%); opacity: 1; transition: transform .45s var(--out), opacity .25s var(--soft); transition-delay: calc(var(--i) * 90ms); }
   .pin-head { width: 22px; height: 22px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: #5c79b8; box-shadow: 0 6px 12px -4px rgb(0 0 0 / .4), inset 0 0 0 5px #fff; }
-  .pin-lbl { font-size: 10px; font-weight: 600; background: #fff; padding: 2px 6px; border-radius: 6px; box-shadow: 0 1px 2px rgb(0 0 0 / .12); color: #2b2622; }
+  .pin-lbl { font-size: 10px; font-weight: 600; background: #fff; padding: 2px 6px; border-radius: 6px; box-shadow: 0 1px 2px rgb(0 0 0 / .12); color: #030302; }
   .vb-list { position: absolute; left: 14px; top: 14px; width: 250px; display: grid; gap: 8px; }
   .vb-card { display: grid; grid-template-columns: 48px 1fr; gap: 10px; align-items: center; padding: 10px 12px; background: #fff; border-radius: 12px; box-shadow: 0 1px 2px rgb(0 0 0 / .08), 0 8px 20px -14px rgb(0 0 0 / .3); font-size: 12px; line-height: 1.3; opacity: 0; transform: translateY(10px); }
   .vb-card.is-in { opacity: 1; transform: none; transition: opacity .4s var(--soft), transform .5s var(--out); transition-delay: calc(var(--i) * 80ms + 150ms); }

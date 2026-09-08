@@ -41,12 +41,14 @@ export const EDIT: Menu = {
   label: 'Edit',
   items: [
     { label: 'Undo', key: '⌘Z', dis: true },
-    { label: 'Redo', key: '⇧⌘Z', dis: true },
     { label: '', sep: true },
     { label: 'Cut', key: '⌘X', dis: true },
     { label: 'Copy', key: '⌘C', dis: true },
     { label: 'Paste', key: '⌘V', dis: true },
+    { label: 'Clear', dis: true },
     { label: 'Select All', key: '⌘A', dis: true },
+    { label: '', sep: true },
+    { label: 'Show Clipboard', dis: true },
   ],
 };
 export const VIEW: Menu = {
@@ -58,11 +60,10 @@ export const VIEW: Menu = {
     { label: 'Enter Full Screen', key: '⌃⌘F', action: 'zoom' },
   ],
 };
-/* Safari and Simulator carry menus this desktop has nothing behind, greyed */
-const HISTORY: Menu = { label: 'History', items: [{ label: 'Show All History', key: '⌘Y', dis: true }, { label: 'Back', key: '⌘[', action: 'sf-back' }, { label: 'Forward', key: '⌘]', action: 'sf-fwd' }, { label: '', sep: true }, { label: 'Reload Page', key: '⌘R', action: 'sf-reload' }] };
+/* the browser's Go menu is its history, the way a 1995 browser kept it */
+const GO: Menu = { label: 'Go', items: [{ label: 'Back', key: '⌘[', action: 'sf-back' }, { label: 'Forward', key: '⌘]', action: 'sf-fwd' }, { label: '', sep: true }, { label: 'Reload', key: '⌘R', action: 'sf-reload' }] };
 const BOOKMARKS: Menu = { label: 'Bookmarks', items: [
-  { label: 'Show Bookmarks', key: '⌃⌘1', dis: true },
-  { label: 'Add Bookmark…', key: '⌘D', dis: true },
+  { label: 'Add Bookmark', key: '⌘D', dis: true },
   { label: '', sep: true },
   { label: 'petermei.com', action: 'sf-go:site:/site' },
   { label: 'Work', action: 'sf-go:site:/site/work' },
@@ -74,8 +75,7 @@ const BOOKMARKS: Menu = { label: 'Bookmarks', items: [
   { label: 'Opportunities near you', action: 'sf-go:volbase:/opportunities/map' },
   { label: 'Organizations', action: 'sf-go:volbase:/organizations' },
 ] };
-const DEVICE: Menu = { label: 'Device', items: [{ label: 'Rotate Left', key: '⌘←', dis: true }, { label: 'Rotate Right', key: '⌘→', dis: true }, { label: 'Home', key: '⇧⌘H', dis: true }, { label: '', sep: true }, { label: 'Erase All Content and Settings…', dis: true }] };
-const IO: Menu = { label: 'I/O', items: [{ label: 'Keyboard', dis: true }, { label: 'Input', dis: true }, { label: 'Audio', dis: true }] };
+const DEVICE: Menu = { label: 'Device', items: [{ label: 'Light', action: 'kyou-light' }, { label: 'Dark', action: 'kyou-dark' }, { label: '', sep: true }, { label: 'Rotate', dis: true }] };
 export const WINDOW: Menu = {
   label: 'Window',
   items: [
@@ -86,25 +86,25 @@ export const WINDOW: Menu = {
     { label: 'Bring All to Front', action: 'front' },
   ],
 };
-/* the standard set, with the host app's own menus slotted in where it keeps them */
-const std = (name: string, go?: MenuItem, extra: Menu[] = []): Menu[] => ([
+/* the standard set: File and Edit, with the host app's own menus after them.
+   About lives under the Apple menu, the way it did. */
+const std = (_name: string, go?: MenuItem, extra: Menu[] = []): Menu[] => ([
   {
     label: 'File',
     items: [
-      { label: `About ${name}`, action: 'about' },
-      ...(go ? [go] : []),
+      ...(go ? [go, { label: '', sep: true }] : []),
+      { label: 'Close', key: '⌘W', action: 'close' },
       { label: '', sep: true },
-      { label: 'Close Window', key: '⌘W', action: 'close' },
+      { label: 'Quit', key: '⌘Q', action: 'quit-front' },
     ],
   },
-  EDIT, VIEW, ...extra, WINDOW,
-  { label: 'Help', items: [{ label: 'Spotlight', key: '⌘K', action: 'spot' }, { label: `${name} Help`, action: 'about' }] },
+  EDIT, ...extra,
 ]);
 
 export const apps: App[] = [
   {
     id: 'volbase',
-    name: 'Safari',
+    name: 'Navigator',
     label: 'volbase',
     title: 'volbase.app',
     kind: 'window',
@@ -118,7 +118,7 @@ export const apps: App[] = [
       state: 'Live, with real users',
       link: { label: 'volbase.app', href: 'https://volbase.app' },
     },
-    menus: std('volbase', { label: 'Open volbase.app', action: 'vb' }, [HISTORY, BOOKMARKS]),
+    menus: std('volbase', { label: 'Open volbase.app', action: 'vb' }, [GO, BOOKMARKS]),
   },
   {
     id: 'rin',
@@ -136,26 +136,13 @@ export const apps: App[] = [
       state: 'Free and open source',
       link: { label: 'github.com/exata531/Rin', href: 'https://github.com/exata531/Rin' },
     },
-    menus: [
-      {
-        label: 'File',
-        items: [
-          { label: 'About Rin', action: 'about' },
-          { label: 'Source on GitHub', action: 'rin-gh' },
-          { label: '', sep: true },
-          { label: 'Close Panel', key: '⌘W', action: 'close' },
-        ],
-      },
-      EDIT,
-      { label: 'Window', items: [{ label: 'Drop Panel', action: 'front' }] },
-      { label: 'Help', items: [{ label: 'Spotlight', key: '⌘K', action: 'spot' }, { label: 'Rin Help', action: 'about' }] },
-    ],
+    menus: std('Rin', { label: 'Source on GitHub', action: 'rin-gh' }),
   },
   {
     id: 'kyou',
-    name: 'Simulator',
+    name: 'Kyou',
     label: 'Kyou',
-    title: 'iPhone 17 Pro',
+    title: 'Kyou',
     kind: 'sim',
     w: 330, h: 726,
     scene: 'kyou', sw: 300, sh: 620, mw: 390, mh: 780,
@@ -170,7 +157,7 @@ export const apps: App[] = [
       state: 'In progress, aimed at the App Store',
       link: { label: 'github.com/exata531', href: 'https://github.com/exata531' },
     },
-    menus: std('Kyou', undefined, [DEVICE, IO]),
+    menus: std('Kyou', undefined, [DEVICE]),
   },
   {
     id: 'market',

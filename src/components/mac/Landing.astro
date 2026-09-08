@@ -1,11 +1,11 @@
 ---
 /* The landing.
 
-   A page of Craft's paper that is also the loading screen. The name, one
+   A white page that is also the loading screen. The name, one
    line, and a thin bar that fills as the page actually settles.
 
-   On a desktop the middle of it is a drawn iMac with the real desktop live
-   inside its screen: what is in the picture is what is about to fill the
+   On a desktop the middle of it is a drawn compact Macintosh with the real
+   desktop live inside its screen: what is in the picture is what is about to fill the
    window, and the screen itself is the way in. The drawing is rendered here
    for the first paint at the shape a desktop window usually has; the script
    redraws it if the visitor's window is shaped differently.
@@ -15,9 +15,17 @@
    gets a plain cover: the name, the line, and one button big enough to hit
    with a thumb. Without JavaScript none of this exists: the plain page is
    the whole site. */
-import { imac } from '../../scripts/mac/devices';
+import { compact } from '../../scripts/mac/devices';
+import Icon from './Icon.astro';
 
-const mac = imac(1.6);
+const mac = compact(1.6);
+/* the four products, in the order the dock keeps them */
+const made = [
+  { id: 'volbase', label: 'volbase' },
+  { id: 'rin', label: 'Rin' },
+  { id: 'kyou', label: 'Kyou' },
+  { id: 'market', label: 'Market Station' },
+];
 const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(3)}%`;
 const screenStyle = (d: typeof mac) =>
   `left:${pct(d.screen.x, d.vbW)};top:${pct(d.screen.y, d.vbH)};width:${pct(d.screen.w, d.vbW)};height:${pct(d.screen.h, d.vbH)}`;
@@ -25,6 +33,20 @@ const screenStyle = (d: typeof mac) =>
 <section class="land" data-land aria-busy="true" aria-label="Peter Mei">
   <div class="land-ground" aria-hidden="true"></div>
   <div class="land-col" data-land-col>
+    {/* the cover's picture, drawn only where the machine cannot be: the same
+        sky, the same disc and the same cloud banks as the wallpaper behind it,
+        with the four things he built sitting on a strip along the bottom. It is
+        the desktop's own illustration, not a picture of a phone. */}
+    <div class="land-card" aria-hidden="true">
+      <span class="land-sun"></span>
+      <span class="land-cloud land-cloud-a"></span>
+      <span class="land-cloud land-cloud-b"></span>
+
+      <span class="land-strip">
+        {made.map((a) => <span class="land-chip"><Icon id={a.id} /></span>)}
+      </span>
+    </div>
+
     <header class="land-head">
       <h1 class="land-name">Peter Mei</h1>
       <p class="land-line">I am a senior in high school and I make software. Everything I have built so far is on this Mac, so click around.</p>

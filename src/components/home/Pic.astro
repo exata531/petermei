@@ -1,0 +1,8 @@
+---
+/* one product picture, in both appearances; the tokens show one */
+import type { Pair } from '../../data/home';
+interface Props { pair: Pair; eager?: boolean }
+const { pair, eager = false } = Astro.props;
+---
+<img class="pic-light" src={pair.light.src} width={pair.light.width} height={pair.light.height} alt={pair.caption} loading={eager ? 'eager' : 'lazy'} decoding="async" draggable="false" />
+<img class="pic-dark" src={pair.dark.src} width={pair.dark.width} height={pair.dark.height} alt="" loading="lazy" decoding="async" draggable="false" />

@@ -8,8 +8,8 @@
    headers. Thumbnails load when the pane is opened, not with the page. */
 import { photos } from '../../data/photos';
 ---
-<div class="fnd-pane pic" data-fnd-pane="pictures">
-  <div class="fnd-head pic-head" aria-hidden="true"><span>Name</span><span>Date Modified</span><span>Kind</span><span>Size</span></div>
+<div class="fnd-pane pic is-on" data-fnd-pane="pictures">
+  <div class="fnd-cols pic-head" aria-hidden="true"><span>Name</span><span>Size</span><span>Kind</span><span>Last Modified</span></div>
   <ul class="fnd-rows pic-rows" role="listbox" aria-label="Pictures">
     {photos.map((p) => (
       <li class="fnd-row pic-row" role="option" aria-selected="false" tabindex={p.i === 0 ? 0 : -1} data-pic={p.i} aria-label={`${p.name}, ${p.alt}`}>

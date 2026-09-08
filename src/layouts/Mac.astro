@@ -1,5 +1,5 @@
 ---
-import '../styles/tokens.css';
+import '../styles/mac-tokens.css';
 import '../styles/mac.css';
 
 interface Props { title: string; desc: string; }
@@ -18,8 +18,9 @@ const url = new URL(Astro.url.pathname, Astro.site ?? 'https://petermei.com');
     <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#cfe0f1" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0d1018" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="preload" href="/fonts/ChiKareGo2.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/FindersKeepers.woff2" as="font" type="font/woff2" crossorigin />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={desc} />
@@ -27,14 +28,9 @@ const url = new URL(Astro.url.pathname, Astro.site ?? 'https://petermei.com');
     <meta property="og:image" content={new URL('/og.png', url).href} />
     <meta name="twitter:card" content="summary_large_image" />
     <script is:inline>
-      /* before the first paint, so the desktop never flashes the wrong appearance */
       (function () {
         var d = document.documentElement;
         d.classList.add('js');
-        try {
-          var t = localStorage.getItem('appearance');
-          if (t === 'light' || t === 'dark') d.dataset.theme = t;
-        } catch (e) {}
         /* the landing shows once per tab: after that a reload lands on the desktop */
         try { if (sessionStorage.getItem('mac-in')) d.classList.add('in'); } catch (e) {}
       })();

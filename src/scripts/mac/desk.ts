@@ -8,7 +8,6 @@
    Nothing here runs on its own. The page loads, the desktop is there, and
    everything after that is the visitor's doing. */
 import { Desk, type Win } from './windows';
-import { initDock } from './dock';
 import { initSpotlight, type Hit } from './spotlight';
 import { mountScene, type Live } from './scenes';
 import { initPhotos, type PhotoRec } from './photos';
@@ -21,7 +20,7 @@ import { initSaver } from './saver';
 import { takeScreenshot, type Shot } from './shot';
 import { sound } from './sounds';
 import { secrets } from './secrets';
-import { apps, byId, links, finder, readme, EDIT, VIEW, WINDOW, type Menu, type MenuItem } from '../../data/apps';
+import { apps, byId, links, finder, readme, EDIT, type Menu, type MenuItem } from '../../data/apps';
 import { trashItems } from '../../data/trash';
 
 const $ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => r.querySelector<T>(s);
@@ -29,8 +28,6 @@ const $$ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document
 
 const stash = $('[data-stash]')!;
 const winRoot = $('[data-wins]')!;
-const dockRoot = $('[data-dock-root]')!;
-const dockWrap = $('[data-dock-wrap]')!;
 const mbar = $('[data-mbar]')!;
 const deskEl = $('[data-desk]')!;
 const macEl = $('[data-mac]')!;
@@ -109,10 +106,7 @@ function initClock() {
     const d = new Date();
     const t = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
     if (long) {
-      long.textContent =
-        d.toLocaleDateString('en-US', { weekday: 'short' }) + ' ' +
-        d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) +
-        '  ' + t;
+      long.textContent = t;
       long.dateTime = d.toISOString();
     }
   };
@@ -135,8 +129,22 @@ function live(id: string) {
 
 /* ── the window manager ─────────────────────────────────────────────────── */
 const desk = new Desk(winRoot);
-const dock = initDock(dockRoot as HTMLElement);
-desk.dockTop = () => dock.top() - 8;
+/* there is no dock. A window grows out of the desktop icon it belongs to, an
+   open application's icon on the desktop is drawn as a ghost, and the
+   Application menu at the right of the bar lists what is running. */
+const iconFor = (id: string) => $<HTMLElement>(`.item[data-open="${id === 'safari' ? 'volbase' : id}"] .item-ico`);
+const dock = {
+  bounce(_id: string) {},
+  settle(_id: string) {},
+  refresh() {},
+  top: () => innerHeight,
+  rect: (id: string) => iconFor(id)?.getBoundingClientRect(),
+  running(ids: string[]) {
+    $$('.item[data-open]').forEach((el) => el.classList.toggle('is-open', ids.includes(el.dataset.open!)));
+    $$('.fnd-row[data-fnd-open]').forEach((el) => el.classList.toggle('is-open', ids.includes(el.dataset.fndOpen!)));
+  },
+};
+desk.dockTop = () => innerHeight;
 const open = new Set<string>();
 const mission = initMission(desk, deskEl);
 let stickyFront = false;
@@ -240,7 +248,7 @@ function rinClose(back = false) {
   lives.get('rin')?.scene.leave?.();
   sync();
   /* closed from the keyboard: the keyboard goes back to the icon it came from */
-  if (back) dockRoot.querySelector<HTMLElement>('[data-dock="rin"]')?.focus({ preventScroll: true });
+  if (back) rinStatus.focus({ preventScroll: true });
   const done = () => { returnBody('rin'); p.remove(); };
   if (reduced()) { done(); return; }
   rinStop?.();
@@ -276,7 +284,7 @@ rinStatus.addEventListener('click', () => { if (!rinPanel) dock.bounce('rin'); r
 addEventListener('pointerdown', (e) => {
   if (!rinPanel) return;
   const t = e.target as HTMLElement;
-  if (t.closest('.panel, [data-mbar], [data-dock-root], [data-menu-pop]')) return;
+  if (t.closest('.panel, [data-mbar], [data-menu-pop]')) return;
   rinClose();
 });
 
@@ -315,6 +323,7 @@ function finderTool(title: string, opts: { views?: boolean; count?: string; empt
   t.innerHTML =
     `<span class="tb-side" data-drag><span class="tb-nav">${btn(G.back, 'Back', ' is-dis')}${btn(G.fwd, 'Forward', ' is-dis')}</span></span>
      <span class="tb-main" data-drag>
+       <span class="tb-sp" data-drag></span>
        <span class="tb-title">${title}</span>
        <span class="tb-sp" data-drag></span>
        ${opts.count ? `<span class="tb-count">${opts.count}</span>` : ''}
@@ -331,15 +340,13 @@ function finderTool(title: string, opts: { views?: boolean; count?: string; empt
    same page in a real tab, and About */
 function safariTool(id: string) {
   const t = document.createElement('div');
-  t.dataset.drag = '';
   t.innerHTML =
-    `<span class="tb-nav">${btn(G.back, 'Back', ' is-dis')}${btn(G.fwd, 'Forward', ' is-dis')}</span>
-     ${btn(G.side, 'Show sidebar', ' is-dis')}
-     <span class="tb-sp" data-drag></span>
-     <span class="tb-url" data-drag>${G.lock}<span data-vb-url>volbase.app</span>${btn(G.reload, 'Reload this page', ' tb-reload')}</span>
-     <span class="tb-sp" data-drag></span>
-     <a class="tb-btn" href="${links.volbase}" target="_blank" rel="noopener" aria-label="Open this page in a new tab" title="Open in a new tab" data-vb-open>${G.share}</a>
-     ${btn(G.info, `About ${byId(id)?.label ?? ''}`, ' tb-about')}`;
+    `<span class="tb-nav"><button class="tb-btn tb-txt is-dis" type="button" aria-label="Back">Back</button><button class="tb-btn tb-txt is-dis" type="button" aria-label="Forward">Forward</button></span>
+     <button class="tb-btn tb-txt tb-reload" type="button">Reload</button>
+     <span class="tb-url-lbl">Location:</span>
+     <span class="tb-url"><span data-vb-url>volbase.app</span></span>
+     <a class="tb-btn tb-txt" href="${links.volbase}" target="_blank" rel="noopener" aria-label="Open this page in a new tab" title="Open in a new tab" data-vb-open>Open</a>
+     <button class="tb-btn tb-txt tb-about" type="button" aria-label="About ${byId(id)?.label ?? ''}">About</button>`;
   const scene = () => lives.get(id)?.scene;
   const [b, f] = t.querySelectorAll<HTMLButtonElement>('.tb-nav .tb-btn');
   b.setAttribute('data-vb-back', ''); f.setAttribute('data-vb-fwd', '');
@@ -359,23 +366,16 @@ function photosTool() {
   t.className = 'pho-tool is-lib';
   const modes: [string, string][] = [['years', 'Years'], ['months', 'Months'], ['days', 'Days'], ['all', 'All Photos']];
   t.innerHTML =
-    `<span class="tb-side" data-drag>
-       ${btn(G.side, 'Hide or show the sidebar', ' pho-sideb')}
-       ${btn(G.back, 'Back to the library', ' pho-back')}
+    `<span class="tb-side">
+       <button class="tb-btn tb-txt pho-sideb" type="button" aria-label="Hide or show the albums">Albums</button>
+       <button class="tb-btn tb-txt pho-back" type="button" aria-label="Back to the library">Back</button>
      </span>
-     <span class="tb-main" data-drag>
-       <span class="tb-title pho-ttl" data-ph-title hidden></span>
+     <span class="tb-main">
+       <span class="tb-title pho-ttl" data-ph-title hidden>Photos</span>
        <span class="tb-title pho-vt" data-ph-vt aria-live="polite"></span>
-       <span class="tb-sp" data-drag></span>
        <span class="tb-seg pho-seg" role="tablist" aria-label="View">
          ${modes.map(([k, l]) => `<button class="tb-btn tb-txt${k === 'all' ? ' is-on' : ''}" type="button" role="tab" aria-selected="${k === 'all'}" tabindex="${k === 'all' ? 0 : -1}" data-ph-mode="${k}">${l}</button>`).join('')}
        </span>
-       <span class="tb-sp" data-drag></span>
-       <label class="pho-zoom" title="Thumbnail size">
-         <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="6" height="6" rx="1"/></svg>
-         <input type="range" min="0" max="4" step="1" value="2" data-ph-zoom aria-label="Thumbnail size" />
-         <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="11" height="11" rx="1.5"/></svg>
-       </label>
      </span>`;
   t.querySelector('.pho-sideb')!.setAttribute('data-ph-side', '');
   t.querySelector('.pho-back')!.setAttribute('data-ph-back', '');
@@ -383,16 +383,19 @@ function photosTool() {
 }
 
 const TITLES: Record<string, string> = {
-  finder: 'About Peter', photos: 'Photos', textedit: 'Read me', trash: 'Trash',
-  terminal: 'visitor — fake-zsh — 80×24',
+  finder: 'Macintosh HD', photos: 'Photos', textedit: 'Read Me', trash: 'Trash',
+  terminal: 'Terminal', pictures: 'Pictures',
+  ...Object.fromEntries(finder.map((s) => [`doc-${s.id}`, s.file.replace(/\.txt$/, '')])),
 };
 const SIZES: Record<string, { w: number; h: number; min?: number; klass?: string }> = {
-  finder: { w: 700, h: 512, min: 460, klass: 'win-finder' },
+  finder: { w: 700, h: 470, min: 400, klass: 'win-finder' },
+  pictures: { w: 640, h: 440, min: 360, klass: 'win-pictures' },
   photos: { w: 920, h: 600, min: 420, klass: 'win-photos' },
-  textedit: { w: 560, h: 268, min: 300, klass: 'win-text' },
-  trash: { w: 620, h: 360, min: 420, klass: 'win-finder' },
-  terminal: { w: 585, h: 400, min: 400, klass: 'win-term' },
+  textedit: { w: 560, h: 300, min: 300, klass: 'win-text' },
+  trash: { w: 620, h: 360, min: 360, klass: 'win-trash' },
+  terminal: { w: 640, h: 380, min: 400, klass: 'win-term' },
 };
+const sizeOf = (id: string) => SIZES[id] ?? (id.startsWith('doc-') ? { w: 560, h: 380, min: 320, klass: 'win-doc' } : { w: 480, h: 320 });
 
 function openApp(id: string) {
   mission.exit();
@@ -417,41 +420,23 @@ function openApp(id: string) {
   const known = byId(id);
   const size = known
     ? { w: known.w, h: known.h, min: known.min, klass: `win-${id}` }
-    : SIZES[id] ?? { w: 480, h: 320 };
+    : sizeOf(id);
 
   let tool: HTMLElement | undefined;
   if (id === 'volbase') tool = safariTool(id);
-  if (id === 'finder') tool = finderTool('About Peter', { views: true });
-  if (id === 'trash') tool = finderTool('Trash', { empty: true });
   if (id === 'photos') tool = photosTool();
-  const side = id === 'finder' || id === 'trash' || id === 'photos';
 
-  dock.bounce(id);
   const title = known?.title ?? TITLES[id] ?? id;
-  let tile: HTMLElement | null = null;
   const win = desk.open({
     id,
     title,
     body: el,
-    w: size.w, h: size.h, min: size.min, klass: size.klass, tool, side,
+    w: size.w, h: size.h, min: size.min, klass: size.klass, tool,
     onClose: () => { open.delete(id); lives.get(id)?.scene.leave?.(); returnBody(id); sync(); },
     onFocus: () => { rinFront = false; stickyFront = false; sync(); },
-    /* minimized: a thumbnail goes into the Dock beside the Trash, and the
-       window folds into it instead of into the app's icon */
-    onMin: () => {
-      lives.get(id)?.scene.leave?.();
-      tile = minTile(win, id, title);
-      const r = tile.querySelector('.dock-tile')!.getBoundingClientRect();
-      desk.setFrom(win, r);
-    },
-    onRestore: () => {
-      tile?.remove(); tile = null;
-      dock.refresh();
-      const r = dock.rect(id);
-      if (r) desk.setFrom(win, r);
-    },
-  }, dock.rect(id));
-  win.settle = () => dock.settle(id);
+    onMin: () => { lives.get(id)?.scene.leave?.(); },
+    onRestore: () => { lives.get(id)?.scene.enter?.(); },
+  }, dock.rect(id) ?? (id.startsWith('doc-') || id === 'pictures' ? dock.rect('finder') : undefined));
 
   open.add(id);
   sync();
@@ -489,11 +474,10 @@ function openApp(id: string) {
   }
   if (known?.about && id !== 'volbase') {
     const b = document.createElement('button');
-    b.className = 'tb-btn';
+    b.className = 'tb-btn tb-txt';
     b.type = 'button';
     b.setAttribute('aria-label', `About ${known.label}`);
-    b.title = `About ${known.label}`;
-    b.innerHTML = G.info;
+    b.textContent = 'About';
     b.addEventListener('click', () => openAbout(id));
     pad.appendChild(b);
   }
@@ -523,49 +507,12 @@ function openApp(id: string) {
       el.addEventListener('sf:open', (e) => openApp((e as CustomEvent<string>).detail));
     }
   }
-  if (id === 'finder') wireFinder(el, tool!);
+  if (id === 'finder') wireFinder(el);
+  if (id === 'pictures') wirePictures(el);
   if (id === 'photos') { photosApp.attachTool(tool!); photosApp.enter('desk'); }
   if (id === 'terminal') { termWire(); requestAnimationFrame(() => term?.focus()); }
-  if (id === 'trash') wireTrash(el, tool!);
+  if (id === 'trash') wireTrash(el);
   return win;
-}
-
-/* a minimized window's thumbnail: the window itself, cloned and scaled into
-   a tile, the app's icon badged on its corner, sitting beside the Trash */
-function minTile(win: Win, id: string, title: string) {
-  const k = Math.min(50 / win.w, 50 / win.h);
-  const tile = document.createElement('button');
-  tile.className = 'dock-i dock-min';
-  tile.type = 'button';
-  tile.dataset.restore = id;
-  tile.setAttribute('aria-label', `${title}, minimized`);
-  const clone = win.el.cloneNode(true) as HTMLElement;
-  clone.removeAttribute('style');
-  clone.removeAttribute('role');
-  clone.removeAttribute('data-win');
-  clone.setAttribute('aria-hidden', 'true');
-  clone.inert = true;
-  clone.className = win.el.className.replace(/\bis-min\b/g, '') + ' is-front';
-  clone.style.width = `${win.w}px`;
-  clone.style.height = `${win.h}px`;
-  clone.querySelectorAll('.rz, [data-body] script').forEach((e) => e.remove());
-  clone.querySelectorAll('[data-body], [id]').forEach((e) => { e.removeAttribute('data-body'); e.removeAttribute('id'); });
-  const thumb = document.createElement('span');
-  thumb.className = 'dock-thumb';
-  thumb.style.setProperty('--tw', `${Math.round(win.w * k)}px`);
-  thumb.style.setProperty('--th', `${Math.round(win.h * k)}px`);
-  thumb.style.setProperty('--k', k.toFixed(4));
-  thumb.appendChild(clone);
-  const t = document.createElement('span');
-  t.className = 'dock-tile';
-  t.appendChild(thumb);
-  t.insertAdjacentHTML('beforeend', `<span class="dock-badge" aria-hidden="true">${icon(id)}</span>`);
-  tile.appendChild(t);
-  tile.insertAdjacentHTML('beforeend', `<span class="dock-name" aria-hidden="true"></span>`);
-  tile.querySelector('.dock-name')!.textContent = title;
-  dockRoot.querySelector('[data-dock="trash"]')!.before(tile);
-  dock.refresh();
-  return tile;
 }
 
 /* a photo opened from anywhere: the desktop, Finder, a Spotlight hit */
@@ -659,77 +606,92 @@ function closeFront() {
 const appName = $('[data-app-name]')!;
 const appMenus = $('[data-app-menus]')!;
 
-/* the Apple menu's order, and its power items are the ways out of the Mac */
-const APPLE: MenuItem[] = [
-  { label: 'About This Mac', action: 'open:about-mac' },
-  { label: 'About Peter', action: 'open:finder' },
-  { label: '', sep: true },
-  { label: 'System Settings…', dis: true },
-  { label: 'App Store…', dis: true },
-  { label: '', sep: true },
-  { label: 'Force Quit…', key: '⌥⌘⎋', dis: true },
-  { label: '', sep: true },
-  { label: 'Sleep', action: 'power:sleep' },
-  { label: 'Restart…', action: 'power:restart' },
-  { label: 'Shut Down…', action: 'power:shutdown' },
-  { label: '', sep: true },
-  { label: 'Lock Screen', key: '⌃⌘Q', action: 'power:lock' },
-  { label: 'Log Out Peter…', key: '⇧⌘Q', action: 'power:logout' },
-];
-/* Control Center: a glass panel of modules, not a list. The radios and the
-   sliders are this desktop's own; the appearance tile is the real switch. */
-const cc = { wifi: true, bt: true, air: true, disp: 80, snd: sound.volume };
-function ccPanel() {
-  const radio = (k: 'wifi' | 'bt' | 'air', g: string, name: string, sub: [string, string]) =>
-    `<button class="cc-row${cc[k] ? ' is-on' : ''}" type="button" role="switch" aria-checked="${cc[k]}" data-cc="${k}">
-       <span class="cc-tog" aria-hidden="true">${g}</span>
-       <span class="cc-txt"><b>${name}</b><small>${cc[k] ? sub[0] : sub[1]}</small></span>
-     </button>`;
-  const dark = theme.now() === 'dark';
-  return `<div class="cc">
-    <div class="cc-card cc-radios">
-      ${radio('wifi', G.wifi, 'Wi-Fi', ['Home', 'Off'])}
-      ${radio('bt', G.bt, 'Bluetooth', ['On', 'Off'])}
-      ${radio('air', G.airdrop, 'AirDrop', ['Contacts Only', 'Off'])}
-    </div>
-    <button class="cc-card cc-appear is-on" type="button" data-cc="theme" aria-label="Appearance, switch to ${dark ? 'light' : 'dark'}">
-      <span class="cc-tog" aria-hidden="true">${dark ? G.moon : G.sun}</span>
-      <span class="cc-txt"><b>Appearance</b><small>${dark ? 'Dark' : 'Light'}</small></span>
-    </button>
-    <label class="cc-card cc-slide"><span class="cc-lbl">Display</span><span class="cc-range">${G.bright}<input type="range" min="0" max="100" value="${cc.disp}" data-cc="disp" aria-label="Display brightness" /></span></label>
-    <label class="cc-card cc-slide"><span class="cc-lbl cc-lbl-row">Sound
-      <button class="cc-mute${sound.muted ? '' : ' is-on'}" type="button" role="switch" aria-checked="${!sound.muted}" data-cc="mute">${sound.muted ? 'Off' : 'On'}</button></span>
-      <span class="cc-range">${G.sound}<input type="range" min="0" max="100" value="${cc.snd}" data-cc="snd" aria-label="Sound volume" /></span></label>
-  </div>`;
+/* the Apple menu: the front application's About first, then the desk
+   accessories in the order the Finder lists them, then Shut Down, the way a
+   7.5 Apple Menu Items folder read */
+function appleMenu(): MenuItem[] {
+  const { about } = currentApp();
+  return [
+    about === 'Finder'
+      ? { label: 'About This Macintosh…', action: 'open:about-mac' }
+      : { label: `About ${about}…`, action: 'about' },
+    { label: '', sep: true },
+    { label: 'About This Macintosh…', action: 'open:about-mac', dis: about === 'Finder' },
+    { label: 'Find File…', key: '⌘F', action: 'spot' },
+    { label: 'Note Pad', action: 'open:stickies' },
+    { label: 'Pictures', action: 'open:pictures' },
+    { label: 'Read Me', action: 'open:textedit' },
+    { label: 'Scrapbook', action: 'open:photos' },
+    { label: 'Terminal', action: 'open:terminal' },
+    { label: '', sep: true },
+    { label: 'Shut Down', action: 'power:shutdown' },
+  ];
 }
-
-const FINDER_MENUS: Menu[] = [
-  { label: 'File', items: [
-    { label: 'New Finder Window', key: '⌘N', action: 'open:finder' },
-    { label: 'New Folder', key: '⇧⌘N', dis: true },
-    { label: '', sep: true },
-    { label: 'Open Read me', action: 'open:textedit' },
-    { label: 'Get Info', key: '⌘I', action: 'open:finder' },
-    { label: '', sep: true },
-    { label: 'Close Window', key: '⌘W', action: 'close' },
-    { label: 'Move to Trash', key: '⌘⌫', dis: true },
-  ] },
-  EDIT,
-  VIEW,
-  { label: 'Go', items: [
-    { label: 'Read me', action: 'open:textedit' },
-    { label: 'Pictures', action: 'pictures' },
-    { label: 'Photos', action: 'open:photos' },
-    { label: 'petermei.com', action: 'open:safari' },
-    { label: 'GitHub', action: 'gh' },
-    { label: '', sep: true },
-    { label: 'Trash', action: 'open:trash' },
-  ] },
-  WINDOW,
-  { label: 'Help', items: [
-    { label: 'Spotlight', key: '⌘K', action: 'spot' },
-  ] },
+const HELP: MenuItem[] = [
+  { label: 'About Balloon Help…', action: 'balloon' },
+  { label: 'Show Balloons', dis: true },
+  { label: '', sep: true },
+  { label: 'Finder Shortcuts', action: 'shortcuts' },
 ];
+/* the Finder's five menus, the way System 7 had them; the greyed items are
+   the ones this desktop has nothing behind, because grey items are how a
+   Macintosh looked */
+function finderMenus(): Menu[] {
+  const f = desk.front;
+  const fnd = f?.el.querySelector('.fnd');
+  const list = !!fnd?.classList.contains('is-list');
+  return [
+    { label: 'File', items: [
+      { label: 'New Folder', key: '⌘N', dis: true },
+      { label: 'Open', key: '⌘O', action: 'open-sel' },
+      { label: 'Print', key: '⌘P', dis: true },
+      { label: 'Close Window', key: '⌘W', action: 'close', dis: !f },
+      { label: '', sep: true },
+      { label: 'Get Info', key: '⌘I', dis: true },
+      { label: 'Sharing…', dis: true },
+      { label: 'Duplicate', key: '⌘D', dis: true },
+      { label: 'Make Alias', dis: true },
+      { label: 'Put Away', key: '⌘Y', dis: true },
+      { label: '', sep: true },
+      { label: 'Find…', key: '⌘F', action: 'spot' },
+      { label: 'Find Again', key: '⌘G', dis: true },
+      { label: '', sep: true },
+      { label: 'Page Setup…', dis: true },
+      { label: 'Print Desktop…', dis: true },
+    ] },
+    EDIT,
+    { label: 'View', items: [
+      { label: 'by Small Icon', dis: true },
+      { label: 'by Icon', action: 'view:icon', check: !!fnd && !list },
+      { label: 'by Name', action: 'view:list', check: list },
+      { label: 'by Size', dis: true },
+      { label: 'by Kind', dis: true },
+      { label: 'by Label', dis: true },
+      { label: 'by Date', dis: true },
+    ] },
+    { label: 'Label', items: [
+      { label: 'None', check: true },
+      { label: 'Essential', dis: true },
+      { label: 'Hot', dis: true },
+      { label: 'In Progress', dis: true },
+      { label: 'Cool', dis: true },
+      { label: 'Personal', dis: true },
+      { label: 'Project 1', dis: true },
+      { label: 'Project 2', dis: true },
+    ] },
+    { label: 'Special', items: [
+      { label: 'Clean Up Desktop', action: 'cleanup' },
+      { label: 'Empty Trash…', action: 'trash-empty', dis: trashEmptied },
+      { label: '', sep: true },
+      { label: 'Eject Disk', key: '⌘E', dis: true },
+      { label: 'Erase Disk…', dis: true },
+      { label: '', sep: true },
+      { label: 'Sleep', action: 'power:sleep' },
+      { label: 'Restart', action: 'power:restart' },
+      { label: 'Shut Down', action: 'power:shutdown' },
+    ] },
+  ];
+}
 
 /* the app in the menu bar, and the name its About row and Quit row use */
 function currentApp(): { name: string; about: string; menus: Menu[] } {
@@ -742,69 +704,59 @@ function currentApp(): { name: string; about: string; menus: Menu[] } {
           { label: 'New Note', key: '⌘N', action: 'open:stickies' },
           { label: '', sep: true },
           { label: 'Close', key: '⌘W', action: 'close' },
+          { label: '', sep: true },
+          { label: 'Quit', key: '⌘Q', action: 'quit-front' },
         ] },
-        EDIT, VIEW, WINDOW,
-        { label: 'Help', items: [{ label: 'Spotlight', key: '⌘K', action: 'spot' }] },
+        EDIT,
       ],
     };
   }
   const id = rinPanel && (rinFront || !f) ? 'rin' : f?.id;
   const known = id ? byId(id) : null;
   if (known) return { name: known.name, about: known.label, menus: known.menus };
+  const plain = (name: string, extra: Menu[] = []): { name: string; about: string; menus: Menu[] } => ({
+    name, about: name,
+    menus: [
+      { label: 'File', items: [
+        { label: 'Close', key: '⌘W', action: 'close' },
+        { label: '', sep: true },
+        { label: 'Quit', key: '⌘Q', action: 'quit-front' },
+      ] },
+      EDIT, ...extra,
+    ],
+  });
   if (id === 'photos') {
-    return {
-      name: 'Photos', about: 'Photos',
-      menus: [
-        { label: 'File', items: [{ label: 'Close Window', key: '⌘W', action: 'close' }] },
-        EDIT,
-        { label: 'View', items: [
-          { label: 'Years', action: 'ph:years', check: photosApp.mode === 'years' },
-          { label: 'Months', action: 'ph:months', check: photosApp.mode === 'months' },
-          { label: 'Days', action: 'ph:days', check: photosApp.mode === 'days' },
-          { label: 'All Photos', action: 'ph:all', check: photosApp.mode === 'all' },
-          { label: '', sep: true },
-          { label: photosApp.sidebar ? 'Hide Sidebar' : 'Show Sidebar', key: '⌥⌘S', action: 'ph:side' },
-          { label: 'Enter Full Screen', key: '⌃⌘F', action: 'zoom' },
-        ] },
-        WINDOW,
-        { label: 'Help', items: [{ label: 'Spotlight', key: '⌘K', action: 'spot' }] },
-      ],
-    };
+    return plain('Photos', [
+      { label: 'View', items: [
+        { label: 'Years', action: 'ph:years', check: photosApp.mode === 'years' },
+        { label: 'Months', action: 'ph:months', check: photosApp.mode === 'months' },
+        { label: 'Days', action: 'ph:days', check: photosApp.mode === 'days' },
+        { label: 'All Photos', action: 'ph:all', check: photosApp.mode === 'all' },
+        { label: '', sep: true },
+        { label: photosApp.sidebar ? 'Hide Albums' : 'Show Albums', action: 'ph:side' },
+      ] },
+    ]);
   }
-  if (id === 'terminal') {
-    return {
-      name: 'Terminal', about: 'Terminal',
-      menus: [
-        { label: 'Shell', items: [
-          { label: 'New Window', key: '⌘N', dis: true },
-          { label: '', sep: true },
-          { label: 'Close Window', key: '⌘W', action: 'close' },
-        ] },
-        EDIT, VIEW, WINDOW,
-        { label: 'Help', items: [{ label: 'Spotlight', key: '⌘K', action: 'spot' }] },
-      ],
-    };
-  }
-  if (id === 'textedit') {
-    return {
-      name: 'TextEdit', about: 'TextEdit',
-      menus: [
-        { label: 'File', items: [{ label: 'Close Window', key: '⌘W', action: 'close' }] },
-        EDIT, VIEW, WINDOW,
-        { label: 'Help', items: [{ label: 'Spotlight', key: '⌘K', action: 'spot' }] },
-      ],
-    };
-  }
-  /* Finder, the Trash, an About panel, Quick Look, or nothing: Finder, with its Go menu */
-  return { name: 'Finder', about: 'Finder', menus: FINDER_MENUS };
+  if (id === 'terminal') return plain('Terminal');
+  if (id === 'textedit' || id?.startsWith('doc-')) return plain('SimpleText');
+  /* the Finder: the disk, a folder, the Trash, an About box, or nothing at all */
+  return { name: 'Finder', about: 'Finder', menus: finderMenus() };
 }
+/* the icon the Application menu wears for the front app */
+const APP_ICON: Record<string, string> = {
+  Finder: 'finder', Navigator: 'safari', Rin: 'rin', Kyou: 'kyou', 'Market Station': 'market',
+  Photos: 'photos', Terminal: 'terminal', SimpleText: 'textedit', Stickies: 'stickies',
+};
+const nameOf = (id: string) => byId(id)?.name ?? ({ photos: 'Photos', terminal: 'Terminal', textedit: 'SimpleText', stickies: 'Stickies' } as Record<string, string>)[id] ?? (id.startsWith('doc-') ? 'SimpleText' : null);
 
+const appIco = $('[data-app-ico]');
 function sync() {
   const { name, menus } = currentApp();
   appName.textContent = name;
   appMenus.innerHTML = menus
     .map((m, i) => `<button class="mb-item" type="button" data-menu="app-${i + 1}" aria-haspopup="true" aria-expanded="false">${m.label}</button>`)
     .join('');
+  if (appIco) appIco.innerHTML = icon(APP_ICON[name] ?? 'app');
   /* Finder is always running on a Mac, and a note on the desk means Stickies
      is too. The one window is Safari; volbase only counts as running while
      its own tab is the one in front. */
@@ -835,22 +787,30 @@ function windowRows(): MenuItem[] {
 }
 
 function menuFor(key: string): MenuItem[] {
-  if (key === 'apple') return APPLE;
+  if (key === 'apple') return appleMenu();
+  if (key === 'help') return HELP;
   const i = Number(key.split('-')[1]);
-  const { name, about, menus } = currentApp();
-  /* the HIG order: About, Settings, Services, Hide, Hide Others, Show All, Quit */
-  if (i === 0) return [
-    { label: `About ${about}`, action: 'about' },
-    { label: '', sep: true },
-    { label: 'Settings…', key: '⌘,', dis: true },
-    { label: 'Services', dis: true },
-    { label: '', sep: true },
-    { label: `Hide ${name}`, key: '⌘H', action: 'hide' },
-    { label: 'Hide Others', key: '⌥⌘H', dis: true },
-    { label: 'Show All', dis: true },
-    { label: '', sep: true },
-    { label: `Quit ${name}`, key: '⌘Q', action: 'quit-front' },
-  ];
+  const { name, menus } = currentApp();
+  /* the Application menu: hide, and every running application with a check
+     on the one in front */
+  if (i === 0) {
+    const rows: MenuItem[] = [
+      { label: `Hide ${name}`, key: '⌘H', action: 'hide', dis: name === 'Finder' && !desk.front },
+      { label: 'Hide Others', dis: true },
+      { label: 'Show All', dis: true },
+      { label: '', sep: true },
+      { label: 'Finder', action: 'switch:finder', check: name === 'Finder' },
+    ];
+    const seen = new Set<string>();
+    for (const id of open) {
+      const nm = nameOf(id);
+      if (!nm || seen.has(nm)) continue;
+      seen.add(nm);
+      rows.push({ label: nm, action: `switch:${id}`, check: nm === name });
+    }
+    if (stickies.count() && !seen.has('Stickies')) rows.push({ label: 'Stickies', action: 'switch:stickies', check: name === 'Stickies' });
+    return rows;
+  }
   const m = menus[i - 1];
   if (!m) return [];
   return m.label === 'Window' ? [...m.items, ...windowRows()] : m.items;
@@ -883,11 +843,9 @@ function openMenu(b: HTMLElement) {
   if (popFor === b) { closeMenu(); return; }
   closeMenu();
   closeCtx();
-  const control = key === 'control';
-  const items = control ? [] : menuFor(key);
-  if (!control && !items.length) return;
-  pop.innerHTML = control ? ccPanel() : rows(items);
-  pop.classList.toggle('menu-cc', control);
+  const items = menuFor(key);
+  if (!items.length) return;
+  pop.innerHTML = rows(items);
   pop.hidden = false;
   pop.style.top = '';
   const r = b.getBoundingClientRect();
@@ -924,23 +882,6 @@ const fireRow = (e: Event) => {
 };
 pop.addEventListener('pointerup', fireRow);
 pop.addEventListener('keydown', (e) => { if (e.key === 'Enter') fireRow(e); });
-/* the Control Center modules: the radios flip, the sliders slide, the
-   appearance tile is the real switch, and the panel stays open the way it does */
-pop.addEventListener('click', (e) => {
-  const b = (e.target as HTMLElement).closest<HTMLElement>('button[data-cc]');
-  if (!b) return;
-  const k = b.dataset.cc!;
-  if (k === 'theme') { theme.flip(); setTimeout(() => { if (popFor) pop.innerHTML = ccPanel(); }, 220); return; }
-  if (k === 'mute') { sound.setMuted(!sound.muted); pop.innerHTML = ccPanel(); return; }
-  const key = k as 'wifi' | 'bt' | 'air';
-  cc[key] = !cc[key];
-  pop.innerHTML = ccPanel();
-});
-pop.addEventListener('input', (e) => {
-  const r = e.target as HTMLInputElement;
-  if (r.dataset.cc === 'disp') cc.disp = Number(r.value);
-  if (r.dataset.cc === 'snd') { cc.snd = Number(r.value); sound.setVolume(cc.snd); }
-});
 addEventListener('pointerdown', (e) => {
   if (!popFor) return;
   const t = e.target as HTMLElement;
@@ -976,10 +917,10 @@ document.addEventListener('contextmenu', (e) => {
   if (!(t instanceof Element)) return;
   if (t.closest('input, textarea, [contenteditable]')) return;
   e.preventDefault();
-  const d = t.closest<HTMLElement>('[data-dock]');
+  const d = t.closest<HTMLElement>('.item[data-open]');
   const w = t.closest<HTMLElement>('.win');
   if (d) {
-    const id = d.dataset.dock!;
+    const id = d.dataset.open!;
     if (id === 'trash') {
       openCtx([
         { label: 'Open', action: 'open:trash' },
@@ -990,30 +931,23 @@ document.addEventListener('contextmenu', (e) => {
     }
     const running = open.has(id);
     openCtx([
-      { label: 'Options', dis: true },
-      { label: 'Mission Control', action: 'mc' },
-      { label: 'Show in Finder', action: 'open:finder' },
-      { label: '', sep: true },
       running ? { label: 'Quit', action: `quit:${id}` } : { label: 'Open', action: `open:${id}` },
+      { label: 'Get Info', key: '⌘I', dis: true },
     ], e.clientX, e.clientY);
   } else if (w) {
     openCtx([
-      { label: 'Minimize', key: '⌘M', action: 'min' },
+      { label: 'Collapse', key: '⌘M', action: 'min' },
       { label: 'Zoom', action: 'zoom' },
       { label: '', sep: true },
       { label: 'Close Window', key: '⌘W', action: 'close' },
     ], e.clientX, e.clientY);
   } else {
-    /* only what this desktop can actually do; nothing greyed */
     openCtx([
-      { label: 'Mission Control', action: 'mc' },
-      { label: 'Change Appearance', action: 'theme' },
+      { label: 'Clean Up Desktop', action: 'cleanup' },
+      { label: 'Arrange by Name', action: 'sort:name', check: deskSort === 'name' },
+      { label: 'Arrange by Kind', action: 'sort:kind', check: deskSort === 'kind' },
       { label: '', sep: true },
-      { label: 'Sort By Name', action: 'sort:name', check: deskSort === 'name' },
-      { label: 'Sort By Kind', action: 'sort:kind', check: deskSort === 'kind' },
-      { label: 'Clean Up', action: 'cleanup' },
-      { label: '', sep: true },
-      { label: 'Show View Options', action: 'viewopts', check: itemsEl.classList.contains('is-big') },
+      { label: 'Large Labels', action: 'viewopts', check: itemsEl.classList.contains('is-big') },
     ], e.clientX, e.clientY);
   }
 });
@@ -1059,6 +993,24 @@ function run(act: string) {
   }
   if (act.startsWith('power:')) { power(act.slice(6) as Power); return; }
   if (act === 'mc') { mission.toggle(); if (mission.active) secrets.found('mission'); return; }
+  if (act.startsWith('view:')) {
+    const fnd = desk.front?.el.querySelector('.fnd');
+    fnd?.classList.toggle('is-list', act === 'view:list');
+    return;
+  }
+  if (act.startsWith('switch:')) {
+    const id = act.slice(7);
+    if (id === 'finder') { const w = desk.wins.find((x) => x.id === 'finder' || x.id === 'pictures' || x.id === 'trash'); if (w) desk.focus(w); else { desk.blur(); sync(); } return; }
+    if (id === 'rin') { if (!rinPanel) rinOpen(); else { rinFront = true; sync(); } return; }
+    if (id === 'stickies') { stickyFront = true; desk.blur(); sync(); return; }
+    const w = desk.get(id);
+    if (w) desk.open({ id: w.id, title: '', body: w.opts.body, w: 0, h: 0 });
+    return;
+  }
+  if (act === 'open-sel') { const it = $('.item.is-sel[data-open]'); if (it) launch(it); return; }
+  if (act === 'kyou-light' || act === 'kyou-dark') { lives.get('kyou')?.scene.finish?.(act === 'kyou-light' ? 'light' : 'dark'); return; }
+  if (act === 'balloon') { notify('Balloon Help', 'There are no balloons on this Macintosh. Double click things instead.', 'note'); return; }
+  if (act === 'shortcuts') { notify('Finder Shortcuts', 'Command W closes a window, Command F finds a file, Command Shift 3 takes a picture of the screen.', 'note'); return; }
   if (act === 'trash-empty') { if (!trashEmptied) emptyTrash(); return; }
   if (act.startsWith('sf-')) {
     const s = lives.get('volbase')?.scene;
@@ -1087,7 +1039,6 @@ function run(act: string) {
     case 'front': if (f) desk.focus(f); break;
     case 'about': aboutFront(); break;
     case 'spot': spot.show(); break;
-    case 'theme': theme.flip(); break;
     case 'gh': window.open(links.github, '_blank', 'noopener'); break;
     case 'vb': window.open(lives.get('volbase')?.scene.href?.() ?? links.volbase, '_blank', 'noopener'); break;
     case 'rin-gh': window.open(links.rin, '_blank', 'noopener'); break;
@@ -1127,7 +1078,7 @@ function openAbout(id: string) {
     id: `about-${id}`,
     title: '',
     body: el,
-    w: 336, h: 300,
+    w: 560, h: 300,
     klass: 'win-about',
     fixed: true,
     onClose: () => { open.delete(`about-${id}`); returnBody(`about-${id}`); sync(); },
@@ -1136,45 +1087,37 @@ function openAbout(id: string) {
 }
 
 /* ── the small apps ────────────────────────────────────────────────────── */
-function wireFinder(root: HTMLElement, tool: HTMLElement) {
-  const views = $$<HTMLButtonElement>('[data-fnd-view] .tb-btn', tool);
-  const fnd = $('.fnd', root);
-  views.forEach((b, i) =>
-    b.addEventListener('click', () => {
-      views.forEach((x) => x.classList.toggle('is-on', x === b));
-      fnd?.classList.toggle('is-list', i === 1);
-    }),
-  );
+function wireFinder(root: HTMLElement) {
   if (root.dataset.wired) return;
   root.dataset.wired = '1';
-  const status = $('[data-fnd-status]', root);
-  const title = $('.tb-title', tool);
-  const show = (id: string) => {
-    $$('[data-fnd]', root).forEach((x) => x.classList.toggle('is-on', x.dataset.fnd === id));
-    $$('[data-fnd-pane]', root).forEach((p) => p.classList.toggle('is-on', p.dataset.fndPane === id));
-    const pane = $(`[data-fnd-pane="${id}"]`, root);
-    const n = pane?.querySelectorAll('.fnd-row').length ?? 0;
-    if (status) status.textContent = pane?.classList.contains('fnd-doc') ? '1 item' : `${n} items`;
-    if (title) title.textContent = id === 'pictures' ? 'Pictures' : 'About Peter';
-    /* a folder of pictures opens in icon view, the facts stay in list view */
-    const list = id !== 'pictures';
-    views.forEach((x, i) => x.classList.toggle('is-on', (i === 1) === list));
-    fnd?.classList.toggle('is-list', list);
-    if (id === 'pictures') $$<HTMLImageElement>('[data-fnd-pane="pictures"] img[data-src]', root).forEach((im) => { im.src = im.dataset.src!; delete im.dataset.src; });
-    desk.get('finder')?.el.setAttribute('aria-label', id === 'pictures' ? 'Pictures' : 'About Peter');
+  const rows = $$('.fnd-row[data-fnd-open]', root);
+  let sel = -1;
+  const pick = (i: number) => {
+    sel = i;
+    rows.forEach((r, j) => { r.classList.toggle('is-sel', j === i); r.setAttribute('aria-selected', String(j === i)); r.tabIndex = j === i ? 0 : -1; });
+    rows[i]?.focus({ preventScroll: true });
   };
-  (root as HTMLElement & { showPane?: (id: string) => void }).showPane = show;
-  $$('[data-fnd]', root).forEach((b) => b.addEventListener('click', () => show(b.dataset.fnd!)));
-  $$('.fnd-row:not([data-pic])', root).forEach((r) =>
-    r.addEventListener('click', () => {
-      $$('.fnd-row', root).forEach((x) => x.classList.toggle('is-sel', x === r));
-    }),
-  );
-  wirePictures(root);
+  const go = (r: HTMLElement) => {
+    const id = r.dataset.fndOpen!;
+    if (id === 'github') { window.open(r.dataset.href ?? links.github, '_blank', 'noopener'); return; }
+    openApp(id);
+  };
+  rows.forEach((r, i) => {
+    r.addEventListener('click', () => pick(i));
+    r.addEventListener('dblclick', () => go(r));
+  });
+  root.addEventListener('keydown', (e) => {
+    const it = (e.target as HTMLElement).closest<HTMLElement>('.fnd-row[data-fnd-open]');
+    if (!it) return;
+    const at = Math.max(0, sel);
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); pick(Math.min(rows.length - 1, at + 1)); }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); pick(Math.max(0, at - 1)); }
+    else if (e.key === 'Enter') { e.preventDefault(); go(it); }
+  });
 }
+/* a section of the About text, or the Pictures folder, as its own window */
 function finderPane(id: string) {
-  const el = body('finder') as (HTMLElement & { showPane?: (id: string) => void }) | null;
-  el?.showPane?.(id);
+  openApp(id === 'pictures' ? 'pictures' : `doc-${id}`);
 }
 
 const photosApp = initPhotos(body('photos')!, PH, {
@@ -1187,6 +1130,9 @@ const photoEsc = () => photosApp.viewing && photosApp.closeViewer();
 
 /* the Pictures folder: rows that select, open in Photos, and Quick Look */
 function wirePictures(root: HTMLElement) {
+  $$<HTMLImageElement>('img[data-src]', root).forEach((im) => { im.src = im.dataset.src!; delete im.dataset.src; });
+  if (root.dataset.wired) return;
+  root.dataset.wired = '1';
   const rows = $$('[data-pic]', root);
   let sel = -1;
   const pick = (i: number, focus = true) => {
@@ -1270,22 +1216,18 @@ function emptyTrash() {
   );
 }
 
-function wireTrash(root: HTMLElement, tool: HTMLElement) {
+function wireTrash(root: HTMLElement) {
   if (!trashEmptied) secrets.found('trash');
-  const emptyBtn = tool.querySelector<HTMLButtonElement>('[data-tr-do]');
   const refresh = () => {
     root.querySelector('[data-tr-items]')?.classList.toggle('is-on', !trashEmptied);
     root.querySelector('[data-tr-empty]')?.classList.toggle('is-on', trashEmptied);
     const st = root.querySelector('[data-tr-status]');
     if (st) st.textContent = trashEmptied ? '0 items' : `${trashItems.length} items`;
-    if (emptyBtn) {
-      emptyBtn.classList.toggle('is-dis', trashEmptied);
-      emptyBtn.toggleAttribute('aria-disabled', trashEmptied);
-    }
+    const ti = $('[data-trash-icon] .item-ico');
+    if (ti) ti.innerHTML = icon(trashEmptied ? 'trash' : 'trash-full');
   };
   trashRefresh = refresh;
   refresh();
-  emptyBtn?.addEventListener('click', () => { if (!trashEmptied) emptyTrash(); });
   $$<HTMLImageElement>('img[data-src]', root).forEach((im) => { im.src = im.dataset.src!; delete im.dataset.src; });
   if (root.dataset.trWired) return;
   root.dataset.trWired = '1';
@@ -1324,7 +1266,7 @@ function amcFill() {
   const el = body('about-mac');
   if (!el) return;
   const d = $('[data-amc-display]', el);
-  if (d) d.textContent = `${innerWidth} × ${innerHeight}${devicePixelRatio >= 2 ? ' Retina' : ''}`;
+  if (d) d.textContent = `${innerWidth} by ${innerHeight} pixels${devicePixelRatio >= 2 ? ', doubled' : ''}`;
   const c = $('[data-amc-count]', el);
   if (c) c.textContent = String(secrets.count());
   const h = $('[data-amc-hint]', el);
@@ -1348,7 +1290,7 @@ function openAboutMac() {
      than covering the box that was just asked for */
   if (rinPanel) rinClose();
   const w = desk.open({
-    id: 'about-mac', title: '', body: el, w: 336, h: 430, klass: 'win-about', fixed: true,
+    id: 'about-mac', title: 'About This Macintosh', body: el, w: 560, h: 430, klass: 'win-about', fixed: true,
     onClose: () => { returnBody('about-mac'); sync(); },
   });
   requestAnimationFrame(() => desk.fit(w, 0));
@@ -1446,7 +1388,7 @@ function askPlain(title: string, text: string, okLabel: string, onOk: () => void
   if (alertKind || plainOk || intro.active) return;
   plainOk = onOk;
   alertFrom = document.activeElement;
-  alertIco.innerHTML = icon('trash');
+  alertIco.innerHTML = icon('caution');
   alertTitle.textContent = title;
   alertOk.textContent = okLabel;
   alertWait.textContent = text;
@@ -1459,7 +1401,7 @@ function askPlain(title: string, text: string, okLabel: string, onOk: () => void
 
 function ask(kind: Ask) {
   if (alertKind || plainOk || intro.active) return;
-  alertIco.innerHTML = icon('finder');
+  alertIco.innerHTML = icon('caution');
   alertKind = kind;
   alertLeft = 60;
   alertFrom = document.activeElement;
@@ -1528,24 +1470,23 @@ const spotEl = $('[data-spot]')!;
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const placeList = PH.map((p) => p.p).filter((p, i, a) => a.indexOf(p) === i);
 const hits = (): Hit[] => [
-  { id: 'finder', label: 'About Peter', kind: 'Finder', icon: icon('finder'), run: () => openApp('finder') },
-  ...apps.map((a) => ({ id: a.id, label: a.label, kind: 'Application', icon: icon(a.id), run: () => openApp(a.id) })),
-  { id: 'photos', label: 'Photos', kind: 'Application', icon: icon('photos'), run: () => openApp('photos') },
-  { id: 'pictures', label: 'Pictures', kind: 'Folder', icon: icon('folder'), run: () => { openApp('finder'); finderPane('pictures'); } },
-  { id: 'textedit', label: 'Read me', kind: 'Document', icon: icon('doc'), run: () => openApp('textedit') },
-  { id: 'trash', label: 'Trash', kind: 'Finder', icon: icon('trash'), run: () => openApp('trash') },
-  { id: 'safari', label: 'Safari', kind: 'Application', icon: icon('safari'), run: () => openApp('safari') },
-  { id: 'terminal', label: 'Terminal', kind: 'Application', icon: icon('terminal'), run: () => openApp('terminal') },
-  { id: 'stickies', label: 'Stickies', kind: 'Application', icon: icon('stickies'), run: () => openApp('stickies') },
-  { id: 'about-mac', label: 'About This Mac', kind: 'System', icon: icon('finder'), run: () => openApp('about-mac') },
-  { id: 'site', label: 'petermei.com', kind: 'Website', icon: icon('safari'), run: () => openApp('safari') },
-  { id: 'gh', label: 'GitHub', kind: 'Website', icon: icon('github'), run: () => window.open(links.github, '_blank', 'noopener') },
-  { id: 'vb', label: 'volbase.app', kind: 'Website', icon: icon('volbase'), run: () => openApp('volbase') },
-  { id: 'dark', label: 'Switch appearance', kind: 'System Settings', icon: icon('settings'), run: () => theme.flip() },
-  /* the text files in the About window, and the places in the photo library */
+  { id: 'finder', label: 'Macintosh HD', kind: 'disk', icon: icon('hd'), run: () => openApp('finder') },
+  ...apps.map((a) => ({ id: a.id, label: a.label, kind: 'application', icon: icon(a.id), run: () => openApp(a.id) })),
+  { id: 'photos', label: 'Photos', kind: 'application', icon: icon('photos'), run: () => openApp('photos') },
+  { id: 'pictures', label: 'Pictures', kind: 'folder', icon: icon('folder'), run: () => openApp('pictures') },
+  { id: 'textedit', label: 'Read Me', kind: 'document', icon: icon('textedit'), run: () => openApp('textedit') },
+  { id: 'trash', label: 'Trash', kind: 'Trash', icon: icon('trash'), run: () => openApp('trash') },
+  { id: 'safari', label: 'Navigator', kind: 'application', icon: icon('safari'), run: () => openApp('safari') },
+  { id: 'terminal', label: 'Terminal', kind: 'application', icon: icon('terminal'), run: () => openApp('terminal') },
+  { id: 'stickies', label: 'Note Pad', kind: 'desk accessory', icon: icon('stickies'), run: () => openApp('stickies') },
+  { id: 'about-mac', label: 'About This Macintosh', kind: 'System', icon: icon('mac'), run: () => openApp('about-mac') },
+  { id: 'site', label: 'petermei.com', kind: 'bookmark', icon: icon('safari'), run: () => openApp('safari') },
+  { id: 'gh', label: 'GitHub', kind: 'alias', icon: icon('github'), run: () => window.open(links.github, '_blank', 'noopener') },
+  { id: 'vb', label: 'volbase.app', kind: 'bookmark', icon: icon('volbase'), run: () => openApp('volbase') },
+  /* the text files on the disk, and the places in the photo library */
   ...finder.map((s) => ({
-    id: `doc-${s.id}`, label: s.file, kind: 'About Peter', icon: icon('doc'),
-    run: () => { openApp('finder'); finderPane(s.id); },
+    id: `doc-${s.id}`, label: s.file.replace(/\.txt$/, ''), kind: 'document', icon: icon('doc'),
+    run: () => openApp(`doc-${s.id}`),
   })),
   ...placeList.map((p) => ({
     id: `place-${slug(p)}`, label: p, kind: 'Photos', icon: icon('photos'),
@@ -1570,7 +1511,7 @@ function sheetOpen(id: string, title?: string) {
   sheetId = id;
   sheetBody.appendChild(el);
   sheetBody.scrollTop = 0;
-  sheetName.textContent = title ?? (id === 'volbase' ? 'Safari' : byId(id)?.label) ?? TITLES[id] ?? '';
+  sheetName.textContent = title ?? byId(id)?.title ?? TITLES[id] ?? '';
   sheet.hidden = false;
   sheet.dataset.app = id;
   /* the way back to the landing lives at the foot of the About sheet */
@@ -1625,11 +1566,11 @@ $('[data-sheet-close]')?.addEventListener('click', () => sheetClose());
 
 /* ── everything that opens an app ──────────────────────────────────────── */
 document.addEventListener('click', (e) => {
-  const b = (e.target as HTMLElement).closest<HTMLElement>('[data-open], [data-dock], [data-restore]');
+  const b = (e.target as HTMLElement).closest<HTMLElement>('[data-open], [data-restore]');
   if (!b || b.tagName === 'A') return;
   /* a desktop icon opens on a double click or Return, never on one click */
   if (b.classList.contains('item')) return;
-  const id = b.dataset.open ?? b.dataset.dock ?? b.dataset.restore;
+  const id = b.dataset.open ?? b.dataset.restore;
   if (!id) return;
   if (b.dataset.photo) { openPhoto(Number(b.dataset.photo)); return; }
   openApp(id);
@@ -1643,7 +1584,7 @@ const launch = (it: HTMLElement) => {
 /* a desktop icon: one click selects, two open, like a Mac */
 {
   let sel: HTMLElement | null = null;
-  const items = $$('[data-open].item');
+  const items = $$('[data-open].item:not(.item-trash)');
   items.forEach((it) => {
     it.addEventListener('click', () => {
       items.forEach((x) => x.classList.toggle('is-sel', x === it));
@@ -1654,6 +1595,7 @@ const launch = (it: HTMLElement) => {
     const t = e.target as HTMLElement;
     if (t.closest('.win, .panel, .item, .items')) return;
     items.forEach((x) => x.classList.remove('is-sel'));
+    $('.item-trash')?.classList.remove('is-sel');
     sel = null;
     desk.blur();
     sync();
@@ -1661,6 +1603,10 @@ const launch = (it: HTMLElement) => {
   items.forEach((it) => {
     it.addEventListener('dblclick', () => launch(it));
   });
+  const trashIt = $('.item-trash');
+  trashIt?.addEventListener('click', () => { items.forEach((x) => x.classList.remove('is-sel')); trashIt.classList.add('is-sel'); });
+  trashIt?.addEventListener('dblclick', () => openApp('trash'));
+  trashIt?.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); openApp('trash'); } });
   /* the keyboard on the desktop: arrows walk the column, Return opens,
      Space is Quick Look on a picture, the way Finder does it */
   const pick = (it: HTMLElement) => {
@@ -1725,9 +1671,7 @@ addEventListener('keydown', (e) => {
   else if (k === 'q') { e.preventDefault(); quitFront(); }
   else if (k === 'm') { e.preventDefault(); if (f) desk.minimize(f); }
   else if (k === 'h') { e.preventDefault(); hideFront(); }
-  else if (k === 'n') { e.preventDefault(); openApp('finder'); }
-  else if (k === 'i') { e.preventDefault(); openApp('finder'); }
-  else if (k === 'f' && e.ctrlKey && e.metaKey) { e.preventDefault(); if (f) desk.zoom(f); }
+  else if (k === 'f' && !e.shiftKey) { e.preventDefault(); spot.show(); }
   else if (k === '`' || e.key === 'Tab') { e.preventDefault(); desk.cycle(); }
 });
 
@@ -1748,7 +1692,6 @@ const intro = initIntro(macEl, $('[data-land]'), {
   },
 });
 document.body.classList.add('is-up');
-dockWrap.classList.add('is-up');
 if (!intro.active) openWanted();
 
 /* the screensaver arms itself; it is the one sanctioned self-starter */

@@ -1,0 +1,10 @@
+---
+/* /work/<slug>: the same page, with that row open and scrolled to */
+import Home from '../../components/home/Home.astro';
+import { products } from '../../data/home';
+export function getStaticPaths() {
+  return products.map((p) => ({ params: { slug: p.slug } }));
+}
+const { slug } = Astro.params;
+---
+<Home open={slug as any} />

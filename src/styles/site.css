@@ -130,9 +130,11 @@ html.framed .nav-mac { display: none; }
   min-height: 100vh; min-height: 100svh;
   display: grid; align-content: center;
   padding: 120px var(--gutter) 160px;
-  /* the page's own ground is periwinkle, not the desktop's sky, so the Safari
-     window still reads as a window when this site runs inside the Mac */
-  background: linear-gradient(in oklab, var(--c-peri) 0%, var(--c-peri-2) 62%, var(--paper) 100%);
+  /* one blue in a frame: the hero is the desktop's own sky, so the wallpaper
+     behind the Safari window and the page inside it are the same weather. The
+     window still reads as a window because its tab bar, its toolbar and its
+     four-layer shadow are what separate it, not a second hue. */
+  background: linear-gradient(in oklab, var(--c-sky) 0%, var(--c-sky-2) 62%, var(--paper) 100%);
   overflow: hidden;
 }
 .hero-in { position: relative; width: 100%; max-width: var(--max); margin: 0 auto; transform: scale(var(--hero-k, 1)); transform-origin: 50% 40%; will-change: transform; }
@@ -144,10 +146,14 @@ html.framed .nav-mac { display: none; }
   background: repeating-linear-gradient(45deg, var(--c-lemon) 0 6px, var(--c-apri) 6px 8px);
   opacity: .9; pointer-events: none;
 }
+/* the same two-puff cloud the desktop wallpaper draws, and both of them low on
+   the left, so neither one hides behind the card and reads as a stray layer */
 .cloud { position: absolute; background: var(--paper); opacity: .9; border-radius: 999px; pointer-events: none; }
-.cloud-a { left: -4%; bottom: 14%; width: 38%; height: 12%; }
-.cloud-a::before, .cloud-b::before { content: ''; position: absolute; left: 22%; bottom: 40%; width: 46%; aspect-ratio: 1.4; border-radius: 50%; background: inherit; }
-.cloud-b { right: 6%; bottom: 22%; width: 24%; height: 9%; }
+.cloud::before, .cloud::after { content: ''; position: absolute; border-radius: 50%; background: inherit; }
+.cloud::before { left: 10%; bottom: 22%; width: 50%; aspect-ratio: 1; }
+.cloud::after { left: 50%; bottom: 12%; width: 36%; aspect-ratio: 1; }
+.cloud-a { left: 2%; bottom: 15%; width: 22%; height: 5%; }
+.cloud-b { left: 26%; bottom: 7%; width: 14%; height: 3.4%; opacity: .62; }
 :root[data-theme='dark'] .hero { background: linear-gradient(in oklab, #232a4d 0%, #141326 100%); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .hero { background: linear-gradient(in oklab, #232a4d 0%, #141326 100%); } }
 :root[data-theme='dark'] .cloud, :root[data-theme='dark'] .sun { opacity: .18; }
