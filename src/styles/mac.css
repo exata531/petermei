@@ -1100,7 +1100,14 @@ html.in .land, html:not(.js) .land { display: none !important; }
   }
   .sheet-x::before { content: ''; position: absolute; inset: calc(-1 * var(--u6)); }
   .sheet-grab { display: none; }
-  .sheet-body { position: relative; overflow: auto; -webkit-overflow-scrolling: touch; }
+  /* a phone scrolls with a finger, so the window keeps no drawn scroll bars and
+     shows no modern one either */
+  .sheet-body { position: relative; overflow: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .sheet-body::-webkit-scrollbar { width: 0; height: 0; display: none; }
+  /* three figures do not fit across a phone, so the last one steps out */
+  .sheet-body .fnd-head { grid-template-columns: auto 1fr; }
+  .sheet-body .fnd-head span:nth-child(3) { display: none; }
+  .sheet-body .fnd-head span:nth-child(2) { text-align: right; }
   .sheet-body .sbox { height: auto; }
   .sheet-body .sbox.is-flat { height: 100%; }
   .sheet-body .fnd { min-height: 100%; }
