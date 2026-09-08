@@ -279,7 +279,8 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
     });
     stage.addEventListener('pointermove', (e) => {
       if (e.pointerId !== id) return;
-      dx = e.clientX - x0;
+      /* the drag rests on whole units, never between two pixels */
+      dx = Math.round((e.clientX - x0) / 2) * 2;
       big.style.transform = `translateX(${dx}px)`;
     });
     const end = (e: PointerEvent) => {
@@ -290,14 +291,14 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
       const dir = dx < 0 ? 1 : -1;
       const can = dir === 1 ? at < shown.length - 1 : at > 0;
       if ((Math.abs(dx) > 60 || fast) && can && !reduced()) {
-        big.style.transition = 'transform 160ms cubic-bezier(.4,0,.2,1)';
+        big.style.transition = 'transform 160ms steps(4, end)';
         big.style.transform = `translateX(${dir * -100}%)`;
         setTimeout(() => {
           nav(dir);
           big.style.transition = 'none';
           big.style.transform = `translateX(${dir * 100}%)`;
           requestAnimationFrame(() => {
-            big.style.transition = 'transform 160ms cubic-bezier(.4,0,.2,1)';
+            big.style.transition = 'transform 160ms steps(4, end)';
             big.style.transform = '';
           });
         }, 160);
@@ -305,7 +306,7 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
         nav(dir);
         big.style.transform = '';
       } else {
-        big.style.transition = 'transform 160ms cubic-bezier(.4,0,.2,1)';
+        big.style.transition = 'transform 160ms steps(4, end)';
         big.style.transform = '';
       }
     };

@@ -10,6 +10,7 @@ import Rin from '../scenes/Rin.astro';
 import Kyou from '../scenes/Kyou.astro';
 import Market from '../scenes/Market.astro';
 import Icon from './Icon.astro';
+import Tri from './Tri.astro';
 import Photos from './Photos.astro';
 import Pictures from './Pictures.astro';
 import { apps, finder, readme, links, aboutPeter } from '../../data/apps';
@@ -79,12 +80,28 @@ const disk = [
         {disk.map((d, i) => (
           d.open === 'github' ? (
             <li class="fnd-row" role="option" aria-selected="false" tabindex={i === 0 ? 0 : -1} data-fnd-open="github" data-href={links.github}>
-              <span class="fnd-name"><span class="fnd-row-ico"><Icon id={d.icon} /></span><b><i>{d.name}</i></b></span>
+              <span class="fnd-name"><span class="fnd-gut" /><span class="fnd-row-ico"><Icon id={d.icon} /></span><b><i>{d.name}</i></b></span>
               <small>{d.size}</small><small>{d.kind}</small><small>{when}</small>
             </li>
+          ) : d.kind === 'folder' ? (
+            <Fragment>
+              <li class="fnd-row is-folder" role="option" aria-selected="false" tabindex={i === 0 ? 0 : -1} data-fnd-open={d.open} data-twirl={d.open}>
+                <span class="fnd-name">
+                  <button class="fnd-gut fnd-tri" type="button" aria-expanded="false" aria-label={`Contents of ${d.name}`}><Tri /></button>
+                  <span class="fnd-row-ico"><Icon id={d.icon} /></span><b>{d.name}</b>
+                </span>
+                <small>{d.size}</small><small>{d.kind}</small><small>{when}</small>
+              </li>
+              {photos.map((p) => (
+                <li class="fnd-row is-kid" role="option" aria-selected="false" tabindex={-1} data-kid={d.open} data-pic-open={p.i} aria-label={`${p.name}, ${p.alt}`} hidden>
+                  <span class="fnd-name"><span class="fnd-gut" /><span class="fnd-row-ico"><Icon id="pict" /></span><b>{p.name}</b></span>
+                  <small>{p.size}</small><small>JPEG image</small><small>{p.shortDate}</small>
+                </li>
+              ))}
+            </Fragment>
           ) : (
             <li class="fnd-row" role="option" aria-selected="false" tabindex={i === 0 ? 0 : -1} data-fnd-open={d.open}>
-              <span class="fnd-name"><span class="fnd-row-ico"><Icon id={d.icon} /></span><b>{d.name}</b></span>
+              <span class="fnd-name"><span class="fnd-gut" /><span class="fnd-row-ico"><Icon id={d.icon} /></span><b>{d.name}</b></span>
               <small>{d.size}</small><small>{d.kind}</small><small>{when}</small>
             </li>
           )
@@ -134,7 +151,7 @@ const disk = [
           {trashItems.map((t, i) => (
             <li class="fnd-row pic-row" role="option" aria-selected="false" tabindex={i === 0 ? 0 : -1} data-tr={i} aria-label={`${t.name}, ${t.alt}`}>
               <span class="pic-name">
-                <span class="pic-ico" data-orient="l"><img data-src={t.thumb} width={t.w} height={t.h} alt="" decoding="async" draggable="false" /></span>
+                <span class="pic-ico"><Icon id="pict" /></span>
                 <b><span class="stem">{t.name.replace(/\.jpeg$/, '')}</span><span class="ext">.jpeg</span></b>
               </span>
             </li>

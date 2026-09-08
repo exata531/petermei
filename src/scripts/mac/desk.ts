@@ -43,31 +43,13 @@ const PH: PhotoRec[] = JSON.parse($('[data-ph-json]')?.textContent || '[]');
 /* the build facts the page rendered once: commit, date, Astro, weight */
 const BUILD = JSON.parse($('[data-build-json]')?.textContent || '{}') as { commit: string; astro: string; date: string; mb: number };
 
-/* ── appearance ─────────────────────────────────────────────────────────── */
+/* ── appearance ─────────────────────────────────────────────────────────
+   The Macintosh has one appearance. What survives is the switch inside the
+   Rin demo, which is a picture of a modern app and paints its own frame. */
 function initTheme() {
-  const apply = (t: 'light' | 'dark') => {
-    document.documentElement.dataset.theme = t;
-    /* the browser chrome follows the desktop, not the system */
-    $$<HTMLMetaElement>('meta[name="theme-color"]').forEach((m) => { m.content = t === 'dark' ? '#151f2c' : '#b9e0f4'; });
-    try { localStorage.setItem('appearance', t); } catch {}
-  };
-  const set = (t: 'light' | 'dark') => {
-    lives.get('volbase')?.scene.theme?.(t);
-    const doc = document as Document & { startViewTransition?: (f: () => void) => void };
-    if (reduced() || !doc.startViewTransition) {
-      document.body.classList.add('is-fading');
-      apply(t);
-      setTimeout(() => document.body.classList.remove('is-fading'), 200);
-      return;
-    }
-    doc.startViewTransition(() => apply(t));
-  };
-  const now = () =>
-    (document.documentElement.dataset.theme as 'light' | 'dark') ||
-    (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  const flip = () => set(now() === 'dark' ? 'light' : 'dark');
-  $$('[data-theme-toggle]').forEach((b) => b.addEventListener('click', flip));
-  return { flip, now };
+  let cur: 'light' | 'dark' = 'light';
+  const set = (t: 'light' | 'dark') => { cur = t; lives.get('volbase')?.scene.theme?.(t); };
+  return { flip: () => set(cur === 'dark' ? 'light' : 'dark'), now: () => cur };
 }
 const theme = initTheme();
 
@@ -140,7 +122,9 @@ const dock = {
   top: () => innerHeight,
   rect: (id: string) => iconFor(id)?.getBoundingClientRect(),
   running(ids: string[]) {
-    $$('.item[data-open]').forEach((el) => el.classList.toggle('is-open', ids.includes(el.dataset.open!)));
+    /* a ghosted icon means THAT item is open; a document does not ghost
+       because the application that would open it happens to be running */
+    $$('.item[data-open]:not(.item-file)').forEach((el) => el.classList.toggle('is-open', ids.includes(el.dataset.open!)));
     $$('.fnd-row[data-fnd-open]').forEach((el) => el.classList.toggle('is-open', ids.includes(el.dataset.fndOpen!)));
   },
 };
@@ -288,52 +272,12 @@ addEventListener('pointerdown', (e) => {
   rinClose();
 });
 
-/* ── toolbars: the chrome a Mac app carries in its own title bar ────────── */
+/* ── the one glyph a menu still draws: the check beside a chosen row ───── */
 const G = {
-  back: '<svg viewBox="0 0 20 20"><path d="M12.5 4.5 7 10l5.5 5.5"/></svg>',
-  fwd: '<svg viewBox="0 0 20 20"><path d="M7.5 4.5 13 10l-5.5 5.5"/></svg>',
-  grid: '<svg viewBox="0 0 20 20"><rect x="3" y="3" width="5.5" height="5.5" rx="1.2"/><rect x="11.5" y="3" width="5.5" height="5.5" rx="1.2"/><rect x="3" y="11.5" width="5.5" height="5.5" rx="1.2"/><rect x="11.5" y="11.5" width="5.5" height="5.5" rx="1.2"/></svg>',
-  list: '<svg viewBox="0 0 20 20"><path d="M6 5h11M6 10h11M6 15h11"/><circle cx="3.2" cy="5" r=".9" fill="currentColor" stroke="none"/><circle cx="3.2" cy="10" r=".9" fill="currentColor" stroke="none"/><circle cx="3.2" cy="15" r=".9" fill="currentColor" stroke="none"/></svg>',
-  search: '<svg viewBox="0 0 20 20"><circle cx="8.6" cy="8.6" r="5"/><path d="M12.4 12.4 17 17"/></svg>',
-  side: '<svg viewBox="0 0 20 20"><rect x="2.5" y="4" width="15" height="12" rx="2.5"/><path d="M8 4v12"/></svg>',
-  lock: '<svg viewBox="0 0 20 20"><rect x="5" y="9" width="10" height="8" rx="2" fill="currentColor" stroke="none"/><path d="M7 9V6.5a3 3 0 0 1 6 0V9"/></svg>',
-  reload: '<svg viewBox="0 0 20 20"><path d="M15.5 10a5.5 5.5 0 1 1-1.6-3.9"/><path d="M15.5 3.5v3.2h-3.2"/></svg>',
-  share: '<svg viewBox="0 0 20 20"><path d="M10 12V3.5M6.8 6.5 10 3.3l3.2 3.2"/><path d="M6 9.5H4.5v7h11v-7H14"/></svg>',
-  info: '<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="7"/><path d="M10 9v5"/><circle cx="10" cy="6.4" r=".9" fill="currentColor" stroke="none"/></svg>',
-  plus: '<svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></svg>',
   check: '<svg viewBox="0 0 12 12"><path d="M2.5 6.5 5 9l4.5-6"/></svg>',
-  cols: '<svg viewBox="0 0 20 20"><rect x="2.5" y="4" width="15" height="12" rx="2"/><path d="M7.5 4v12M12.5 4v12"/></svg>',
-  gallery: '<svg viewBox="0 0 20 20"><rect x="3" y="3" width="14" height="9" rx="1.5"/><rect x="3" y="14.5" width="3" height="2.5" rx=".6"/><rect x="8.5" y="14.5" width="3" height="2.5" rx=".6"/><rect x="14" y="14.5" width="3" height="2.5" rx=".6"/></svg>',
-  wifi: '<svg viewBox="0 0 20 20"><path d="M2.2 7.4a11 11 0 0 1 15.6 0"/><path d="M5.2 10.6a6.8 6.8 0 0 1 9.6 0"/><path d="M8.1 13.8a2.7 2.7 0 0 1 3.8 0"/><circle cx="10" cy="16.4" r="1.3" fill="currentColor" stroke="none"/></svg>',
-  bt: '<svg viewBox="0 0 20 20"><path d="M6 6.5l8 7-4 3.5V3l4 3.5-8 7"/></svg>',
-  airdrop: '<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="2.2"/><path d="M5.8 14.2a6 6 0 0 1 0-8.4M14.2 5.8a6 6 0 0 1 0 8.4M3.3 16.7a9.5 9.5 0 0 1 0-13.4M16.7 3.3a9.5 9.5 0 0 1 0 13.4"/></svg>',
-  sun: '<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="3.4"/><path d="M10 2v2.2M10 15.8V18M2 10h2.2M15.8 10H18M4.3 4.3l1.6 1.6M14.1 14.1l1.6 1.6M15.7 4.3l-1.6 1.6M5.9 14.1l-1.6 1.6"/></svg>',
-  moon: '<svg viewBox="0 0 20 20"><path d="M15.6 12.6A6.6 6.6 0 0 1 7.4 4.4a6.6 6.6 0 1 0 8.2 8.2Z"/></svg>',
-  bright: '<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="3"/><path d="M10 3v1.5M10 15.5V17M3 10h1.5M15.5 10H17M5 5l1 1M14 14l1 1M15 5l-1 1M6 14l-1 1"/></svg>',
-  sound: '<svg viewBox="0 0 20 20"><path d="M3.5 7.5h3L11 4v12l-4.5-3.5h-3z"/><path d="M13.5 7.5a3.5 3.5 0 0 1 0 5M15.5 5a7 7 0 0 1 0 10"/></svg>',
 };
 const btn = (g: string, label: string, extra = '') =>
   `<button class="tb-btn${extra}" type="button" aria-label="${label}" title="${label}">${g}</button>`;
-
-/* the back/forward pair sits on the sidebar strip, everything else over the
-   content pane; both halves are handles */
-function finderTool(title: string, opts: { views?: boolean; count?: string; empty?: boolean } = {}) {
-  const t = document.createElement('div');
-  t.dataset.drag = '';
-  t.innerHTML =
-    `<span class="tb-side" data-drag><span class="tb-nav">${btn(G.back, 'Back', ' is-dis')}${btn(G.fwd, 'Forward', ' is-dis')}</span></span>
-     <span class="tb-main" data-drag>
-       <span class="tb-sp" data-drag></span>
-       <span class="tb-title">${title}</span>
-       <span class="tb-sp" data-drag></span>
-       ${opts.count ? `<span class="tb-count">${opts.count}</span>` : ''}
-       ${opts.views ? `<span class="tb-seg" data-fnd-view>${btn(G.grid, 'Icon view')}${btn(G.list, 'List view', ' is-on')}${btn(G.cols, 'Column view', ' is-dis')}${btn(G.gallery, 'Gallery view', ' is-dis')}</span>` : ''}
-       ${opts.empty ? `<button class="tb-btn tb-txt" type="button" data-tr-do>Empty</button>` : ''}
-       <span class="tb-search" aria-hidden="true">${G.search}<span>Search</span></span>
-     </span>`;
-  t.querySelectorAll('.tb-btn.is-dis').forEach((b) => b.setAttribute('aria-disabled', 'true'));
-  return t;
-}
 
 /* Safari's toolbar: back and forward on the front tab's own history, the
    URL field that mirrors the page, reload, the share button that opens the
@@ -569,7 +513,7 @@ function qlShow(p: QlRec, at = -1, download?: string) {
   });
   ql = win;
   const pad = win.el.querySelector('.win-pad')!;
-  pad.insertAdjacentHTML('beforeend', btn(G.share, 'Share', ' ql-share is-dis'));
+  pad.insertAdjacentHTML('beforeend', '<button class="tb-btn tb-txt ql-share is-dis" type="button">Share</button>');
   pad.querySelector('.ql-share')!.setAttribute('aria-disabled', 'true');
   const dl = document.createElement('a');
   dl.className = 'tb-btn tb-txt ql-open';
@@ -1119,6 +1063,29 @@ function wireFinder(root: HTMLElement) {
     else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); pick(Math.max(0, at - 1)); }
     else if (e.key === 'Enter') { e.preventDefault(); go(it); }
   });
+  /* the outline triangle lists a folder's contents where they sit, without
+     opening it: HIG p. 218 */
+  $$<HTMLElement>('.fnd-row[data-twirl]', root).forEach((row) => {
+    const tri = row.querySelector<HTMLButtonElement>('.fnd-tri');
+    const kids = $$<HTMLElement>(`.fnd-row[data-kid="${row.dataset.twirl}"]`, root);
+    if (!tri) return;
+    tri.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const on = !row.classList.contains('is-twirl');
+      row.classList.toggle('is-twirl', on);
+      tri.setAttribute('aria-expanded', String(on));
+      kids.forEach((k) => { k.hidden = !on; k.tabIndex = on ? -1 : -1; });
+    });
+    tri.addEventListener('dblclick', (e) => e.stopPropagation());
+  });
+  /* a listed picture opens the way one in the Pictures window does */
+  $$<HTMLElement>('.fnd-row[data-pic-open]', root).forEach((r) => {
+    r.addEventListener('click', () => {
+      $$('.fnd-row', root).forEach((x) => { x.classList.remove('is-sel'); x.setAttribute('aria-selected', 'false'); });
+      r.classList.add('is-sel'); r.setAttribute('aria-selected', 'true'); sel = -1;
+    });
+    r.addEventListener('dblclick', () => openPhoto(Number(r.dataset.picOpen)));
+  });
 }
 /* a section of the About text, or the Pictures folder, as its own window */
 function finderPane(id: string) {
@@ -1324,13 +1291,11 @@ function addShotIcon(s: Shot) {
   const li = document.createElement('li');
   li.innerHTML =
     `<button class="item item-file" type="button">
-       <span class="item-ico"><span class="item-pic" data-orient="l"><img alt="" draggable="false" /></span></span>
+       <span class="item-ico">${icon('pict')}</span>
        <span class="item-lbl"></span>
      </button>`;
   const sBtn = li.querySelector('button')!;
   sBtn.setAttribute('aria-label', `${s.name}, a screenshot of this desktop`);
-  const im = li.querySelector('img')!;
-  im.src = s.url; im.width = s.w; im.height = s.h;
   li.querySelector('.item-lbl')!.textContent = s.name;
   const rec: QlRec = { f: s.url, n: s.name, w: s.w, h: s.h, a: 'A screenshot of this desktop, taken a moment ago.' };
   sBtn.addEventListener('click', () => {

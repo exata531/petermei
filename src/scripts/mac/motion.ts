@@ -95,13 +95,5 @@ export class Velocity {
   clear() { this.s.length = 0; }
 }
 
-/* The house curves. One easing family across the whole desktop, so a hover and
-   a window opening feel like the same machine. */
-export const EASE = {
-  out: 'cubic-bezier(.22, 1, .36, 1)',        // the standard settle
-  soft: 'cubic-bezier(.4, 0, .2, 1)',         // material-ish, for colour
-  boing: 'cubic-bezier(.34, 1.56, .64, 1)',   // one overshoot, for a pop
-} as const;
-
 /* A tiny promise-shaped waiter, used by the boot sequence. */
 export const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));

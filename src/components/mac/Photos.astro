@@ -15,29 +15,23 @@ import { photos, byMonth, byYear, albums } from '../../data/photos';
 
 const months = byMonth();
 const years = byYear();
-const G = {
-  lib: '<path d="M2.5 4.5h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1Z"/><path d="M2.5 11 6 7.5l2.5 2.5 2-1.5 3.5 2.5"/><circle cx="10.5" cy="7" r="1" fill="currentColor" stroke="none"/>',
-  places: '<path d="M8 14.5s-4.5-4.2-4.5-7.5a4.5 4.5 0 0 1 9 0c0 3.3-4.5 7.5-4.5 7.5Z"/><circle cx="8" cy="7" r="1.6"/>',
-  album: '<rect x="2" y="3.5" width="12" height="9.5" rx="1.5"/><path d="M2 6.5h12"/>',
-  chev: '<path d="M6 3.5 10.5 8 6 12.5"/>',
-};
 ---
 <div class="pho" data-pho data-mode="all" data-view="lib">
   <nav class="pho-side fnd-side" aria-label="Sidebar">
     <span class="fnd-h">Library</span>
     <button class="fnd-tab is-on" type="button" data-ph-nav="lib" aria-current="page">
-      <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={G.lib} /><span>Library</span>
+      <span>Library</span>
     </button>
     <button class="fnd-tab" type="button" data-ph-nav="places">
-      <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={G.places} /><span>Places</span>
+      <span>Places</span>
     </button>
     <button class="fnd-tab" type="button" data-ph-nav="otd">
-      <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="3" width="12" height="10.5" rx="1.5"/><path d="M2 6.5h12M5.5 3.2V1.8M10.5 3.2V1.8"/><circle cx="8" cy="10" r="1.4" fill="currentColor" stroke="none"/></svg><span>On This Day</span>
+      <span>On This Day</span>
     </button>
     <span class="fnd-h">Albums</span>
     {albums.map((a) => (
       <button class="fnd-tab" type="button" data-ph-nav="album" data-ph-album={a.id} data-ph-blurb={a.blurb} title={a.place}>
-        <svg class="fnd-ico" viewBox="0 0 16 16" aria-hidden="true" set:html={G.album} /><span>{a.place}</span>
+        <span>{a.place}</span>
       </button>
     ))}
   </nav>
@@ -101,7 +95,7 @@ const G = {
       <img data-ph-big alt="" decoding="async" draggable="false" />
     </div>
     <button class="pho-nav pho-prev" type="button" data-ph-prev aria-label="Previous photo"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5"/></svg></button>
-    <button class="pho-nav pho-next" type="button" data-ph-next aria-label="Next photo"><svg viewBox="0 0 16 16" aria-hidden="true" set:html={G.chev} /></button>
+    <button class="pho-nav pho-next" type="button" data-ph-next aria-label="Next photo"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5"/></svg></button>
   </div>
 
   <noscript>

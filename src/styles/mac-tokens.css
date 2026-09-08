@@ -54,6 +54,11 @@
   --grey-4: #555555;
   --manila: #ffffcc;
   --tan:    #ffcc99;
+  /* the four Stickies pads, System 7.5 */
+  --note-yellow: #ffff99;
+  --note-pink:   #ffccdd;
+  --note-green:  #ccffcc;
+  --note-blue:   #cceeff;
   --sky:    #99ccff;
   --navy:   #3366cc;
   --red:    #dd3333;
@@ -84,8 +89,6 @@
   --bar-ink: var(--ink);
   --wall-flat: #bbbbbb;
   --wall-ink: var(--ink);
-  --veil:    rgb(0 0 0 / .1);
-  --dim-veil: rgb(0 0 0 / .6);
   --row-alt: transparent;
 
   /* ── the patterns, in units, so they stay on the pixel grid ─────────

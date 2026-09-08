@@ -3,9 +3,11 @@
 
    Twenty units of white with a black line under it, the way System 7 drew
    it: the Apple at the left, then the front application's own menus, and at
-   the right the things 7.5 kept there: Rin's mark (she is a menu bar app in
-   real life, so she is one here), the Balloon Help menu, the Application
-   menu wearing the front app's icon, and the clock.
+   the right the things 7.5 kept there, in the order the machine drew them.
+   Measured off a 7.5.3 desktop at 1:1, right to left: the Application menu
+   wearing the front app's icon hard against the edge, the Balloon Help menu
+   beside it, then the clock the Date & Time panel paints. Rin sits left of
+   all three, where a menu bar app of her kind goes.
 
    Nothing in here is inside a transformed ancestor, on purpose: a fixed
    element trapped inside one stops being fixed. */
@@ -21,13 +23,15 @@ import Icon from './Icon.astro';
   </div>
 
   <div class="mbar-r">
-    <button class="mb-item mb-rin" type="button" data-rin-status aria-haspopup="dialog" aria-expanded="false" aria-label="Rin" title="Rin">凛</button>
+    <button class="mb-item mb-rin" type="button" data-rin-status aria-haspopup="dialog" aria-expanded="false" aria-label="Rin" title="Rin">
+      <Icon id="rin" />
+    </button>
+    <span class="mb-item mb-clock"><time data-clock>4:42 PM</time></span>
     <button class="mb-item mb-help" type="button" data-menu="help" aria-haspopup="true" aria-expanded="false" aria-label="Help">
       <Icon id="balloon" />
     </button>
     <button class="mb-item mb-appmenu" type="button" data-menu="app-0" aria-haspopup="true" aria-expanded="false" aria-label="Application menu">
       <span class="mb-appico" data-app-ico><Icon id="finder" /></span>
     </button>
-    <span class="mb-item mb-clock"><time data-clock>4:42 PM</time></span>
   </div>
 </header>

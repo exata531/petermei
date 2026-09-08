@@ -154,8 +154,6 @@ export function initTerminal(root: HTMLElement, hooks: TermHooks) {
   const neofetch = () => {
     const up = Math.max(1, Math.round((performance.now() - opened) / 1000));
     const upTxt = up < 60 ? `${up} secs` : `${Math.floor(up / 60)} min${up % 60 ? ` ${up % 60} secs` : ''}`;
-    const dark = document.documentElement.dataset.theme === 'dark' ||
-      (!document.documentElement.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
     const art = [
       ' ╭──────────────╮ ',
       ' │              │ ',
@@ -173,7 +171,6 @@ export function initTerminal(root: HTMLElement, hooks: TermHooks) {
       ['Uptime', upTxt],
       ['Shell', 'not really zsh'],
       ['Resolution', `${innerWidth}x${innerHeight}`],
-      ['Appearance', dark ? 'Dark' : 'Light'],
       ['Commit', hooks.build.commit],
       ['Built', hooks.build.date],
       ['Photos', String(hooks.photos.length)],

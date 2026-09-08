@@ -32,11 +32,13 @@
 import { compact } from './devices';
 import { reduced } from './motion';
 
-const EASE = 'cubic-bezier(.7, 0, .15, 1)';
-const DUR = 900;
+/* a Macintosh drew a move in a handful of frames, so every move here is a
+   step count, never a curve, and it is over before it can read as a glide */
+const EASE = 'steps(6, end)';
+const DUR = 200;
 /* the phone's way in: an app opening, not a camera pushing in */
-const ZOOM = 420;
-const ZOOM_EASE = 'cubic-bezier(.32, .72, 0, 1)';
+const ZOOM = 160;
+const ZOOM_EASE = 'steps(5, end)';
 const FADE = 300;
 const FLOOR = 600;
 const CAP = 2500;
@@ -199,7 +201,7 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     mac.inert = true;
     frame();
     mac.classList.remove('is-pending');
-    const imgs = [...mac.querySelectorAll<HTMLImageElement>('.item-pic img, .pad img')];
+    const imgs = [...mac.querySelectorAll<HTMLImageElement>('.pad img')];
     const jobs: Promise<unknown>[] = [
       (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts?.ready ?? Promise.resolve(),
       ...imgs.map((i) => (i.decode ? i.decode() : Promise.resolve()).catch(() => {})),
@@ -302,11 +304,7 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
       [{ transform: home, opacity: 1 }, { opacity: 1, offset: 0.35 }, { opacity: 0, offset: 0.88 }, { transform: away, opacity: 0 }],
       opts,
     );
-    const a3 = host.animate(
-      [{ filter: 'blur(0px)' }, { filter: 'blur(0px)', offset: 0.4 }, { filter: 'blur(7px)' }],
-      opts,
-    );
-    anims = [a1, a2, a3];
+    anims = [a1, a2];
     a1.onfinish = finish;
   }
 
@@ -386,11 +384,7 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
       [{ transform: away, opacity: 0 }, { opacity: 0, offset: 0.12 }, { opacity: 1, offset: 0.65 }, { transform: home, opacity: 1 }],
       opts,
     );
-    const a3 = host.animate(
-      [{ filter: 'blur(7px)' }, { filter: 'blur(0px)', offset: 0.6 }, { filter: 'blur(0px)' }],
-      opts,
-    );
-    anims = [a1, a2, a3];
+    anims = [a1, a2];
     a1.onfinish = finish;
   }
 

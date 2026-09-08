@@ -12,7 +12,7 @@
 
 /* What each one shows, and where a liberty was taken.
 
-   hd         a wide drive case, darker top face, drive light bottom left
+   hd         a wide low drive case: dark top face, lid seam, activity light
    folder     the manila folder, tab top left, darker back panel
    doc        blank page, folded top right corner, four lines of text
    textedit   the same page with a bold headline: a ReadMe
@@ -25,7 +25,7 @@
    app        the generic application diamond, pen inside
    apple      the six colour Apple, sized for the menu bar
    caution    yellow triangle, exclamation mark
-   stop       red octagon, white hand
+   stop       muted red hexagon, open white hand
    note       a face with a speech balloon
    balloon    balloon help: a speech balloon with a question mark
    volbase    white card, navy v
@@ -49,7 +49,23 @@
    `note` uses a face with a speech balloon rather than System 7's profile
    portrait, which does not survive being redrawn at this size. `github` is
    the folder with the alias arrow, the way an alias to a repository would
-   actually have looked on that desktop. */
+   actually have looked on that desktop.
+
+   `stop` is a hexagon, not the road sign octagon it is often mistaken for:
+   the Human Interface Guidelines describe the Stop alert as "a hexagon with
+   an open hand, which resembles a stop sign in some locales" (HIG, "Alert
+   Boxes," pp. 194 to 196). Its diagonals step two pixels across for every
+   row so all six sides read as straight lines at 32 by 32. Its red is held
+   well below a traffic red because the Apple Icon Color Set was picked "to
+   be subtle" and to avoid "a 'circus' effect on the screen" (HIG, "The
+   Apple Icon Color Set," p. 240); the same rule is why only the Apple logo
+   runs at full saturation.
+
+   `hd` carries more internal contrast than a drive case strictly needs. It
+   has to stay legible when the Finder dims an open volume behind a 50
+   percent pattern, which throws away every other pixel, so the value steps
+   (black outline, dark top face, white bevel, grey front, black lid seam)
+   are spaced far enough apart that half of them still reads. */
 
 export type Pix = { pal: Record<string, string>; rows: string[] };
 
@@ -123,18 +139,18 @@ export const pix: Record<string, Pix> = {
       '................................',
       '................................',
       '................................',
-      '................................',
       '.#############################..',
       '.#ddddddddddddddddddddddddddd##.',
+      '.#kkkkkkkkkkkkkkkkkkkkkkkkkkk##.',
       '.#kkkkkkkkkkkkkkkkkkkkkkkkkkk##.',
       '.#kkkkkkkkkkkkkkkkkkkkkkkkkkk##.',
       '.##############################.',
       '.#wwwwwwwwwwwwwwwwwwwwwwwwwwd##.',
       '.#wgggggggggggggggggggggggggd##.',
       '.#wgggggggggggggggggggggggggd##.',
-      '.#w#########################d##.',
-      '.#wwwwwwwwwwwwwwwwwwwwwwwwwwd##.',
       '.#wgggggggggggggggggggggggggd##.',
+      '.#w#########################d##.',
+      '.#wllllllllllllllllllllllllld##.',
       '.#wgggggggggggggggggggggggggd##.',
       '.#w######gggggggggggggggggggd##.',
       '.#w#qqqq#gggggggggggggggggggd##.',
@@ -276,20 +292,20 @@ export const pix: Record<string, Pix> = {
       '.....#wwwwwwwwwwwwwww#lllll#....',
       '.....#wwwwwwwwwwwwwww#######....',
       '.....#wwwwwwwwwwwwwwwwwwwwl##...',
+      '.....#ww######wwwww##wwwwwl##...',
+      '.....#ww#wwww#wwww#ww#wwwwl##...',
+      '.....#ww#wwww#www#wwww#wwwl##...',
+      '.....#ww#wwww#www#wwww#wwwl##...',
+      '.....#ww#wwww#wwww#ww#wwwwl##...',
+      '.....#ww######wwwww##wwwwwl##...',
       '.....#wwwwwwwwwwwwwwwwwwwwl##...',
-      '.....#ww################wwl##...',
-      '.....#ww#bbbbbbbbbeeebb#wwl##...',
-      '.....#ww#bbbbbbbbeeeeeb#wwl##...',
-      '.....#ww#bbbbbbbbeeeeeb#wwl##...',
-      '.....#ww#bbbbbbbbeeeeeb#wwl##...',
-      '.....#ww#vvvvvvvvvvvvvv#wwl##...',
-      '.....#ww#vvvvvvvvvvvvvv#wwl##...',
-      '.....#ww#vvvvvvvvvvvvvv#wwl##...',
-      '.....#ww#vvvvvvvvvvvvvv#wwl##...',
-      '.....#ww#vvvvvvvvvvvvvv#wwl##...',
-      '.....#ww#vvvvvvvvvvvvvv#wwl##...',
-      '.....#ww################wwl##...',
-      '.....#wwwwwwwwwwwwwwwwwwwwl##...',
+      '.....#wwwwwwwww#wwwwwwwwwwl##...',
+      '.....#wwwwwwww#w#wwwwwwwwwl##...',
+      '.....#wwwwwww#www#wwwwwwwwl##...',
+      '.....#wwwwww#wwwww#wwwwwwwl##...',
+      '.....#wwwww#wwwwwww#wwwwwwl##...',
+      '.....#wwww#wwwwwwwww#wwwwwl##...',
+      '.....#www#############wwwwl##...',
       '.....#wwwwwwwwwwwwwwwwwwwwl##...',
       '.....#lllllllllllllllllllll##...',
       '.....########################...',
@@ -600,31 +616,31 @@ export const pix: Record<string, Pix> = {
       '................................',
       '................................',
       '................................',
-      '................................',
-      '..........############..........',
-      '.........##HHHHHHHHHH##.........',
-      '........##HRRRRRRRRRRR##........',
-      '.......##HRRRR####RRRRR##.......',
-      '.......##HR####ww####RR##.......',
-      '......##HRR#ww#ww#ww#RRR##......',
-      '.....##HRRR#ww#ww#ww####R##.....',
-      '....##HRRRR#ww#ww#ww#ww#RR##....',
+      '........################........',
+      '........##HHHHHHHHHHHH##........',
+      '.......##HRRRRRRRRRRRRR##.......',
+      '.......##HRRRRRRRRRRRRR##.......',
+      '......##HRRRRRRRRRRRRRRR##......',
+      '......##HRRRRR####RRRRRR##......',
+      '.....##HRRR####ww####RRRR##.....',
+      '.....##HRRR#ww#ww#ww#RRRR##.....',
+      '....##HRRRR#ww#ww#ww####RR##....',
       '....##HRRRR#ww#ww#ww#ww#RR##....',
       '...##HRRRRR#ww#ww#ww#ww#RRR##...',
-      '..##HRRRRRR#ww#ww#ww#ww#RRRR##..',
-      '.##HRRRRR###ww#ww#ww#ww#RRRRR##.',
-      '.##RRRRR#wwwwwwwwwwwwww#RRRRS##.',
-      '..##RRR#wwwwwwwwwwwwwwl#RRRS##..',
-      '...##RR#wwwwwwwwwwwwwwl#RRS##...',
-      '....##RR#llwwwwwwwwwwwl#RS##....',
-      '....##RRR###wwwwwwwwwww#RS##....',
-      '.....##RRRRR#wwwwwwwww#RS##.....',
-      '......##RRRR###########S##......',
+      '...##HRRRRR#ww#ww#ww#ww#RRS##...',
+      '..##HRRRRRR#ww#ww#ww#ww#RRRS##..',
+      '..##HRRRRRR#ww#ww#ww#ww#RRRS##..',
+      '...##RRRRR##ww#ww#ww#ww#RRS##...',
+      '...##RRRR#wwwwwwwwwwwww#RRS##...',
+      '....##RR#wwwwwwwwwwwwwl#RS##....',
+      '....##RR#wwwwwwwwwwwwwl#RS##....',
+      '.....##RR#wwwwwwwwwwwwl#S##.....',
+      '.....##RRR##############S##.....',
+      '......##RRRRRRRRRRRRRRRS##......',
+      '......##RRRRRRRRRRRRRRRS##......',
       '.......##RRRRRRRRRRRRRS##.......',
-      '.......##RRRRRRRRRRRRRS##.......',
-      '........##RRRRRRRRRRRS##........',
-      '.........##SSSSSSSSSS##.........',
-      '..........############..........',
+      '.......##SSSSSSSSSSSSSS##.......',
+      '........################........',
       '................................',
       '................................',
       '................................',

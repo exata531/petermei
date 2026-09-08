@@ -7,6 +7,7 @@
    the name under it; list view lays the same rows out under four column
    headers. Thumbnails load when the pane is opened, not with the page. */
 import { photos } from '../../data/photos';
+import Icon from './Icon.astro';
 ---
 <div class="fnd-pane pic is-on" data-fnd-pane="pictures">
   <div class="fnd-cols pic-head" aria-hidden="true"><span>Name</span><span>Size</span><span>Kind</span><span>Last Modified</span></div>
@@ -14,7 +15,7 @@ import { photos } from '../../data/photos';
     {photos.map((p) => (
       <li class="fnd-row pic-row" role="option" aria-selected="false" tabindex={p.i === 0 ? 0 : -1} data-pic={p.i} aria-label={`${p.name}, ${p.alt}`}>
         <span class="pic-name">
-          <span class="pic-ico" data-orient={p.w >= p.h ? 'l' : 'p'}><img data-src={p.icon} width={p.w} height={p.h} alt="" decoding="async" draggable="false" /></span>
+          <span class="pic-ico"><Icon id="pict" /></span>
           <b><span class="stem">{p.name.replace(/\.jpeg$/, '')}</span><span class="ext">.jpeg</span></b>
         </span>
         <span class="pic-date">{p.shortDate}</span>

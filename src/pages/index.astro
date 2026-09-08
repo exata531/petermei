@@ -62,7 +62,7 @@ const padApps = [
       {deskPhotos.map((p) => (
         <li>
           <button class="item item-file" type="button" data-open="photos" data-photo={p.i} aria-label={`${p.name}, ${p.alt}`}>
-            <span class="item-ico"><span class="item-pic" data-orient={p.w >= p.h ? 'l' : 'p'}><img src={p.icon} width={p.w} height={p.h} alt="" decoding="async" draggable="false" /></span></span>
+            <span class="item-ico"><Icon id="pict" /></span>
             <span class="item-lbl">{p.name}</span>
           </button>
         </li>
