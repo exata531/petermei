@@ -343,17 +343,14 @@ function safariTool(id: string) {
   t.innerHTML =
     `<span class="tb-nav"><button class="tb-btn tb-txt is-dis" type="button" aria-label="Back">Back</button><button class="tb-btn tb-txt is-dis" type="button" aria-label="Forward">Forward</button></span>
      <button class="tb-btn tb-txt tb-reload" type="button">Reload</button>
-     <span class="tb-url-lbl">Location:</span>
      <span class="tb-url"><span data-vb-url>volbase.app</span></span>
-     <a class="tb-btn tb-txt" href="${links.volbase}" target="_blank" rel="noopener" aria-label="Open this page in a new tab" title="Open in a new tab" data-vb-open>Open</a>
-     <button class="tb-btn tb-txt tb-about" type="button" aria-label="About ${byId(id)?.label ?? ''}">About</button>`;
+     <a class="tb-btn tb-txt" href="${links.volbase}" target="_blank" rel="noopener" aria-label="Open this page in a new tab" title="Open in a new tab" data-vb-open>Open</a>`;
   const scene = () => lives.get(id)?.scene;
   const [b, f] = t.querySelectorAll<HTMLButtonElement>('.tb-nav .tb-btn');
   b.setAttribute('data-vb-back', ''); f.setAttribute('data-vb-fwd', '');
   b.addEventListener('click', () => scene()?.back?.());
   f.addEventListener('click', () => scene()?.fwd?.());
   t.querySelector('.tb-reload')!.addEventListener('click', () => scene()?.run?.());
-  t.querySelector('.tb-about')!.addEventListener('click', () => openAbout(id));
   return t;
 }
 
@@ -472,7 +469,8 @@ function openApp(id: string) {
     }
     if (seg.children.length) pad.appendChild(seg);
   }
-  if (known?.about && id !== 'volbase') {
+  
+  if (known?.about) {
     const b = document.createElement('button');
     b.className = 'tb-btn tb-txt';
     b.type = 'button';
@@ -611,20 +609,23 @@ const appMenus = $('[data-app-menus]')!;
    7.5 Apple Menu Items folder read */
 function appleMenu(): MenuItem[] {
   const { about } = currentApp();
+  const APP_ABOUT: Record<string, string> = {
+    Navigator: 'volbase', Rin: 'rin', Kyou: 'kyou', 'Market Station': 'market',
+    Photos: 'photos', Terminal: 'terminal', SimpleText: 'textedit', Stickies: 'stickies',
+  };
   return [
     about === 'Finder'
-      ? { label: 'About This Macintosh…', action: 'open:about-mac' }
-      : { label: `About ${about}…`, action: 'about' },
+      ? { label: 'About This Macintosh…', action: 'open:about-mac', icon: 'mac' }
+      : { label: `About ${about}…`, action: 'about', icon: APP_ABOUT[about] ?? 'app' },
     { label: '', sep: true },
-    { label: 'About This Macintosh…', action: 'open:about-mac', dis: about === 'Finder' },
-    { label: 'Find File…', key: '⌘F', action: 'spot' },
-    { label: 'Note Pad', action: 'open:stickies' },
-    { label: 'Pictures', action: 'open:pictures' },
-    { label: 'Read Me', action: 'open:textedit' },
-    { label: 'Scrapbook', action: 'open:photos' },
-    { label: 'Terminal', action: 'open:terminal' },
+    { label: 'Find File…', key: '⌘F', action: 'spot', icon: 'app' },
+    { label: 'Note Pad', action: 'open:stickies', icon: 'stickies' },
+    { label: 'Pictures', action: 'open:pictures', icon: 'folder' },
+    { label: 'Read Me', action: 'open:textedit', icon: 'textedit' },
+    { label: 'Scrapbook', action: 'open:photos', icon: 'photos' },
+    { label: 'Terminal', action: 'open:terminal', icon: 'terminal' },
     { label: '', sep: true },
-    { label: 'Shut Down', action: 'power:shutdown' },
+    { label: 'Shut Down', action: 'power:shutdown', icon: 'mac' },
   ];
 }
 const HELP: MenuItem[] = [
@@ -708,6 +709,9 @@ function currentApp(): { name: string; about: string; menus: Menu[] } {
           { label: 'Quit', key: '⌘Q', action: 'quit-front' },
         ] },
         EDIT,
+        { label: 'Color', items: ['Yellow', 'Pink', 'Green', 'Blue'].map((c, i) => ({
+          label: c, action: `sticky-color:${i}`, check: stickies.frontColor() === i,
+        })) },
       ],
     };
   }
@@ -763,7 +767,6 @@ function sync() {
   /* a note in front comes over the windows, the way an app's own window would */
   document.documentElement.classList.toggle('sticky-front', stickyFront && stickies.count() > 0);
   const running = new Set(open);
-  running.add('finder');
   if (stickies.count()) running.add('stickies');
   if (running.has('volbase')) {
     running.add('safari');
@@ -821,8 +824,8 @@ function rows(items: MenuItem[]) {
     .map((it) =>
       it.sep
         ? '<hr class="menu-sep" />'
-        : `<button class="menu-row${it.dis ? ' is-dis' : ''}" type="button" role="menuitem" ${it.dis ? 'aria-disabled="true"' : ''} data-act="${it.action ?? ''}">
-             <span class="menu-chk" aria-hidden="true">${it.check ? G.check : ''}</span>
+        : `<button class="menu-row${it.dis ? ' is-dis' : ''}${it.icon ? ' has-ico' : ''}" type="button" role="menuitem" ${it.dis ? 'aria-disabled="true"' : ''} data-act="${it.action ?? ''}">
+             <span class="menu-chk" aria-hidden="true">${it.icon ? icon(it.icon) : it.check ? G.check : ''}</span>
              <span class="menu-lbl">${it.label}</span>
              ${it.key ? `<span class="menu-key">${it.key}</span>` : ''}
            </button>`,
@@ -846,6 +849,7 @@ function openMenu(b: HTMLElement) {
   const items = menuFor(key);
   if (!items.length) return;
   pop.innerHTML = rows(items);
+  pop.classList.toggle('menu-ico', items.some((i) => i.icon));
   pop.hidden = false;
   pop.style.top = '';
   const r = b.getBoundingClientRect();
@@ -1007,6 +1011,7 @@ function run(act: string) {
     if (w) desk.open({ id: w.id, title: '', body: w.opts.body, w: 0, h: 0 });
     return;
   }
+  if (act.startsWith('sticky-color:')) { stickies.colorFront(Number(act.slice(13))); return; }
   if (act === 'open-sel') { const it = $('.item.is-sel[data-open]'); if (it) launch(it); return; }
   if (act === 'kyou-light' || act === 'kyou-dark') { lives.get('kyou')?.scene.finish?.(act === 'kyou-light' ? 'light' : 'dark'); return; }
   if (act === 'balloon') { notify('Balloon Help', 'There are no balloons on this Macintosh. Double click things instead.', 'note'); return; }
@@ -1076,7 +1081,7 @@ function openAbout(id: string) {
   if (id === 'rin' && rinPanel) rinClose();
   const w = desk.open({
     id: `about-${id}`,
-    title: '',
+    title: `About ${id === 'peter' ? 'Peter Mei' : byId(id)?.label ?? ''}`,
     body: el,
     w: 560, h: 300,
     klass: 'win-about',
@@ -1203,7 +1208,7 @@ let trashRefresh: (() => void) | null = null;
 function emptyTrash() {
   askPlain(
     'Are you sure you want to permanently erase the items in the Trash?',
-    'You can’t undo this action.',
+    'You cannot undo this action.',
     'Empty Trash',
     () => {
       trashEmptied = true;
@@ -1346,16 +1351,16 @@ function addShotIcon(s: Shot) {
 type Ask = 'restart' | 'shutdown' | 'logout';
 const ASK: Record<Ask, { title: string; ok: string; wait: (n: string) => string }> = {
   restart: {
-    title: 'Are you sure you want to restart your computer now?', ok: 'Restart',
-    wait: (n) => `If you do nothing, the computer will restart automatically in ${n}.`,
+    title: 'Are you sure you want to restart the computer?', ok: 'Restart',
+    wait: () => 'Any work you have not saved will be lost.',
   },
   shutdown: {
-    title: 'Are you sure you want to shut down your computer now?', ok: 'Shut Down',
-    wait: (n) => `If you do nothing, the computer will shut down automatically in ${n}.`,
+    title: 'Are you sure you want to shut down the computer?', ok: 'Shut Down',
+    wait: () => 'Any work you have not saved will be lost.',
   },
   logout: {
-    title: 'Are you sure you want to quit all applications and log out now?', ok: 'Log Out',
-    wait: (n) => `If you do nothing, the system will log out automatically in ${n}.`,
+    title: 'Are you sure you want to quit all the open applications?', ok: 'Quit All',
+    wait: () => 'Any work you have not saved will be lost.',
   },
 };
 const alertEl = $('[data-alert]')!;
@@ -1366,8 +1371,6 @@ const alertOk = $<HTMLButtonElement>('[data-alert-ok]')!;
 const alertIco = $('[data-alert] .alert-ico')!;
 let alertKind: Ask | null = null;
 let plainOk: (() => void) | null = null;
-let alertLeft = 60;
-let alertTimer = 0;
 let alertFrom: Element | null = null;
 
 /* every app quits on the way out of anything but Sleep and Lock Screen */
@@ -1403,21 +1406,14 @@ function ask(kind: Ask) {
   if (alertKind || plainOk || intro.active) return;
   alertIco.innerHTML = icon('caution');
   alertKind = kind;
-  alertLeft = 60;
   alertFrom = document.activeElement;
   alertTitle.textContent = ASK[kind].title;
   alertOk.textContent = ASK[kind].ok;
-  countdown();
+  alertWait.textContent = ASK[kind].wait('');
   alertEl.hidden = false;
   macEl.inert = true;
   requestAnimationFrame(() => alertEl.classList.add('is-on'));
   alertOk.focus({ preventScroll: true });
-  alertTimer = window.setInterval(() => { alertLeft--; if (alertLeft <= 0) answer(true); else countdown(); }, 1000);
-}
-
-function countdown() {
-  if (!alertKind) return;
-  alertWait.textContent = ASK[alertKind].wait(`${alertLeft} second${alertLeft === 1 ? '' : 's'}`);
 }
 
 function answer(go: boolean) {
@@ -1434,7 +1430,6 @@ function answer(go: boolean) {
   if (!alertKind) return;
   const kind = alertKind;
   alertKind = null;
-  clearInterval(alertTimer);
   alertEl.classList.remove('is-on');
   setTimeout(() => { alertEl.hidden = true; }, reduced() ? 0 : 140);
   if (go) { intro.power(kind); return; }
@@ -1494,6 +1489,7 @@ const hits = (): Hit[] => [
   })),
 ];
 const spot = initSpotlight(spotEl, hits, () => { closeMenu(); closeCtx(); });
+$('[data-sp-close]')?.addEventListener('click', () => spot.hide());
 $('[data-spot-open]')?.addEventListener('click', () => spot.show());
 
 /* ── the phone ─────────────────────────────────────────────────────────── */
@@ -1563,6 +1559,14 @@ function sheetClose(now = false) {
   sheetTop.addEventListener('pointercancel', end);
 }
 $('[data-sheet-close]')?.addEventListener('click', () => sheetClose());
+/* the phone's Read Me is drawn as a window, so its close box has to put it away */
+{
+  const w = $('.widget');
+  const x = $('[data-widget-close]');
+  const shut = (e: Event) => { e.stopPropagation(); w?.classList.add('is-gone'); };
+  x?.addEventListener('click', shut);
+  x?.addEventListener('keydown', (e) => { if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') shut(e); });
+}
 
 /* ── everything that opens an app ──────────────────────────────────────── */
 document.addEventListener('click', (e) => {

@@ -81,6 +81,7 @@ const padApps = [
   <div class="home" data-home>
     <div class="home-pad">
       <button class="widget" type="button" data-open="textedit">
+        <span class="wbox wbox-c widget-x" role="button" tabindex="0" data-widget-close aria-label="Close"></span>
         <span class="widget-h">Read Me</span>
         <span class="widget-p">{readmeCard}</span>
         <span class="widget-more">Open the rest</span>
@@ -140,6 +141,7 @@ const padApps = [
   <!-- Find File, at the body level so no transform can trap it -->
   <div class="spot" data-spot hidden>
     <div class="spot-box" role="dialog" aria-label="Find File">
+      <button class="wbox wbox-c spot-x" type="button" data-sp-close aria-label="Close"></button>
       <div class="spot-field">
         <input data-sp-in type="text" placeholder="" aria-label="Find items whose name contains"
                autocomplete="off" autocapitalize="off" spellcheck="false" />

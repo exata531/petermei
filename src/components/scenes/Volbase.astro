@@ -1,10 +1,19 @@
 ---
-/* Safari: two tabs. One holds petermei.com, the small real website under
-   /site, in a same-origin frame at 1:1. The other holds the real
+/* Navigator: two directory buttons. One holds petermei.com, the small real
+   website under /site, in a same-origin frame at 1:1. The other holds the real
    www.volbase.app in a frame at 1:1, with the old captured film underneath as
    the fallback for any browser or origin the live site refuses. The toolbar
    in the window's title bar (back, forward, the URL field, reload, share)
-   lives in desk.ts and talks to the script in scripts/scenes/volbase.ts. */
+   lives in desk.ts and talks to the script in scripts/scenes/volbase.ts.
+
+   The strip under that toolbar is a row of directory buttons, the way a 1995
+   browser drew it: flat rectangles, one unit of black around each, Chicago 12
+   inside, no icon. Tabbed browsing did not exist yet, so there are no tabs
+   here. The one you are looking at is drawn inverted, which is how a Macintosh
+   showed a selection everywhere (system7-spec.md, section 14 and detail 5 of
+   the authenticity list: solid black fill plus white text, never a coloured
+   highlight). The script still calls them tabs and still finds them by
+   data-sf-pick, so the class names and the hooks are unchanged. */
 const pins = [
   { x: 36, y: 58, d: '1.4 mi', name: 'the school Institute of Science · docent' },
   { x: 68, y: 30, d: '2.9 mi', name: 'Gleaners Food Bank · sort shift' },
@@ -15,17 +24,15 @@ const pins = [
 ---
 <div class="safari" data-vb data-sf-tab="volbase">
   <div class="sf-bar" data-drag>
-    <div class="sf-tabs" role="tablist" aria-label="Tabs">
+    <div class="sf-tabs" role="tablist" aria-label="Directory">
       <button class="sf-tab" type="button" role="tab" aria-selected="false" data-sf-pick="site">
-        <img src="/icons/favicon.svg" width="14" height="14" alt="" />
         <span data-sf-title="site">petermei.com</span>
       </button>
       <button class="sf-tab is-on" type="button" role="tab" aria-selected="true" data-sf-pick="volbase">
-        <img src="/img/volbase-icon.svg" width="14" height="14" alt="" />
         <span data-sf-title="volbase">volbase</span>
       </button>
     </div>
-    <span class="sf-demo" data-vb-demo hidden>demo</span>
+    <span class="sf-demo" data-vb-demo hidden>Demo</span>
   </div>
   <div class="sf-page">
     <!-- tab one: petermei.com, the site under /site, same origin -->
@@ -67,17 +74,43 @@ const pins = [
 </div>
 
 <style>
-  .safari { position: absolute; inset: 0; display: grid; grid-template-rows: 34px 1fr; background: #f6f3ee; color: #030302; font-family: var(--ui); }
-  .sf-bar { display: flex; align-items: center; gap: 8px; padding: 0 8px; background: #ebe7e1; box-shadow: 0 .5px 0 rgb(0 0 0 / .14); }
-  .sf-tabs { display: flex; gap: 1px; flex: 1; min-width: 0; height: 26px; }
-  .sf-tab { position: relative; display: inline-flex; align-items: center; gap: 7px; flex: 1; min-width: 0; padding: 0 12px; border-radius: 7px; font-size: 12px; background: rgb(3 3 2 / .04); color: rgb(3 3 2 / .62); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background-color var(--t-fast) var(--soft), color var(--t-fast) var(--soft); cursor: default; justify-content: center; }
+  /* the strip is one --tool-h row plus the one unit rule that closes it, the
+     same geometry mac.css gives every strip of buttons under a title bar */
+  .safari { position: absolute; inset: 0; display: grid; grid-template-rows: calc(var(--tool-h) + var(--u)) 1fr; background: var(--vb-page); color: var(--ink); font-family: var(--chicago); font-size: var(--fs-12); }
+  .sf-bar {
+    display: flex; align-items: center; gap: var(--u4);
+    padding: 0 var(--u4);
+    background: var(--paper);
+    border-bottom: var(--u) solid var(--ink);
+    user-select: none; -webkit-user-select: none;
+    /* the strip is the machine talking, not the demo: the bitmap type stays
+       unsmoothed here even though .sframe antialiases everything inside it */
+    -webkit-font-smoothing: none;
+  }
+  .sf-tabs { display: flex; align-items: center; gap: var(--u2); flex: 1; min-width: 0; }
+  /* a directory button: a flat rectangle, no radius, no fill but the paper,
+     sized to its name off a 59 unit floor (the HIG's own standard button
+     width, spec section 7) and 20 units tall (its standard height) */
+  .sf-tab {
+    position: relative;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex: 0 1 auto; min-width: calc(59 * var(--u)); max-width: calc(150 * var(--u));
+    height: calc(20 * var(--u)); padding: 0 var(--u6);
+    border: var(--u) solid var(--ink); border-radius: 0;
+    background: var(--paper); color: var(--ink);
+    font-family: var(--chicago); font-size: var(--fs-12); line-height: 1;
+    white-space: nowrap; cursor: default;
+  }
   .sf-tab span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-  .sf-tab::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; translate: 0 -50%; height: 44px; }
-  .sf-tab:active { transform: scale(.98); }
-  .sf-tab img { border-radius: 3px; flex: none; }
-  .sf-tab.is-on { background: #fcf9f7; color: #030302; box-shadow: 0 1px 2px rgb(0 0 0 / .12), 0 0 0 .5px rgb(0 0 0 / .08); }
-  .sf-tab:hover:not(.is-on) { background: rgb(3 3 2 / .09); }
-  .sf-demo { flex: none; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #5f5952; padding: 2px 7px; border-radius: 4px; box-shadow: inset 0 0 0 .5px rgb(0 0 0 / .18); }
+  /* the finger gets a 22 unit target whatever the button measures */
+  .sf-tab::before { content: ''; position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: 100%; height: calc(22 * var(--u)); }
+  /* the chosen one is inverted, and a press inverts too (HIG p. 205) */
+  .sf-tab.is-on, .sf-tab:active { background: var(--ink); color: var(--paper); }
+  .sf-demo {
+    flex: none; padding: 0 var(--u2);
+    border: var(--u) solid var(--ink); background: var(--paper); color: var(--ink);
+    font-family: var(--geneva); font-size: var(--fs-9); line-height: var(--lh-9);
+  }
   .sf-page { position: relative; overflow: clip; }
   .sf-pane { position: absolute; inset: 0; }
   .sf-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #f6f3ee; }
@@ -113,7 +146,9 @@ const pins = [
   .vb-sort { position: absolute; right: 14px; top: 44px; font-size: 11px; padding: 6px 10px; border-radius: 999px; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / .1); color: #4b4640; opacity: 0; transform: translateY(6px); }
   .vb-sort.is-in { opacity: 1; transform: none; transition: opacity .4s var(--out) .6s, transform .4s var(--out) .6s; }
   .vb-sort b { color: #4b68c3; }
-  :global(.is-narrow) .sf-tab { padding: 0 8px; font-size: 11px; }
+  /* narrow: the buttons give up the 59 unit floor and their air, never the
+     type, because Chicago is a bitmap and has exactly one size */
+  :global(.is-narrow) .sf-tab { min-width: 0; padding: 0 var(--u3); }
   :global(.is-narrow) .vb-list { width: 160px; }
   :global(.is-narrow) .vb-card { grid-template-columns: 40px 1fr; padding: 7px 9px; font-size: 10.5px; }
   :global(.is-narrow) .vb-sort { display: none; }

@@ -52,6 +52,7 @@ export type Win = {
   opts: WinOpts;
   stop?: () => void;
   settle?: () => void;
+  repaintBars?: () => void;
 };
 
 /* the geometry, in CSS pixels, kept in step with the tokens (one unit is 2px) */
@@ -157,7 +158,28 @@ export class Desk {
 
     const body = document.createElement('div');
     body.className = 'win-body';
-    body.appendChild(o.body);
+    const pane = document.createElement('div');
+    pane.className = 'win-pane';
+    pane.appendChild(o.body);
+    body.appendChild(pane);
+    /* every document window carries both scroll bars and the grow box between
+       them, even when there is nothing to scroll: an empty white track is what
+       a Macintosh showed, and the corner has to have something to sit in */
+    const bars = !o.fixed && !o.zoomOnly;
+    if (bars) {
+      body.insertAdjacentHTML('beforeend',
+        `<div class="sb sb-v" data-sb="v">
+           <button class="sb-arw sb-up" type="button" tabindex="-1" aria-label="Scroll up"></button>
+           <div class="sb-track" data-sb-track><span class="sb-thumb" data-sb-thumb></span></div>
+           <button class="sb-arw sb-dn" type="button" tabindex="-1" aria-label="Scroll down"></button>
+         </div>
+         <div class="sb sb-h" data-sb="h">
+           <button class="sb-arw sb-lf" type="button" tabindex="-1" aria-label="Scroll left"></button>
+           <div class="sb-track" data-sb-track><span class="sb-thumb" data-sb-thumb></span></div>
+           <button class="sb-arw sb-rt" type="button" tabindex="-1" aria-label="Scroll right"></button>
+         </div>
+         <div class="win-grow" aria-hidden="true"></div>`);
+    }
 
     el.append(bar);
     if (o.tool) { o.tool.classList.add('win-tool'); el.appendChild(o.tool); }
@@ -195,6 +217,7 @@ export class Desk {
     });
     this.wireFocus(win);
     this.drag(win);
+    if (bars) this.scrollbars(win, pane);
     if (!o.fixed && !o.zoomOnly) this.resize(win);
     this.focus(win);
     this.paint(win);
@@ -336,12 +359,13 @@ export class Desk {
     win.el.style.width = `${win.w}px`;
     win.el.style.height = `${win.shaded ? TBAR : win.h}px`;
     win.el.dispatchEvent(new CustomEvent('win:resize', { bubbles: false }));
+    win.repaintBars?.();
   }
 
   /* an About window is as tall as its own words, measured once the body is
      in place rather than guessed at in the app table */
   fit(win: Win, extra = 0) {
-    const inner = win.el.querySelector<HTMLElement>('.win-body');
+    const inner = win.el.querySelector<HTMLElement>('.win-pane');
     if (!inner) return;
     const chrome = win.el.offsetHeight - inner.offsetHeight;
     const h = Math.min(this.dockTop() - BAR - 20 * U, inner.scrollHeight + chrome + extra);
@@ -356,6 +380,116 @@ export class Desk {
   private clamp(win: Win) {
     win.x = Math.min(Math.max(KEEP - win.w, win.x), innerWidth - KEEP);
     win.y = Math.min(Math.max(BAR, win.y), this.dockTop() - TBAR);
+  }
+
+  /* The drawn scroll bars.
+
+     The pane scrolls the way any element does, by wheel, by keyboard, by an
+     app calling scrollIntoView; these read it every time it moves and lay the
+     thumb out over the track. Driving it works the other way: an arrow scrolls
+     a line and keeps going while held, the track pages, the thumb drags. With
+     nothing to scroll the bar loses its dither and its thumb. */
+  private scrollbars(win: Win, pane: HTMLElement) {
+    const LINE = 16 * U;
+    const bars = [...win.el.querySelectorAll<HTMLElement>('[data-sb]')];
+
+    const paint = () => {
+      for (const bar of bars) {
+        const v = bar.dataset.sb === 'v';
+        const track = bar.querySelector<HTMLElement>('[data-sb-track]')!;
+        const thumb = bar.querySelector<HTMLElement>('[data-sb-thumb]')!;
+        const size = v ? pane.clientHeight : pane.clientWidth;
+        const full = v ? pane.scrollHeight : pane.scrollWidth;
+        const live = full - size > 1;
+        bar.classList.toggle('is-live', live);
+        if (!live) continue;
+        const room = v ? track.clientHeight : track.clientWidth;
+        /* the thumb is as much of the track as the window is of the document,
+           never smaller than a square one */
+        const len = Math.max(16 * U, Math.round((size / full) * room));
+        const at = Math.round(((v ? pane.scrollTop : pane.scrollLeft) / (full - size)) * (room - len));
+        if (v) { thumb.style.top = `${at}px`; thumb.style.height = `${len}px`; }
+        else { thumb.style.left = `${at}px`; thumb.style.width = `${len}px`; }
+      }
+    };
+
+    const by = (v: boolean, d: number) => {
+      if (v) pane.scrollTop += d; else pane.scrollLeft += d;
+    };
+
+    for (const bar of bars) {
+      const v = bar.dataset.sb === 'v';
+      const track = bar.querySelector<HTMLElement>('[data-sb-track]')!;
+      const thumb = bar.querySelector<HTMLElement>('[data-sb-thumb]')!;
+
+      /* an arrow scrolls one line, and keeps scrolling while it is held */
+      for (const arw of [...bar.querySelectorAll<HTMLElement>('.sb-arw')]) {
+        const back = arw.classList.contains('sb-up') || arw.classList.contains('sb-lf');
+        let timer = 0, first = 0;
+        const go = () => by(v, back ? -LINE : LINE);
+        const stop = () => { clearInterval(timer); clearTimeout(first); timer = 0; first = 0; };
+        arw.addEventListener('pointerdown', (e) => {
+          e.preventDefault(); e.stopPropagation();
+          this.focus(win);
+          go();
+          first = window.setTimeout(() => { timer = window.setInterval(go, 40); }, 300);
+          const up = () => { stop(); removeEventListener('pointerup', up); removeEventListener('pointercancel', up); };
+          addEventListener('pointerup', up); addEventListener('pointercancel', up);
+        });
+      }
+
+      /* the track pages toward the pointer, the way a click above or below the
+         thumb did; the thumb itself drags */
+      track.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        this.focus(win);
+        if (!bar.classList.contains('is-live')) return;
+        const r = track.getBoundingClientRect();
+        const t = thumb.getBoundingClientRect();
+        const page = v ? pane.clientHeight : pane.clientWidth;
+        if (e.target !== thumb) {
+          const before = v ? e.clientY < t.top : e.clientX < t.left;
+          by(v, before ? -page : page);
+          return;
+        }
+        /* drag: the pointer holds its place on the thumb the whole way */
+        const grab = (v ? e.clientY - t.top : e.clientX - t.left);
+        const room = (v ? r.height : r.width) - (v ? t.height : t.width);
+        const size = v ? pane.clientHeight : pane.clientWidth;
+        const full = v ? pane.scrollHeight : pane.scrollWidth;
+        const id = e.pointerId;
+        try { thumb.setPointerCapture(id); } catch {}
+        const move = (m: PointerEvent) => {
+          if (m.pointerId !== id) return;
+          const at = Math.min(Math.max(0, (v ? m.clientY - r.top : m.clientX - r.left) - grab), room);
+          const to = room > 0 ? (at / room) * (full - size) : 0;
+          if (v) pane.scrollTop = to; else pane.scrollLeft = to;
+        };
+        const up = (m: PointerEvent) => {
+          if (m.pointerId !== id) return;
+          try { thumb.releasePointerCapture(id); } catch {}
+          thumb.removeEventListener('pointermove', move);
+          thumb.removeEventListener('pointerup', up);
+          thumb.removeEventListener('pointercancel', up);
+        };
+        thumb.addEventListener('pointermove', move);
+        thumb.addEventListener('pointerup', up);
+        thumb.addEventListener('pointercancel', up);
+      });
+    }
+
+    pane.addEventListener('scroll', paint, { passive: true });
+    win.el.addEventListener('win:resize', paint);
+    /* the content inside a window changes size on its own: a folder switching
+       from icons to a list, a demo settling, a picture loading */
+    if (typeof ResizeObserver !== 'undefined') {
+      const ro = new ResizeObserver(paint);
+      ro.observe(pane);
+      if (pane.firstElementChild) ro.observe(pane.firstElementChild);
+    }
+    win.repaintBars = paint;
+    requestAnimationFrame(paint);
+    setTimeout(paint, 300);
   }
 
   /* the dotted outline a drag or a resize moves */
@@ -431,6 +565,8 @@ export class Desk {
   /* resize from the grow box or any edge: an outline shows the new frame,
      and the window takes it on release */
   private resize(win: Win) {
+    /* the drawn grow box sits in the corner cell; the invisible .rz-se handle
+       lies over it and is what the hand actually grabs */
     const handles = [...win.el.querySelectorAll<HTMLElement>('.rz')];
     for (const h of handles) {
       const dir = h.dataset.rz!;

@@ -13,7 +13,7 @@ const ORDER: Secret[] = ['terminal', 'screenshot', 'trash', 'mission', 'saver'];
 
 const HINTS: Record<Secret, string> = {
   terminal: 'One app in the Dock answers typing.',
-  screenshot: 'The Mac’s own screenshot shortcut works here.',
+  screenshot: "The Mac's own screenshot shortcut works here.",
   trash: 'The Trash was never emptied.',
   mission: 'Control and the up arrow tidy the windows.',
   saver: 'Leave the Mac alone for three minutes.',

@@ -132,6 +132,17 @@ export function initStickies(layer: HTMLElement, hooks: StickyHooks = {}) {
     closeAll() {
       [...els.values()].forEach((el) => el.querySelector<HTMLButtonElement>('.sticky-x')?.click());
     },
+    /* the Color menu paints the note on top */
+    colorFront(c: number) {
+      const el = layer.lastElementChild as HTMLElement | null;
+      el?.querySelector<HTMLButtonElement>(`.sticky-dot[data-c="${c}"]`)?.click();
+    },
+    /* which colour that note is wearing, so the menu can show the check */
+    frontColor() {
+      const el = layer.lastElementChild as HTMLElement | null;
+      const m = el?.className.match(/sticky-c(\d)/);
+      return m ? Number(m[1]) : -1;
+    },
     /* the note on top is the one command-W throws away */
     closeFront() {
       const el = layer.lastElementChild as HTMLElement | null;

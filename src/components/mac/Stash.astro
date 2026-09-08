@@ -73,7 +73,7 @@ const disk = [
   <section class="stash-app" data-body="finder" aria-label="Macintosh HD">
     <h2 class="stash-h">Macintosh HD</h2>
     <div class="fnd" data-fnd-root>
-      <div class="fnd-head" aria-hidden="true"><span data-fnd-count>{disk.length} items</span><span>{build.mb} MB in disk</span><span></span></div>
+      <div class="fnd-head" aria-hidden="true"><span data-fnd-count>{disk.length} items</span><span>{build.mb} MB in disk</span><span>0 K available</span></div>
       <div class="fnd-cols" aria-hidden="true"><span>Name</span><span>Size</span><span>Kind</span><span>Last Modified</span></div>
       <ul class="fnd-rows" role="listbox" aria-label="Macintosh HD">
         {disk.map((d, i) => (
@@ -107,7 +107,7 @@ const disk = [
   <section class="stash-app" data-body="pictures" aria-label="Pictures">
     <h2 class="stash-h">Pictures</h2>
     <div class="fnd">
-      <div class="fnd-head" aria-hidden="true"><span>{photos.length} items</span><span>{build.mb} MB in disk</span><span></span></div>
+      <div class="fnd-head" aria-hidden="true"><span>{photos.length} items</span><span>{build.mb} MB in disk</span><span>0 K available</span></div>
       <Pictures />
     </div>
   </section>
@@ -181,7 +181,6 @@ const disk = [
         <p class="abt-line">{a.about!.line}</p>
         <div class="abt-facts">
           <span><b>Built with</b> {a.about!.built}</span>
-          <span><b>Now</b> {a.about!.state}</span>
         </div>
         <a class="abt-link" href={a.about!.link.href} rel="noopener" target="_blank">{a.about!.link.label}</a>
       </div>

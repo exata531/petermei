@@ -16,7 +16,7 @@ export type About = {
   link: { label: string; href: string };
 };
 
-export type MenuItem = { label: string; action?: string; key?: string; sep?: boolean; dis?: boolean; check?: boolean };
+export type MenuItem = { label: string; action?: string; key?: string; sep?: boolean; dis?: boolean; check?: boolean; icon?: string };
 export type Menu = { label: string; items: MenuItem[] };
 
 export type App = {
