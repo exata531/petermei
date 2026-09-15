@@ -7,7 +7,12 @@
    GitHub sees a request every thirty minutes at most, whatever the
    traffic. On any failure the page keeps the build-time grid. */
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { parse, URL } from '../src/data/github-parse.ts';
+/* No extension on purpose. This file is compiled by the host rather than
+   bundled by Astro, and a '.ts' specifier survives into the emitted JavaScript,
+   which Node will not resolve at run time: the function then fails to load at
+   all, before its own error handling can answer. Astro's copy of this import
+   keeps the extension because Vite resolves it. */
+import { parse, URL } from '../src/data/github-parse';
 
 export default async function handler(_req: IncomingMessage, res: ServerResponse) {
   try {
