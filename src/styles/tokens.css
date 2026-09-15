@@ -179,6 +179,26 @@
   --r-control: 8px;
   --r-pill: 999px;
 
+  /* ── glass ───────────────────────────────────────────────────────────
+     Three depths, because the amount of blur is what says how far in front of
+     the page a thing is floating. Thin is for something resting on the paper,
+     a button or a card; regular is for the navigation, which floats over
+     everything; thick is for a whole sheet sliding up over the sky.
+
+     Glass covers what is above it and samples what is BELOW, so a frosted
+     surface needs something behind it worth blurring. On flat paper it reads
+     as nothing, which is why the tint and the edge come with it rather than
+     the blur alone.
+
+     The prefix is --glass-, not --bf-: --bf is already the birds' share of the
+     scroll, and one name for two ideas is how a system starts rotting. */
+  --glass-thin: blur(6px) saturate(120%);
+  --glass: blur(12px) saturate(160%);
+  --glass-thick: blur(28px) saturate(110%);
+  --glass-tint: var(--white-a35);   /* the frost itself */
+  --glass-edge: var(--white-a50);   /* the lit top edge that sells it */
+  --glass-inner: var(--white-a25);  /* the sheen just inside that edge */
+
   /* ── shadow and grain ────────────────────────────────────────────────── */
   --shadow-block: 0 50px 40px #00000003, 0 50px 40px #00000005, 0 20px 40px #0000000d, 0 3px 10px #00000014;
   --shadow-card: 0 4px 12px rgb(0 0 0 / .1);

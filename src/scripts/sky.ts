@@ -24,6 +24,8 @@ export function bandAt(hour: number): Band {
 
 const BANDS: Band[] = EDGES.map(([, b]) => b);
 const PIN = 'pm-sky';
+/* where you were on each page when you left it, so the next paint knows */
+export const AT = 'pm-at:';
 
 /* A way to stand in another hour without changing the clock on your Mac.
    Put ?sky=night on any address and the whole site holds that one, through
@@ -51,7 +53,15 @@ if(q==='auto'||q==='off'){sessionStorage.removeItem('${PIN}')}
 else if(q){sessionStorage.setItem('${PIN}',q);w=q}
 else{w=sessionStorage.getItem('${PIN}')}}catch(e){}
 if(B.indexOf(w)<0){var h=new Date().getHours();w='night';for(var i=0;i<E.length;i++){if(h>=E[i][0])w=E[i][1]}}
-d.dataset.sky=w}catch(e){}})();`;
+d.dataset.sky=w;
+/* The entrance, or not. A reload lands wherever you left it, and the router
+   puts you back there AFTER the first paint, so the page drew its top, played
+   the name's entrance into your face, and only then jumped down to where you
+   actually were. The scroll you left at is written down when you go, and read
+   here before the first pixel: if it was not the top, there is no entrance to
+   play, because you are not looking at the thing that would enter. */
+try{if(Number(sessionStorage.getItem('${AT}'+location.pathname))>0)d.classList.remove('is-first')}catch(e){}
+}catch(e){}})();`;
 
 /* Paint the word onto the root and keep it true. A page left open crosses an
    hour eventually, so it is checked again every few minutes, and again the

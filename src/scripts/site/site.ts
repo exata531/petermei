@@ -13,8 +13,18 @@ import './eggs';
 /* the flair: the name leaning, the arrivals, the tilt, the faces */
 import './flair';
 /* the hero's weather follows the visitor's own clock */
-import { watchSky } from '../sky';
+import { watchSky, AT } from '../sky';
 watchSky();
+
+/* Where you are, written down as you go, for the line that runs before the
+   next paint. It reads this to decide whether the entrance has an audience:
+   a reload that lands you halfway down the page should not play the name
+   rising at the top you are not looking at. Per page, and this tab only. */
+const markWhere = () => {
+  try { sessionStorage.setItem(AT + location.pathname, String(Math.round(scrollY))); } catch {}
+};
+addEventListener('pagehide', markWhere);
+document.addEventListener('visibilitychange', () => { if (document.hidden) markWhere(); });
 
 const $ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => r.querySelector<T>(s);
 const $$ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => [...r.querySelectorAll<T>(s)];

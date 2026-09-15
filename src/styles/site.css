@@ -88,7 +88,7 @@ html.is-going .page { opacity: .68; transition: opacity 140ms linear 60ms; }
   background: var(--white-a35);
   border: 1px solid var(--white-a50);
   box-shadow: inset 0 4px 6px var(--white-a25);
-  --bf: blur(12px) saturate(160%);
+  --bf: var(--glass);
   backdrop-filter: var(--bf);
   color: var(--ink);
   clip-path: inset(0 round 28px);
@@ -151,7 +151,7 @@ html.is-going .page { opacity: .68; transition: opacity 140ms linear 60ms; }
   display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 16px; margin-top: 6px;
   border-radius: 999px; font-size: 14px; font-weight: 500;
   background: var(--white-a35); border: 1px solid var(--white-a50);
-  --bf: blur(12px);
+  --bf: var(--glass);
   backdrop-filter: var(--bf);
   box-shadow: 0 2px 4px -1px #0000000f;
 }
@@ -457,7 +457,7 @@ html.framed .nav { display: none; }
 .sheet::after {
   top: 0; height: var(--glass); border-radius: 40px 40px 0 0;
   background: color-mix(in oklab, var(--paper) 84%, transparent);
-  backdrop-filter: blur(28px) saturate(1.1);
+  backdrop-filter: var(--glass-thick);
   -webkit-mask-image: linear-gradient(#000 0 60%, transparent 100%);
   mask-image: linear-gradient(#000 0 60%, transparent 100%);
 }
@@ -486,6 +486,9 @@ html.framed .nav { display: none; }
   box-shadow: inset 0 0 0 1px var(--ink-a09);
 }
 /* hover deepens the field and draws a hairline, both by opacity alone */
+/* the lit edge every glass surface on this site carries, so a card belongs to
+   the same material as the navigation floating over it */
+.tile-art { box-shadow: inset 0 1px 0 var(--glass-edge); backdrop-filter: var(--glass-thin); }
 .tile-art::before { content: ''; position: absolute; inset: 0; z-index: 1; border-radius: inherit; pointer-events: none; opacity: 0; background: color-mix(in oklab, var(--tile-tint, var(--c-sky)) 32%, transparent); box-shadow: inset 0 0 0 1px var(--ink-a18); transition: opacity var(--t-hover) var(--spring); }
 .tile-art::after { content: ''; position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none; opacity: var(--grain); mix-blend-mode: overlay; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 .tile:hover .tile-art { transform: translateY(-4px) scale(1.01); }
@@ -541,8 +544,15 @@ html.framed .nav { display: none; }
 .btn { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 40px; background: var(--ink); color: var(--paper); font-size: 15px; font-weight: 600; }
 .btn:hover { transform: translateY(-1px); background: #2a2826; }
 .btn:active { transform: scale(.97); }
-.btn.is-quiet { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--hair-2); }
-.btn.is-quiet:hover { background: var(--ink-a06); }
+/* The quiet button was a hairline around nothing. It is frosted now, which
+   gives it a body without giving it the weight of the solid one: it still
+   reads as the second choice, but as a thing rather than an outline. */
+.btn.is-quiet {
+  background: var(--glass-tint); color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--glass-edge), inset 0 2px 4px var(--glass-inner);
+  backdrop-filter: var(--glass-thin);
+}
+.btn.is-quiet:hover { background: var(--white-a50); }
 .btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 
 /* ── a project page: a deck of panels that stack ────────────────────── */
@@ -628,7 +638,7 @@ html.can-drag .polaroid { cursor: grab; }
 .polaroid.is-dragging { box-shadow: 0 22px 48px var(--black-a24); cursor: grabbing; z-index: 5; }
 .polaroid img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 1px; pointer-events: none; }
 .polaroid small { position: absolute; left: 12px; right: 12px; bottom: 10px; font-size: 12px; color: var(--ink-caption); text-align: center; }
-.pile-reset { position: absolute; right: 0; bottom: 0; z-index: 10; width: 46px; height: 46px; border-radius: 999px; display: grid; place-items: center; background: var(--white-a60); --bf: blur(6px); backdrop-filter: var(--bf); box-shadow: 0 6px 18px rgb(43 43 43 / .14); color: #2b2b2b; }
+.pile-reset { position: absolute; right: 0; bottom: 0; z-index: 10; width: 46px; height: 46px; border-radius: 999px; display: grid; place-items: center; background: var(--white-a60); --bf: var(--glass-thin); backdrop-filter: var(--bf); box-shadow: 0 6px 18px rgb(43 43 43 / .14); color: #2b2b2b; }
 .pile-reset:hover { background: var(--white-a85); }
 .pile-reset:active { transform: scale(.94); }
 .pile-reset svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; transition: transform var(--t-in) var(--spring); }
@@ -741,7 +751,9 @@ html:not(.can-drag) .pile-reset { display: none; } /* the drag is for fine point
    standard property. In one block the CSS minifier folds the two together
    and drops one, so the alias sits in its own rule down here. */
 .pill, .nav-back, .pile-reset { -webkit-backdrop-filter: var(--bf); }
-.sheet::after { -webkit-backdrop-filter: blur(28px) saturate(1.1); }
+.btn.is-quiet { -webkit-backdrop-filter: var(--glass-thin); }
+.tile-art { -webkit-backdrop-filter: var(--glass-thin); }
+.sheet::after { -webkit-backdrop-filter: var(--glass-thick); }
 
 /* WEB-044: under 360px a case study cannot hold Back, the face and three labels, so the face steps out on that route only (Rin, 09-13) */
 @media (max-width: 359px) { html[data-route='project'] .pill-face { display: none; } }

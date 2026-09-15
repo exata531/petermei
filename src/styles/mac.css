@@ -1038,6 +1038,13 @@ html.is-cover .mac.is-far:not(.is-moving) { z-index: 1; }
 .login-in:focus-visible, .login-in:focus { border-width: var(--u2); padding: 0 var(--u2); }
 .login-in::placeholder { color: var(--grey-3); }
 .login-go { grid-column: 1 / -1; justify-self: end; margin-top: var(--u3); outline: var(--u2) solid var(--ink); outline-offset: var(--u); }
+/* The prop label. Small, under the whole box, in the machine's own face so it
+   belongs to the dialog rather than floating over it. It spans both columns and
+   sits last, so it reads after the button, the way a footnote does. */
+.login-note {
+  grid-column: 1 / -1; margin-top: var(--u3); font-size: var(--fs-9);
+  color: var(--grey-3); text-align: center; line-height: 1.3;
+}
 /* the click: the default button takes it, the way a Mac showed a press */
 .welcome-veil.is-go .login-go { background: var(--ink); color: var(--paper); }
 
