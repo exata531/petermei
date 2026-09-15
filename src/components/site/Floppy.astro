@@ -1,0 +1,30 @@
+---
+/* A floppy disk, drawn the way this website draws things.
+
+   Not pixel art. The Mac gets the pixel drawing; out here a disk is a small
+   flat object in the page's own paper and ink, with the site's radius and
+   one soft shadow, so it reads as something lying on the page rather than
+   as a sprite that wandered in from the other half of the site.
+
+   It is rendered once, into a template, and the script that hides the three
+   disks clones it wherever one of them is. Every part takes its colour from
+   the stylesheet rather than from an attribute, so a disk lying on sand and
+   a disk leaning on paper are the same drawing.
+
+   The label is a slot the script fills with the name of what is on the disk,
+   which is the only thing that tells the three of them apart. */
+---
+<template data-floppy>
+  <button class="fd" type="button">
+    <svg class="fd-art" viewBox="0 0 40 40" aria-hidden="true">
+      <rect class="fd-body" x="1" y="1" width="38" height="38" rx="3" />
+      <rect class="fd-shutter" x="12" y="2.5" width="16" height="12" rx="1.5" />
+      <rect class="fd-slot" x="17.5" y="4" width="5" height="9" rx="1" />
+      <rect class="fd-notch" x="3.5" y="17" width="3" height="4" rx="1" />
+      <rect class="fd-label" x="6" y="20" width="28" height="16" rx="1.5" />
+      <rect class="fd-rule" x="9" y="24" width="22" height="1.4" rx=".7" />
+      <rect class="fd-rule" x="9" y="28" width="16" height="1.4" rx=".7" />
+    </svg>
+    <span class="fd-lbl"></span>
+  </button>
+</template>

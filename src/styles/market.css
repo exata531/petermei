@@ -1,0 +1,380 @@
+/* Market Station, the product page.
+
+   This page carries its own tokens and never loads tokens.css, because that
+   sheet is the warm cream paper, the 22px radii and the brown shadows the
+   portfolio is made of, and this page is defined against all three. One rule
+   from the product's own stylesheet runs everything here: colour means state,
+   never decoration. So the page is gray and every color on it is a reading's state.
+
+   Red appears three times: the word crossed where the four states are named,
+   the fired step in the state rail, and the word EASING where that state is
+   explained. Green once and teal once, in the same sentence as crossed. If a
+   fourth red turns up, something went decorative and it comes out.
+
+   No shadow anywhere. No radius anywhere except 2px on a figure plate, so a
+   picture reads as a mounted print. Separation is hairlines and one step of
+   tone between the paper and the plate. */
+
+:root {
+  /* light: graph paper under a lamp */
+  --paper: #eef0f4;
+  --plate: #f8f9fc;
+  --rule: #d2d7df;
+  --rule-2: #97a0ac;
+  --ink: #13171c;
+  --ink-2: #474e58;
+  --ink-3: #626a75;
+  /* State hues, from the station's own light tokens, so the page and the
+     pictures agree. Two are darkened a step here and only here: the station
+     paints them on chips and marks, this page sets them in 16px prose, where
+     the station's own green measures 4.48 and its amber 3.75 against this
+     paper. 4.5 is the floor for reading text, so green and amber go to 4.97
+     and 4.59. Red (4.71) and teal (4.56) are untouched, and the dark set
+     below is untouched because it clears the floor as it is. */
+  --alert: #cf2318;
+  --ok: #2b7537;
+  --watch: #9a5f07;
+  --opp: #0e7a70;
+
+  --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --t-h1: clamp(28px, 3.4vw, 42px);
+  --t-h2: clamp(20px, 2.2vw, 26px);
+  --t-h3: 17px;
+  --t-lead: 18px;
+  --t-body: 16px;
+  --t-data: 15px;
+  --t-label: 12px;
+  --t-cap: 12.5px;
+  --t-fine: 11.5px;
+
+  --gutter: clamp(16px, 4vw, 40px);
+  --rail: 132px;
+  --gap: 32px;
+  --block: 48px;
+
+  color-scheme: light dark;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* dark: the monitor is the only light in the room */
+    --paper: #0b0e11;
+    --plate: #12161a;
+    --rule: #212831;
+    --rule-2: #39424c;
+    --ink: #e7ebf0;
+    --ink-2: #a8b0bb;
+    --ink-3: #8b939e;
+    --alert: #fb4b3d;
+    --ok: #43b25b;
+    --watch: #dd9a18;
+    --opp: #20a496;
+  }
+}
+
+@media (min-width: 780px) {
+  :root { --block: 72px; }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { background: var(--paper); }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink-2);
+  font: 400 var(--t-body)/1.6 var(--sans);
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* the column. Left aligned and it stays left at every width: the band and the
+   footer hold the right hand side, so the page reads as ruled, not adrift.
+   Centring it is one word, margin-inline: 0 auto. */
+.wrap {
+  max-width: 1060px;
+  margin-inline: 0;
+  padding-inline: var(--gutter);
+}
+
+img { max-width: 100%; }
+
+a { color: var(--ink); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { color: var(--ink-3); }
+
+/* the project's one ring, on every route (WEB-072) */
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+/* the same bypass every other route has (WEB-074) */
+.skip { position: absolute; left: 12px; top: -60px; z-index: 200; padding: 8px 12px; border-radius: 8px; background: var(--ink); color: var(--paper, #fff); }
+.skip:focus { top: 12px; }
+/* the site's menu sits above the band, so the band starts under it */
+body > .band:first-of-type { padding-top: 84px; }
+/* a standalone control clears the 44px floor (WEB-088) */
+.acts .btn2 { display: inline-flex; align-items: center; min-height: 44px; }
+
+h1, h2 { color: var(--ink); font-family: var(--mono); font-weight: 500; margin: 0; }
+h1 { font-size: var(--t-h1); letter-spacing: -0.02em; line-height: 1.15; max-width: 20ch; }
+h2 { font-size: var(--t-h2); letter-spacing: -0.01em; line-height: 1.25; max-width: 26ch; }
+
+p { margin: 0 0 14px; max-width: 62ch; }
+p:last-child { margin-bottom: 0; }
+.lead { font-size: var(--t-lead); line-height: 1.55; }
+
+/* the machine's own voice: anything the station prints is mono and tabular */
+.d { font-family: var(--mono); font-size: var(--t-data); color: var(--ink); }
+
+/* the status band, full width, no logo */
+.band {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  justify-content: space-between;
+  padding: 10px var(--gutter);
+  border-bottom: 1px solid var(--rule);
+  font: 400 var(--t-label)/1.4 var(--mono);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+/* sections. Each opens on a heavier hairline across the wrap with its number
+   sitting on it, the way a plotted axis carries a tick label. */
+.sec { padding-block: var(--block) 0; }
+
+.tickrule {
+  position: relative;
+  height: 1px;
+  background: var(--rule-2);
+  margin: 0 0 24px;
+}
+.tick {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--paper);
+  padding-right: 10px;
+  font: 400 var(--t-label)/1 var(--mono);
+  letter-spacing: 0.09em;
+  color: var(--ink-3);
+}
+
+.grid { display: grid; grid-template-columns: var(--rail) minmax(0, 1fr); column-gap: var(--gap); }
+.railname {
+  margin: 0;
+  font: 400 var(--t-label)/1.4 var(--mono);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding-top: 4px;
+}
+.col > h2 + p, .col > h2 + .states { margin-top: 16px; }
+.states + p { margin-top: 24px; }
+.after-fold { margin-top: 32px; }
+
+@media (max-width: 779px) {
+  .grid { display: block; }
+  .railname { border-bottom: 1px solid var(--rule); padding: 0 0 8px; margin-bottom: 16px; }
+}
+
+/* figures. A plate one step lighter than the paper, a hairline, a caption. */
+.fig {
+  margin: 32px 0;
+  padding: 20px;
+  background: var(--plate);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+}
+.fig img { display: block; width: 100%; height: auto; }
+.fig figcaption {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+  font: 400 var(--t-cap)/1.5 var(--mono);
+  color: var(--ink-3);
+  max-width: 78ch;
+}
+.fig--card { max-width: 420px; }
+.fig--phone { max-width: 360px; }
+.fig--tight { padding: 12px; }
+
+@media (max-width: 779px) {
+  .fig--card, .fig--phone { max-width: none; }
+}
+
+/* the appearance swap is a picture source, not a hidden second image, so the
+   browser only ever downloads the one it is going to show */
+.fig picture { display: block; }
+
+.fine {
+  margin: 0;
+  font: 400 var(--t-fine)/1.6 var(--mono);
+  color: var(--ink-3);
+  max-width: 74ch;
+}
+
+/* the two buttons, and they only ever appear twice on the page */
+.acts { display: flex; flex-wrap: wrap; align-items: baseline; gap: 16px; margin-top: 32px; }
+.btn {
+  display: inline-block;
+  padding: 12px 18px;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  color: var(--ink);
+  text-decoration: none;
+  font: 400 13px/1 var(--mono);
+  letter-spacing: 0.02em;
+  transition: background-color 120ms linear, color 120ms linear;
+}
+.btn:hover { background: var(--ink); color: var(--paper); }
+.btn2 { font-family: var(--mono); font-size: 13px; color: var(--ink); }
+.acts + .fig { margin-top: 48px; }
+
+/* section 01 names the four states, and it is the only place three of the
+   four hues appear at all */
+.s-ok { color: var(--ok); }
+.s-watch { color: var(--watch); }
+.s-alert { color: var(--alert); }
+.s-opp { color: var(--opp); }
+
+/* section 03, the phone beside the prose on a wide screen. The split only
+   turns on when the phone figure is actually there: with no figure the grid
+   would leave a 360px hole where it will go. */
+@media (min-width: 900px) {
+  .split--fig { display: grid; grid-template-columns: 360px minmax(0, 1fr); column-gap: var(--gap); align-items: start; }
+  .split--fig .fig { grid-column: 1; grid-row: 1; margin-top: 0; }
+  .split--fig .split-t { grid-column: 2; grid-row: 1; }
+}
+@media (max-width: 899px) {
+  .split .fig { max-width: 320px; }
+}
+
+/* section 04, the switch drawn in CSS. Furniture, never a picture of the app. */
+.states {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+  margin: 0;
+  padding: 16px 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  overflow: hidden;
+  font: 400 var(--t-data)/1.4 var(--mono);
+  color: var(--ink-3);
+}
+.states li { position: relative; }
+.states li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  width: 24px;
+  height: 1px;
+  background: var(--rule);
+}
+.states .is-fired { color: var(--alert); }
+
+/* section 02, the ledger. All twenty-eight, behind one fold. */
+.fold { margin: 32px 0 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.fold summary {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 14px 0;
+  cursor: pointer;
+  list-style: none;
+  color: var(--ink);
+  font: 400 var(--t-data)/1.4 var(--mono);
+}
+.fold summary::-webkit-details-marker { display: none; }
+.fold summary::before { content: '+'; color: var(--ink-3); width: 1ch; }
+.fold[open] summary::before { content: '\2212'; }
+.fold summary:hover { color: var(--ink-3); }
+
+.fold-in { padding-bottom: 24px; }
+
+@supports (interpolate-size: allow-keywords) {
+  :root { interpolate-size: allow-keywords; }
+  .fold::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition: block-size 180ms ease, content-visibility 180ms;
+    transition-behavior: allow-discrete;
+  }
+  .fold[open]::details-content { block-size: auto; }
+}
+
+.led { width: 100%; border-collapse: collapse; margin: 0 0 24px; }
+.led:last-child { margin-bottom: 0; }
+.led caption {
+  text-align: left;
+  padding: 24px 0 8px;
+  font: 600 var(--t-h3)/1.3 var(--mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.led tr + tr { border-top: 1px solid var(--rule); }
+.led th, .led td { padding: 12px 16px 12px 0; text-align: left; vertical-align: baseline; }
+.led th {
+  width: 25%;
+  font: 400 var(--t-data)/1.4 var(--mono);
+  color: var(--ink);
+}
+.led .c-mean { width: 50%; font-size: var(--t-body); color: var(--ink-2); }
+.led .c-line {
+  padding-right: 0;
+  text-align: right;
+  white-space: nowrap;
+  font: 400 var(--t-data)/1.4 var(--mono);
+  color: var(--ink-2);
+}
+
+@media (max-width: 639px) {
+  .led, .led caption, .led tbody, .led tr, .led th, .led td { display: block; }
+  .led caption { padding-top: 24px; }
+  .led tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 16px; padding: 12px 0; }
+  .led th, .led td { width: auto; padding: 0; }
+  .led th { grid-column: 1; }
+  .led .c-line { grid-column: 2; grid-row: 1; }
+  .led .c-mean { grid-column: 1 / -1; font-size: var(--t-data); font-family: var(--sans); margin-top: 4px; }
+}
+
+/* the close */
+.end { padding-block: var(--block) 0; }
+.endrule { height: 1px; background: var(--rule-2); margin: 0 0 24px; }
+.end p { max-width: 58ch; }
+.end h2 + p { margin-top: 16px; }
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  justify-content: space-between;
+  margin-top: 48px;
+  padding: 24px 0;
+  border-top: 1px solid var(--rule);
+  font: 400 var(--t-fine)/1.5 var(--mono);
+  color: var(--ink-3);
+}
+.foot a { color: var(--ink-3); }
+
+.hero { padding-block: 48px 0; }
+.hero .fig { margin-bottom: 12px; }
+.hero p { max-width: 58ch; }
+.hero h1 + .lead { margin-top: 24px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .fold::details-content { transition: none; }
+}

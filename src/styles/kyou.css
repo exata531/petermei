@@ -1,0 +1,893 @@
+/* Kyou's product page.
+   ---------------------------------------------------------------------------
+   The look is taken out of the app rather than invented for the web: the
+   near-black hero band, the off-white curtain that rises over it on a 32px
+   radius, one red that only ever means "now", and a left rail carrying a 2px
+   hairline with a red bar that walks down it as you read. The rail is the
+   app's now-line doing its one job at page scale.
+
+   Nothing in this file is shared with another page on this site. Every picture
+   is a real capture of the running app; no app chrome is drawn here in CSS.
+
+   Contrast is checked against the surface each colour actually sits on. The
+   secondary grey resolves near #8E8E93 and measures 4.6:1 on the curtain, so it
+   never appears under 15px; anything smaller takes --ink-3 instead. The red
+   goes to #D70015 for text, because #FF3B30 on white is 3.55:1.
+   ------------------------------------------------------------------------- */
+
+/* ---------- tokens: light ---------- */
+
+:root {
+  color-scheme: light dark;
+
+  /* surfaces */
+  --hero: #0e0e12;
+  --curtain: #f2f2f7;
+  --card: #ffffff;
+
+  /* the shot plates are the ground the captures were staged on */
+  --plate: #1a0b09;
+  --plate-edge: rgba(0, 0, 0, 0.14);
+
+  /* ink */
+  --ink: #000000;
+  --ink-2: rgba(60, 60, 67, 0.6);
+  --ink-3: #4a4a4f;
+
+  /* one red, plus the darker red that small text needs to pass on white */
+  --red: #ff3b30;
+  --red-text: #d70015;
+
+  /* the app's glyph colours: blue is an event, orange is a to-do, purple a tag */
+  --blue: #007aff;
+  --orange: #ff9500;
+  --orange-text: #c93400;
+  --purple: #8944ab;
+
+  --hair: #d8d8dd;
+  --rail-line: #3c3c43;
+
+  /* type: one family, the app's own */
+  --face: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+
+  --t-hero: clamp(40px, 9.4vw, 58px);
+  --t-section: clamp(28px, 4.2vw, 38px);
+  --t-lead: clamp(19px, 2.2vw, 22px);
+  --t-body: 17px;
+  --t-sub: 15px;
+  --t-cap: 13px;
+  --t-micro: 11px;
+  --t-face: 22px;
+
+  /* the app's 8pt grid, taken literally */
+  --gutter: 24px;
+  --shell: 1012px;
+  --rail: 0px;
+  --gap: 0px;
+  --measure: 62ch;
+  --sec-gap: 56px;
+  --dip: 84px;
+
+  --r-plate: 14px;
+  --r-shot: 30px;
+  --r-seam: 32px;
+
+  /* the app's two springs, ported */
+  --calm: 500ms cubic-bezier(0.32, 0.72, 0, 1);
+  --snap: 300ms cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+
+/* ---------- tokens: dark, the app's own measured dark values ---------- */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --hero: #000000;
+    --curtain: #111113;
+    --card: #1c1c1e;
+    --plate: #0b0505;
+    --plate-edge: rgba(235, 235, 245, 0.16);
+
+    --ink: #ffffff;
+    --ink-2: rgba(235, 235, 245, 0.6);
+    --ink-3: rgba(235, 235, 245, 0.75);
+
+    --red: #ff453a;
+    --red-text: #ff6961;
+
+    --blue: #0a84ff;
+    --orange: #ff9f0a;
+    --orange-text: #ff9f0a;
+    --purple: #bf5af2;
+
+    --hair: rgba(235, 235, 245, 0.16);
+    --rail-line: #ebebf5;
+  }
+}
+
+:root[data-theme="dark"] {
+  --hero: #000000;
+  --curtain: #111113;
+  --card: #1c1c1e;
+  --plate: #0b0505;
+  --plate-edge: rgba(235, 235, 245, 0.16);
+
+  --ink: #ffffff;
+  --ink-2: rgba(235, 235, 245, 0.6);
+  --ink-3: rgba(235, 235, 245, 0.75);
+
+  --red: #ff453a;
+  --red-text: #ff6961;
+
+  --blue: #0a84ff;
+  --orange: #ff9f0a;
+  --orange-text: #ff9f0a;
+  --purple: #bf5af2;
+
+  --hair: rgba(235, 235, 245, 0.16);
+  --rail-line: #ebebf5;
+}
+
+/* ---------- base ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--curtain);
+  color: var(--ink);
+  font-family: var(--face);
+  font-size: var(--t-body);
+  line-height: 1.58;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  position: relative;
+  overflow-x: clip;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* every time and count carries the app's monospaced figures */
+.cap,
+.status,
+.quote,
+.draft {
+  font-variant-numeric: tabular-nums;
+}
+
+a {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: text-decoration-thickness var(--snap);
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* the project's one ring, on every route (WEB-072) */
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 3px;
+}
+
+h1,
+h2 {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: -0.022em;
+}
+
+p {
+  margin: 0 0 16px;
+  max-width: var(--measure);
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 200;
+}
+
+.skip:focus {
+  left: 12px;
+  top: 12px;
+  padding: 10px 14px;
+  border-radius: var(--r-plate);
+  background: var(--card);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* ---------- bands, and the seam that happens twice ---------- */
+
+.band {
+  position: relative;
+}
+
+/* the rail's hairline, drawn per band so it spans exactly that band */
+.band::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  left: calc(50% - min(100%, var(--shell)) / 2 + var(--gutter) + var(--rail) - 2px);
+  width: 2px;
+  background: var(--rail-line);
+  opacity: 0.35;
+}
+
+.band--dark {
+  background: var(--hero);
+  color: #ffffff;
+
+  /* the pieces keep working on the dark band by swapping their own tokens */
+  --ink: #ffffff;
+  --ink-2: rgba(235, 235, 245, 0.6);
+  --ink-3: rgba(235, 235, 245, 0.75);
+  --card: rgba(255, 255, 255, 0.06);
+  --hair: rgba(235, 235, 245, 0.16);
+  --rail-line: #ebebf5;
+  --red-text: #ff6961;
+  --orange-text: #ff9f0a;
+  --purple: #bf5af2;
+  --plate-edge: rgba(235, 235, 245, 0.16);
+}
+
+/* the curtain rises over the hero, and over the phone standing in it */
+.curtain {
+  position: relative;
+  z-index: 2;
+  margin-top: -28px;
+  border-radius: var(--r-seam) var(--r-seam) 0 0;
+  background: var(--curtain);
+  color: var(--ink);
+  padding-bottom: 72px;
+}
+
+/* the same shape inverted: the dark rises over the curtain to close */
+.closing {
+  z-index: 3;
+  margin-top: -28px;
+  border-radius: var(--r-seam) var(--r-seam) 0 0;
+  padding-block: 64px 0;
+}
+
+.shell {
+  position: relative;
+  z-index: 1;
+  width: min(100%, var(--shell));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* one spine: the rail track, then the content track */
+.track {
+  margin-left: calc(var(--rail) + var(--gap));
+}
+
+/* ---------- the rail, and the red bar walking down it ---------- */
+
+.now {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  left: calc(50% - min(100%, var(--shell)) / 2 + var(--gutter) + var(--rail) - 2px);
+  width: 2px;
+  height: 40px;
+  pointer-events: none;
+}
+
+.now i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--red);
+  transform: translateY(0);
+  will-change: transform;
+}
+
+.anim .now i {
+  transition: transform var(--calm);
+}
+
+/* the app puts a dot at the head of its now-line. So does the rail. */
+.now i::before {
+  content: "";
+  position: absolute;
+  left: -2px;
+  top: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+}
+
+/* ---------- section heads and their glyphs ---------- */
+
+.head {
+  position: relative;
+}
+
+/* the glyph sits in the rail gutter, beside the hairline rather than on it,
+   so the red bar always has the line to itself */
+.mark {
+  position: absolute;
+  left: calc((var(--gap) + 2px + var(--rail) / 2) * -1);
+  top: calc(var(--t-section) * 0.52);
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  line-height: 1;
+}
+
+.hero .mark {
+  top: calc(var(--t-hero) * 0.44);
+}
+
+.mark i {
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+}
+
+.mark i.blue {
+  background: var(--blue);
+}
+
+.mark i.orange {
+  background: var(--orange);
+}
+
+.mark i.ring {
+  background: none;
+  box-shadow: inset 0 0 0 2px var(--ink-3);
+}
+
+.mark--face {
+  font-size: 14px;
+  letter-spacing: -0.05em;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+/* ---------- hero ---------- */
+
+/* the site's menu floats over the top of this page, so the band starts under it */
+.hero {
+  padding-block: 104px 0;
+}
+
+.hero .track {
+  display: grid;
+  gap: 32px;
+}
+
+.wordmark {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 0 20px;
+  line-height: 1.1;
+}
+
+.kao {
+  font-size: var(--t-face);
+  letter-spacing: -0.04em;
+  color: var(--ink-2);
+}
+
+.wm {
+  font-size: var(--t-cap);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.hero h1 {
+  font-size: var(--t-hero);
+  line-height: 0.9;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  max-width: 14ch;
+}
+
+/* the app sets a red dot after its weekday. So does the headline. */
+.dot {
+  display: inline-block;
+  width: 0.16em;
+  height: 0.16em;
+  margin-left: 0.05em;
+  border-radius: 50%;
+  background: var(--red);
+  vertical-align: baseline;
+}
+
+.lead {
+  margin: 24px 0 0;
+  max-width: 36ch;
+  font-size: var(--t-lead);
+  line-height: 1.45;
+  color: rgba(235, 235, 245, 0.78);
+}
+
+/* the app's own empty free block: dotted, unfilled, and not a button */
+/* it is a sentence, not a control: no box, no radius, no button's height.
+   The rule beside it is the only mark it needs (WEB-086). */
+.status {
+  display: block;
+  margin: 40px 0 0;
+  padding: 0 0 0 14px;
+  border-left: 2px solid var(--red-text);
+  font-size: var(--t-body);
+  color: var(--red-text);
+}
+
+.status-link {
+  margin: 16px 0 0;
+  font-size: var(--t-sub);
+  color: var(--ink-2);
+}
+
+/* the hero phone hangs past its band so the curtain genuinely crops it */
+.shot--hero {
+  margin: 0 0 calc(var(--dip) * -1);
+}
+
+.shot--hero .plate {
+  max-width: 340px;
+  border-radius: var(--r-shot) var(--r-shot) 0 0;
+  border-bottom: 0;
+}
+
+/* ---------- sections on the curtain ---------- */
+
+.sec {
+  position: relative;
+  padding-top: var(--sec-gap);
+}
+
+.sec:first-child {
+  padding-top: 56px;
+}
+
+/* the dotted hairline starts after the rail, never at the page edge */
+.rule {
+  height: 1px;
+  margin-bottom: var(--sec-gap);
+  background-image: linear-gradient(to right, var(--hair) 0 1px, transparent 1px 3px);
+  background-size: 3px 1px;
+  background-repeat: repeat-x;
+}
+
+.sec:first-child .rule {
+  display: none;
+}
+
+.sec h2 {
+  font-size: var(--t-section);
+  line-height: 1.06;
+  max-width: 17ch;
+}
+
+.head + p,
+.head + .quote,
+.head + .rows,
+.head + .pair {
+  margin-top: 24px;
+}
+
+/* the one centred section on the page: the one about the app's personality.
+   The head keeps the full track width so its glyph still lands on the rail. */
+.sec--mid .head {
+  text-align: center;
+}
+
+.sec--mid h2 {
+  max-width: none;
+}
+
+.sec--mid .body {
+  max-width: 52ch;
+  margin-top: 24px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+/* ---------- shots ---------- */
+
+figure {
+  margin: 40px 0 0;
+}
+
+.plate {
+  overflow: hidden;
+  border: 1px solid var(--plate-edge);
+  border-radius: var(--r-shot);
+  background: var(--plate);
+}
+
+.plate img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.shot--phone .plate {
+  max-width: 360px;
+}
+
+.shot--small .plate {
+  max-width: 300px;
+}
+
+.shot--centre .plate {
+  max-width: 380px;
+  margin-inline: auto;
+}
+
+.cap {
+  margin: 12px 0 0;
+  max-width: 52ch;
+  font-size: var(--t-cap);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink-3);
+}
+
+.sec--mid .cap {
+  margin-inline: auto;
+  text-align: center;
+}
+
+.anim .shot {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity var(--snap), transform var(--snap);
+}
+
+.anim .shot.in,
+.anim .shot--hero {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- the small typeset pieces ---------- */
+
+/* the add field's own colouring, in HTML type instead of described */
+.quote {
+  max-width: none;
+  margin: 0 0 24px;
+  padding: 16px;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-plate);
+  background: var(--card);
+  font-size: var(--t-lead);
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+.q-parsed {
+  color: var(--orange-text);
+}
+
+.caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  margin-left: 1px;
+  background: var(--red);
+  vertical-align: -0.18em;
+}
+
+/* the app's own tag chip: a colour it picked, on a tint of itself */
+.tag {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--purple) 12%, transparent);
+  color: var(--purple);
+  font-size: 0.94em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* three refusals, one plate, dotted rules between them: the app's row rule,
+   used here once and nowhere else on the page */
+.rows {
+  margin: 0 0 16px;
+  padding: 0;
+  max-width: 34ch;
+  border: 1px solid var(--hair);
+  border-radius: var(--r-plate);
+  background: var(--card);
+  list-style: none;
+}
+
+.rows li {
+  padding: 12px 16px;
+  font-weight: 600;
+}
+
+.rows li + li {
+  background-image: linear-gradient(to right, var(--hair) 0 1px, transparent 1px 3px);
+  background-size: 3px 1px;
+  background-repeat: repeat-x;
+  background-position: top left;
+}
+
+/* ---------- the closing dark band ---------- */
+
+.closing .sec {
+  padding-top: 0;
+}
+
+.closing .rule {
+  display: none;
+}
+
+.closing p {
+  max-width: 58ch;
+}
+
+.closing .last {
+  color: var(--ink-2);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 32px;
+  max-width: none;
+}
+
+/* ---------- footer ---------- */
+
+.foot {
+  padding-block: 56px 64px;
+}
+
+.foot .track {
+  position: relative;
+}
+
+.today {
+  margin-bottom: 16px;
+  font-size: var(--t-lead);
+  line-height: 1.45;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  font-size: var(--t-sub);
+  color: var(--ink-2);
+}
+
+.made {
+  font-size: var(--t-cap);
+  color: var(--ink-3);
+}
+
+/* the rail stops above the last lines, on a red dot, the way the day's last
+   row closes the card */
+.foot::before {
+  bottom: auto;
+  height: 32px;
+}
+
+.end {
+  position: absolute;
+  left: calc(var(--gap) * -1 - 4px);
+  top: -24px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+}
+
+/* ---------- 640px and up: the rail arrives, narrow ---------- */
+
+@media (min-width: 640px) {
+  :root {
+    --rail: 40px;
+    --gap: 24px;
+    --sec-gap: 80px;
+    --dip: 104px;
+  }
+
+  .mark--face {
+    font-size: 12px;
+  }
+
+  .hero {
+    padding-block: 88px 0;
+  }
+
+  .shot--hero .plate {
+    max-width: 380px;
+  }
+}
+
+/* ---------- 900px and up: the full two-track spine ---------- */
+
+@media (min-width: 900px) {
+  :root {
+    --rail: 64px;
+    --gap: 40px;
+    --sec-gap: 104px;
+    --dip: 132px;
+  }
+
+  .mark--face {
+    font-size: 14px;
+  }
+
+  .hero {
+    padding-block: 96px 0;
+  }
+
+  .hero .track {
+    grid-template-columns: minmax(0, 48%) minmax(0, 42%);
+    justify-content: space-between;
+    align-items: end;
+    gap: 40px;
+  }
+
+  .shot--hero {
+    justify-self: end;
+  }
+
+  .shot--hero .plate {
+    max-width: none;
+  }
+
+  /* under the heading: text one side, phone the other, alternating down the
+     page. The heading itself keeps the full track, so its glyph stays on the
+     rail and the spine never breaks. */
+  .pair {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    column-gap: 40px;
+    align-items: start;
+  }
+
+  .pair--flip {
+    grid-template-columns: 300px minmax(0, 1fr);
+  }
+
+  .pair--flip .body {
+    order: 2;
+  }
+
+  .pair--flip figure {
+    order: 1;
+  }
+
+  .pair figure {
+    margin-top: 0;
+  }
+
+  .pair .plate {
+    max-width: none;
+  }
+
+  /* the settings sheet stays the small thing it is */
+  .pair .shot--small .plate {
+    max-width: 240px;
+  }
+
+  .pair .cap {
+    max-width: none;
+  }
+}
+
+@media (min-width: 1100px) {
+  :root {
+    --sec-gap: 120px;
+  }
+
+  .pair {
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+
+  .pair--flip {
+    grid-template-columns: 340px minmax(0, 1fr);
+  }
+
+  /* the prose-only close takes the app's wide margin */
+  .closing .track {
+    padding-right: 40px;
+  }
+}
+
+/* ---------- under 640px: no rail, the glyph comes inline ---------- */
+
+@media (max-width: 639px) {
+  .band::before,
+  .now,
+  .end {
+    display: none;
+  }
+
+  .sec .head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  /* the face sits inline after the wordmark once the rail is gone */
+  .wordmark {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .kao {
+    order: 2;
+  }
+
+  .mark {
+    position: static;
+    flex-direction: row;
+    gap: 4px;
+    margin-top: calc(var(--t-section) * 0.42);
+    transform: none;
+  }
+
+  .hero .mark {
+    display: none;
+  }
+
+  .sec--mid .head {
+    justify-content: center;
+  }
+
+  .sec h2 {
+    max-width: none;
+  }
+}
+
+/* ---------- reduced motion: nothing moves, everything is already there ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .shot,
+  .anim .shot {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

@@ -1,1 +1,13 @@
-{ "name": "Peter Mei", "short_name": "Peter Mei", "icons": [ { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }, { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" } ], "theme_color": "#fffdf8", "background_color": "#fffdf8", "display": "browser" }
+{
+  "name": "Peter Mei",
+  "short_name": "Peter Mei",
+  "description": "Peter Mei is a high school senior in Michigan who makes software. volbase, Rin, Kyou and Market Station, and the Mac they run on.",
+  "start_url": "/",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "theme_color": "#fcf9f7",
+  "background_color": "#fcf9f7",
+  "display": "browser"
+}

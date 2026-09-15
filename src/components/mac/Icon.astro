@@ -4,9 +4,22 @@
    A 32 by 32 grid rendered as crisp SVG rects, so it is the same drawing at
    every size and doubles cleanly on the pixel-doubled desktop. Nothing here
    depends on a gradient or an id, so the same icon can appear in the
-   desktop, a window, a menu and the phone at once with nothing to collide. */
-import { pixSvg } from '../../data/pixels';
-interface Props { id: string; class?: string }
-const { id, class: cls } = Astro.props;
+   desktop, a window, a menu and the phone at once with nothing to collide.
+
+   Asked for size 16 it draws the icon's own small grid in a 16 unit viewBox,
+   so a menu row or a list row gets a drawing made for that size rather than
+   the big one shrunk to half a pixel per pixel. An icon with no small grid
+   keeps its 32.
+
+   With `use` the rects are not emitted at all: the svg points at a symbol the
+   page defined once, for an icon that appears a hundred times over. */
+import { pixSvg, pixSize } from '../../data/pixels';
+interface Props { id: string; class?: string; size?: 16 | 32; use?: boolean }
+const { id, class: cls, size = 32, use = false } = Astro.props;
+const n = pixSize(id, size);
+const small = size === 16;
+const box = `0 0 ${n} ${n}`;
 ---
-<svg class:list={['ico', `ico-${id}`, cls]} viewBox="0 0 32 32" shape-rendering="crispEdges" role="img" aria-hidden="true" set:html={pixSvg(id)} />
+{use
+  ? <svg class:list={['ico', `ico-${id}`, { 'ico-s': small }, cls]} viewBox={box} shape-rendering="crispEdges" role="img" aria-hidden="true"><use href={`#ico-${id}${n === 16 ? '-s' : ''}`} /></svg>
+  : <svg class:list={['ico', `ico-${id}`, { 'ico-s': small }, cls]} viewBox={box} shape-rendering="crispEdges" role="img" aria-hidden="true" set:html={pixSvg(id, n)} />}

@@ -1,10 +1,8 @@
 ---
-/* /work/<slug>: the same page, with that row open and scrolled to */
-import Home from '../../components/home/Home.astro';
-import { products } from '../../data/home';
+/* One address per product: /site/work/<slug>. This one still answers (WEB-004). */
+import { projects } from '../../data/site';
 export function getStaticPaths() {
-  return products.map((p) => ({ params: { slug: p.slug } }));
+  return projects.map((p) => ({ params: { slug: p.slug } }));
 }
-const { slug } = Astro.params;
+return Astro.redirect(`/site/work/${Astro.params.slug}`, 301);
 ---
-<Home open={slug as any} />

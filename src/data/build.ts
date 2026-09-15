@@ -29,12 +29,17 @@ function astroVersion(): string {
   }
 }
 
-/* everything under public/ is, within a rounding error, everything the
-   deployed site serves besides its own markup and scripts */
-function weigh(dir: string): number {
+/* public/ is what the deployed site serves besides its own markup and
+   scripts, minus the folders below. lab/ is gitignored, so it exists on this
+   machine and never on the deploy, and counting it would make a local build
+   report a bigger number than the real one. */
+const UNSHIPPED = new Set(['lab']);
+
+function weigh(dir: string, top = false): number {
   let total = 0;
   try {
     for (const name of readdirSync(dir)) {
+      if (top && UNSHIPPED.has(name)) continue;
       const p = join(dir, name);
       const s = statSync(p);
       if (s.isDirectory()) total += weigh(p);
@@ -52,5 +57,5 @@ export const build = {
   date: now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
   shortDate: now.toISOString().slice(0, 10),
   /* the site's files, in whole megabytes, photographs being most of it */
-  mb: Math.max(1, Math.round(weigh(join(process.cwd(), 'public')) / 1e6)),
+  mb: Math.max(1, Math.round(weigh(join(process.cwd(), 'public'), true) / 1e6)),
 };

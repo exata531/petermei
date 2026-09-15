@@ -1,0 +1,6 @@
+---
+/* Playground is the Mac now (Peter, 09-12). The old toys page is gone; the
+   nav's Playground link goes straight to /mac and this route follows it. */
+export const prerender = true;
+return Astro.redirect('/mac', 301);
+---

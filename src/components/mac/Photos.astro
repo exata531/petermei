@@ -30,7 +30,7 @@ const years = byYear();
     </button>
     <span class="fnd-h">Albums</span>
     {albums.map((a) => (
-      <button class="fnd-tab" type="button" data-ph-nav="album" data-ph-album={a.id} data-ph-blurb={a.blurb} title={a.place}>
+      <button class="fnd-tab" type="button" data-ph-nav="album" data-ph-album={a.id} title={a.place}>
         <span>{a.place}</span>
       </button>
     ))}
@@ -61,10 +61,8 @@ const years = byYear();
       <section class="pho-grp">
         <ul class="pho-grid" role="listbox" aria-label="All Photos">
           {photos.map((p) => (
-            <li role="option" aria-selected="false" data-ph-cell={p.i} data-place={p.place} data-day={p.date} data-month={p.month}>
-              <button class="pho-cell" type="button" tabindex={p.i === 0 ? 0 : -1} aria-label={`${p.alt}. ${p.place}, ${p.dayLabel}`}>
-                <img data-src={p.thumb} width={p.w} height={p.h} alt="" decoding="async" />
-              </button>
+            <li class="pho-cell" role="option" aria-selected="false" tabindex={p.i === 0 ? 0 : -1} aria-label={`${p.alt}. ${p.place}, ${p.dayLabel}`} data-ph-cell={p.i} data-place={p.place} data-day={p.date} data-month={p.month}>
+              <img data-src={p.thumb} width={p.w} height={p.h} alt="" decoding="async" />
             </li>
           ))}
         </ul>

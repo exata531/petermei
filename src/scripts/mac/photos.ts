@@ -97,9 +97,11 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
     if (vw === 'album' || vw === 'otd') {
       const t = document.createElement('div');
       t.className = 'pho-title';
-      t.innerHTML = `<h2></h2><p class="pho-blurb"></p><p></p>`;
+      /* an album header is its place and its count; the sentence under it went
+         (Peter, 09-13: no random text). On This Day keeps its one dated line. */
+      t.innerHTML = vw === 'otd' ? `<h2></h2><p class="pho-blurb"></p><p></p>` : `<h2></h2><p></p>`;
       t.firstElementChild!.textContent = vw === 'otd' ? 'On This Day' : albumPlace(album);
-      t.children[1].textContent = vw === 'otd' ? otdPick().label : albumBlurb(album);
+      if (vw === 'otd') t.children[1].textContent = otdPick().label;
       t.lastElementChild!.textContent = plural(subset.length);
       frag.appendChild(t);
     }
@@ -149,7 +151,6 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
         : `Nothing from ${MONTH_NAMES[m - 1]} yet, so here is ${MONTH_NAMES[best - 1]}.`,
     };
   };
-  const albumBlurb = (id: string) => $(`[data-ph-album="${id}"]`, el)?.dataset.phBlurb ?? '';
   const plural = (n: number) => `${n} ${n === 1 ? 'Photo' : 'Photos'}`;
 
   /* ── panes, modes, views ──────────────────────────────────────────── */
@@ -198,9 +199,9 @@ export function initPhotos(el: HTMLElement, data: PhotoRec[], hooks: { onTitle?:
       const on = Number(c.dataset.phCell) === i;
       c.setAttribute('aria-selected', String(on));
       c.classList.toggle('is-sel', on);
-      (c.firstElementChild as HTMLElement).tabIndex = on ? 0 : -1;
+      c.tabIndex = on ? 0 : -1;
     }
-    if (focus) (cellOf(i).firstElementChild as HTMLElement).focus({ preventScroll: true });
+    if (focus) cellOf(i).focus({ preventScroll: true });
     cellOf(i).scrollIntoView({ block: 'nearest' });
   }
   function columns() {

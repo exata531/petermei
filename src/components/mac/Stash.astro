@@ -5,28 +5,38 @@
    time and keeps whatever you typed into it when you close its window and open
    it again. With JavaScript off nothing moves anywhere and this file is the
    whole site: real headings, real links, no desktop. */
-import Volbase from '../scenes/Volbase.astro';
-import Rin from '../scenes/Rin.astro';
-import Kyou from '../scenes/Kyou.astro';
-import Market from '../scenes/Market.astro';
+import Navigator from '../scenes/Navigator.astro';
 import Icon from './Icon.astro';
 import Tri from './Tri.astro';
 import Photos from './Photos.astro';
 import Pictures from './Pictures.astro';
-import { apps, finder, readme, links, aboutPeter } from '../../data/apps';
+import { apps, finder, readme, links, aboutPeter, siteWindow } from '../../data/apps';
 import { build } from '../../data/build';
 import { trashItems } from '../../data/trash';
 import { photos } from '../../data/photos';
+import { pixSvg, pix16 } from '../../data/pixels';
+import { statSync } from 'node:fs';
+import { join } from 'node:path';
 
 /* what the scripts need to know about a photo, once, as JSON */
 const photoJson = JSON.stringify(photos.map((p) => ({ f: p.file, n: p.name, w: p.w, h: p.h, a: p.alt, p: p.place, d: p.dayLabel, m: p.month, ml: p.monthLabel })));
-const scenes = { volbase: Volbase, rin: Rin, kyou: Kyou, market: Market };
 
-/* what sits on the hard disk, in the order the Finder lists them by name */
+/* what sits on the hard disk, sorted by name the way the Finder sorts a
+   window viewed by Name: the column heading is underlined to say so, and the
+   rows have to agree with it */
 /* a document's size is its own text, measured; an application's is left
    blank rather than made up */
 const when = new Date(build.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 const kOf = (t: string[]) => `${Math.max(1, Math.ceil(new TextEncoder().encode(t.join('\n')).length / 1024))}K`;
+/* what is in the Trash, measured the way Pictures measures its photographs:
+   the size off the real file, the day it was thrown away without the time,
+   which the list's date column has no room for */
+const kb = (n: number) => `${Math.max(1, Math.round(n / 1000))} KB`;
+const trash = trashItems.map((t) => {
+  let bytes = 0;
+  try { bytes = statSync(join(process.cwd(), 'public', t.file)).size; } catch {}
+  return { ...t, size: bytes ? kb(bytes) : '–', day: t.date.replace(/,\s*\d{1,2}:\d{2}\s*[AP]M$/, '') };
+});
 const disk = [
   { open: 'textedit', icon: 'textedit', name: 'Read Me', kind: 'SimpleText document', size: kOf(readme) },
   ...finder.map((s) => ({ open: `doc-${s.id}`, icon: 'doc', name: s.file.replace(/\.txt$/, ''), kind: 'SimpleText document', size: kOf(s.text) })),
@@ -38,37 +48,54 @@ const disk = [
   { open: 'photos', icon: 'photos', name: 'Photos', kind: 'application program', size: '' },
   { open: 'terminal', icon: 'terminal', name: 'Terminal', kind: 'application program', size: '' },
   { open: 'github', icon: 'github', name: 'GitHub', kind: 'alias', size: '' },
-];
+].sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
 ---
 <div class="stash" data-stash>
+  {/* the picture icon, defined once: the rows in Pictures, under Macintosh HD
+      and in the Trash all point at these two symbols instead of each carrying
+      the drawing, which is a hundred copies of it otherwise */}
+  <svg class="ico-defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <symbol id="ico-pict" viewBox="0 0 32 32" set:html={pixSvg('pict')} />
+    <symbol id="ico-pict-s" viewBox="0 0 16 16" set:html={pixSvg('pict', 16)} />
+  </svg>
   <div class="stash-head">
     <h1>Peter Mei</h1>
-    <p>I am a senior at the school, outside Detroit, and I make software. This page is normally a Macintosh desktop you can click around in, and it needs JavaScript for that. Everything that would be on it is below.</p>
+    <p>I’m a senior in high school in Michigan and I make software. This page is normally a Macintosh desktop you can click around in, and it needs JavaScript for that. Everything that would be on it is below.</p>
     <p class="stash-note">The same things are also on a plain website: <a href="/site">petermei.com</a>.</p>
   </div>
 
-  {apps.map((a) => {
-    const Scene = a.scene ? scenes[a.scene] : null;
-    return (
-      <section class="stash-app" data-body={a.id} aria-label={a.name}>
-        <h2 class="stash-h">{a.label}</h2>
-        {a.about && <p class="stash-p">{a.about.line}</p>}
-        {a.about && <p class="stash-meta">{a.about.built} · {a.about.state}</p>}
-        {a.about?.link && <p><a href={a.about.link.href} rel="noopener">{a.about.link.label}</a></p>}
-        {Scene && (
-          <div class:list={['sbox', { 'is-flat': a.id === 'volbase' }]} data-fitbox>
-            <figure class="sfig" data-scene={a.scene} data-w={a.sw} data-h={a.sh}
-                    data-mw={a.mw} data-mh={a.mh} data-flat={a.id === 'volbase' ? '' : undefined}
-                    style={`--w:${a.sw}px;--h:${a.sh}px`}>
-              <div class="sframe" data-scene-root role="group" aria-label={`A working demo of ${a.label}`}>
-                <Scene />
-              </div>
-            </figure>
-          </div>
-        )}
-      </section>
-    );
-  })}
+  {apps.map((a) => (
+    <section class="stash-app" data-body={a.id} aria-label={a.label}>
+      <h2 class="stash-h">{a.label}</h2>
+      {a.about && <p class="stash-p">{a.about.line}</p>}
+      {a.about && <p class="stash-meta">{a.about.built} · {a.about.state}</p>}
+      {a.about?.link && <p><a href={a.about.link.href} rel="noopener">{a.about.link.label}</a></p>}
+      {a.site && (
+        <div class="sbox is-flat" data-fitbox>
+          <figure class="sfig" data-scene="nav" data-w={a.sw} data-h={a.sh}
+                  data-mw={a.mw} data-mh={a.mh} data-flat
+                  style={`--w:${a.sw}px;--h:${a.sh}px`}>
+            <div class="sframe" data-scene-root role="group" aria-label={`${a.label} on the web`}>
+              <Navigator id={a.id} title={a.title} site={a.site} />
+            </div>
+          </figure>
+        </div>
+      )}
+    </section>
+  ))}
+
+  {/* the plain website, in a browser window of its own */}
+  <section class="stash-app" data-body={siteWindow.id} aria-label={siteWindow.title}>
+    <h2 class="stash-h">{siteWindow.title}</h2>
+    <p><a href={siteWindow.site.start}>{siteWindow.title}</a></p>
+    <div class="sbox is-flat" data-fitbox>
+      <figure class="sfig" data-scene="nav" data-flat style="--w:1060px;--h:640px">
+        <div class="sframe" data-scene-root role="group" aria-label="petermei.com on the web">
+          <Navigator id={siteWindow.id} title={siteWindow.title} site={siteWindow.site} />
+        </div>
+      </figure>
+    </div>
+  </section>
 
   {/* the hard disk: a folder window of everything on this Macintosh */}
   <section class="stash-app" data-body="finder" aria-label="Macintosh HD">
@@ -80,28 +107,28 @@ const disk = [
         {disk.map((d, i) => (
           d.open === 'github' ? (
             <li class="fnd-row" role="option" aria-selected="false" tabindex={i === 0 ? 0 : -1} data-fnd-open="github" data-href={links.github}>
-              <span class="fnd-name"><span class="fnd-gut" /><span class="fnd-row-ico"><Icon id={d.icon} /></span><b><i>{d.name}</i></b></span>
+              <span class="fnd-name"><span class="fnd-gut" /><span class="fnd-row-ico"><Icon id={d.icon} /><Icon id={d.icon} size={16} /></span><b><i>{d.name}</i></b></span>
               <small>{d.size}</small><small>{d.kind}</small><small>{when}</small>
             </li>
           ) : d.kind === 'folder' ? (
             <Fragment>
-              <li class="fnd-row is-folder" role="option" aria-selected="false" tabindex={i === 0 ? 0 : -1} data-fnd-open={d.open} data-twirl={d.open}>
+              <li class="fnd-row is-folder" role="option" aria-selected="false" aria-expanded="false" tabindex={i === 0 ? 0 : -1} data-fnd-open={d.open} data-twirl={d.open}>
                 <span class="fnd-name">
-                  <button class="fnd-gut fnd-tri" type="button" aria-expanded="false" aria-label={`Contents of ${d.name}`}><Tri /></button>
-                  <span class="fnd-row-ico"><Icon id={d.icon} /></span><b>{d.name}</b>
+                  <span class="fnd-gut fnd-tri" aria-hidden="true"><Tri /></span>
+                  <span class="fnd-row-ico"><Icon id={d.icon} /><Icon id={d.icon} size={16} /></span><b>{d.name}</b>
                 </span>
                 <small>{d.size}</small><small>{d.kind}</small><small>{when}</small>
               </li>
               {photos.map((p) => (
                 <li class="fnd-row is-kid" role="option" aria-selected="false" tabindex={-1} data-kid={d.open} data-pic-open={p.i} aria-label={`${p.name}, ${p.alt}`} hidden>
-                  <span class="fnd-name"><span class="fnd-gut" /><span class="fnd-row-ico"><Icon id="pict" /></span><b>{p.name}</b></span>
+                  <span class="fnd-name"><span class="fnd-gut" /><span class="fnd-row-ico"><Icon id="pict" use /><Icon id="pict" use size={16} /></span><b>{p.name}</b></span>
                   <small>{p.size}</small><small>JPEG image</small><small>{p.shortDate}</small>
                 </li>
               ))}
             </Fragment>
           ) : (
             <li class="fnd-row" role="option" aria-selected="false" tabindex={i === 0 ? 0 : -1} data-fnd-open={d.open}>
-              <span class="fnd-name"><span class="fnd-gut" /><span class="fnd-row-ico"><Icon id={d.icon} /></span><b>{d.name}</b></span>
+              <span class="fnd-name"><span class="fnd-gut" /><span class="fnd-row-ico"><Icon id={d.icon} /><Icon id={d.icon} size={16} /></span><b>{d.name}</b></span>
               <small>{d.size}</small><small>{d.kind}</small><small>{when}</small>
             </li>
           )
@@ -131,7 +158,7 @@ const disk = [
 
   <section class="stash-app" data-body="photos" aria-label="Photos">
     <h2 class="stash-h">Photos</h2>
-    <p class="stash-p">Forty eight photographs I took, in the places on the labels.</p>
+    <p class="stash-p">{photos.length} photographs I took, in the places on the labels.</p>
     <Photos />
   </section>
 
@@ -144,16 +171,25 @@ const disk = [
 
   <section class="stash-app" data-body="trash" aria-label="Trash">
     <h2 class="stash-h">Trash</h2>
-    <div class="fnd">
+    {/* the Trash's list has its own column widths: every kind in it is "JPEG
+        image" and every date is one day, so those three columns are fixed at
+        what their text needs and the name takes the rest, the way the Finder
+        gave the slack to the name. The shared widths are cut for the disk,
+        whose Kind column has to hold "SimpleText document" */}
+    <div class="fnd" style="--cols: minmax(calc(90 * var(--u)), 1fr) calc(42 * var(--u)) calc(64 * var(--u)) calc(75 * var(--u))">
       <div class="fnd-head" aria-hidden="true"><span data-tr-status>{trashItems.length} items</span><span></span><span></span></div>
       <div class="fnd-pane is-on" data-tr-items>
+        <div class="fnd-cols pic-head" aria-hidden="true"><span>Name</span><span>Size</span><span>Kind</span><span>Last Modified</span></div>
         <ul class="fnd-rows pic-rows" role="listbox" aria-label="Trash">
-          {trashItems.map((t, i) => (
+          {trash.map((t, i) => (
             <li class="fnd-row pic-row" role="option" aria-selected="false" tabindex={i === 0 ? 0 : -1} data-tr={i} aria-label={`${t.name}, ${t.alt}`}>
               <span class="pic-name">
-                <span class="pic-ico"><Icon id="pict" /></span>
+                <span class="pic-ico"><Icon id="pict" use /><Icon id="pict" use size={16} /></span>
                 <b><span class="stem">{t.name.replace(/\.jpeg$/, '')}</span><span class="ext">.jpeg</span></b>
               </span>
+              <span class="pic-size">{t.size}</span>
+              <span class="pic-kind">{t.kind}</span>
+              <span class="pic-date">{t.day}</span>
             </li>
           ))}
         </ul>
@@ -184,7 +220,7 @@ const disk = [
         <span><b>Display</b> <span data-amc-display>this window</span></span>
         <span><b>Built</b> {build.date}</span>
       </div>
-      <p class="amc-secrets"><b data-amc-count>0</b> of <b>5</b> secrets found on this Macintosh.</p>
+      <p class="amc-secrets"><b data-amc-count>0</b> of <b data-amc-total>5</b> secrets found on this Macintosh.</p>
       <p class="amc-hint" data-amc-hint></p>
     </div>
   </section>
@@ -225,6 +261,11 @@ const disk = [
   {['finder', 'hd', 'volbase', 'rin', 'kyou', 'market', 'photos', 'textedit', 'trash', 'trash-full', 'github', 'settings', 'folder', 'doc', 'safari', 'terminal', 'stickies', 'caution', 'stop', 'note', 'mac', 'happy', 'app', 'pict', 'peter'].map((id) => (
     <template data-icon={id}><Icon id={id} /></template>
   ))}
+  {/* the same, at sixteen, for a menu row, the Application menu and a Find
+      File row: every icon that has a small drawing */}
+  {Object.keys(pix16).map((id) => (
+    <template data-icon-s={id}><Icon id={id} size={16} /></template>
+  ))}
 </div>
 
 <style is:global>
@@ -232,6 +273,8 @@ const disk = [
      wider than its track falls back to start alignment to avoid clipping the
      far edge, which parks a scaled-down demo off to one side */
   .sbox { position: relative; width: 100%; height: 100%; overflow: hidden; }
+  /* the symbol sheet takes no room and is never seen itself */
+  .ico-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
   .sfig {
     position: absolute; left: 50%; top: 50%; margin: 0;
     width: var(--w); height: var(--h);
@@ -239,6 +282,6 @@ const disk = [
   }
   .sframe {
     position: absolute; inset: 0; overflow: hidden; isolation: isolate;
-    background: var(--slate); color: var(--slate-fg);
+    background: var(--paper); color: var(--ink);
   }
 </style>

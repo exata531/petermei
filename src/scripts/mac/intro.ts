@@ -1,11 +1,12 @@
 /* The landing, the way in, and the ways out.
 
    The first thing a fresh visitor sees is a white page with a drawn compact
-   Macintosh on it, and inside its screen the real desktop, live and scaled down: what
-   is in the picture is exactly what is about to fill the window. The bar
-   under it is honest: it waits for the fonts, the desktop's pictures and one
-   painted frame, never less than a moment and never longer than a breath.
-   Then the screen becomes a button.
+   Macintosh on it, and inside its screen the real desktop, live and scaled
+   down: what is in the picture is exactly what is about to fill the window.
+   The bar under it is honest: it waits for the fonts and one painted frame,
+   never less than a moment and never longer than a breath, and it fills in
+   steps on that clock without ever getting ahead of the work. Then the
+   screen becomes a button.
 
    The click is a camera move. The desktop grows from the screen's rectangle
    to the whole viewport and the picture around it grows past the edges and
@@ -13,12 +14,21 @@
    nothing is left but the real desktop at one to one with every transform
    gone.
 
+   Over the move the machine boots the way a Macintosh did, in beats: the
+   Happy Mac on the grey screen, then "Welcome to Macintosh." in its box,
+   then the extensions marching in along the bottom one at a time, then the
+   desktop. Each beat is drawn in one frame and left there; about two
+   seconds end to end, a click skips it, and a phone or reduced motion gets
+   the desktop straight away.
+
    Every power item in the kaomoji menu runs the same move backwards, with
-   the flavour a Mac gives it. Shut Down blanks the screen first and lands
-   with it off; Sleep dims it and lands with it dark; Restart blanks, lands
-   off, and comes back in on its own after a moment; Lock Screen and Log Out
-   leave with the desktop still showing. The black is a layer inside the
-   machine, so it scales with the screen instead of covering the paper.
+   the flavour a Mac gives it. Shut Down clears the desktop, leaves the one
+   line a Mac without a soft switch left lit, then blanks the screen and
+   lands with it off; Sleep dims it and lands with it dark; Restart blanks,
+   lands off, lifts the black on the Happy Mac and boots back in on its own;
+   Lock Screen leaves with the desktop still showing. The black
+   and the grey are layers inside the machine, so they scale with the screen
+   instead of covering the paper.
 
    A phone gets none of the camera move. Drawing a phone inside a phone
    spends the whole screen saying something the visitor is already holding,
@@ -27,8 +37,11 @@
    way an app opens on iOS, growing out of the point the finger touched.
 
    Once entered, the landing stays out of the way for the rest of the tab
-   session; Shut Down, Restart and Log Out end that, Sleep and Lock Screen
-   keep it. With reduced motion every move is a short crossfade. */
+   session; Shut Down and Restart end that, Sleep and Lock Screen keep
+   it. With reduced motion every move is a short crossfade. */
+/* the words are imported under another name: `cover` is already what this
+   file calls the phone-shaped landing, and the two collided (09-15) */
+import { cover as words, cue as coverCue } from '../../data/cover';
 import { compact } from './devices';
 import { reduced } from './motion';
 
@@ -42,30 +55,44 @@ const ZOOM_EASE = 'steps(5, end)';
 const FADE = 300;
 const FLOOR = 600;
 const CAP = 2500;
-/* how long a restart leaves the screen off before it comes back on */
-const BOOT = 1000;
+/* the bar fills in this many steps: a drawn bar moved in chunks, not pixels */
+const STEPS = 12;
+/* the boot, in beats from the click: the Happy Mac holds, the box replaces
+   it, the extensions march in this far apart, and the desktop paints */
+const HAPPY = 600;
+const MARCH = 900;
+const STRIDE = 200;
+const PAINT = 1900;
+/* how long a restart holds the Happy Mac in the picture before the camera
+   moves back in and the rest of the boot follows */
+const BOOT = 400;
+/* the shutdown line stays lit about this long before the screen goes black */
+const SAFE = 1000;
 /* the blank: a Mac's screen goes black in about this long */
 const BLANK = 400;
 const DIM = 600;
 const WAKE = 260;
 
-export type Power = 'sleep' | 'restart' | 'shutdown' | 'logout' | 'lock';
+export type Power = 'sleep' | 'restart' | 'shutdown' | 'lock';
 export type Intro = { readonly active: boolean; power(kind: Power): void };
 
 type Hooks = { onEnter?: () => void; beforeLeave?: (kind: Power) => void; onLeave?: (kind: Power) => void };
 
 /* what the screen in the picture is doing, and the caption under it. The
-   phone has no picture and no screen to point at, so its button says the
-   same thing about itself */
+   caption points at the drawn screen, so it only ever shows where there is
+   one. The phone's button carries the verb on its own: a label is the name
+   of what happens, not an instruction to press the thing you are reading,
+   and it is the same word the screen's own name uses (WEB-105). The button
+   ships with that word in the HTML, so dressing it moves nothing (WEB-062).
+   The words themselves are in src/data/cover.ts, which is the one place to
+   change what this page says. */
 type Screen = 'on' | 'off' | 'asleep';
-const CUE: Record<Screen, { text: (tap: boolean) => string; verb: string; tap: (tap: boolean) => string }> = {
-  on: { text: (t) => `${t ? 'Tap' : 'Click'} the screen to have a look around.`, verb: 'Look around', tap: (t) => `${t ? 'Tap' : 'Click'} to have a look around` },
-  off: { text: (t) => `${t ? 'Tap' : 'Click'} the screen to turn it on.`, verb: 'Turn on', tap: (t) => `${t ? 'Tap' : 'Click'} to turn it on` },
-  asleep: { text: (t) => `${t ? 'Tap' : 'Click'} the screen to wake it.`, verb: 'Wake', tap: (t) => `${t ? 'Tap' : 'Click'} to wake it` },
-};
-/* the line under his name says which machine the visitor is holding */
-const LEDE = (phone: boolean) =>
-  `I am a senior in high school and I make software. Everything I have built so far is on this ${phone ? 'phone' : 'Mac'}, so ${phone ? 'tap' : 'click'} around.`;
+
+/* what the grey screen is showing, or nothing. 'idle' is the grey itself
+   with nothing on it: a Macintosh sitting across the room is not showing you
+   its desktop at readable size, and drawing the live one in there made the
+   picture look like a screenshot of a screenshot (Peter, 09-15). */
+type Stage = 'idle' | 'happy' | 'welcome' | 'safe' | null;
 
 export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hooks = {}): Intro {
   if (!land) { mac.classList.remove('is-pending'); return { get active() { return false; }, power() {} }; }
@@ -78,12 +105,13 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
   const fill = $('[data-land-fill]');
   const bar = $('[data-land-bar]');
   const cue = $('[data-land-cue-text]');
-  const lede = $('.land-line');
   const blank = mac.querySelector<HTMLElement>('[data-mac-blank]')!;
+  const veil = mac.querySelector<HTMLElement>('[data-welcome]');
+  const exts = [...mac.querySelectorAll<HTMLElement>('[data-welcome-ext] .ico')];
   const phoneMq = matchMedia('(max-width: 767px)');
   const touchMq = matchMedia('(hover: none)');
   /* a narrow window is a phone whatever the pointer says it is, so the verb in
-     the cue and the verb on the button never disagree with the line above them */
+     the cue never disagrees with the line above it */
   const tapping = () => touchMq.matches || phoneMq.matches;
   /* An iMac's screen is landscape. Sizing the drawn one to the visitor's own
      window is what keeps the live desktop inside it at one to one, so a
@@ -95,6 +123,13 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
   const cover = () => phoneMq.matches || innerWidth / innerHeight < MIN_AR;
   const enterBtn = () => (cover() ? tapBtn : deskBtn);
   const ms = (n: number) => (reduced() ? Math.min(n, 80) : n);
+  /* the grey screen and its beats belong to the drawn machine: a phone has no
+     boot to watch and reduced motion gets none of it */
+  const staged = () => !!veil && !cover() && !reduced();
+  /* the machine is drawn and sitting in the room, so its screen is grey.
+     Reduced motion still gets this: a still screen is not motion. */
+  const drawnMac = () => !!veil && !cover();
+  const rest = () => { if (drawnMac()) stage('idle'); };
 
   let state: 'off' | 'loading' | 'ready' | 'moving' = 'off';
   let screen: Screen = 'on';
@@ -105,12 +140,15 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
   let tap: { x: number; y: number } | null = null;
   let anims: Animation[] = [];
   let blankAnim: Animation | null = null;
+  let bootTimers: number[] = [];
+  let unskip: (() => void) | null = null;
 
   /* redraw the machine when the window's shape has changed enough to show */
   function draw(aspect: number) {
     const d = compact(aspect);
     host.style.setProperty('--ar', (d.vbW / d.vbH).toFixed(4));
-    host.querySelector('svg')!.outerHTML = d.svg;
+    /* the machine is the direct child; the room's drawing sits in a div before it */
+    host.querySelector(':scope > svg')!.outerHTML = d.svg;
     const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(3)}%`;
     deskBtn.style.left = pct(d.screen.x, d.vbW);
     deskBtn.style.top = pct(d.screen.y, d.vbH);
@@ -149,6 +187,10 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     for (const v of ['--fx', '--fy', '--fk', '--sr']) mac.style.removeProperty(v);
   }
 
+  /* the picture only moves while the machine is at rest in it: mid-move the
+     keyframes already hold the numbers, and once in there is no picture */
+  const still = () => state === 'loading' || state === 'ready';
+
   /* the machine at rest, out of reach, behind the paper */
   function frame() {
     mac.classList.add('is-far');
@@ -164,10 +206,9 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
   function setScreen(s: Screen) {
     screen = s;
     land.classList.toggle('is-dark', s !== 'on');
-    cue.textContent = CUE[s].text(tapping());
-    lede.textContent = LEDE(phoneMq.matches);
-    deskBtn.setAttribute('aria-label', `${CUE[s].verb} the Mac`);
-    tapBtn.textContent = CUE[s].tap(tapping());
+    cue.textContent = coverCue(s, tapping());
+    deskBtn.setAttribute('aria-label', `${words[s].verb} the Mac`);
+    tapBtn.textContent = words[s].verb;
   }
 
   /* the black over the screen, faded in or out; the resting value is set at
@@ -185,6 +226,44 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     });
   }
 
+  /* the grey screen, showing one thing, or taken down with the extensions
+     put back so the next boot marches them in again */
+  function stage(s: Stage) {
+    if (!veil) return;
+    if (!s) {
+      veil.hidden = true;
+      delete veil.dataset.stage;
+      for (const e of exts) e.classList.remove('is-on');
+      return;
+    }
+    veil.dataset.stage = s;
+    veil.hidden = false;
+  }
+
+  /* the boot, on its own clock beside the camera move. A click on the grey
+     screen, or Escape, ends it early and the desktop is simply there */
+  function boot() {
+    if (!staged()) return;
+    endBoot();
+    stage('happy');
+    const at = (t: number, f: () => void) => { bootTimers.push(setTimeout(f, t)); };
+    at(HAPPY, () => stage('welcome'));
+    exts.forEach((e, i) => at(MARCH + i * STRIDE, () => e.classList.add('is-on')));
+    at(PAINT, endBoot);
+    const skip = (e: Event) => { if (e instanceof KeyboardEvent && e.key !== 'Escape') return; endBoot(); };
+    veil!.addEventListener('pointerdown', skip);
+    addEventListener('keydown', skip);
+    unskip = () => { veil!.removeEventListener('pointerdown', skip); removeEventListener('keydown', skip); };
+  }
+
+  function endBoot() {
+    for (const t of bootTimers) clearTimeout(t);
+    bootTimers = [];
+    unskip?.();
+    unskip = null;
+    stage(null);
+  }
+
   function ready() {
     if (state !== 'loading') return;
     state = 'ready';
@@ -192,27 +271,46 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     land.classList.add('is-ready');
     land.setAttribute('aria-busy', 'false');
     for (const b of [deskBtn, tapBtn]) b.disabled = false;
+    /* a link that names an app (/mac?open=kyou) already said what it wants,
+       so the landing shows itself and then opens on its own; every other
+       arrival waits for the visitor to click the screen */
+    let wanted = false;
+    try { wanted = new URLSearchParams(location.search).has('open'); } catch {}
+    if (wanted) setTimeout(() => { if (state === 'ready') enter(); }, reduced() ? 0 : 260);
   }
 
-  /* the honest bar: fonts, the desktop's pictures, one painted frame */
+  /* the honest bar: the fonts and one painted frame. The fill walks the floor
+     in steps and is clamped to what has actually finished, so it reaches the
+     end on the frame the screen becomes a button and never before the work */
   function load() {
     state = 'loading';
     document.body.classList.add('is-landing');
     mac.inert = true;
     frame();
     mac.classList.remove('is-pending');
-    const imgs = [...mac.querySelectorAll<HTMLImageElement>('.pad img')];
+    const fonts = (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts?.ready ?? Promise.resolve();
     const jobs: Promise<unknown>[] = [
-      (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts?.ready ?? Promise.resolve(),
-      ...imgs.map((i) => (i.decode ? i.decode() : Promise.resolve()).catch(() => {})),
+      fonts,
       new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))),
     ];
     let done = 0;
-    jobs.forEach((p) => p.then(() => { done++; if (state === 'loading') setProgress(done / jobs.length); }));
+    jobs.forEach((p) => p.then(() => { done++; }));
+    const t0 = performance.now();
+    let shown = -1;
+    const tick = () => {
+      if (state !== 'loading') return;
+      const p = Math.floor(Math.min((performance.now() - t0) / FLOOR, done / jobs.length) * STEPS) / STEPS;
+      if (p !== shown) { shown = p; setProgress(p); }
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
     const settled = Promise.all(jobs);
     const floor = new Promise((r) => setTimeout(r, FLOOR));
     const cap = new Promise((r) => setTimeout(r, CAP));
-    Promise.race([Promise.all([settled, floor]), cap]).then(ready);
+    /* the lede can wrap to one more line once the fonts are in, and the column
+       grows under the machine; the picture is measured again for it */
+    fonts.then(() => { if (still()) place(); });
+    Promise.race([Promise.all([settled, floor]), cap]).then(() => { if (still()) place(); ready(); });
   }
 
   function stopAnims() {
@@ -235,17 +333,14 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
   const far = () => `translate(${fx.toFixed(2)}px, ${fy.toFixed(2)}px) scale(${k.toFixed(5)})`;
   const home = 'translate(0px, 0px) scale(1)';
 
-  /* the way in: the camera moves from the picture to the desktop. A visitor's
-     click is remembered for the tab; a restart's own return is not */
-  function go(remember: boolean) {
+  /* the way in: the camera moves from the picture to the desktop while the
+     machine boots */
+  function go() {
     state = 'moving';
     document.body.classList.remove('is-land-hover');
-    /* "Welcome to Macintosh." while the camera moves in, then the desktop */
-    const wel = mac.querySelector<HTMLElement>('[data-welcome]');
-    if (wel && !cover() && !reduced()) {
-      wel.hidden = false;
-      setTimeout(() => { wel.hidden = true; }, DUR + 700);
-    }
+    /* the grey comes down with the camera: either the boot plays over it, or
+       there is no boot to play and it simply goes */
+    if (staged()) boot(); else stage(null);
     land.classList.add('is-moving');
     mac.classList.add('is-moving');
     const finish = () => {
@@ -263,7 +358,6 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
       land.classList.remove('is-moving', 'is-blank');
       document.body.classList.remove('is-landing');
       document.documentElement.classList.add('in');
-      try { if (remember) sessionStorage.setItem('mac-in', '1'); } catch {}
       setScreen('on');
       state = 'off';
       tap = null;
@@ -309,16 +403,17 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
   }
 
   /* the screen, clicked: a dark screen brightens while the camera starts
-     moving, no boot sequence, and the desktop is there */
+     moving and the boot begins */
   function enter() {
     if (state !== 'ready') return;
     try { sessionStorage.removeItem('mac-power'); } catch {}
     if (screen !== 'on') blankTo(false, ms(WAKE));
-    go(true);
+    go();
   }
 
   /* the way out: the camera moves from the desktop back into the picture,
-     which is put back on the page first */
+     which is put back on the page first. The screen is not a button again
+     until the machine is at rest, so a restart's off window takes no clicks */
   function leave(kind: Power, after: Screen) {
     document.documentElement.classList.remove('in');
     document.body.appendChild(land);
@@ -328,7 +423,7 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     land.classList.remove('is-moving');
     land.setAttribute('aria-busy', 'false');
     setProgress(1);
-    for (const b of [deskBtn, tapBtn]) b.disabled = false;
+    for (const b of [deskBtn, tapBtn]) b.disabled = true;
     state = 'moving';
     document.body.classList.add('is-landing');
     mac.inert = true;
@@ -343,12 +438,17 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
       col.style.transform = '';
       land.style.opacity = '';
       stopAnims();
+      rest();
       if (kind === 'restart') {
-        /* off for a moment, then on and back in, all from the one click */
-        setTimeout(() => { blankTo(false, ms(WAKE)); go(false); }, BOOT);
+        /* the black lifts on the Happy Mac in the picture, it holds a moment,
+           and the boot carries on from there with the camera moving back in */
+        if (staged()) stage('happy');
+        blankTo(false, ms(WAKE));
+        setTimeout(() => go(), BOOT);
         return;
       }
       state = 'ready';
+      for (const b of [deskBtn, tapBtn]) b.disabled = false;
       enterBtn().focus({ preventScroll: true });
       hooks.onLeave?.(kind);
     };
@@ -394,15 +494,21 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     if (state !== 'off') return;
     state = 'moving';
     mac.inert = true;
+    endBoot();
     hooks.beforeLeave?.(kind);
     try {
-      if (kind === 'shutdown' || kind === 'restart' || kind === 'logout') sessionStorage.removeItem('mac-in');
+      if (kind === 'shutdown' || kind === 'restart') sessionStorage.removeItem('mac-in');
       if (kind === 'shutdown') sessionStorage.setItem('mac-power', 'off');
       else sessionStorage.removeItem('mac-power');
     } catch {}
     const after: Screen = kind === 'sleep' ? 'asleep' : kind === 'shutdown' || kind === 'restart' ? 'off' : 'on';
     const fade = kind === 'sleep' ? DIM : after === 'off' ? BLANK : 0;
-    blankTo(after !== 'on', ms(fade)).then(() => leave(kind, after));
+    /* a Mac without a soft switch cleared the desktop and left one line lit
+       until the switch was flipped; here the screen going black is the flip */
+    const safe = kind === 'shutdown' && staged()
+      ? new Promise<void>((r) => { stage('safe'); setTimeout(r, SAFE); })
+      : Promise.resolve();
+    safe.then(() => blankTo(after !== 'on', ms(fade))).then(() => { stage(null); leave(kind, after); });
   }
 
   /* the screen reads as a button: it lifts and brightens under the pointer */
@@ -416,18 +522,25 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     enter();
   });
 
-  /* the window changed shape: the picture follows, and the desktop with it */
+  /* the window changed shape, or the column under the machine did (the lede
+     rewrapping once the fonts are in is enough to move it): the picture
+     follows, and the desktop with it */
   let raf = 0;
-  addEventListener('resize', () => {
-    if (state !== 'loading' && state !== 'ready') return;
+  const follow = () => {
+    if (!still()) return;
     cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(place);
-  });
+    raf = requestAnimationFrame(() => { if (still()) place(); });
+  };
+  addEventListener('resize', follow);
+  if ('ResizeObserver' in window) new ResizeObserver(follow).observe(col);
   /* crossing the breakpoint swaps the whole landing: the words, and whether
      there is a machine in the picture at all */
   for (const mq of [phoneMq, touchMq]) mq.addEventListener('change', () => {
     if (state !== 'loading' && state !== 'ready' && state !== 'off') return;
     setScreen(screen);
+    /* crossing into a cover takes the drawn machine away, so the grey it was
+       wearing has to go with it */
+    if (state !== 'off') { if (drawnMac()) rest(); else stage(null); }
     if (state !== 'off') frame();
   });
 
@@ -440,6 +553,7 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     try { off = sessionStorage.getItem('mac-power') === 'off'; } catch {}
     if (off) { blank.style.opacity = '1'; setScreen('off'); }
     else setScreen('on');
+    rest();
     load();
   }
 

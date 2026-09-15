@@ -26,6 +26,7 @@ export type WinOpts = {
   minH?: number;         // minimum height
   klass?: string;
   tool?: HTMLElement;    // a strip of controls under the title bar
+  scroller?: HTMLElement; // the element the app scrolls, when it is not the pane
   side?: boolean;        // kept for callers; a System 7 window has no sidebar
   fixed?: boolean;       // an About window: no resize, no zoom
   zoomOnly?: boolean;    // Quick Look: no resize, zoom is live
@@ -58,15 +59,17 @@ export type Win = {
 /* the geometry, in CSS pixels, kept in step with the tokens (one unit is 2px) */
 const U = 2;
 const BAR = 20 * U;      // the menu bar
-const TBAR = 19 * U;     // a title bar, its bottom line included
+const TBAR = 20 * U;     // a title bar, its bottom line included
 const KEEP = 60 * U;     // how much of a title bar must stay on screen, sideways
 const ZOOM_STEPS = 8;
 const ZOOM_TICK = 14;
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-/* the dotted rectangles: a fixed layer, a few outlines at a time */
-function zoomRects(a: Rect, b: Rect, done: () => void) {
+/* the dotted rectangles: a fixed layer, a few outlines at a time. Exported
+   because a disk mounting on the desktop is drawn in with the same eight
+   frames a window opens with, and there should be one of them. */
+export function zoomRects(a: Rect, b: Rect, done: () => void) {
   if (reduced()) { done(); return; }
   const layer = document.createElement('div');
   layer.className = 'zoom-rects';
@@ -103,23 +106,39 @@ export class Desk {
     addEventListener('resize', () => this.wins.forEach((w) => { this.clamp(w); this.paint(w); }));
   }
 
+  /* the top of the pile, whether or not it is active */
   get front() {
     const vis = this.wins.filter((w) => !w.minimized);
     return vis.length ? vis.reduce((a, b) => (a.z > b.z ? a : b)) : null;
   }
+  /* the window taking the keyboard and the menu bar: the top of the pile,
+     unless the desktop or a note was clicked since, in which case nothing */
+  private blurred = false;
+  get active() { return this.blurred ? null : this.front; }
   get visible() { return this.wins.filter((w) => !w.minimized); }
   has(id: string) { return this.wins.some((w) => w.id === id); }
   get(id: string) { return this.wins.find((w) => w.id === id); }
   barH(_win: Win) { return TBAR; }
 
-  /* where a new window lands: a little down and right of the last one, the
-     way the Finder staggered them, starting near the top left */
+  /* where a new window lands: the first one near the middle of the screen,
+     every one after it a step down and right of the last, the way the Finder
+     staggered them, and back at the first one's corner once the next step
+     would run off the screen */
+  private origin: { x: number; y: number } | null = null;
   private place(w: number, h: number) {
-    const n = this.wins.length;
     const vw = innerWidth, vh = this.dockTop();
     const snap = (v: number) => Math.round(v / U) * U;
-    const x = Math.max(4 * U, snap(Math.min((vw - w) / 2 + (n % 5) * 12 * U - 24 * U, vw - w - 4 * U)));
-    const y = Math.max(BAR + 4 * U, snap(Math.min((vh + BAR - h) / 2 - 10 * U + (n % 5) * 10 * U, vh - h - 4 * U)));
+    const inside = (x: number, y: number) => ({
+      x: Math.max(4 * U, snap(Math.min(x, vw - w - 4 * U))),
+      y: Math.max(BAR + 4 * U, snap(Math.min(y, vh - h - 4 * U))),
+    });
+    const last = this.wins[this.wins.length - 1];
+    if (!last || !this.origin) {
+      this.origin = inside((vw - w) / 2 - 24 * U, (vh + BAR - h) / 2 - 10 * U);
+      return { ...this.origin };
+    }
+    const x = snap(last.x) + 10 * U, y = snap(last.y) + 10 * U;
+    if (x + w > vw - 4 * U || y + h > vh - 4 * U) return inside(this.origin.x, this.origin.y);
     return { x, y };
   }
 
@@ -195,8 +214,13 @@ export class Desk {
     }
     this.root.appendChild(el);
 
+    /* the floor a resize stops at: the window's own chrome, the two arrows
+       and room for the scroll box between them. Measured rather than
+       guessed, because a toolbar adds a row and a narrow one wraps into two. */
+    const floor = () => (bars ? el.offsetHeight - pane.offsetHeight + 48 * U : 60 * U);
+
     const win: Win = {
-      id: o.id, el, bar, x, y, w, h, min: o.min ?? 130 * U, minH: o.minH ?? 60 * U,
+      id: o.id, el, bar, x, y, w, h, min: o.min ?? 130 * U, minH: o.minH ?? floor(),
       from: from
         ? { x: from.left, y: from.top, w: from.width, h: from.height }
         : { x: x + w / 2 - 16 * U, y: y + h / 2 - 16 * U, w: 32 * U, h: 32 * U },
@@ -217,8 +241,11 @@ export class Desk {
     });
     this.wireFocus(win);
     this.drag(win);
-    if (bars) this.scrollbars(win, pane);
-    if (!o.fixed && !o.zoomOnly) this.resize(win);
+    if (bars) this.scrollbars(win, o.scroller ?? pane);
+    if (!o.fixed && !o.zoomOnly) {
+      this.resize(win);
+      if (o.minH == null) el.addEventListener('win:resize', () => { if (!win.shaded) win.minH = floor(); });
+    }
     this.focus(win);
     this.paint(win);
 
@@ -272,13 +299,16 @@ export class Desk {
       win.z = ++this.z;
       win.el.style.zIndex = String(win.z);
     }
+    this.blurred = false;
     this.wins.forEach((w) => w.el.classList.toggle('is-front', w === win));
     win.opts.onFocus?.();
     this.onChange(this.front);
   }
 
-  /* nobody in front: the desktop was clicked */
+  /* nobody in front: the desktop was clicked. The pile keeps its order; the
+     top window just stops being the active one. */
   blur() {
+    this.blurred = true;
     this.wins.forEach((w) => w.el.classList.remove('is-front'));
     this.onChange(null);
   }
@@ -295,16 +325,21 @@ export class Desk {
     if (this.wins.indexOf(win) < 0) return;
     win.el.style.visibility = 'hidden';
     win.el.style.pointerEvents = 'none';
-    const here = { x: win.x, y: win.y, w: win.w, h: win.shaded ? TBAR : win.h };
+    const here = { x: win.x, y: win.y, w: win.w, h: this.tall(win) };
     zoomRects(here, win.from, () => this.reap(win));
   }
 
-  /* WindowShade: the body rolls up, the bar stays where it is */
+  /* how tall a window is drawn: a shaded one is as tall as the sheet makes
+     its bar, frame included, so it is read off the element */
+  private tall(win: Win) { return win.shaded ? win.el.offsetHeight : win.h; }
+
+  /* WindowShade: the body rolls up, the bar stays where it is. The height is
+     the sheet's to set, so the bar is not squeezed against its own frame. */
   minimize(win: Win) {
     if (win.shaded || win.opts.fixed) return;
     win.shaded = true;
     win.el.classList.add('is-shade');
-    win.el.style.height = `${TBAR}px`;
+    win.el.style.height = '';
     win.opts.onMin?.();
     this.focus(win);
   }
@@ -357,7 +392,7 @@ export class Desk {
 
   private size(win: Win) {
     win.el.style.width = `${win.w}px`;
-    win.el.style.height = `${win.shaded ? TBAR : win.h}px`;
+    win.el.style.height = win.shaded ? '' : `${win.h}px`;
     win.el.dispatchEvent(new CustomEvent('win:resize', { bubbles: false }));
     win.repaintBars?.();
   }
@@ -384,11 +419,12 @@ export class Desk {
 
   /* The drawn scroll bars.
 
-     The pane scrolls the way any element does, by wheel, by keyboard, by an
-     app calling scrollIntoView; these read it every time it moves and lay the
-     thumb out over the track. Driving it works the other way: an arrow scrolls
-     a line and keeps going while held, the track pages, the thumb drags. With
-     nothing to scroll the bar loses its dither and its thumb. */
+     The pane, or whatever element inside it the app actually scrolls, moves
+     the way any element does, by wheel, by keyboard, by an app calling
+     scrollIntoView; these read it every time it moves and lay the scroll box
+     out over the track. Driving it works the other way: an arrow scrolls a
+     line and keeps going while held, the track pages, the box drags. With
+     nothing to scroll the bar loses its dither and its box. */
   private scrollbars(win: Win, pane: HTMLElement) {
     const LINE = 16 * U;
     const bars = [...win.el.querySelectorAll<HTMLElement>('[data-sb]')];
@@ -400,13 +436,16 @@ export class Desk {
         const thumb = bar.querySelector<HTMLElement>('[data-sb-thumb]')!;
         const size = v ? pane.clientHeight : pane.clientWidth;
         const full = v ? pane.scrollHeight : pane.scrollWidth;
-        const live = full - size > 1;
+        /* a few units of padding hanging off the foot of a page is not a
+           document to scroll; half a line of text is */
+        const live = full - size >= 8 * U;
         bar.classList.toggle('is-live', live);
         if (!live) continue;
         const room = v ? track.clientHeight : track.clientWidth;
-        /* the thumb is as much of the track as the window is of the document,
-           never smaller than a square one */
-        const len = Math.max(16 * U, Math.round((size / full) * room));
+        /* the scroll box is a square that only moves: System 7 said where you
+           were, never how much there was. A box sized to the document came
+           with the Appearance Manager in 8.5. */
+        const len = 16 * U;
         const at = Math.round(((v ? pane.scrollTop : pane.scrollLeft) / (full - size)) * (room - len));
         if (v) { thumb.style.top = `${at}px`; thumb.style.height = `${len}px`; }
         else { thumb.style.left = `${at}px`; thumb.style.width = `${len}px`; }
@@ -523,12 +562,12 @@ export class Desk {
         win.el.classList.add('is-drag');
         document.body.classList.add('is-dragging');
         this.dragging = win;
-        box = this.outline({ x: win.x, y: win.y, w: win.w, h: win.shaded ? TBAR : win.h });
+        box = this.outline({ x: win.x, y: win.y, w: win.w, h: this.tall(win) });
       }
       nx = Math.min(Math.max(KEEP - win.w, ox + (e.clientX - px)), innerWidth - KEEP);
       /* the menu bar is a wall */
       ny = Math.min(Math.max(BAR, oy + (e.clientY - py)), this.dockTop() - TBAR);
-      if (box) this.placeOutline(box, { x: nx, y: ny, w: win.w, h: win.shaded ? TBAR : win.h });
+      if (box) this.placeOutline(box, { x: nx, y: ny, w: win.w, h: this.tall(win) });
     };
 
     const up = (e: PointerEvent) => {

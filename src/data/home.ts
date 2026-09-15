@@ -44,12 +44,12 @@ export const products: Product[] = [
     name: 'volbase',
     hue: 'var(--vb)',
     kicker: 'a marketplace, live',
-    headline: 'volbase finds volunteer work near you.',
+    headline: 'volbase lists volunteer work, closest first.',
     blurb: 'Organizations post volunteer, internship, and summer program openings, and students apply to the ones closest to them. It is live at volbase.app with real users.',
     study: [
       'volbase is a marketplace. Organizations post volunteer, internship, and summer program openings, and students apply to them, sorted by distance. I built it on Next.js after changing schools enough times to know that finding this kind of thing starts over every time, and that plenty of students never had a counselor to ask in the first place.',
-      'The code turned out to be the easy half. A marketplace with one side missing is a list, and the work since launch has been getting it in front of students who do not know it exists. That is a different job from building, and I am worse at it.',
-      'It is live at volbase.app with real users and listings across the country. The build is done for now. The next job is distribution.',
+      'The code turned out to be the easy half. The work since launch has been getting it in front of students who do not know it exists, and I am worse at that than at building.',
+      'It is live at volbase.app with real users and listings across the country. The build is done for now.',
     ],
     facts: 'Built alone. Next.js. Live at volbase.app. Listings across the country.',
     aside: 'The listings change, because it is live.',
@@ -68,11 +68,11 @@ export const products: Product[] = [
     name: 'Rin',
     hue: 'var(--rin)',
     kicker: 'a Mac app, free',
-    headline: 'Rin gives your Mac a memory.',
+    headline: 'Rin drops a terminal down from the menu bar.',
     blurb: 'A Mac app that drops a terminal down from the menu bar, with a folder of notes it has already read, so the assistant inside knows your deadlines before you type. It is free and open source, and it only runs on a Mac.',
     study: [
       'Rin is a Mac app. Control and backtick drops a terminal down from the menu bar, one tab per session, and the tabs survive quitting. It ships with a folder of notes already set up, so the assistant inside knows your deadlines and your projects before you type anything. It is written in Swift, with SwiftUI and AppKit, and it has one dependency.',
-      'I built it for my own school life first, and the app knew my folder, my name, and my classes. Making it something a stranger could install meant taking all of me out. The working directory became a setting the first run writes, and the note folder ships empty inside the app, dotfiles included, so the first run works offline. It is unsigned, because the certificate costs about a hundred dollars a year and the app is free, so the first launch gets blocked once and the site walks you through the one click.',
+      'I built it for my own school life first, and the app knew my folder, my name, and my classes. Making it something a stranger could install meant taking all of me out. The working directory became a setting the first run writes, and the note folder ships empty inside the app, dotfiles included, so the first run works offline. It is unsigned, because the certificate costs about 100 dollars a year and the app is free, so the first launch gets blocked once and the site walks you through the one click.',
       'It is free and MIT licensed, and it only runs on a Mac. It has not been released yet. What stands between it and a release is watching one person who is not me install it cold, with no help.',
     ],
     facts: 'Built alone. Swift, with SwiftUI and AppKit. One dependency. MIT licensed, not released yet.',
@@ -91,12 +91,12 @@ export const products: Product[] = [
     slug: 'kyou',
     name: 'Kyou',
     hue: 'var(--kyou)',
-    kicker: 'an iPhone planner, in review',
-    headline: 'Kyou puts the whole day on one screen.',
-    blurb: 'An iPhone planner that puts events and homework on one timeline, with a small face at the top that wears the kind of day it is. I use it every morning and it is headed for the App Store.',
+    kicker: 'an iPhone planner, not on the App Store yet',
+    headline: 'Kyou puts my whole day on one screen.',
+    blurb: 'An iPhone planner that puts events and homework on one timeline, with a small face at the top that changes with the kind of day it is. I use it every morning. It is not on the App Store yet.',
     study: [
-      'Kyou is an iPhone planner. Calendar events and assignments merge into one timeline, events take their height from how long they run, and a small kaomoji at the top wears the shape of the day. You type "physics set friday at 4" and it becomes an entry. Nothing leaves the phone: events and reminders live in Apple’s own stores, and the sentence parser runs on the device.',
-      'The parser was the hard part. The first version assumed things, so "problems 1-10" became an event from one in the afternoon to ten at night. The rule now is that it may not assume anything you did not type. A repeat needs a word like every, an alert needs a word like remind, and a clock needs evidence. The highlighter and the parser ask the same question, so they cannot disagree. The face has a rule too: nothing overdue ever gets one.',
+      'Kyou is an iPhone planner. Calendar events and assignments merge into one timeline, events take their height from how long they run, and a small text face at the top changes with the shape of the day. You type “physics set friday at 4” and it becomes an entry. Nothing leaves the phone: events and reminders live in Apple’s own stores, and the sentence parser runs on the device.',
+      'The parser was the hard part. The first version assumed things, so “problems 1–10” became an event from 1 in the afternoon to 10 at night. The rule now is that it may not assume anything you did not type. A repeat needs a word like every, an alert needs a word like remind, and a clock needs evidence. The highlighter and the parser read the sentence the same way. The face has a rule too: nothing overdue ever gets one.',
       'Two pages exist, the day and the work list, and I open it every morning. The habits page is designed and not built, and the app does not claim it. It is headed for the App Store.',
     ],
     facts: 'Built alone. Swift and SwiftUI, on Apple’s own calendar and reminders. Two pages, the day and the work list. Headed for the App Store.',
@@ -105,7 +105,7 @@ export const products: Product[] = [
     peek: pair('kyou-day', 'Kyou’s day screen on an iPhone.'),
     gallery: [
       pair('kyou-day', 'The day screen. The weekday, the face, one sentence about the day, and the timeline under it.'),
-      pair('kyou-quickadd', 'The add sheet, with a typed sentence colouring in the parts it recognised.'),
+      pair('kyou-quickadd', 'The add sheet, with a typed sentence coloring in the parts it recognized.'),
       pair('kyou-work', 'The work list, grouped by how soon each thing is due.'),
       pair('kyou-notification', 'A reminder from Kyou on the Home Screen.'),
       pair('kyou-overlap', 'Two events at the same hour, side by side on the timeline.'),
@@ -118,14 +118,14 @@ export const products: Product[] = [
     name: 'Market Station',
     hue: 'var(--mo)',
     kicker: 'a dashboard, running since August',
-    headline: 'Market Station calls when a number crosses a line.',
-    blurb: 'A dashboard that watches twenty-eight public market readings all day for one reader at home and sends a phone alert when one crosses a line. It has been running on an old laptop since August.',
+    headline: 'Market Station sends one alert when a number crosses a line.',
+    blurb: 'A dashboard that watches 28 public market readings all day for one reader at home and sends a phone alert when one crosses a line. It has been running on an old laptop since August.',
     study: [
-      'Market Station watches twenty-eight public readings, like the VIX, the yield curve, jobless claims, and the share of S&P 500 stocks above their own average. They sit in six sections on a plain dashboard, and every reading says in words what it means. When one crosses its line the phone gets an alert. Twice a day it writes a short briefing. I built it for one reader at home who does not read charts.',
-      'An alert that fires every time a number wobbles gets switched off in a week. So a crossing fires once, and the reading has to clear the line by a margin before it can fire again. Some of the numbers are not published anywhere free. Market breadth is computed there from eight months of daily closes across about five hundred tickers, and a day is only published if four hundred of them had usable data. Four readings are scraped from pages that can change without warning, so each collector fails on its own and greys its own tile instead of taking the station down.',
-      'It has been running since August on a Windows laptop with the lid closed, as a service that restarts itself. Colour on it means state and nothing else. It is behind a login for the people who use it, so there is no link here.',
+      'Market Station watches 28 public readings, like the VIX, the yield curve, jobless claims, and the share of S&P 500 stocks above their own average. They sit in six sections on a plain dashboard, and every reading says in words what it means. When one crosses its line the phone gets an alert. Twice a day it writes a short briefing. I built it for one reader at home who does not read charts.',
+      'An alert that fires every time a number wobbles gets switched off in a week. So a crossing fires once, and the reading has to clear the line by a margin before it can fire again. Some of the numbers are not published anywhere free. Market breadth is computed there from 8 months of daily closes across about 500 tickers, and a day is only published if 400 of them had usable data. Four readings are scraped from pages that can change without warning, so each collector fails on its own and grays its own tile instead of taking the station down.',
+      'It has been running since August on a Windows laptop with the lid closed, as a service that restarts itself. Color on it means state and nothing else. It is behind a login for the people who use it, so there is no link here.',
     ],
-    facts: 'Built alone. Python, on public data. Twenty-eight readings in six sections. Running since August on a laptop with the lid closed.',
+    facts: 'Built alone. Python, on public data. 28 readings in six sections. Running since August on a laptop with the lid closed.',
     aside: 'The numbers in these pictures are whatever the day looked like when I took them.',
     chapter: { pin: 'market-dashboard', swaps: ['market-alerts'] },
     peek: pair('market-desk', 'Market Station on a monitor, with the phone in front.'),
@@ -145,30 +145,30 @@ export const bySlug = (s: string) => products.find((p) => p.slug === s);
 /* ── the words that are not a product ─────────────────────────────── */
 export const copy = {
   hero: 'I am a senior in high school and I make software.',
-  lede: 'I am a senior in high school and I make software. These are the four things I have built that are real enough to show. Each one is running somewhere right now, and each one exists because I needed it first.',
-  city: 'Detroit',
-  status: 'Senior year, Detroit',
+  lede: 'I am a senior in high school and I make software. I have built four things that work. All of them are running somewhere right now, and I made each one because I needed it.',
+  city: 'Michigan',
+  status: 'Senior year, Michigan',
   elsewhere: 'I started my school’s FIRST Robotics team and we reached Worlds as a rookie team. I climb, mostly bouldering, and I have for six years.',
-  aboutHead: ['I make the things I wish existed, and then I ', 'use them'],
+  aboutHead: ['Things I made because I ', 'needed them'],
   about: [
-    'I am a senior at the school, outside Detroit, and I make software. Four of the things I built are on this page: a marketplace for students, a Mac app with a memory, an iPhone planner, and a market dashboard for one reader at home. None of them came with a mentor. I learned each from the docs and from getting it wrong.',
+    'I am a senior in Michigan, and I make software. Four of the things I built are on this page: a marketplace for students, a Mac app that drops down from the menu bar, an iPhone planner, and a market dashboard for one reader at home. None of them came with a mentor, so I read the docs.',
     'Before software it was robots. I started my school’s FIRST Robotics team with four friends, raised the money by cold calling businesses after school, and we reached Worlds in our first year. When I am not at a computer I climb, mostly bouldering, and have for six years. I am applying to college this fall.',
   ],
   list: [
     { name: 'volbase', line: 'A marketplace for students, live with real users.' },
     { name: 'FIRST Robotics', line: 'Started the team with four friends, and we reached Worlds in the first year.' },
     { name: 'Climbing', line: 'Mostly bouldering and some speed, for six years.' },
-    { name: 'A hospital’s orthopedic wing', line: 'More than a hundred hours volunteering there.' },
+    { name: 'A hospital’s orthopedic wing', line: 'More than 100 hours volunteering there.' },
   ],
   thisWeek: ['Ship this site', 'Physics set', 'Climb'],
   photosHead: 'Places, mostly',
   notes: [
     'I made this site myself and there is no tracking on it.',
-    'Everything on this page is running somewhere right now; the links go to the real things.',
+    'Everything on this page is running somewhere right now, and the links go to the real things.',
   ],
-  footAbout: 'Made by one person in Detroit.',
-  fine: '2026. No cookies, no analytics, no framework.',
-  bar: 'Peter Mei, Detroit, 2026',
+  footAbout: 'Made by one person in Michigan.',
+  fine: '2026. No cookies and no analytics.',
+  bar: 'Peter Mei, Michigan, 2026',
 };
 
 export const links = {
@@ -182,15 +182,15 @@ export type Photo = { file: string; w: number; h: number; alt: string; place: st
 const photoList = (rawPhotos as (Photo & { date: string })[]).map(({ date, ...p }) => p);
 
 /* the polaroid pile: four with no faces and no street names */
-export const pile = ['the school-garden', 'estes-park-ridge', 'waikiki-sunset', 'the-bund']
+export const pile = ['garden-allee', 'rocky-ridge', 'beach-sunset', 'city-skyline-night']
   .map((n) => photoList.find((p) => p.file.endsWith(`/${n}.webp`))!);
 
 /* the strip: twenty four of the forty eight, spread across the places */
 const stripNames = [
-  'grand-prismatic', 'estes-park-stream', 'the-bund', 'pupukea-tidepools', 'horseshoe-falls', 'valencia-sunset',
-  'chasm-lake-peaks', 'texas-capitol-dome', 'frozen-pier', 'red-rocks', 'oahu-coast', 'deer-in-snow',
-  'houston-tower', 'lily-lake', 'maui-underwater', 'the school-arcade', 'wing-over-clouds', 'heron',
-  'midway-geyser', 'diamond-head', 'autumn-lane', 'niagara-river', 'leadville-plain', 'water-caustics',
+  'hot-spring-edge', 'boulder-stream', 'city-skyline-night', 'lava-tidepools', 'falls-lip', 'rooftops-sunset',
+  'snow-gullies', 'capitol-dome-from-below', 'frozen-pier', 'amphitheatre-benches', 'sea-cliffs', 'deer-in-snow',
+  'glass-tower', 'lake-under-storm', 'fish-underwater', 'winter-arcade', 'wing-over-clouds', 'heron',
+  'blue-pool-steam', 'headland-slopes', 'autumn-lane', 'turquoise-river', 'mountains-across-plain', 'water-caustics',
 ];
 export const strip = stripNames.map((n) => photoList.find((p) => p.file.endsWith(`/${n}.webp`))!);
 

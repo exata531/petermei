@@ -113,7 +113,16 @@ export function initSaver(photos: SaverPhoto[], allowed: () => boolean) {
     layer = null;
     front = 0;
     l.classList.remove('is-on');
-    setTimeout(() => l.remove(), reduced() ? 0 : 240);
+    /* the layer leaves once its own fade has ended, and a photograph that was
+       mid-dissolve when the visitor moved finishes under it: the slot fade is
+       the longest thing in there at 1200ms, so the fallback outlasts it */
+    if (reduced()) l.remove();
+    else {
+      let gone = false;
+      const done = () => { if (gone) return; gone = true; clearTimeout(fb); l.remove(); };
+      const fb = window.setTimeout(done, 1400);
+      l.addEventListener('transitionend', (e) => { if (e.target === l && e.propertyName === 'opacity') done(); });
+    }
     arm();
   }
 

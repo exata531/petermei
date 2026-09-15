@@ -180,6 +180,168 @@
     "description": "Kyou's settings"
   },
   {
+    "name": "kyou-site-day",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-site-day-dark.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Kyou's day screen on the staged Thursday, dark, with the live free block and the red now-line"
+  },
+  {
+    "name": "kyou-site-day",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-site-day-light.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Kyou's day screen on the staged Thursday, dark, with the live free block and the red now-line"
+  },
+  {
+    "name": "kyou-site-faces",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-site-faces-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "A clear day beside a packed one: the face changes with the load, the rows never do"
+  },
+  {
+    "name": "kyou-site-faces",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-site-faces-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "A clear day beside a packed one: the face changes with the load, the rows never do"
+  },
+  {
+    "name": "kyou-site-gap-crop",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-site-gap-crop-dark.webp",
+    "width": 2000,
+    "height": 1520,
+    "description": "A tight crop of the live free block: Physics above, the red now-line inside the block, the 4 PM to-do below"
+  },
+  {
+    "name": "kyou-site-gap-crop",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-site-gap-crop-light.webp",
+    "width": 2000,
+    "height": 1520,
+    "description": "A tight crop of the live free block: Physics above, the red now-line inside the block, the 4 PM to-do below"
+  },
+  {
+    "name": "kyou-site-gap-live",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-site-gap-live-dark.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "The free block between the last class and practice, drawn live with the now-line inside it"
+  },
+  {
+    "name": "kyou-site-gap-live",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-site-gap-live-light.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "The free block between the last class and practice, drawn live with the now-line inside it"
+  },
+  {
+    "name": "kyou-site-month",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-site-month-dark.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "The month card over the day, with dots on the dates that carry something"
+  },
+  {
+    "name": "kyou-site-month",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-site-month-light.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "The month card over the day, with dots on the dates that carry something"
+  },
+  {
+    "name": "kyou-site-quickadd",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-site-quickadd-dark.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Typing a plan into quick-add, the date coloured by the parser and the draft card underneath"
+  },
+  {
+    "name": "kyou-site-quickadd",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-site-quickadd-light.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Typing a plan into quick-add, the date coloured by the parser and the draft card underneath"
+  },
+  {
+    "name": "kyou-site-settings",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-site-settings-dark.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Kyou's settings: the calendars and lists it reads, haptics, and the version line"
+  },
+  {
+    "name": "kyou-site-settings",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-site-settings-light.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "Kyou's settings: the calendars and lists it reads, haptics, and the version line"
+  },
+  {
+    "name": "kyou-site-side-by-side",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-site-side-by-side-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "Apple Calendar and Kyou on the same Thursday: the same events, with the to-dos merged in"
+  },
+  {
+    "name": "kyou-site-side-by-side",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-site-side-by-side-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "Apple Calendar and Kyou on the same Thursday: the same events, with the to-dos merged in"
+  },
+  {
+    "name": "kyou-site-work",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-site-work-dark.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "The work list: everything outstanding, grouped by when it is owed, one ticked row still in place"
+  },
+  {
+    "name": "kyou-site-work",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-site-work-light.webp",
+    "width": 2000,
+    "height": 2400,
+    "description": "The work list: everything outstanding, grouped by when it is owed, one ticked row still in place"
+  },
+  {
     "name": "kyou-ticked",
     "theme": "dark",
     "product": "kyou",
@@ -196,6 +358,24 @@
     "width": 2000,
     "height": 2400,
     "description": "A to-do ticked off in Kyou"
+  },
+  {
+    "name": "kyou-tile",
+    "theme": "dark",
+    "product": "kyou",
+    "src": "/img/mock/kyou-tile-dark.webp",
+    "width": 1800,
+    "height": 3400,
+    "description": "Kyou's day view on an upright iPhone, for the website's tile and case study: no tilt, so the picture can be cropped tight to the device"
+  },
+  {
+    "name": "kyou-tile",
+    "theme": "light",
+    "product": "kyou",
+    "src": "/img/mock/kyou-tile-light.webp",
+    "width": 1800,
+    "height": 3400,
+    "description": "Kyou's day view on an upright iPhone, for the website's tile and case study: no tilt, so the picture can be cropped tight to the device"
   },
   {
     "name": "kyou-work",
@@ -322,6 +502,150 @@
     "width": 3200,
     "height": 2000,
     "description": "One reading pulled forward off the Market Station dashboard"
+  },
+  {
+    "name": "market-site-briefing",
+    "theme": "dark",
+    "product": "market-site",
+    "src": "/img/mock/market-site-briefing-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "A written briefing and the morning's alert history, on a monitor"
+  },
+  {
+    "name": "market-site-briefing",
+    "theme": "light",
+    "product": "market-site",
+    "src": "/img/mock/market-site-briefing-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "A written briefing and the morning's alert history, on a monitor"
+  },
+  {
+    "name": "market-site-connections",
+    "theme": "dark",
+    "product": "market-site",
+    "src": "/img/mock/market-site-connections-dark.webp",
+    "width": 3200,
+    "height": 2240,
+    "description": "Every connection tested and passing, in a browser window"
+  },
+  {
+    "name": "market-site-connections",
+    "theme": "light",
+    "product": "market-site",
+    "src": "/img/mock/market-site-connections-light.webp",
+    "width": 3200,
+    "height": 2240,
+    "description": "Every connection tested and passing, in a browser window"
+  },
+  {
+    "name": "market-site-dashboard",
+    "theme": "dark",
+    "product": "market-site",
+    "src": "/img/mock/market-site-dashboard-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "The Market Station dashboard on a monitor, five readings alerting"
+  },
+  {
+    "name": "market-site-dashboard",
+    "theme": "light",
+    "product": "market-site",
+    "src": "/img/mock/market-site-dashboard-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "The Market Station dashboard on a monitor, five readings alerting"
+  },
+  {
+    "name": "market-site-desk",
+    "theme": "dark",
+    "product": "market-site",
+    "src": "/img/mock/market-site-desk-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "The dashboard on a monitor with the phone layout standing in front"
+  },
+  {
+    "name": "market-site-desk",
+    "theme": "light",
+    "product": "market-site",
+    "src": "/img/mock/market-site-desk-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "The dashboard on a monitor with the phone layout standing in front"
+  },
+  {
+    "name": "market-site-easing",
+    "theme": "dark",
+    "product": "market-site",
+    "src": "/img/mock/market-site-easing-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "One reading mid-episode: the VIX tile easing, everything else quiet"
+  },
+  {
+    "name": "market-site-easing",
+    "theme": "light",
+    "product": "market-site",
+    "src": "/img/mock/market-site-easing-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "One reading mid-episode: the VIX tile easing, everything else quiet"
+  },
+  {
+    "name": "market-site-reading",
+    "theme": "dark",
+    "product": "market-site",
+    "src": "/img/mock/market-site-reading-dark.webp",
+    "width": 2000,
+    "height": 1600,
+    "description": "One reading on its own: the 10-year rate, alerting"
+  },
+  {
+    "name": "market-site-reading",
+    "theme": "light",
+    "product": "market-site",
+    "src": "/img/mock/market-site-reading-light.webp",
+    "width": 2000,
+    "height": 1600,
+    "description": "One reading on its own: the 10-year rate, alerting"
+  },
+  {
+    "name": "market-site-sections",
+    "theme": "dark",
+    "product": "market-site",
+    "src": "/img/mock/market-site-sections-dark.webp",
+    "width": 3200,
+    "height": 2400,
+    "description": "Three of the six groups on the dashboard at once, in a browser window"
+  },
+  {
+    "name": "market-site-sections",
+    "theme": "light",
+    "product": "market-site",
+    "src": "/img/mock/market-site-sections-light.webp",
+    "width": 3200,
+    "height": 2400,
+    "description": "Three of the six groups on the dashboard at once, in a browser window"
+  },
+  {
+    "name": "market-site-settings",
+    "theme": "dark",
+    "product": "market-site",
+    "src": "/img/mock/market-site-settings-dark.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "The alert lines in Market Station's settings, in a browser window"
+  },
+  {
+    "name": "market-site-settings",
+    "theme": "light",
+    "product": "market-site",
+    "src": "/img/mock/market-site-settings-light.webp",
+    "width": 3200,
+    "height": 2000,
+    "description": "The alert lines in Market Station's settings, in a browser window"
   },
   {
     "name": "rin-hero",

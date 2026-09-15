@@ -1,10 +1,9 @@
 ---
 /* One product: two panels. The first is the hero, with the whole story run
    as one paragraph and the plain facts beside it. The second is ink, with
-   the two things to press and the next one to read. */
+   the real capture, the two things to press and the next one to read. */
 import Site from '../../../layouts/Site.astro';
-import Icon from '../../../components/mac/Icon.astro';
-import { projects, bySlug } from '../../../data/site';
+import { projects, bySlug, icon, shot } from '../../../data/site';
 
 export function getStaticPaths() {
   return projects.map((p) => ({ params: { slug: p.slug } }));
@@ -13,41 +12,41 @@ const p = bySlug(Astro.params.slug!)!;
 const i = projects.indexOf(p);
 const next = projects[(i + 1) % projects.length];
 const tint: Record<string, string> = { volbase: 'var(--c-sky)', rin: 'var(--c-peri)', kyou: 'var(--c-green)', market: 'var(--c-apri)' };
-const story = p.story.join(' ');
-const openLine: Record<string, string> = {
-  volbase: 'volbase is open on the desktop if you want to click around it.',
-  rin: 'Rin is open on the desktop if you want to try it.',
-  kyou: 'Kyou is open on the desktop if you want to try it.',
-  market: 'Market Station is open on the desktop if you want to try it.',
-};
+const story = p.story.slice(0, -1).join(' ');
+/* the last line of his own story closes the ink panel, so that panel says
+   something instead of explaining the button under it (WEB-082) */
+const close = p.story[p.story.length - 1];
+const ic = icon[p.slug];
+const s = shot[p.slug];
 ---
-<Site title={p.name} desc={p.blurb} route="project" back="/site/work">
+<Site title={p.name} desc={p.blurb} route="project" back="/">
   <div class="deck" style={`--p-tint:${tint[p.slug]}`}>
     <section class="panel hero-p" data-panel data-nav-tone="light">
       <div class="ledger">
         <div>
-          <span class="p-ico"><Icon id={p.slug} /></span>
+          <span class:list={['p-ico', { 'is-bare': ic.bare }]} aria-hidden="true">
+            {ic.svg ? <Fragment set:html={ic.svg} /> : <img src={ic.src} width={ic.size} height={ic.size} alt="" decoding="async" />}
+          </span>
           <h1 class="h-title">{p.name}</h1>
           <p class="story">{story}</p>
         </div>
         <div class="meta">
-          <p><small>Built with</small>{p.built}.</p>
-          <p><small>Where it is</small>{p.state}.</p>
-          {p.link && <p><small>Address</small><a href={p.link.href} rel="noopener" target="_blank" data-tab={p.slug === 'volbase' ? 'volbase' : undefined} style="text-decoration: underline; text-underline-offset: 3px">{p.link.label}</a></p>}
-          <p><small>On this desktop</small><a href={`/?open=${p.open}`} data-open={p.open} style="text-decoration: underline; text-underline-offset: 3px">Open it and click around.</a></p>
+          <p><small>Built with</small>{p.built}</p>
+          <p><small>Where it is</small>{p.state}</p>
+          {p.link && <p><small>Address</small>{p.link.label}</p>}
         </div>
       </div>
     </section>
 
     <section class="panel is-dark" data-panel data-nav-tone="dark">
-      <div class="ledger">
+      {/* the closing panel is his last line and the two ways in, centred, with
+          no picture: the pictures have already had their say by here
+          (Peter, 09-14) */}
+      <div class="ledger is-say">
         <div>
-          <span class="p-ico is-ink"><Icon id={p.slug} /></span>
-        </div>
-        <div>
-          <p class="h-section">{openLine[p.slug]}</p>
+          <p class="h-section">{close}</p>
           <div class="results">
-            <a class="btn" href={`/?open=${p.open}`} data-open={p.open}>Open {p.name} on the desktop</a>
+            <a class="btn" href={`/mac?open=${p.open}`} data-open={p.open}>Open {p.name} on the desktop</a>
             {p.link && <a class="btn is-quiet" href={p.link.href} rel="noopener" target="_blank" data-tab={p.slug === 'volbase' ? 'volbase' : undefined}>{p.link.label}</a>}
           </div>
           <p class="next">Read next: <a href={`/site/work/${next.slug}`}>{next.name}</a></p>
@@ -56,7 +55,8 @@ const openLine: Record<string, string> = {
     </section>
   </div>
 
-  <div class="pager" aria-hidden="true">
-    {Array.from({ length: 2 }).map(() => <button class="tick" type="button" data-tick tabindex="-1"></button>)}
-  </div>
+  <nav class="pager" aria-label="Panels">
+    <button class="tick" type="button" data-tick aria-label={`Go to ${p.name}`}></button>
+    <button class="tick" type="button" data-tick aria-label={`Go to the last word on ${p.name} and the links`}></button>
+  </nav>
 </Site>

@@ -1,26 +1,76 @@
 ---
+/* the page that is not there, drawn the way System 7 showed one: the menu
+   bar still across the top with every title dimmed, because an alert is up
+   and a modal alert took the menus away, and the alert seated where the
+   desktop's own alerts sit */
 import Mac from '../layouts/Mac.astro';
 import Icon from '../components/mac/Icon.astro';
+const titles = ['File', 'Edit', 'View', 'Label', 'Special'];
 ---
-<Mac title="Not here, Peter Mei" desc="That page does not exist on this Macintosh.">
+<Mac title="Not here · Peter Mei" desc="That page does not exist on this Macintosh." script={false} canonical={false}>
+  <header class="mbar lost-bar" aria-hidden="true">
+    <div class="mbar-l">
+      <span class="mb-item mb-apple is-dim"><Icon id="apple" size={16} /></span>
+      {titles.map((t) => <span class="mb-item is-dim">{t}</span>)}
+    </div>
+    <div class="mbar-r">
+      <span class="mb-item mb-clock"><time data-clock>4:42 PM</time></span>
+      <span class="mb-item mb-appmenu is-dim"><span class="mb-appico"><Icon id="finder" size={16} /></span></span>
+    </div>
+  </header>
+
   <div class="desk lost-desk"></div>
 
-  <div class="lost">
-    <section class="alert lost-box" role="alertdialog" aria-labelledby="lost-h">
+  <div class="lost" id="main" role="main">
+    <section class="alert lost-box" aria-labelledby="lost-h">
       <span class="alert-ico"><Icon id="stop" /></span>
       <div>
         <h1 class="alert-title" id="lost-h">The item could not be found.</h1>
-        <p class="alert-wait">There is no such thing on this Macintosh.</p>
+        <p class="alert-wait">The address is wrong, or the page it named has moved.</p>
       </div>
-      <div class="alert-btns"><a class="alert-btn is-default" href="/">OK</a></div>
+      <div class="alert-btns"><a class="alert-btn is-default" href="/">Back to petermei.com</a></div>
     </section>
   </div>
+
+  <script is:inline>
+    /* the clock keeps time even here; the desktop's script is not loaded */
+    (function () {
+      var t = document.querySelector('[data-clock]');
+      if (!t) return;
+      var paint = function () {
+        var d = new Date();
+        t.textContent = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        t.dateTime = d.toISOString();
+      };
+      paint();
+      setInterval(paint, 15000);
+    })();
+  </script>
 </Mac>
 
 <style is:global>
   html { background: var(--paper) var(--dither); background-size: var(--dither-size); }
-  .lost { position: fixed; inset: 0; z-index: 5; display: grid; place-items: center; padding: 20px; }
+  /* dimmed titles: greyed text, and the icons drawn through the fifty percent pattern */
+  .lost-bar .is-dim { color: var(--grey-3); }
+  .lost-bar .is-dim .ico { -webkit-mask: var(--dither); mask: var(--dither); -webkit-mask-size: var(--dither-size); mask-size: var(--dither-size); }
+  .lost-bar .mb-clock { display: inline-flex; }
+  /* the alert sits where the desktop's own alerts sit, high on the screen */
+  .lost { position: fixed; inset: 0; z-index: 5; display: grid; justify-items: center; align-content: start; padding: calc(var(--bar) + calc(30 * var(--u))) 16px 0; }
   .lost-box { grid-template-columns: var(--icon) 1fr; }
   .lost-box .alert-ico { grid-row: 1; }
   .lost-box .alert-wait { margin-top: var(--u2); }
+  /* the website's one ring on the website's own not-found page (WEB-072) */
+  .lost-box .alert-btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+  /* the titles give up their room before the clock does, so the time is never
+     cut through a letter (WEB-052) */
+  .lost-bar .mbar-l { flex: 1 1 auto; min-width: 0; }
+  .lost-bar .mbar-r { flex: none; }
+  /* at the narrowest supported width the label takes two lines rather than
+     crossing the dialog's own frame (WEB-052) */
+  @media (max-width: 400px) {
+    .lost-box .alert-btn.is-default {
+      height: auto; min-height: calc(20 * var(--u)); max-width: 100%;
+      padding: var(--u2) var(--u6); white-space: normal; text-align: center; line-height: var(--lh-12);
+    }
+  }
 </style>

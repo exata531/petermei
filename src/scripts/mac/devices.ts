@@ -1,8 +1,10 @@
 /* The machine on the landing, drawn.
 
    A compact Macintosh, the beige box with the screen in its face and the
-   floppy slot under it, in the flat illustrated register the rest of the
-   page uses: a few fills, one line, no gradients, no lighting. The screen is
+   floppy slot under it, standing on a desk, in the flat illustrated register
+   the rest of the page uses: a few fills, one line, no gradients, no
+   lighting. The desk itself is left to the page so the surface can run the
+   whole width of the window (Peter, 09-13: the old Mac, on the desk). The screen is
    left as a flat field because the real desktop sits over it, live and
    scaled. The screen's shape follows the visitor's viewport so the desktop
    fits it exactly; everything around it keeps the box's own proportions.
@@ -11,7 +13,9 @@
    whenever the viewport's shape changes. */
 
 export type Screen = { x: number; y: number; w: number; h: number; r: number };
-export type Draw = { svg: string; vbW: number; vbH: number; screen: Screen };
+/* desk: how much of the drawing's height is desk, as a fraction, so the page
+   can run the same surface the full width of the window behind the machine */
+export type Draw = { svg: string; vbW: number; vbH: number; screen: Screen; desk: number };
 
 const n = (v: number) => Math.round(v * 10) / 10;
 
@@ -36,6 +40,7 @@ export function compact(aspect: number): Draw {
     .join('');
 
   const svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+<ellipse cx="${W / 2}" cy="${n(bh + footH)}" rx="${n(W * 0.46)}" ry="10" fill="rgb(3 3 2 / .10)"/>
 <rect x="${n(W * 0.06)}" y="${bh}" width="${n(W * 0.88)}" height="${footH}" rx="6" fill="#d3c7a9" stroke="#8c8064" stroke-width="2"/>
 <rect x="1" y="1" width="${W - 2}" height="${bh - 2}" rx="${r}" fill="#e6dcc2" stroke="#8c8064" stroke-width="2"/>
 <rect x="${b - 14}" y="${b - 14}" width="${sw + 28}" height="${sh + 28}" rx="10" fill="#d9ceb0" stroke="#8c8064" stroke-width="2"/>
@@ -44,7 +49,9 @@ export function compact(aspect: number): Draw {
 ${bands}
 <text x="${badgeX + 40}" y="${n(badgeY + 30)}" font-family="ChicagoFLF, ChiKareGo2, Geneva, sans-serif" font-size="30" fill="#5b5344">Macintosh</text>
 </svg>`;
-  return { svg, vbW: W, vbH: H, screen: { x: b, y: b, w: sw, h: sh, r: 0 } };
+  /* the foot rests here; everything below is the desk, drawn by the page */
+  const deskY = n(bh + footH - 6);
+  return { svg, vbW: W, vbH: H, screen: { x: b, y: b, w: sw, h: sh, r: 0 }, desk: (H - deskY) / H };
 }
 
 /* the old name, kept for any caller that still uses it */

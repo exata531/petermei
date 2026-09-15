@@ -4,21 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Modules · Rin</title>
-<meta name="description" content="Modules for Rin. Each one is a folder of plain files that teaches your assistant a new job. Browse them, then add one from inside the app.">
+<meta name="description" content="Modules for Rin. Each one is a folder of plain files that teaches the assistant a new job. Browse them, then add one from inside the app.">
 <meta name="theme-color" content="#fff7ed" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#171310" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
 <link rel="canonical" href="https://petermei.com/rin/modules.html">
 <meta property="og:title" content="Modules · Rin">
-<meta property="og:description" content="Folders of plain files that teach your assistant a new job. Written by whoever wrote them, added from inside the app.">
+<meta property="og:description" content="Folders of plain files that teach the assistant a new job. Added from inside the app.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="en_US">
 <meta property="og:url" content="https://petermei.com/rin/modules.html">
-<meta property="og:site_name" content="Rin">
+<meta property="og:site_name" content="Peter Mei">
 <meta property="og:image" content="https://petermei.com/rin/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Rin. An assistant that knows your whole life.">
+<meta property="og:image:alt" content="Rin. A dark session panel with a question typed in and the answer under it.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://petermei.com/rin/og.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='15' fill='%231c1917'/><text x='32' y='45' font-size='40' text-anchor='middle' fill='%23fff7ed' font-family='sans-serif'>凛</text></svg>">
@@ -437,12 +437,12 @@ main:focus { outline: none; }
 
     <header class="top">
       <p class="eyebrow">Modules</p>
-      <h1>Teach it something it didn't ship knowing</h1>
+      <h1>Folders that teach it a new job</h1>
       <p class="sub">
-        A module is a folder of plain files that gives your assistant one new job:
-        how to run your weekly review, how to keep a reading log, how to quiz you
-        before a test. They install into your own brain folder, so they're yours to
-        read, edit, and throw away.
+        A module is a folder of plain files that gives the assistant one new job:
+        running a weekly review, keeping a reading log, quizzing you before a test.
+        It installs into your own notes folder, so you can read it, edit it, or throw
+        it away.
       </p>
       <div class="how">
         <span class="step"><span class="n">1</span> Press Add to Rin</span>
@@ -463,8 +463,7 @@ main:focus { outline: none; }
       </div>
       <div class="empty">
         <h3>Nothing here yet</h3>
-        <p>The registry is a folder in a public repo, and the first module in it will
-          be somebody's afternoon. Yours could be the one.</p>
+        <p>The list is a folder in a public repo. Nothing has been added to it yet.</p>
         <a class="btn btn--solid" href="https://github.com/exata531/Rin/blob/main/docs/modules.md">How to write one</a>
       </div>
       <p class="nomatch" id="nomatch" hidden>Nothing matches that. Clear the search to see everything.</p>
@@ -472,28 +471,26 @@ main:focus { outline: none; }
 
     <section class="build" aria-labelledby="build-head">
       <p class="eyebrow">Make one</p>
-      <h2 id="build-head">The fastest way to write one is to ask for it</h2>
+      <h2 id="build-head">Making one</h2>
       <div class="steps">
         <div class="step-card up">
           <h3>Say what it should do</h3>
-          <p>Your assistant writes modules. Describe the job in a sentence and it
-            scaffolds the folder, writes the instructions, and puts it straight into
-            your brain where it works immediately.</p>
-          <span class="said">"make me a module that tracks my runs"</span>
+          <p>The assistant writes modules. Describe the job in a sentence and it makes
+            the folder, writes the instructions, and puts it in your notes folder.</p>
+          <span class="said">“make me a module that tracks my runs”</span>
         </div>
         <div class="step-card up">
           <h3>Use it, then fix it</h3>
-          <p>It's live in the next tab you open. When it gets something wrong, say so
-            and the instructions get edited. That's the whole loop, and there's
-            nothing to compile.</p>
-          <span class="said">"the run log should record how it felt too"</span>
+          <p>It’s live in the next tab you open. When it gets something wrong, say so
+            and the instructions get edited. There is nothing to compile.</p>
+          <span class="said">“the run log should record how it felt too”</span>
         </div>
         <div class="step-card up">
           <h3>Share it if you want</h3>
-          <p>A module is a folder. Put it in a public repo, open a pull request adding
-            one line to the registry, and an automatic check reads it before a person
-            does. Or keep it to yourself. Both are fine.</p>
-          <span class="said">"help me publish the run tracker"</span>
+          <p>A module is a folder. Put it in a public repo and open a pull request that
+            adds one line to the list. An automatic check reads it, then a person does.
+            Or keep it to yourself.</p>
+          <span class="said">“help me publish the run tracker”</span>
         </div>
       </div>
       <a class="btn btn--solid" href="https://github.com/exata531/Rin/blob/main/docs/modules.md">How to write one</a>
@@ -502,22 +499,21 @@ main:focus { outline: none; }
     <section class="notes" aria-labelledby="honest-head">
       <h2 class="sr" id="honest-head">Two things worth knowing</h2>
       <div class="note up">
-        <h3>A module is somebody else's work, running in your folder</h3>
-        <p>It can read and change anything in the brain you install it into, and some
-          of them ship scripts that run on your Mac. Every card here says which, and
-          your assistant reads it back to you and waits for a yes before writing a
-          single file. Those labels are read out of each module's own files rather
-          than taken from what its author says about it, so they can be wrong in both
-          directions. The source is one click away. Read it like you'd read a script
-          a stranger sent you.</p>
+        <h3>A module is somebody else’s work, running in your folder</h3>
+        <p>It can read and change anything in the folder you install it into, and some
+          of them ship scripts that run on your Mac. Every card here says which. The
+          assistant reads that back to you and waits for a yes before it writes a
+          single file. The labels are computed from each module’s own files. Nothing
+          gets audited, so they can be wrong. The source is one click away. Read it
+          like you’d read a script a stranger sent you.</p>
       </div>
       <div class="note up">
-        <h3>This is a list, not a review</h3>
+        <h3>Nothing here is reviewed</h3>
         <p>Nothing here has been audited for safety. A submission gets an automatic
-          check and a read-through by one person, which catches carelessness and not
-          much else. Listing is not endorsement. Anything can come off the list, and
-          getting one out of your own brain is just asking for it gone. The folder
-          lands in your Trash, not nowhere.</p>
+          check and one person reads it through. That catches carelessness and not
+          much else. Being on the list doesn’t mean I vouch for it. Anything can come
+          off the list. To get one out of your own folder you just ask, and the folder
+          goes to the Trash, so you can get it back.</p>
       </div>
     </section>
 
@@ -528,7 +524,7 @@ main:focus { outline: none; }
       <div class="cols">
         <div class="about">
           <div class="mark"><span class="sq" aria-hidden="true">凛</span> Rin</div>
-          <p>A Claude brain wrapped in an app. Made by one person, given away.</p>
+          <p>Free and MIT licensed. I made it for myself first.</p>
         </div>
 
         <nav aria-labelledby="f-get">

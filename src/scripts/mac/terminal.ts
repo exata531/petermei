@@ -1,15 +1,21 @@
 /* Terminal.app.
 
-   A real prompt over a small pretend file system: the Read me, the Pictures
+   A real prompt over a small pretend file system: the Read Me, the Pictures
    folder, one project folder per product, and a couple of honest jokes in
    the filenames. The commands are the ones a hand tries first: help, ls, cd,
    cat, open (which really opens the window), neofetch (whose every line is
    true), say, date, clear. The up arrow walks the history, Tab completes,
    and a command that does not exist earns the error sound and the zsh line.
    The transcript is kept for the tab session. Nothing typed here leaves the
-   page. */
+   page.
+
+   Two words it answers are in neither help nor Tab: `hello`, which is the
+   first thing a Macintosh ever wrote on its own screen, and `moof`, which is
+   what the dogcow says. A person who has read the machine's history types
+   them; nobody else finds them, which is the point. */
 import { load, save, esc } from '../scenes/state';
 import { secrets } from './secrets';
+import { hello as helloArt, gridEl } from '../../data/pixels-eggs';
 
 type Dir = { [name: string]: Dir | string[] };
 type St = { hist: string[]; lines: string[] };
@@ -28,13 +34,12 @@ const dim = (s: string) => `<span class="dim">${s}</span>`;
 
 /* what `open` knows how to open, and what the window is called */
 const OPENS: Record<string, [string, string]> = {
-  volbase: ['volbase', 'volbase'], safari: ['safari', 'Safari'], kyou: ['kyou', 'Kyou'],
+  volbase: ['volbase', 'volbase'], navigator: ['safari', 'Navigator'], safari: ['safari', 'Navigator'], kyou: ['kyou', 'Kyou'],
   market: ['market', 'Market Station'], 'market station': ['market', 'Market Station'],
   'market-station': ['market', 'Market Station'],
-  rin: ['rin', 'Rin'], photos: ['photos', 'Photos'], finder: ['finder', 'About Peter'],
-  about: ['finder', 'About Peter'], textedit: ['textedit', 'TextEdit'],
-  'read me': ['textedit', 'the Read me'], 'read me.md': ['textedit', 'the Read me'],
-  readme: ['textedit', 'the Read me'], trash: ['trash', 'the Trash'],
+  rin: ['rin', 'Rin'], photos: ['photos', 'Photos'], finder: ['finder', 'Macintosh HD'],
+  about: ['doc-peter', 'the Peter document'], simpletext: ['textedit', 'SimpleText'], textedit: ['textedit', 'SimpleText'],
+  'read me': ['textedit', 'the Read Me'], readme: ['textedit', 'the Read Me'], trash: ['trash', 'the Trash'],
   stickies: ['stickies', 'Stickies'], 'petermei.com': ['safari', 'petermei.com'], site: ['safari', 'petermei.com'],
 };
 
@@ -52,15 +57,15 @@ export function initTerminal(root: HTMLElement, hooks: TermHooks) {
 
   /* ── the file system, all of it pretend and all of it honest ────────── */
   const pictures: Dir = {};
-  for (const p of hooks.photos) pictures[p.n] = [`a photograph: ${p.a} (${p.p}.)`, `open Photos to see it properly.`];
+  for (const p of hooks.photos) pictures[p.n] = [`a photograph: ${p.a} (${p.p}.)`, `open Photos to see it bigger.`];
   const FS: Dir = {
-    'Read me.md': [], /* filled by the page: the same lines TextEdit shows */
+    'Read Me': [], /* filled by the page: the same lines SimpleText shows */
     'homework.txt': ['not on this Mac.'],
     Pictures: pictures,
     Projects: {
       volbase: {
         'README.md': ['a marketplace where students find volunteer and internship openings near them.', 'live at volbase.app, with real users. try: open volbase'],
-        node_modules: { 'README.md': ['several hundred megabytes of other people\'s code.', 'not listing it, for both our sakes.'] },
+        node_modules: { 'README.md': ['several hundred megabytes of other people\'s code.', 'not listing it.'] },
       },
       rin: {
         'README.md': ['a Mac app that drops an assistant down from the menu bar.', 'free and open source. the tabs survive quitting. try: open rin'],
@@ -71,10 +76,10 @@ export function initTerminal(root: HTMLElement, hooks: TermHooks) {
       },
       'market-station': {
         'README.md': ['a dashboard that watches the market all day for one reader at home.', 'running since August. try: open market'],
-        'alerts.log': ['one alert per crossing. that is the whole point.'],
+        'alerts.log': ['one alert per crossing.'],
       },
       'first-robotics': {
-        'robot-v1.stl': ['it fell apart after every match, but by then we had', 'gotten pretty good at putting it back together.'],
+        'robot-v1.stl': ['fell apart after most matches.', 'went to Worlds anyway.'],
       },
     },
     'old versions.txt': ['they are in the Trash.'],
@@ -145,24 +150,27 @@ export function initTerminal(root: HTMLElement, hooks: TermHooks) {
     `  ls ${dim('[folder]')}         ${dim('what is in a folder')}`,
     `  cd ${dim('[folder]')}         ${dim('go there (cd .. goes back)')}`,
     `  cat ${dim('&lt;file&gt;')}          ${dim('read a file')}`,
-    `  open ${dim('&lt;app&gt;')}          ${dim('really opens it: volbase, rin, kyou, market, photos…')}`,
-    `  neofetch            ${dim('this machine, truthfully')}`,
+    `  open ${dim('&lt;app&gt;')}          ${dim('really opens it: volbase, rin, kyou, market, photos...')}`,
+    `  neofetch            ${dim('this machine')}`,
     `  say ${dim('&lt;words&gt;')}         ${dim('the Mac says them out loud')}`,
-    `  date · clear · pwd · whoami · history`,
+    `  date, clear, pwd, whoami, history`,
   ].join('\n');
 
   const neofetch = () => {
     const up = Math.max(1, Math.round((performance.now() - opened) / 1000));
     const upTxt = up < 60 ? `${up} secs` : `${Math.floor(up / 60)} min${up % 60 ? ` ${up % 60} secs` : ''}`;
+    /* Drawn with characters Monaco 9 actually carries. The box-drawing set
+       and the kaomoji are not in the face, so the old art was silently
+       falling back to a system font mid-window, at the wrong width. */
     const art = [
-      ' ╭──────────────╮ ',
-      ' │              │ ',
-      ' │   (｡•ᴗ•｡)    │ ',
-      ' │              │ ',
-      ' ╞══════════════╡ ',
-      ' ╰──────────────╯ ',
-      '       ╱ ╲        ',
-      '    ─────────     ',
+      '+-----------+ ',
+      '| +-------+ | ',
+      '| |       | | ',
+      '| | o   o | | ',
+      '| |       | | ',
+      '| | \\___/ | | ',
+      '| +-------+ | ',
+      '+--[_____]--+ ',
     ];
     const facts: [string, string][] = [
       ['OS', 'petermei.com'],
@@ -174,12 +182,12 @@ export function initTerminal(root: HTMLElement, hooks: TermHooks) {
       ['Commit', hooks.build.commit],
       ['Built', hooks.build.date],
       ['Photos', String(hooks.photos.length)],
-      ['Weight', `${hooks.build.mb} MB, mostly photographs`],
+      ['Weight', `${hooks.build.mb} MB`],
     ];
     const head = `<b class="term-acc">visitor</b>@<b class="term-acc">petermei.com</b>`;
-    const rows = [head, dim('────────────────────'), ...facts.map(([k, v]) => `<b class="term-acc">${k}</b>${' '.repeat(Math.max(1, 11 - k.length))}${esc(v)}`)];
+    const rows = [head, dim('-'.repeat(20)), ...facts.map(([k, v]) => `<b class="term-acc">${k}</b>${' '.repeat(Math.max(1, 11 - k.length))}${esc(v)}`)];
     return art.map((a, i) => `<span class="term-art">${a}</span>${rows[i] ?? ''}`).join('\n') +
-      (rows.length > art.length ? '\n' + rows.slice(art.length).map((r) => ' '.repeat(18) + r).join('\n') : '');
+      (rows.length > art.length ? '\n' + rows.slice(art.length).map((r) => ' '.repeat(14) + r).join('\n') : '');
   };
 
   /* ── the commands ───────────────────────────────────────────────────── */
@@ -230,7 +238,7 @@ export function initTerminal(root: HTMLElement, hooks: TermHooks) {
           speechSynthesis.speak(u);
           return dim(`the Mac says: `) + `“${esc(rest)}”`;
         } catch {
-          return dim('this browser gave the Mac no voice. it mouths: ') + `“${esc(rest)}”`;
+          return dim('no speech in this browser. it would have said: ') + `“${esc(rest)}”`;
         }
       }
       case 'date': return new Date().toString();
@@ -241,9 +249,18 @@ export function initTerminal(root: HTMLElement, hooks: TermHooks) {
       case 'history': return st.hist.map((h, i) => `  ${i + 1}  ${esc(h)}`).join('\n') || dim('(no history yet)');
       case 'sudo': return `visitor is not in the sudoers file. this incident will not be reported.`;
       case 'exit': return dim('the red light, top left.');
-      case 'rm': return `rm: this Mac took years. no.`;
-      case 'vim': case 'nano': case 'emacs': return `${c}: the only editable file here is the Read me, and TextEdit has it.`;
-      case 'git': return `git: the whole repository IS the site. ${dim('neofetch has the commit.')}`;
+      case 'rm': return `rm: no.`;
+      case 'vim': case 'nano': case 'emacs': return `${c}: the only editable file here is the Read Me, and SimpleText has it.`;
+      case 'git': return `git: the repository is the site. ${dim('neofetch has the commit.')}`;
+      /* the first word a Macintosh wrote on its own screen, in 1984, in the
+         hand it wrote it in. Not in help, and Tab will not find it. */
+      case 'hello': case 'hello.': {
+        secrets.found('hello');
+        return `${gridEl(helloArt, 'term-pix')}\nThe first Mac wrote that on its screen in 1984. This one can too.`;
+      }
+      /* the dogcow's one word, answered as a courtesy. It does not count:
+         hers is in the Finder, where she actually lives. */
+      case 'moof': return 'Moof!';
       default:
         hooks.bonk();
         return `zsh: command not found: ${esc(cmd)}`;
@@ -340,6 +357,6 @@ export function initTerminal(root: HTMLElement, hooks: TermHooks) {
   return {
     focus() { real.focus({ preventScroll: true }); },
     blur() { real.blur(); },
-    setReadme(lines: string[]) { (FS['Read me.md'] as string[]).splice(0, 0, ...lines); },
+    setReadme(lines: string[]) { (FS['Read Me'] as string[]).splice(0, 0, ...lines); },
   };
 }

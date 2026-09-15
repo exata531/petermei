@@ -1,34 +1,27 @@
-/* Mounting a product demo inside a window.
+/* Mounting a page inside a window.
 
-   The four demos were written to fill an absolutely positioned parent at a
-   fixed design size. A window is any size, so the scene keeps its own pixels
-   and gets scaled into the space it has been given. On a phone the demo is
-   fitted to the width and the box takes the scaled height, so nothing sits
-   under it.
+   Every product on this desktop opens as a browser window on its own real
+   website, so there is one kind of scene left and it is a live page. A live
+   page is never scaled: the figure takes the box it is given, one to one, and
+   the frame inside it reflows the way the site itself does. The scaling path
+   below is what a fixed size figure would need, and it is kept because the
+   phone's sheet still measures a body that way.
 
-   A demo opens at rest, at its first frame. Whatever it can do after that,
-   it does because the visitor pressed something inside it. */
-import { initVolbase } from '../scenes/volbase';
-import { initRin } from '../scenes/rin';
-import { initKyou } from '../scenes/kyou';
-import { initMarket } from '../scenes/market';
+   A page loads when its window opens, and not before. */
+import { initNav } from '../scenes/navigator';
 
 export type Scene = {
   enter?(): void;        // the window is on screen
   leave?(): void;        // the window closed or minimized
-  finish?(m: 'light' | 'dark'): void;
-  run?(): void;          // the one honest film, started by the visitor
-  back?(): void;         // Safari: one page back in the tab's own history
+  run?(): void;          // reload
+  back?(): void;         // one page back in this window's own history
   fwd?(): void;
-  go?(tab: 'site' | 'volbase', path: string): void;
-  tab?(id: 'site' | 'volbase'): void;
-  href?(): string;       // the page the front tab is on, as a real address
+  href?(): string;       // the page this window is on, as a real address
   title?(): string;
-  theme?(v: string): void;
 };
 
 const builders: Record<string, (el: HTMLElement) => Scene> = {
-  volbase: initVolbase, rin: initRin, kyou: initKyou, market: initMarket,
+  nav: initNav,
 };
 
 export type Live = {

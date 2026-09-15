@@ -1,0 +1,472 @@
+---
+/* Kyou's product page.
+
+   The Macintosh on the front of this site opens this page in its browser
+   window instead of pretending to be the app, the same way it opens
+   volbase.app. Every picture is a real screenshot of the real build running on
+   a simulator, with an invented school day staged in Apple's Calendar and
+   Reminders first, then dressed into a device mockup by capture/stage. None of
+   it is drawn in CSS.
+
+   The look belongs to the app: a near-black band you land on, an off-white
+   curtain that rises over it, and one red that only ever means "now". It
+   shares no stylesheet with any other page on this site. */
+import '../../styles/kyou.css';
+import Pill from '../../components/site/Pill.astro';
+
+const url = new URL(Astro.url.pathname, Astro.site ?? 'https://petermei.com');
+const title = 'Kyou: a planner where an hour is an inch';
+const desc =
+  'Your calendar app draws a one hour class and a four hour gap the same height. Kyou does not. Every block is as long as the thing actually runs, and nothing leaves the phone.';
+const og = new URL('/og.png', url).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={desc} />
+    <link rel="canonical" href={url.href} />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#0e0e12" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Peter Mei" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={url.href} />
+    <meta property="og:image" content={og} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={desc} />
+    <meta name="twitter:image" content={og} />
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('has-js');
+        /* the page follows the Mac's appearance when it is opened from there */
+        try {
+          var t = localStorage.getItem('appearance');
+          if (t === 'light' || t === 'dark') d.dataset.theme = t;
+        } catch (e) {}
+        try {
+          if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) d.classList.add('anim');
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+
+  <body>
+    <a class="skip" href="#to-scale">Skip to the content</a>
+    <Pill />
+
+    <div class="page">
+      <div class="now" aria-hidden="true"><i></i></div>
+
+      <header class="band band--dark hero" data-sec>
+        <div class="shell">
+          <div class="track">
+            <div>
+              <div class="head">
+                <span class="mark" aria-hidden="true"><i></i></span>
+                <p class="wordmark">
+                  <span class="kao" aria-hidden="true">( ･ω･ )</span>
+                  <span class="wm">Kyou</span>
+                </p>
+                <h1>An hour is an inch<span class="dot" aria-hidden="true"></span></h1>
+              </div>
+              <p class="lead">
+                An iPhone planner where the day is drawn to scale. The one already on your phone
+                has been drawing a fifty minute class and a four hour void at the same height
+                since 2007. Nobody has stopped it.
+              </p>
+              <p class="status">Not on the App Store yet.</p>
+              <p class="status-link"><a href="/kyou/privacy">The privacy policy is already up</a></p>
+            </div>
+
+            <figure class="shot shot--hero">
+              <div class="plate">
+                <img
+                  src="/img/mock/kyou-site-day-dark.webp"
+                  width="2000"
+                  height="2400"
+                  decoding="async"
+                  fetchpriority="high"
+                  alt="Kyou’s day screen at 3:45. Lunch with a yearbook meeting nested under it, then Spanish, Studio Art and Physics, each drawn as long as it runs, and under them a free block with a red line lying across it."
+                />
+              </div>
+            </figure>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <div class="band band--light curtain">
+          <div class="shell">
+            <div class="track">
+              <section class="sec" id="to-scale" data-sec>
+                <div class="rule" aria-hidden="true"></div>
+                <div class="head">
+                  <span class="mark" aria-hidden="true"><i></i></span>
+                  <h2>To scale</h2>
+                </div>
+                <p>Your calendar app thinks one hour and four hours are the same size.</p>
+                <p>
+                  Kyou draws every block as tall as the thing actually takes. Gaps too, with a red
+                  line crawling across them like a progress bar for your remaining freedom.
+                </p>
+                <p>You could do that arithmetic yourself every morning. Be honest.</p>
+                <figure class="shot">
+                  <div class="plate">
+                    <img
+                      src="/img/mock/kyou-site-gap-crop-dark.webp"
+                      width="2000"
+                      height="1520"
+                      loading="lazy"
+                      decoding="async"
+                      alt="A close crop of the timeline. Physics ends at 2:50, a shaded free block under it reads 14 minutes left, a red line crosses that block, and a to-do at 4 sits below."
+                    />
+                  </div>
+                  <figcaption class="cap">
+                    Physics ends at 2:50. The block under it is the free stretch, drawn live, with
+                    the red line inside it and the writeup at 4.
+                  </figcaption>
+                </figure>
+              </section>
+
+              <section class="sec" id="one-line" data-sec>
+                <div class="rule" aria-hidden="true"></div>
+                <div class="head">
+                  <span class="mark" aria-hidden="true"><i class="blue"></i><i class="orange"></i></span>
+                  <h2>No second copy</h2>
+                </div>
+                <p>We did not build you a second calendar.</p>
+                <p>
+                  Events come from Apple Calendar, to-dos come from Reminders, and both land on the
+                  same line wearing the colors their own lists already gave them. Tick one off here
+                  and it is ticked off there. Apple did the hard part. We took the credit.
+                </p>
+                <p>Delete Kyou tomorrow and nothing moves. We would love to hold your data hostage. Never got around to it.</p>
+                <figure class="shot">
+                  <div class="plate">
+                    <img
+                      src="/img/mock/kyou-site-side-by-side-dark.webp"
+                      width="3200"
+                      height="2000"
+                      loading="lazy"
+                      decoding="async"
+                      alt="Two iPhones showing the same Thursday. Apple’s Calendar on the left with the classes laid out in a grid, Kyou on the right with those same classes in one column and an overdue to-do sitting above them."
+                    />
+                  </div>
+                  <figcaption class="cap">
+                    Apple’s Calendar on the left, Kyou on the right, the same Thursday in both. Lunch
+                    and the yearbook meeting overlap: Apple puts them side by side, Kyou nests one
+                    under the other.
+                  </figcaption>
+                </figure>
+              </section>
+
+              <section class="sec" id="quick-add" data-sec>
+                <div class="rule" aria-hidden="true"></div>
+                <div class="head">
+                  <span class="mark" aria-hidden="true"><i class="orange"></i></span>
+                  <h2>Quick add</h2>
+                </div>
+                <div class="pair pair--flip">
+                <div class="body">
+                  <p class="quote">
+                    chem lab writeup <span class="q-parsed">friday at 4</span><span class="caret" aria-hidden="true"></span>
+                  </p>
+                  <p>It is aggressively stupid, on purpose.</p>
+                  <p>
+                    Type it the way you would text it. A card underneath shows exactly what is about
+                    to be saved, so it cannot quietly decide you meant something else and then act
+                    innocent on Friday.
+                  </p>
+                  <p>
+                    Every other parser guesses. Feed one problems 1 to 10 and watch it produce an
+                    event running from one in the afternoon until ten at night, because it saw two
+                    numbers and got excited. Ours reads homework. That is what you typed. Some people
+                    would call that artificial intelligence. We call it reading.
+                  </p>
+                  <p>Hand it a blank title and the row shakes at you. We were going to write a proper error message. This was worse.</p>
+                </div>
+                <figure class="shot shot--phone">
+                  <div class="plate">
+                    <img
+                      src="/img/mock/kyou-site-quickadd-dark.webp"
+                      width="2000"
+                      height="2400"
+                      loading="lazy"
+                      decoding="async"
+                      alt="Kyou’s add sheet open over the day. The field reads chem lab writeup friday at 4, with friday at 4 colored orange, and a card underneath reading Chem lab writeup, to-do, Friday at four."
+                    />
+                  </div>
+                  <figcaption class="cap">
+                    The card under the field shows the title it took, whether it is an event or a
+                    to-do, and the date it read.
+                  </figcaption>
+                </figure>
+                </div>
+              </section>
+
+              <section class="sec" id="whats-due" data-sec>
+                <div class="rule" aria-hidden="true"></div>
+                <div class="head">
+                  <span class="mark" aria-hidden="true"><i class="orange"></i></span>
+                  <h2>What is due</h2>
+                </div>
+                <div class="pair">
+                <div class="body">
+                  <p>Overdue goes on top.</p>
+                  <p>
+                    Everything you still owe, grouped by how soon, with the late things nailed to the
+                    top where you have to get past them to reach anything pleasant. Tick one off and
+                    it stays put, crossed out, until tomorrow.
+                  </p>
+                  <p>
+                    Tag it <span class="tag">#chem</span> and the tag keeps that color for good. No
+                    color picker. We have seen your taste.
+                  </p>
+                </div>
+                <figure class="shot shot--phone">
+                  <div class="plate">
+                    <img
+                      src="/img/mock/kyou-site-work-dark.webp"
+                      width="2000"
+                      height="2400"
+                      loading="lazy"
+                      decoding="async"
+                      alt="Kyou’s what’s due tab. An overdue library book at the top marked a day late in red, then today’s work including a chem lab writeup under a purple chem tag, then this week, then one thing with no date at all."
+                    />
+                  </div>
+                  <figcaption class="cap">
+                    Overdue at the top, then today, then this week, then the things with no date.
+                  </figcaption>
+                </figure>
+                </div>
+              </section>
+
+              <section class="sec" id="reach" data-sec>
+                <div class="rule" aria-hidden="true"></div>
+                <div class="head">
+                  <span class="mark" aria-hidden="true"><i class="blue"></i></span>
+                  <h2>Week and month</h2>
+                </div>
+                <p>It scrolls.</p>
+                <p>
+                  Sideways through the week, and tapping the weekday opens the month over the top of
+                  it, forwards and backwards as far as you feel like going.
+                </p>
+                <p>Our engineering team worked on this for weeks. They scrolled.</p>
+                <figure class="shot shot--centre">
+                  <div class="plate">
+                    <img
+                      src="/img/mock/kyou-site-month-dark.webp"
+                      width="2000"
+                      height="2400"
+                      loading="lazy"
+                      decoding="async"
+                      alt="The month card open over the day. Today circled in red, colored dots under the dates that have something on them, and the day’s first three items listed underneath."
+                    />
+                  </div>
+                </figure>
+              </section>
+
+              <section class="sec sec--mid" id="the-face" data-sec>
+                <div class="rule" aria-hidden="true"></div>
+                <div class="head">
+                  <span class="mark mark--face" aria-hidden="true">(&#12539;&#7447;&#12539;)</span>
+                  <h2>The face</h2>
+                </div>
+                <div class="body">
+                  <p>There is a face at the top and it is judging nothing.</p>
+                  <p>It changes with the shape of the day, and whatever face the day got is the face the day keeps. It has no opinion about you and never will, which puts it ahead of most of your notifications.</p>
+                  <p>No sad one. Not for the overdue pile, not sitting beside a count, not for a day you did not finish.</p>
+                  <p>Other apps make you feel bad so you open them more often. We looked into it. Legal said no.</p>
+                </div>
+                <figure class="shot">
+                  <div class="plate">
+                    <img
+                      src="/img/mock/kyou-site-faces-dark.webp"
+                      width="3200"
+                      height="2000"
+                      loading="lazy"
+                      decoding="async"
+                      alt="Two iPhones side by side. A clear Sunday reading nothing with a fixed time, next to a full Thursday of classes, each with a different small text face at the top of the screen."
+                    />
+                  </div>
+                  <figcaption class="cap">A clear Sunday next to a full Thursday, same app, same hour.</figcaption>
+                </figure>
+              </section>
+
+              <section class="sec" id="home-screen" data-sec>
+                <div class="rule" aria-hidden="true"></div>
+                <div class="head">
+                  <span class="mark" aria-hidden="true"><i></i></span>
+                  <h2>Widgets</h2>
+                </div>
+                <p>Two of them. We are aware that is not many.</p>
+                <p>
+                  Up Next goes on the Lock Screen, Timeline goes on the Home Screen, and Siri will
+                  add something for you if you are the sort of person willing to be seen talking to a
+                  phone in a hallway.
+                </p>
+              </section>
+
+              <section class="sec" id="nothing-leaves" data-sec>
+                <div class="rule" aria-hidden="true"></div>
+                <div class="head">
+                  <span class="mark" aria-hidden="true"><i class="ring"></i></span>
+                  <h2>Nothing leaves the phone</h2>
+                </div>
+                <div class="pair pair--flip">
+                <div class="body">
+                  <ul class="rows">
+                    <li>No account.</li>
+                    <li>No sign-in.</li>
+                    <li>No server.</li>
+                  </ul>
+                  <p>We would sell your data. There is not any.</p>
+                  <p>
+                    No network code, no web view, and no outside libraries that could smuggle one in.
+                    Nothing to send and nothing to send it with. It is free, and there is nothing
+                    inside it to buy. Our business model is under active review.
+                  </p>
+                  <p>Settings is four switches and two links. We tried to pad it out.</p>
+                </div>
+                <figure class="shot shot--small">
+                  <div class="plate">
+                    <img
+                      src="/img/mock/kyou-site-settings-dark.webp"
+                      width="2000"
+                      height="2400"
+                      loading="lazy"
+                      decoding="async"
+                      alt="Kyou’s settings sheet: the calendars and to-do lists it reads, a notifications switch, a haptics switch, a row reading Kyou is free, a privacy row, and the version line at the foot."
+                    />
+                  </div>
+                  <figcaption class="cap">The bottom of the settings sheet. That is most of it.</figcaption>
+                </figure>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+
+        <div class="band band--dark closing">
+          <div class="shell">
+            <div class="track">
+              <section class="sec" id="where-it-is" data-sec>
+                <div class="rule" aria-hidden="true"></div>
+                <div class="head">
+                  <span class="mark" aria-hidden="true"><i></i></span>
+                  <h2>Where it is</h2>
+                </div>
+                <p>Apple has not let it in yet.</p>
+                <p>
+                  Built: the day, quick add, what is due, the month, both widgets, the Siri
+                  shortcuts. Not built: habits, and there is no empty tab sitting there implying
+                  otherwise.
+                </p>
+                <p class="last">
+                  What is left is Apple’s fee and Apple’s review. One of those is a fixed price and
+                  the other is a coin flip. Until both land you are looking at photographs of an app,
+                  and we are about as thrilled about that as you are.
+                </p>
+                <p class="links">
+                  <a href="https://github.com/exata531" rel="me noopener" target="_blank">github.com/exata531</a>
+                  <a href="/">petermei.com</a>
+                </p>
+              </section>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer class="band band--dark foot">
+        <div class="shell">
+          <div class="track">
+            <span class="end" aria-hidden="true"></span>
+            <p class="today">Kyou is Japanese for today.</p>
+            <p class="row">
+              <a href="/kyou/privacy">Privacy policy</a>
+              <span aria-hidden="true">·</span>
+              <a href="/">petermei.com</a>
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script is:inline>
+      (function () {
+        var page = document.querySelector('.page');
+        var bar = document.querySelector('.now i');
+        var secs = [].slice.call(document.querySelectorAll('[data-sec]'));
+        if (!page || !bar || !secs.length) return;
+
+        /* the red bar sits beside whatever you are reading, the way the app's
+           now-line sits at whatever hour it currently is */
+        var live = secs[0];
+
+        function place() {
+          var m = live.querySelector('.mark') || live;
+          var y = m.getBoundingClientRect().top - page.getBoundingClientRect().top;
+          bar.style.transform = 'translateY(' + Math.round(y) + 'px)';
+        }
+
+        if ('IntersectionObserver' in window) {
+          var seen = [];
+          var watch = new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (e) {
+                var i = seen.indexOf(e.target);
+                if (e.isIntersecting && i === -1) seen.push(e.target);
+                if (!e.isIntersecting && i !== -1) seen.splice(i, 1);
+              });
+              if (seen.length) {
+                /* the topmost section in the band wins, so the bar walks in
+                   document order instead of jumping around */
+                live = secs.filter(function (s) {
+                  return seen.indexOf(s) !== -1;
+                })[0];
+              }
+              place();
+            },
+            { rootMargin: '-45% 0px -50% 0px', threshold: 0 }
+          );
+          secs.forEach(function (s) {
+            watch.observe(s);
+          });
+
+          /* each shot rises once, the first time it comes into view */
+          if (document.documentElement.classList.contains('anim')) {
+            var reveal = new IntersectionObserver(
+              function (entries) {
+                entries.forEach(function (e) {
+                  if (!e.isIntersecting) return;
+                  e.target.classList.add('in');
+                  reveal.unobserve(e.target);
+                });
+              },
+              { rootMargin: '0px 0px -8% 0px', threshold: 0.08 }
+            );
+            [].slice.call(document.querySelectorAll('.shot')).forEach(function (s) {
+              reveal.observe(s);
+            });
+          }
+        }
+
+        place();
+        window.addEventListener('resize', place, { passive: true });
+        window.addEventListener('load', place);
+      })();
+    </script>
+  </body>
+</html>

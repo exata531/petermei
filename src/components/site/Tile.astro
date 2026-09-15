@@ -1,35 +1,37 @@
 ---
-/* One product tile: a pastel field with the product drawn as an object on
-   it (a browser window for volbase, a phone for Kyou, a dark panel for Rin
-   and Market Station), the icon above it, and the name and the two sentences
-   printed under it, where a caption goes and where they stay. */
-import Icon from '../mac/Icon.astro';
+/* One product tile: a pastel field with the product's own icon in the corner
+   and its real capture rising from the bottom edge, then the name and the
+   two sentences printed under it. The whole card is one link. The captures
+   are the staged files in /img/work; each one is cropped to its device so
+   none of the staging ground shows, using bounds measured off the file. */
 import type { Project } from '../../data/site';
+import { icon, shot } from '../../data/site';
 interface Props { p: Project; wide?: boolean; href?: string; line?: string; caption?: boolean }
 const { p, wide = false, href = `/site/work/${p.slug}`, line = p.blurb, caption = true } = Astro.props;
 const tint: Record<string, string> = { volbase: 'var(--c-peri)', rin: 'var(--c-lemon)', kyou: 'var(--c-apri)', market: 'var(--c-green)' };
+const ic = icon[p.slug];
+const s = shot[p.slug];
+/* the crop, as the tile reads it: the image scaled so the device spans the box */
+const sw = (100 * s.w / s.dw).toFixed(2);
+const sx = (-100 * s.x / s.dw).toFixed(2);
+const sy = (-100 * s.y / s.dh).toFixed(2);
+const style = `--tile-tint:${tint[p.slug]};--w:${s.width};--b:${s.bottom};--ar:${s.dw} / ${s.dh};--rad:${s.radius};--sw:${sw}%;--sx:${sx}%;--sy:${sy}%${s.maxWidth ? `;--mw:${s.maxWidth}` : ''}`;
 ---
-<div class:list={['tile-cell', wide ? 'is-wide' : 'is-narrow']}>
-<a class="tile" href={href} style={`--tile-tint:${tint[p.slug]}`} data-tile data-cursor-label="Read about it" aria-label={`${p.name}. ${line}`}>
-  <span class="tile-ico"><Icon id={p.slug} /></span>
-  {p.slug === 'volbase' && (
-    <span class="tile-device" aria-hidden="true">
-      <span class="tile-device-bar"><i></i><i></i><i></i></span>
-      <img src="/img/volbase-landing.webp" width="1280" height="2400" alt="" loading="lazy" decoding="async" style="aspect-ratio: 1280 / 640; object-fit: cover; object-position: top;" />
+<div class:list={['tile-cell', wide ? 'is-wide' : 'is-narrow']} data-tile-cell>
+  <a class="tile" href={href} style={style}>
+    <span class="tile-art" aria-hidden="true">
+      <span class:list={['tile-ico', { 'is-bare': ic.bare }]}>
+        {ic.svg ? <Fragment set:html={ic.svg} /> : <img src={ic.src} width={ic.size} height={ic.size} alt="" loading="lazy" decoding="async" />}
+      </span>
+      <span class="tile-shot">
+        <img src={s.src} srcset={`${s.half} ${s.hw}w, ${s.src} ${s.w}w`} sizes="(max-width: 767px) 340px, 680px" width={s.w} height={s.h} alt="" loading="lazy" decoding="async" />
+      </span>
     </span>
-  )}
-  {p.slug === 'kyou' && <span class="tile-phone" aria-hidden="true"><span>(≧∪≦)</span></span>}
-  {p.slug === 'rin' && <span class="tile-panel" aria-hidden="true"><b>❯</b> /daily<br /><span style="opacity:.6">two things with teeth today.</span></span>}
-  {p.slug === 'market' && (
-    <span class="tile-panel is-tool" aria-hidden="true">VIX 16.8 <span style="opacity:.6">· calm, below 20</span>
-      <svg viewBox="0 0 100 28" preserveAspectRatio="none"><polyline points="0,20 12,17 24,19 36,13 48,15 60,9 72,12 84,7 100,10" /></svg>
-    </span>
-  )}
-</a>
-  {caption && (
-    <div class="tile-say">
-      <b>{p.name}</b>
-      <p>{line}</p>
-    </div>
-  )}
+    {caption && (
+      <span class="tile-say">
+        <h3>{p.name}</h3>
+        <p>{line}</p>
+      </span>
+    )}
+  </a>
 </div>

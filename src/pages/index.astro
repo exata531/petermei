@@ -1,170 +1,74 @@
 ---
-import Mac from '../layouts/Mac.astro';
-import MenuBar from '../components/mac/MenuBar.astro';
-import Stash from '../components/mac/Stash.astro';
-import Landing from '../components/mac/Landing.astro';
-import Icon from '../components/mac/Icon.astro';
-import { readmeCard } from '../data/apps';
-import { deskPhotos } from '../data/photos';
-
-/* the desktop, the way a Macintosh kept one: the hard disk at the top right,
-   then a column of the things on it, the Trash on its own in the corner.
-   There is no dock; every application is an icon you double click. */
-const deskItems = [
-  { id: 'finder', icon: 'hd', label: 'Macintosh HD' },
-  { id: 'volbase', icon: 'volbase', label: 'volbase' },
-  { id: 'rin', icon: 'rin', label: 'Rin' },
-  { id: 'kyou', icon: 'kyou', label: 'Kyou' },
-  { id: 'market', icon: 'market', label: 'Market Station' },
-  { id: 'textedit', icon: 'textedit', label: 'Read Me' },
-  { id: 'pictures', icon: 'folder', label: 'Pictures' },
-  { id: 'photos', icon: 'photos', label: 'Photos' },
-  { id: 'terminal', icon: 'terminal', label: 'Terminal' },
-];
-/* the phone holds the same things in a grid of three */
-const padApps = [
-  { id: 'finder', icon: 'hd', label: 'Macintosh HD' },
-  { id: 'volbase', icon: 'volbase', label: 'volbase' },
-  { id: 'rin', icon: 'rin', label: 'Rin' },
-  { id: 'kyou', icon: 'kyou', label: 'Kyou' },
-  { id: 'market', icon: 'market', label: 'Market Station' },
-  { id: 'pictures', icon: 'folder', label: 'Pictures' },
-  { id: 'photos', icon: 'photos', label: 'Photos' },
-  { id: 'terminal', icon: 'terminal', label: 'Terminal' },
-  { id: 'trash', icon: 'trash', label: 'Trash' },
-];
+/* petermei.com: the home, which is also the Work index. A pinned hero with
+   the name and two paragraphs; then the paper with the four tiles, each one
+   named under its picture; then the rail of what he built; then the footer. */
+import Site from '../layouts/Site.astro';
+import Tile from '../components/site/Tile.astro';
+import Heatmap from '../components/site/Heatmap.astro';
+import { projects, copy, timeline, build, photoFacts, links } from '../data/site';
+const [vb, rin, kyou, ms] = projects;
 ---
-<Mac
-  title="Peter Mei"
-  desc="Peter Mei is a senior at the school, outside Detroit, and makes software. This portfolio is a Macintosh running System 7: volbase, Rin, Kyou and Market Station open as applications on it."
->
-  <!-- the machine: everything that is the computer, so the landing can hold
-       it in a picture and the way in can move it as one thing -->
-  <div class="mac is-pending" data-mac>
-
-  <!-- the desktop -->
-  <div class="desk" data-desk>
-    <ul class="items" aria-label="Desktop">
-      {deskItems.map((d) => (
-        <li>
-          <button class="item" type="button" data-open={d.id}>
-            <span class="item-ico"><Icon id={d.icon} /></span>
-            <span class="item-lbl">{d.label}</span>
-          </button>
-        </li>
-      ))}
-      <li>
-        <a class="item" href="https://github.com/exata531" rel="me noopener" target="_blank" data-open="github">
-          <span class="item-ico"><Icon id="github" /></span>
-          <span class="item-lbl">GitHub</span>
-        </a>
-      </li>
-      {deskPhotos.map((p) => (
-        <li>
-          <button class="item item-file" type="button" data-open="photos" data-photo={p.i} aria-label={`${p.name}, ${p.alt}`}>
-            <span class="item-ico"><Icon id="pict" /></span>
-            <span class="item-lbl">{p.name}</span>
-          </button>
-        </li>
-      ))}
-    </ul>
-    <button class="item item-trash" type="button" data-open="trash" data-trash-icon>
-      <span class="item-ico"><Icon id="trash" /></span>
-      <span class="item-lbl">Trash</span>
-    </button>
-
-    <div class="wins" data-wins></div>
-    <div class="stickies" data-stickies></div>
-  </div>
-
-  <!-- the phone: the same desktop, held in one hand -->
-  <div class="home" data-home>
-    <div class="home-pad">
-      <button class="widget" type="button" data-open="textedit">
-        <span class="wbox wbox-c widget-x" role="button" tabindex="0" data-widget-close aria-label="Close"></span>
-        <span class="widget-h">Read Me</span>
-        <span class="widget-p">{readmeCard}</span>
-        <span class="widget-more">Open the rest</span>
-      </button>
-      <ul class="pad">
-        {padApps.map((a) => (
-          <li>
-            <button class="pad-i" type="button" data-open={a.id}>
-              <span class="pad-tile"><Icon id={a.icon} /></span>
-              <span class="pad-lbl">{a.label}</span>
-            </button>
-          </li>
-        ))}
-        <li>
-          <a class="pad-i" href="https://github.com/exata531" rel="me noopener" target="_blank">
-            <span class="pad-tile"><Icon id="github" /></span>
-            <span class="pad-lbl">GitHub</span>
-          </a>
-        </li>
-      </ul>
+<Site title="petermei.com" desc="Peter Mei is a high school senior in Michigan who makes software. volbase, Rin, Kyou, and Market Station, and the Mac they run on." route="work">
+  <section class="hero" data-hero data-nav-tone="light">
+    <span class="sun" aria-hidden="true"></span>
+    <span class="cloud cloud-a" aria-hidden="true" style="--cf:.34"></span>
+    <span class="cloud cloud-b" aria-hidden="true" style="--cf:.18"></span>
+    <span class="cloud cloud-c" aria-hidden="true" style="--cf:.26"></span>
+    <span class="cloud cloud-d" aria-hidden="true" style="--cf:.12"></span>
+    <span class="cloud cloud-e" aria-hidden="true" style="--cf:.42"></span>
+    <span class="cloud cloud-f" aria-hidden="true" style="--cf:.22"></span>
+    {/* out only after dark, and each one on its own slow breath */}
+    {[[8, 18, 0], [17, 11, 1.6], [31, 26, 3.1], [42, 9, 0.7], [63, 21, 2.3], [74, 13, 4.2], [88, 29, 1.1], [93, 8, 2.8]].map(([x, y, t]) => (
+      <span class="star" aria-hidden="true" style={`left:${x}%;top:${y}%;--t:${t}s`}></span>
+    ))}
+    {/* two birds, the kind that fill his Photos app, crossing the sky as the
+        page scrolls; the wings change on the scroll, never on a clock */}
+    <svg class="bird bird-a" viewBox="0 0 48 24" aria-hidden="true" style="--bf:.9">
+      <path class="w0" d="M2 14c6-8 12-8 18-1 2 2 3 2 6 2 3 0 4 0 6-2 6-7 12-7 14 1-4-3-8-3-13 3-2 3-4 4-7 4s-5-1-7-4C14 11 10 11 2 14Z"/>
+      <path class="w1" d="M4 8c6-2 11 1 16 6 2 2 3 3 4 3s2-1 4-3c5-5 10-8 16-6-5 1-9 4-13 9-2 3-4 4-7 4s-5-1-7-4C13 12 9 9 4 8Z"/>
+    </svg>
+    <svg class="bird bird-b" viewBox="0 0 48 24" aria-hidden="true" style="--bf:.55">
+      <path class="w0" d="M2 14c6-8 12-8 18-1 2 2 3 2 6 2 3 0 4 0 6-2 6-7 12-7 14 1-4-3-8-3-13 3-2 3-4 4-7 4s-5-1-7-4C14 11 10 11 2 14Z"/>
+      <path class="w1" d="M4 8c6-2 11 1 16 6 2 2 3 3 4 3s2-1 4-3c5-5 10-8 16-6-5 1-9 4-13 9-2 3-4 4-7 4s-5-1-7-4C13 12 9 9 4 8Z"/>
+    </svg>
+    {/* the landing is the name, centred, and nothing else (Peter, 09-13:
+        "no need to explain everything"). The sun and the clouds stay; the
+        Mac, the photos and GitHub are one click away in the nav and the
+        footer. */}
+    <div class="hero-in">
+      <h1 class="h-display hero-name hero-only" data-name transition:name="wordmark" aria-label="Peter Mei">{['Peter', 'Mei'].map((word, w) => (<><span class="w">{[...word].map((ch, j) => { const i = w * 6 + j; return <span class={`l l${i % 6}`} style={`--i:${i}`} aria-hidden="true"><i>{ch}</i></span>; })}</span>{w === 0 && <span class="sp" aria-hidden="true"> </span>}</>))}</h1>
     </div>
+  </section>
 
-    <div class="sheet" data-sheet hidden>
-      <div class="sheet-top" data-sheet-top>
-        <span class="sheet-grab" aria-hidden="true"></span>
-        <span class="sheet-name" data-sheet-name></span>
-        <button class="sheet-x" type="button" data-sheet-close aria-label="Close">Close</button>
-      </div>
-      <div class="sheet-body" data-sheet-body></div>
-      <div class="sheet-foot" data-sheet-foot hidden>
-        <div class="sheet-power" role="group" aria-label="Special">
-          <button class="sheet-row" type="button" data-power="sleep">Sleep</button>
-          <button class="sheet-row" type="button" data-power="shutdown">Shut Down</button>
-        </div>
+  <section class="sheet" data-nav-tone="light" aria-labelledby="work-h">
+    <div class="wrap">
+      <h2 class="h-section intro" id="work-h" data-rise>My Projects.</h2>
+      <div class="tiles">
+        <div class="row"><Tile p={vb} wide /><Tile p={rin} /></div>
+        <div class="row"><Tile p={kyou} /><Tile p={ms} wide /></div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <MenuBar />
-
-  <!-- "Welcome to Macintosh." over the desktop while it boots -->
-  <div class="welcome-veil" data-welcome hidden>
-    <div class="welcome">Welcome to Macintosh.</div>
-    <div class="welcome-ext" data-welcome-ext aria-hidden="true">
-      <Icon id="volbase" /><Icon id="rin" /><Icon id="kyou" /><Icon id="market" />
-    </div>
-  </div>
-
-  <!-- the screen's black: inside the machine so it scales with the screen -->
-  <div class="mac-blank" data-mac-blank aria-hidden="true"></div>
-  </div>
-
-  <div class="menu" data-menu-pop hidden role="menu"></div>
-  <div class="notifs" data-notifs aria-live="polite"></div>
-  <div class="menu" data-ctx hidden role="menu"></div>
-
-  <!-- Find File, at the body level so no transform can trap it -->
-  <div class="spot" data-spot hidden>
-    <div class="spot-box" role="dialog" aria-label="Find File">
-      <button class="wbox wbox-c spot-x" type="button" data-sp-close aria-label="Close"></button>
-      <div class="spot-field">
-        <input data-sp-in type="text" placeholder="" aria-label="Find items whose name contains"
-               autocomplete="off" autocapitalize="off" spellcheck="false" />
-      </div>
-      <ul class="spot-list" data-sp-list></ul>
-    </div>
-  </div>
-
-  <!-- the alert a Macintosh shows before it restarts or shuts down -->
-  <div class="alert-veil" data-alert hidden>
-    <div class="alert" data-alert-box role="alertdialog" aria-modal="true" aria-labelledby="alert-title" aria-describedby="alert-wait">
-      <span class="alert-ico" aria-hidden="true"><Icon id="caution" /></span>
-      <p class="alert-title" id="alert-title" data-alert-title></p>
-      <label class="alert-chk"><input type="checkbox" checked /><span>Reopen windows when logging back in</span></label>
-      <p class="alert-wait" id="alert-wait" data-alert-wait></p>
-      <div class="alert-btns">
-        <button class="alert-btn" type="button" data-alert-cancel>Cancel</button>
-        <button class="alert-btn is-default" type="button" data-alert-ok>Restart</button>
+  <section class="rail-sec" data-nav-tone="light" aria-labelledby="rail-h">
+    <div class="wrap">
+      <h2 class="h-section" id="rail-h" data-rise>Here is what I built laid out just for you to look at.</h2>
+      <div class="rail-grid">
+        <ol class="rail" data-rail>
+          {timeline.map((s, i) => (
+            <li class="stop" style={`--i:${i}`}>
+              <span class:list={['node', { 'is-origin': s.origin }]} aria-hidden="true">
+                {s.tone === 'blue' ? <svg viewBox="0 0 16 16"><path d="M2 9.5 6.5 8l2.5-5.5 1.5.5-1.2 5.2L14 9.4l-.3 1.3-4.8-.6-2.6 3.6-1.2-.4 1.2-3.8L2.4 10.8Z"/></svg> : <i></i>}
+              </span>
+              <span class="stop-t">
+                <span>{s.name && <b>{s.name}</b>}{s.name && s.text ? ' ' : ''}{s.text}{s.href && <> <a href={s.href} rel="noopener" target="_blank" data-tab={s.href.includes('volbase') ? 'volbase' : undefined}>{s.href.replace('https://', '')}</a></>}{s.open && <> <a href={`/mac?open=${s.open}`} data-open={s.open}>Open {s.name} on the desktop.</a></>}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
       </div>
     </div>
-  </div>
+  </section>
 
-  <Landing />
-
-  <Stash />
-</Mac>
+  <Heatmap />
+</Site>

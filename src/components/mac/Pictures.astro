@@ -2,10 +2,15 @@
 /* The Pictures folder, as a Finder pane.
 
    One row per photo, carrying everything both views need: the thumbnail, the
-   file name, the date, the kind and the size Finder measured off the real
-   file at build time. Icon view shows the thumbnail in its white frame with
-   the name under it; list view lays the same rows out under four column
-   headers. Thumbnails load when the pane is opened, not with the page. */
+   file name, the size, the kind and the date Finder measured off the real
+   file at build time, in the order of the four column headers. Icon view
+   shows the thumbnail in its white frame with the name under it; list view
+   lays the same rows out under those headers. Thumbnails load when the pane
+   is opened, not with the page.
+
+   Every row wears the same picture icon, so the rows point at the two
+   symbols Stash defined once (the 32 for icon view, the 16 for the list)
+   instead of each carrying a copy of the drawing. */
 import { photos } from '../../data/photos';
 import Icon from './Icon.astro';
 ---
@@ -15,12 +20,12 @@ import Icon from './Icon.astro';
     {photos.map((p) => (
       <li class="fnd-row pic-row" role="option" aria-selected="false" tabindex={p.i === 0 ? 0 : -1} data-pic={p.i} aria-label={`${p.name}, ${p.alt}`}>
         <span class="pic-name">
-          <span class="pic-ico"><Icon id="pict" /></span>
+          <span class="pic-ico"><Icon id="pict" use /><Icon id="pict" use size={16} /></span>
           <b><span class="stem">{p.name.replace(/\.jpeg$/, '')}</span><span class="ext">.jpeg</span></b>
         </span>
-        <span class="pic-date">{p.shortDate}</span>
-        <span class="pic-kind">JPEG image</span>
         <span class="pic-size">{p.size}</span>
+        <span class="pic-kind">JPEG image</span>
+        <span class="pic-date">{p.shortDate}</span>
       </li>
     ))}
   </ul>

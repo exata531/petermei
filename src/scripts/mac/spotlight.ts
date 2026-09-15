@@ -22,6 +22,7 @@ export function initSpotlight(
 ) {
   const field = el.querySelector<HTMLInputElement>('[data-sp-in]')!;
   const list = el.querySelector<HTMLElement>('[data-sp-list]')!;
+  const live = el.querySelector<HTMLElement>('[data-sp-live]');
   let hits: Hit[] = [];
   let sel = 0;
   let open = false;
@@ -29,31 +30,39 @@ export function initSpotlight(
   const render = () => {
     const q = field.value.trim().toLowerCase();
     const all = source();
-    /* an empty field is not an empty panel: the real one already has the list
-       of apps under it the moment it opens, so there is something to arrow to */
+    /* nothing is found until something is asked for: Find File listed no
+       items before a search had run */
     hits = q
       ? all.filter((h) => h.label.toLowerCase().includes(q) || h.kind.toLowerCase().includes(q))
-      : all.slice(0, 7);
+      : [];
     sel = 0;
+    /* the rows are the options and the field stays the focus: the field's
+       aria-activedescendant names the row the arrows are on */
     list.innerHTML = hits
       .map(
         (h, i) =>
-          `<li><button type="button" class="sp-row${i === 0 ? ' is-sel' : ''}" data-i="${i}">
+          `<li role="option" id="sp-opt-${i}" class="sp-row${i === 0 ? ' is-sel' : ''}" aria-selected="${i === 0}" data-i="${i}">
              <span class="sp-glyph" aria-hidden="true">${h.icon ?? ''}</span>
              <span class="sp-label">${h.label}</span>
              <span class="sp-kind">${h.kind}</span>
-           </button></li>`,
+           </li>`,
       )
       .join('');
-    if (q && !hits.length) list.innerHTML = '<li class="sp-none" aria-live="polite">No Results</li>';
+    if (q && !hits.length) list.innerHTML = '<li class="sp-none" role="presentation">No Results</li>';
+    if (live) live.textContent = q && !hits.length ? 'No Results' : '';
+    field.setAttribute('aria-expanded', String(hits.length > 0));
+    mark();
     el.classList.toggle('has-hits', q.length > 0 || hits.length > 0);
   };
 
   const mark = () => {
     list.querySelectorAll<HTMLElement>('.sp-row').forEach((r, i) => {
       r.classList.toggle('is-sel', i === sel);
+      r.setAttribute('aria-selected', String(i === sel));
       if (i === sel) r.scrollIntoView({ block: 'nearest' });
     });
+    if (hits.length) field.setAttribute('aria-activedescendant', `sp-opt-${sel}`);
+    else field.removeAttribute('aria-activedescendant');
   };
 
   const show = () => {
@@ -72,6 +81,8 @@ export function initSpotlight(
   const hide = () => {
     if (!open) return;
     open = false;
+    field.setAttribute('aria-expanded', 'false');
+    field.removeAttribute('aria-activedescendant');
     el.classList.remove('is-open');
     const done = () => { el.hidden = true; };
     if (reduced()) done();

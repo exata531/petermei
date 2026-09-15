@@ -33,6 +33,13 @@ ul, ol { list-style: none; }
 ::selection { background: var(--ink); color: var(--paper); }
 :focus-visible { outline: var(--u) dotted var(--ink); outline-offset: var(--u); }
 .item:focus-visible { outline: none; }
+/* the same bypass every other route has (WEB-074) */
+.skip { position: absolute; left: 12px; top: -80px; z-index: 200; padding: var(--u4) var(--u6); background: var(--paper); color: var(--ink); border: var(--u) solid var(--ink); }
+.skip:focus { top: 12px; }
+/* the skip link belongs to the website, not to the desktop inside the
+   machine, so it takes the site's one ring and not the period dotted one
+   the System 7 drawing uses (WEB-072) */
+.skip:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 .mono { font-family: var(--monaco); }
 body.is-dragging, body.is-dragging * { user-select: none !important; -webkit-user-select: none !important; }
 /* the product demos are pictures of modern apps and keep their own smoothing */
@@ -58,11 +65,15 @@ html:not(.js) .sbox { display: none; }
 html:not(.js) body { background: var(--paper); }
 
 .stash { max-width: 720px; margin: 0 auto; padding: 56px 24px 96px; font-family: var(--geneva); font-size: var(--fs-10); line-height: 1.5; }
-.stash-head h1 { font-family: var(--chicago); font-size: calc(24 * var(--u)); line-height: 1.2; }
+/* the two Chicago headings state their weight: the bitmap face has one, and
+   the browser's default bold on an h1 smears a second stroke over it, which
+   closes the dot of an i and turns the name into "petermel". The size is the
+   one bitmap size too; there is no Chicago at one and a half times */
+.stash-head h1 { font-family: var(--chicago); font-size: var(--fs-12); font-weight: 400; line-height: var(--lh-12); }
 .stash-head p { margin-top: 10px; max-width: 52ch; }
 .stash-note { color: var(--grey-4); }
 .stash-app { margin-top: 40px; padding-top: 22px; border-top: var(--u) solid var(--ink); }
-.stash-h { font-family: var(--chicago); font-size: var(--fs-12); }
+.stash-h { font-family: var(--chicago); font-size: var(--fs-12); font-weight: 400; }
 .stash-p { margin-top: 6px; max-width: 56ch; }
 .stash-meta { margin-top: 4px; color: var(--grey-4); }
 .stash a { text-decoration: underline; text-underline-offset: 3px; }
@@ -82,6 +93,10 @@ html:not(.js) body { background: var(--paper); }
   direction: rtl;
   gap: 0;
   max-height: calc(100vh - var(--bar) - calc(56 * var(--u)));
+  /* a short screen wraps the column into more columns than fit across it;
+     they stay reachable by scrolling instead of vanishing off the left edge */
+  max-width: calc(100vw - 2 * var(--u8));
+  overflow: auto;
 }
 .items > * { direction: ltr; }
 .item {
@@ -90,8 +105,10 @@ html:not(.js) body { background: var(--paper); }
 }
 .item-ico { position: relative; width: var(--icon); height: var(--icon); }
 .item-ico .ico { width: 100%; height: 100%; }
-/* a selected icon is drawn dark, an open application's icon is drawn as a ghost */
-.item.is-sel .item-ico .ico, .item:focus-visible .item-ico .ico { filter: invert(1); }
+/* a selected icon is drawn dark, its own colours pulled toward black, the
+   way the Finder darkened one; a negative would turn a manila folder navy.
+   An open application's icon is drawn as a ghost */
+.item.is-sel .item-ico .ico, .item:focus-visible .item-ico .ico { filter: brightness(.45); }
 .item.is-open .item-ico { -webkit-mask: var(--dither); mask: var(--dither); -webkit-mask-size: var(--dither-size); mask-size: var(--dither-size); }
 .item-lbl {
   font-family: var(--geneva); font-size: var(--fs-9); line-height: var(--lh-9); text-align: center;
@@ -105,19 +122,27 @@ html:not(.js) body { background: var(--paper); }
 /* the Trash sits in the bottom right corner on its own */
 .item-trash { position: fixed; right: var(--u4); bottom: var(--u3); z-index: 2; }
 
-/* ══ the menu bar: 20 units of white with a black line under it ═════════ */
+/* ══ the menu bar: 20 units of white with a black line under it ═════════
+   A phone with a sensor housing at the top of its screen adds that housing's
+   height above the bar, so the Apple and the clock sit under glass rather
+   than under the hardware; everything that hangs from the bar measures from
+   the same number, and on a desktop it is simply the bar. */
+:root { --bar-top: calc(var(--bar) + max(0px, env(safe-area-inset-top))); }
 .mbar {
   position: fixed; inset: 0 0 auto; z-index: 60;
-  height: var(--bar); display: flex; align-items: stretch;
+  height: var(--bar-top); display: flex; align-items: stretch;
   justify-content: space-between; gap: 0;
-  padding: 0 var(--u6) 0 0;
+  padding: max(0px, env(safe-area-inset-top)) var(--u6) 0 0;
   background: var(--paper); color: var(--ink);
   border-bottom: var(--u) solid var(--ink);
   font-family: var(--chicago); font-size: var(--fs-12);
   user-select: none; -webkit-user-select: none;
 }
 .mbar-l, .mbar-r { display: flex; align-items: stretch; min-width: 0; }
-.mb-menus { display: flex; align-items: stretch; }
+/* the titles may run out of room before the right-hand group does, and when
+   they do they stop short of it rather than run underneath it */
+.mbar-l { overflow: hidden; }
+.mb-menus { display: flex; align-items: stretch; min-width: 0; overflow: hidden; }
 .mb-item {
   position: relative;
   display: inline-flex; align-items: center; gap: var(--u4);
@@ -126,24 +151,31 @@ html:not(.js) body { background: var(--paper); }
 }
 /* an open title is inverted, the whole height of the bar */
 .mb-item[aria-expanded='true'], .mb-item[aria-expanded='true']:hover { background: var(--ink); color: var(--paper); }
-.mb-apple { padding: 0 calc(9 * var(--u)) 0 calc(10 * var(--u)); }
-.mb-apple .ico, .mb-help .ico, .mb-appmenu .ico, .mb-rin .ico { width: var(--icon); height: var(--icon); margin: 0 calc(-8 * var(--u)); flex: none; }
-.mb-apple[aria-expanded='true'] .ico, .mb-help[aria-expanded='true'] .ico, .mb-appmenu[aria-expanded='true'] .ico, .mb-rin[aria-expanded='true'] .ico { filter: invert(1); }
+.mb-apple { padding: 0 calc(6 * var(--u)); }
+/* the bar's icons are sixteen unit boxes, centred in their titles, so the
+   inverted Apple title is a snug black rectangle around the apple */
+.mb-apple .ico, .mb-help .ico, .mb-appmenu .ico, .mb-rin .ico { width: var(--icon-s); height: var(--icon-s); max-width: none; margin: 0; flex: none; }
+.mb-appico { display: block; width: var(--icon-s); height: var(--icon-s); flex: none; }
+.mb-apple[aria-expanded='true'] .ico, .mb-help[aria-expanded='true'] .ico, .mb-appmenu[aria-expanded='true'] .ico { filter: invert(1); }
 .mb-app { display: none; }
 .mbar-r .mb-item { padding: 0 var(--u6); }
-/* the Application menu is the last thing before the screen edge */
-.mb-appmenu { padding-right: calc(9 * var(--u)); }
 .mb-clock time { white-space: pre; }
+/* a window narrower than a 14 inch screen cannot hold five Finder titles and
+   the clock both, so the clock steps out and the titles close up a little,
+   which is what a small screen made an application do */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .mb-clock { display: none; }
+  .mb-item, .mb-apple { padding: 0 calc(5 * var(--u)); }
+}
 
 /* ── the pull-down: white, a one unit border, a one unit shadow, 16 unit rows ── */
 .menu {
-  position: fixed; top: calc(var(--bar) - var(--u)); z-index: 70;
+  position: fixed; top: calc(var(--bar-top) - var(--u)); z-index: 70;
   min-width: calc(100 * var(--u)); padding: 0;
   background: var(--paper); color: var(--ink);
   border: var(--u) solid var(--ink);
   box-shadow: var(--shadow);
-  user-select: none; -webkit-user-select: none;
-}
+  user-select: none; -webkit-user-select: none; outline: none; /* the pop takes focus on a mouse open so the arrows work; no ring, a menu is not a control */ }
 .menu-row {
   display: grid; grid-template-columns: calc(12 * var(--u)) 1fr auto; align-items: center; gap: 0;
   width: 100%; height: var(--menu-row); text-align: left;
@@ -161,10 +193,12 @@ html:not(.js) body { background: var(--paper); }
 .menu-chk svg:not(.ico) { width: calc(9 * var(--u)); height: calc(9 * var(--u)); fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: square; }
 .menu-lbl { overflow: hidden; white-space: nowrap; }
 .menu-key { padding-left: calc(16 * var(--u)); white-space: pre; font-family: var(--symbols); font-size: var(--fs-sym); }
-/* the separator is a grey line that takes a whole row */
+/* the separator is a dotted line that takes a whole row: the menu drew it
+   with the fifty percent pattern, one pixel tall, the same dither as the
+   desktop, so it is dots on every kind of screen and never a smooth grey */
 .menu-sep {
   display: block; height: var(--u); margin: calc(7 * var(--u)) 0 calc(8 * var(--u)); border: 0;
-  background: var(--grey-2);
+  background: var(--dither); background-size: var(--dither-size);
 }
 .menu.menu-cc { display: none; }
 
@@ -361,6 +395,14 @@ html:not(.js) body { background: var(--paper); }
 .sb-lf { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath d='M3.5 8 9 3 9 6 12.5 6 12.5 10 9 10 9 13Z' fill='%23fff' stroke='%23000'/%3E%3C/svg%3E"); }
 .sb-rt { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath d='M12.5 8 7 13 7 10 3.5 10 3.5 6 7 6 7 3Z' fill='%23fff' stroke='%23000'/%3E%3C/svg%3E"); }
 .sb-arw:active { filter: invert(1); }
+/* with nothing to scroll the arrows grey out along with the track: the
+   Control Manager drew the whole bar inactive, not only its thumb, and a
+   held arrow on a bar that cannot move has nothing to flash for */
+.sb:not(.is-live) .sb-up { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath d='M8 3.5 13 9 10 9 10 12.5 6 12.5 6 9 3 9Z' fill='%23fff' stroke='%23888'/%3E%3C/svg%3E"); }
+.sb:not(.is-live) .sb-dn { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath d='M8 12.5 3 7 6 7 6 3.5 10 3.5 10 7 13 7Z' fill='%23fff' stroke='%23888'/%3E%3C/svg%3E"); }
+.sb:not(.is-live) .sb-lf { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath d='M3.5 8 9 3 9 6 12.5 6 12.5 10 9 10 9 13Z' fill='%23fff' stroke='%23888'/%3E%3C/svg%3E"); }
+.sb:not(.is-live) .sb-rt { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath d='M12.5 8 7 13 7 10 3.5 10 3.5 6 7 6 7 3Z' fill='%23fff' stroke='%23888'/%3E%3C/svg%3E"); }
+.sb:not(.is-live) .sb-arw:active { filter: none; }
 .sb-arw::before { content: ''; position: absolute; inset: calc(-1 * var(--u2)); }
 
 .sb-track { position: relative; background: var(--paper); overflow: hidden; }
@@ -385,6 +427,20 @@ html:not(.js) body { background: var(--paper); }
 .win:not(.is-front) .sb-thumb { visibility: hidden; }
 .win:not(.is-front) .sb-track { background: var(--paper); }
 .win:not(.is-front) .win-grow { background-image: none; }
+/* and what the window holds goes quiet with it: a selection drops its
+   highlight and the buttons and fields go grey, so nothing inside a window
+   at the back looks like it would take the next click (Inside Macintosh,
+   Responding to Activate Events). The icon of a selected row comes back to
+   its own colours with the label, or it would stay dark beside a plain name */
+.win:not(.is-front) .tb-btn.is-on,
+.win:not(.is-front) .tb-btn[aria-selected='true'],
+.win:not(.is-front) .fnd-tab.is-on,
+.win:not(.is-front) .fnd-row.is-sel b,
+.win:not(.is-front) .fnd.is-list .fnd-row.is-sel { background: var(--paper); color: var(--ink); }
+.win:not(.is-front) .fnd .fnd-row.is-sel .fnd-row-ico .ico,
+.win:not(.is-front) .fnd .fnd-row.is-sel .pic-ico .ico { filter: none; }
+.win:not(.is-front) .tb-btn,
+.win:not(.is-front) .tb-url { color: var(--grey-3); border-color: var(--grey-3); }
 
 /* the same element is the whole no-JS page and the inside of a window, so the
    plain-page headings step aside the moment it is carried into one */
@@ -402,20 +458,14 @@ html:not(.js) body { background: var(--paper); }
    way every System 7 document window did */
 .win-pane { position: relative; background: var(--paper); }
 .win-pane > [data-body],
-.sheet-body > [data-body],
-.panel > [data-body] { height: 100%; margin: 0; padding: 0; border: 0; }
+.sheet-body > [data-body] { height: 100%; margin: 0; padding: 0; border: 0; }
 .win-pane .stash-h, .win-pane .stash-p, .win-pane .stash-meta, .win-pane .stash-app > p,
-.sheet-body .stash-h, .sheet-body .stash-p, .sheet-body .stash-meta, .sheet-body .stash-app > p,
-.panel .stash-h, .panel .stash-p, .panel .stash-meta, .panel .stash-app > p { display: none; }
-.win-pane .sbox, .sheet-body .sbox, .panel .sbox { height: 100%; margin: 0; }
+.sheet-body .stash-h, .sheet-body .stash-p, .sheet-body .stash-meta, .sheet-body .stash-app > p { display: none; }
+.win-pane .sbox, .sheet-body .sbox { height: 100%; margin: 0; }
 
-/* the product windows hold a scaled demo and nothing else; the letterbox
-   around a demo wears the demo's own surface */
-.win-volbase .win-pane { background: var(--vb-page); }
-.win-market .win-pane { background: #f5f5f8; }
-.win-kyou .win-pane { background: var(--paper); }
-.win-volbase .sframe { border-radius: 0; }
-.win-kyou .sframe { background: transparent; }
+/* a browser window holds one live page, edge to edge, at its own size */
+.win-nav .win-pane { background: var(--vb-page); }
+.win-nav .sframe { border-radius: 0; }
 
 /* ── About: a small window, the icon beside the words, Geneva for the story ── */
 .win-about .win-pane { overflow: auto; }
@@ -427,7 +477,9 @@ html:not(.js) body { background: var(--paper); }
 }
 .abt::after { display: none; }
 .abt-ico { grid-row: 1 / 4; width: var(--icon); height: var(--icon); }
-.abt-name { font-family: var(--chicago); font-size: var(--fs-12); line-height: var(--lh-12); }
+/* the name is an h3, and the browser's default bold on the one-weight bitmap
+   face is a synthesised stroke that closes the dot of the i in petermei */
+.abt-name { font-family: var(--chicago); font-size: var(--fs-12); font-weight: 400; line-height: var(--lh-12); }
 .abt-ver { font-family: var(--geneva); font-size: var(--fs-9); line-height: var(--lh-9); margin-top: calc(-1 * var(--u2)); }
 .abt-line { font-family: var(--geneva); font-size: var(--fs-10); line-height: calc(13 * var(--u)); max-width: 46ch; }
 .abt-peter .abt-line { max-width: 40ch; }
@@ -442,13 +494,18 @@ html:not(.js) body { background: var(--paper); }
 .notifs { position: fixed; top: calc(var(--bar) + var(--u4)); right: var(--u4); z-index: 75; display: grid; gap: var(--u4); pointer-events: none; }
 .notif {
   pointer-events: auto;
-  display: grid; grid-template-columns: var(--icon) 1fr auto; align-items: center; gap: var(--u4);
-  width: min(calc(180 * var(--u)), calc(100vw - 24px)); padding: var(--u4) var(--u6);
+  display: grid; grid-template-columns: var(--icon) 1fr auto; align-items: start; gap: var(--u4);
+  width: min(calc(220 * var(--u)), calc(100vw - 24px)); padding: var(--u4) var(--u6);
   background: var(--paper); color: var(--ink);
   border: var(--u) solid var(--ink); box-shadow: var(--shadow);
+  /* it comes in from the right edge in four frames, the same four the sheet
+     takes, and goes back out the same way before the script drops it */
+  transform: translateX(calc(100% + var(--u4)));
+  transition: transform 200ms steps(4, end);
 }
 .notif.is-in { transform: none; }
-.notif-ico { width: var(--icon); height: var(--icon); }
+/* the icon sits level with the title's first line, the way the alert's does */
+.notif-ico { width: var(--icon); height: var(--icon); align-self: start; }
 .notif-txt { display: grid; gap: var(--u); min-width: 0; }
 .notif-txt b { font-family: var(--chicago); font-weight: 400; font-size: var(--fs-12); line-height: 1; }
 .notif-txt span { font-family: var(--geneva); font-size: var(--fs-9); line-height: var(--lh-9); }
@@ -521,7 +578,9 @@ html:not(.js) body { background: var(--paper); }
 }
 .alert-ico { display: block; grid-row: 1 / 3; width: var(--icon); height: var(--icon); }
 .alert-ico svg { display: block; width: 100%; height: 100%; }
-.alert-title { font-family: var(--chicago); font-size: var(--fs-12); line-height: var(--lh-12); }
+/* the 404 uses an h1 here, and the browser's default bold on a one-weight
+   bitmap face is a synthesised stroke: it swallowed the gap under the i */
+.alert-title { font-family: var(--chicago); font-size: var(--fs-12); line-height: var(--lh-12); font-weight: 400; }
 .alert-chk { grid-column: 2; display: none; align-items: center; gap: var(--u4); font-family: var(--geneva); font-size: var(--fs-9); line-height: var(--lh-9); }
 .alert-chk input, .chk {
   appearance: none; -webkit-appearance: none; margin: 0; flex: none;
@@ -570,18 +629,23 @@ html:not(.js) body { background: var(--paper); }
   display: grid; justify-items: center; gap: var(--u); width: calc(64 * var(--u));
   padding: 0; text-align: center; color: var(--ink); cursor: default;
 }
-.fnd-row .fnd-glyph, .fnd-row-ico { width: var(--icon); height: var(--icon); }
+/* the icon is a block so its size holds, and the name stacks under it one
+   unit down rather than sharing its line and hanging into the row below */
+.fnd-name { display: grid; justify-items: center; gap: var(--u); min-width: 0; max-width: 100%; }
+.fnd-row .fnd-glyph, .fnd-row-ico { display: block; width: var(--icon); height: var(--icon); }
 .fnd-row-ico .ico { width: 100%; height: 100%; }
 .fnd-row b { font-family: var(--geneva); font-size: var(--fs-9); font-weight: 400; line-height: var(--lh-9); padding: 0 var(--u); max-width: calc(100 * var(--u)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fnd-row small { display: none; }
 .fnd-row.is-sel b { background: var(--ink); color: var(--paper); }
-.fnd-row.is-sel .fnd-row-ico .ico, .fnd-row.is-sel .pic-ico .ico { filter: invert(1); }
+.fnd-row.is-sel .fnd-row-ico .ico, .fnd-row.is-sel .pic-ico .ico { filter: brightness(.45); }
 .fnd-row.is-open .fnd-row-ico { -webkit-mask: var(--dither); mask: var(--dither); -webkit-mask-size: var(--dither-size); mask-size: var(--dither-size); }
 .fnd-row:focus-visible { outline: none; }
 .fnd-row:focus-visible b { outline: var(--u) dotted var(--ink); }
 /* the list: sixteen unit rows, a small icon, the column names over them with
    the sorted one underlined */
-.fnd { --cols: minmax(calc(90 * var(--u)), 1.6fr) .6fr 1fr 1.1fr; }
+/* Kind carries the longest words in the list ("SimpleText document"), so it
+   takes the widest of the three shares and the date the narrowest */
+.fnd { --cols: minmax(calc(90 * var(--u)), 1.3fr) .6fr 1.45fr .95fr; }
 .fnd-cols { display: none; grid-template-columns: var(--cols); align-items: center; height: calc(14 * var(--u)); padding: 0 var(--u4); font-family: var(--geneva); font-size: var(--fs-9); line-height: 1; position: sticky; top: calc(14 * var(--u)); z-index: 1; background: var(--paper); }
 .fnd.is-list .fnd-cols { display: grid; }
 .fnd-cols span { padding-left: var(--u4); white-space: nowrap; }
@@ -593,7 +657,13 @@ html:not(.js) body { background: var(--paper); }
 }
 .fnd.is-list .fnd-row .fnd-name, .fnd.is-list .pic-name { display: flex; align-items: center; gap: var(--u2); min-width: 0; }
 .fnd.is-list .fnd-row .fnd-row-ico, .fnd.is-list .fnd-row .fnd-glyph { width: var(--icon-s); height: var(--icon-s); }
-.fnd.is-list .fnd-row b { padding: 0; }
+/* a row carries its icon twice, the 32 grid and the 16 drawn for the list,
+   and shows the one its view is at: the small drawing is not the big one
+   shrunk, so neither can stand in for the other */
+.fnd-row-ico .ico-s, .pic-ico .ico-s { display: none; }
+.fnd.is-list .fnd-row-ico .ico:not(.ico-s), .fnd.is-list .pic-ico .ico:not(.ico-s) { display: none; }
+.fnd.is-list .fnd-row-ico .ico-s, .fnd.is-list .pic-ico .ico-s { display: inline; }
+.fnd.is-list .fnd-row b { padding: 0; max-width: none; }
 .fnd.is-list .fnd-row small, .fnd.is-list .pic-date, .fnd.is-list .pic-kind, .fnd.is-list .pic-size { display: block; font-family: var(--geneva); font-size: var(--fs-9); line-height: 1; padding-left: var(--u4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 .fnd.is-list .fnd-row.is-sel { background: var(--ink); color: var(--paper); }
 .fnd.is-list .fnd-row.is-sel b { background: none; color: inherit; }
@@ -619,22 +689,26 @@ html:not(.js) body { background: var(--paper); }
 .fnd-doc, .fnd-file, .fnd-sheet { display: none; }
 
 /* the Pictures folder and the Trash: the rows are pictures */
-.pic-rows { grid-template-columns: repeat(auto-fill, calc(64 * var(--u))); }
-.pic-row { width: calc(64 * var(--u)); }
+/* a 72 unit cell: every IMG name is one line inside it with a gutter to its
+   neighbours, so no name is cut short and no two labels touch */
+.pic-rows { grid-template-columns: repeat(auto-fill, calc(72 * var(--u))); }
+.pic-row { width: calc(72 * var(--u)); }
 .pic-name { display: grid; justify-items: center; gap: var(--u); min-width: 0; max-width: 100%; }
 /* every picture file wears the same mark, whatever the picture is: the
    machine had no thumbnails, only the icon its kind was given */
 .pic-ico { display: grid; place-items: center; width: var(--icon); height: var(--icon); }
-.pic-row b { display: flex; justify-content: center; max-width: 100%; }
-.pic-row b .stem { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.pic-row b .ext { flex: none; }
+/* the name is never split around its extension: the Finder centred the whole
+   name under the icon and only cut one that could not fit */
+.pic-row b { display: block; min-width: 0; white-space: nowrap; text-align: center; }
+.fnd:not(.is-list) .pic-row b { max-width: calc(68 * var(--u)); }
 .fnd:not(.is-list) .pic-date, .fnd:not(.is-list) .pic-kind, .fnd:not(.is-list) .pic-size { display: none; }
 .fnd.is-list .pic-ico { width: var(--icon-s); height: var(--icon-s); }
 .fnd.is-list .pic-row.is-sel .pic-ico .ico { filter: invert(1); }
+/* the Trash holds long names, and in icon view they wrap at whole words in a
+   wider cell; the list keeps its one line rows like every other list */
 [data-tr-items] .pic-rows { grid-template-columns: repeat(auto-fill, calc(84 * var(--u))); }
 [data-tr-items] .pic-row { width: calc(84 * var(--u)); }
-[data-tr-items] .pic-row b { display: block; white-space: normal; overflow-wrap: normal; word-break: normal; line-height: var(--lh-9); }
-[data-tr-items] .pic-row b .stem { display: inline; overflow: visible; }
+.fnd:not(.is-list) [data-tr-items] .pic-row b { max-width: 100%; white-space: normal; overflow-wrap: normal; word-break: normal; line-height: var(--lh-9); }
 html.pm-trash-empty .ico-paper { display: none; }
 
 /* ── Quick Look: the picture in a window of its own size ─────────────── */
@@ -651,23 +725,6 @@ html.pm-trash-empty .ico-paper { display: none; }
 }
 .txt h2 { font-family: var(--chicago); font-size: var(--fs-12); font-weight: 400; }
 
-/* ══ Rin's panel: it hangs off its own menu bar item, the way it does on
-   Peter's Mac; here it is a windoid with no title bar ══════════════════ */
-.panel {
-  position: fixed; top: calc(var(--bar) + var(--u)); left: 0;
-  width: min(760px, calc(100vw - 24px)); height: 372px;
-  max-height: calc(100dvh - var(--bar) - 18px);
-  z-index: 40; overflow: hidden;
-  background: var(--paper);
-  border: var(--u) solid var(--ink); box-shadow: var(--shadow);
-  transform-origin: var(--px, 50%) top;
-  opacity: calc(round(up, var(--drop, 0)));
-  will-change: transform;
-}
-.panel .sframe .rin, .sheet[data-app='rin'] .sframe .rin { grid-template-rows: 0 1fr; }
-.panel .rin .rin-bar, .sheet[data-app='rin'] .rin .rin-bar { display: none; }
-.panel .sbox { background: var(--slate); }
-
 /* ══ Terminal: Monaco 9 on white, black, the way an MPW window read ════ */
 .win-term .win-pane { background: var(--paper); }
 [data-vterm].term {
@@ -680,15 +737,19 @@ html.pm-trash-empty .ico-paper { display: none; }
 [data-vterm].term .term-scroll { overflow: auto; padding: var(--u4) var(--u6) var(--u6); overscroll-behavior: contain; cursor: text; font-size: var(--fs-9); line-height: var(--lh-9); }
 [data-vterm].term .term-out a { color: var(--navy); }
 [data-vterm].term .term-out .ok, [data-vterm].term .term-out .amber, [data-vterm].term .term-out .cmd { color: var(--ink); }
-/* Rin's own panel sets a pale colour on .term-out, and a rule on the element
-   beats a colour inherited from its parent, so the Terminal states its own */
+/* the Terminal states its own colour on the element rather than inheriting
+   it, so nothing a parent sets can tint a window that is meant to be paper */
 [data-vterm].term .term-out, [data-vterm].term .term-mirror, [data-vterm].term .term-line { margin: 0; font: inherit; white-space: pre-wrap; word-break: break-word; color: var(--ink); }
 [data-vterm].term .term-out:empty { display: none; }
 [data-vterm].term .dim { color: var(--ink); }
 [data-vterm].term .term-dir { color: var(--navy); }
-[data-vterm].term .term-acc { color: var(--ink); text-decoration: underline; }
+/* the accent is a <b>, and the bitmap face has only one weight, so without
+   this the browser fattens the stroke by a whole unit and closes the counters */
+[data-vterm].term .term-acc { color: var(--ink); font-weight: 400; text-decoration: underline; }
 [data-vterm].term .term-art { color: var(--ink); }
-[data-vterm].term .term-ps { color: var(--ink); }
+/* same story as the colour above: the bitmap face has exactly one weight, so
+   the prompt states it rather than taking a bolder one from anywhere */
+[data-vterm].term .term-ps { color: var(--ink); font-weight: 400; }
 [data-vterm].term .term-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--u3); }
 [data-vterm].term .term-mirror { white-space: pre-wrap; word-break: break-all; min-height: 1em; }
 [data-vterm].term .term-caret { width: var(--u); height: var(--lh-9); align-self: center; background: var(--ink); }
@@ -756,14 +817,24 @@ html.is-mc .items, html.is-mc .stickies { opacity: 0; pointer-events: none; }
 /* ══ the screensaver: the photographs, with the clock in Chicago ═══════ */
 .saver { position: fixed; inset: 0; z-index: 88; background: #000; opacity: 0; transition: opacity 400ms steps(4, end); cursor: none; }
 .saver.is-on { opacity: 1; }
+/* each slot is a twelfth wider than the screen and drifts across that
+   margin one unit at a time, back and forth, for as long as the saver runs;
+   a turn is one leg of the drift, so a photograph and the one after it move
+   opposite ways. A photograph takes its turn by dissolving in as the last
+   one dissolves out, in eight steps */
 .sv-img {
   position: absolute; left: -6%; top: -6%; right: auto; bottom: auto;
   width: 112%; height: 112%; max-width: none; max-height: none; object-fit: cover;
   opacity: 0;
+  transition: opacity 1200ms steps(8, end);
+  animation: sv-drift 14s steps(32, end) infinite alternate;
 }
+@keyframes sv-drift { from { translate: 0 0; } to { translate: calc(-32 * var(--u)) 0; } }
 .sv-img.is-on { opacity: 1; }
 .sv-clock { position: absolute; z-index: 1; left: calc(16 * var(--u)); bottom: calc(14 * var(--u)); color: var(--paper); display: grid; gap: var(--u2); }
-.sv-clock b { display: inline-block; padding: var(--u2) var(--u4); background: var(--ink); font-family: var(--chicago); font-weight: 400; font-size: calc(24 * var(--u)); line-height: 1; }
+/* the time and the date are both Chicago 12: the machine had no Chicago at
+   one and a half times, and the black slip carries the emphasis instead */
+.sv-clock b { display: inline-block; justify-self: start; padding: var(--u2) var(--u4); background: var(--ink); font-family: var(--chicago); font-weight: 400; font-size: var(--fs-12); line-height: 1; }
 .sv-clock span { display: inline-block; justify-self: start; padding: var(--u) var(--u4); background: var(--ink); font-family: var(--chicago); font-size: var(--fs-12); }
 
 /* ══ About This Macintosh ══════════════════════════════════════════════ */
@@ -816,8 +887,8 @@ html.is-mc .items, html.is-mc .stickies { opacity: 0; pointer-events: none; }
 .pho-cell { position: relative; display: block; width: 100%; aspect-ratio: 1; overflow: hidden; background: var(--grey-1); border: var(--u) solid var(--ink); }
 .pho-cell img { width: 100%; height: 100%; object-fit: cover; }
 .pho-cell:focus-visible { outline: var(--u) dotted var(--ink); outline-offset: calc(-1 * var(--u3)); }
-[data-ph-cell][aria-selected='true'] .pho-cell { outline: var(--u3) solid var(--ink); outline-offset: calc(-1 * var(--u4)); }
-[data-ph-cell][aria-selected='true'] .pho-cell::after { display: none; }
+.pho-cell[aria-selected='true'] { outline: var(--u3) solid var(--ink); outline-offset: calc(-1 * var(--u4)); }
+.pho-cell[aria-selected='true']::after { display: none; }
 .pho-count { padding: var(--u6) var(--u4) var(--u4); text-align: center; font-family: var(--geneva); font-size: var(--fs-9); }
 .pho-title { padding: var(--u6) var(--u6) var(--u2); }
 .pho-title h2 { font-family: var(--chicago); font-size: var(--fs-12); font-weight: 400; }
@@ -901,7 +972,12 @@ html.is-cover .mac.is-far:not(.is-moving) { z-index: 1; }
 .mac.is-far, .mac.is-far * { pointer-events: none !important; }
 .desk:focus, .desk:focus-visible { outline: none; }
 
-/* "Welcome to Macintosh." in its box, with the extensions marching under it */
+/* the boot, in beats. The grey screen holds the Happy Mac, then "Welcome to
+   Macintosh." in its box, then the extensions march in under it one at a
+   time; the script moves the stage along and nothing here animates on its
+   own, because a Macintosh drew each of these in one frame and left it. The
+   veil takes the pointer so a click skips the boot instead of landing on a
+   desktop icon under it. */
 .welcome {
   position: absolute; left: 50%; top: 44%; translate: -50% -50%; z-index: 96;
   padding: calc(14 * var(--u)) calc(24 * var(--u));
@@ -911,9 +987,21 @@ html.is-cover .mac.is-far:not(.is-moving) { z-index: 1; }
   font-family: var(--chicago); font-size: var(--fs-12); line-height: 1; white-space: nowrap;
   pointer-events: none;
 }
+.welcome-happy { position: absolute; left: 50%; top: 44%; translate: -50% -50%; z-index: 96; width: var(--icon); height: var(--icon); pointer-events: none; }
 .welcome-ext { position: absolute; left: var(--u4); bottom: var(--u4); z-index: 96; display: flex; gap: var(--u4); pointer-events: none; }
-.welcome-ext .ico { width: var(--icon); height: var(--icon); }
-.welcome-veil { position: absolute; inset: 0; z-index: 95; background: var(--paper) var(--dither); background-size: var(--dither-size); pointer-events: none; }
+.welcome-ext .ico { width: var(--icon); height: var(--icon); visibility: hidden; }
+.welcome-ext .ico.is-on { visibility: visible; }
+.welcome-veil { position: absolute; inset: 0; z-index: 95; background: var(--paper) var(--dither); background-size: var(--dither-size); cursor: default; }
+.welcome-veil:not([data-stage='happy']) .welcome-happy { display: none; }
+.welcome-veil:not([data-stage='welcome']) .welcome-boot { display: none; }
+.welcome-veil:not([data-stage='welcome']) .welcome-ext { display: none; }
+.welcome-veil:not([data-stage='safe']) .welcome-safe { display: none; }
+/* the machine sitting in the room is not switched on, so its screen is one
+   flat grey and nothing else. The dither is the DESKTOP's pattern, and at
+   picture size it reads as static rather than as a screen (Peter, 09-15:
+   "just make it grey"). The boot stages keep the dither, because that is
+   what a Macintosh actually showed while it started up. */
+.welcome-veil[data-stage='idle'] { background: #6f7175; }
 
 /* ══ the landing: a white page, a drawn Macintosh, the desktop live on its screen ══ */
 .land {
@@ -923,17 +1011,28 @@ html.is-cover .mac.is-far:not(.is-moving) { z-index: 1; }
 }
 html.in .land, html:not(.js) .land { display: none !important; }
 .land-ground { position: absolute; inset: 0; background: var(--paper); }
+/* the desk the laptop sits on: the drawing leaves it out so the surface can
+   run the whole width of the window, with the front edge along the bottom */
+/* the machine paints over the room, and the screen is the button, so it
+   takes the clicks above both (the z-index here was eating them) */
+.land-mac > svg { position: relative; z-index: 1; }
+.land-screen { z-index: 2; }
+.land.is-cover .land-room { display: none; }
 .land-col {
   position: relative; width: 100%;
   display: grid; justify-items: center; gap: calc(14 * var(--u));
   padding: 24px; transform-origin: 0 0;
+  /* one number the machine, the room and the cue are all measured from, so
+     the desk always meets the foot and the cue always lands on the floor */
+  --macw: min(42vw, calc((100dvh - 300px) * var(--ar, 1.3)), 760px);
 }
-.land-head { display: grid; gap: var(--u4); text-align: center; max-width: 60ch; }
-.land-name { font-family: var(--symbols); font-size: calc(36 * var(--u)); font-weight: 400; line-height: 1.1; }
-.land-line { font-family: var(--geneva); font-size: var(--fs-9); line-height: var(--lh-9); max-width: 44ch; margin: 0 auto; text-wrap: balance; }
+/* the cover prints nothing but the cue (Peter, 09-14). The heading stays in
+   the document, off the page, so the route still has one for a reader that
+   needs it. */
+.land-name { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .land-mac {
   position: relative;
-  width: min(44vw, calc((100dvh - 340px) * var(--ar, 1.3)), 760px);
+  width: var(--macw);
   aspect-ratio: var(--ar, 1.3);
 }
 .land-mac svg { display: block; width: 100%; height: 100%; overflow: visible; }
@@ -941,24 +1040,39 @@ html.in .land, html:not(.js) .land { display: none !important; }
 .land.is-moving { pointer-events: none; }
 .land-screen { position: absolute; display: block; padding: 0; border-radius: 0; }
 .land-screen:not(:disabled) { cursor: pointer; }
-.land-screen:focus-visible { outline: var(--u) dotted var(--ink); outline-offset: var(--u2); }
+.land-screen:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 .land-tap { display: none; }
+/* the word under the bar and the cue that replaces it share the foot's
+   bottom edge, so the swap changes the words and nothing moves */
 .land-foot { position: relative; width: 100%; height: calc(24 * var(--u)); }
+/* the cue sits below the desk's front edge, on the floor, not on the wood
+   (Peter, 09-14: move it down into the white). The desk's edge ends 0.227 of
+   the machine's own width under its foot, so the gap is measured from that
+   and holds at every size. */
+.land:not(.is-cover) .land-foot { margin-top: calc(var(--macw) * .227 - 14 * var(--u) + 10 * var(--u)); }
 .land-load {
   position: absolute; inset: 0;
-  display: grid; justify-items: center; align-content: center; gap: var(--u4);
+  display: grid; justify-items: center; align-content: end; gap: var(--u4);
   font-family: var(--geneva); font-size: var(--fs-9); line-height: 1;
 }
+/* the arrow and the line it points at sit on one middle. Bottom-aligning them
+   hung the arrow below the text's baseline, because the arrow fills its box
+   and the text does not fill its line (Peter, 09-15) */
 .land-cue {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center; gap: var(--u4);
   font-family: var(--geneva); font-size: var(--fs-9); line-height: 1;
 }
-/* the progress bar: a bordered box that fills with black, left to right */
+.land-cue [data-land-cue-text] { display: block; line-height: 1; }
+/* the progress bar: a bordered box that fills with black, left to right.
+   The script sets the fill in steps on its own clock; no transition, so the
+   bar shows the value it was given and nothing else */
 .land-bar { display: block; width: calc(100 * var(--u)); height: var(--u8); border: var(--u) solid var(--ink); background: var(--paper); overflow: hidden; }
-.land-fill { display: block; width: 100%; height: 100%; background: var(--ink); transform: scaleX(var(--p, .12)); transform-origin: 0 50%; transition: transform 200ms steps(4, end); }
+.land-fill { display: block; width: 100%; height: 100%; background: var(--ink); transform: scaleX(var(--p, 0)); transform-origin: 0 50%; }
 .land-cue { opacity: 0; }
-.land-ptr { width: calc(8 * var(--u)); height: calc(8 * var(--u)); flex: none; fill: var(--ink); stroke: var(--paper); stroke-width: 1; stroke-linejoin: miter; }
+.land-ptr { width: calc(11 * var(--u)); height: calc(11 * var(--u)); flex: none; fill: var(--ink); stroke: var(--paper); stroke-width: 1; stroke-linejoin: miter; }
+/* the bar crosses out as the cue crosses in, in a few frames, not one */
+.land-load, .land-cue { transition: opacity 120ms steps(3, end); }
 .land.is-ready .land-load { opacity: 0; }
 .land.is-ready .land-cue { opacity: 1; }
 .land.is-ready.is-blank .land-cue { opacity: 0; }
@@ -968,10 +1082,12 @@ html.in .land, html:not(.js) .land { display: none !important; }
 .land.is-cover .land-imac { display: none; }
 .land.is-cover .land-cue { display: none; }
 .land.is-cover .land-card { display: block; }
-.land.is-cover .land-tap { display: inline-flex; }
+.land.is-cover .land-tap { display: inline-flex; align-self: center; }
+/* the column is never wider than the phone: the grid it sits in would size
+   it to its widest child, the button, and cut the right edge off screen */
 .land.is-cover .land-col {
   display: flex; flex-direction: column; justify-content: center;
-  height: 100dvh; max-width: 520px; margin: 0 auto;
+  height: 100dvh; width: 100%; max-width: min(520px, 100%); min-width: 0; margin: 0 auto;
   gap: calc(10 * var(--u)); padding: 26px 24px max(20px, env(safe-area-inset-bottom));
 }
 .land.is-cover .land-head { text-align: left; max-width: none; gap: var(--u4); }
@@ -981,21 +1097,40 @@ html.in .land, html:not(.js) .land { display: none !important; }
   background: var(--paper) var(--dither); background-size: var(--dither-size);
   border: var(--u) solid var(--ink); box-shadow: var(--shadow);
 }
-.land-sun, .land-cloud { display: none; }
 .land-strip {
   position: absolute; left: 50%; top: 50%; translate: -50% -50%;
   display: flex; gap: var(--u8); padding: var(--u6) var(--u8);
+  min-width: 0; max-width: calc(100% - var(--u8));
   background: var(--paper); border: var(--u) solid var(--ink);
 }
+/* the strip stays inside the card's frame: on a narrower phone the four
+   chips close up, and on the narrowest they sit two by two */
+@media (max-width: 411px) { .land-strip { gap: var(--u4); padding: var(--u4); } }
+@media (max-width: 363px) { .land-strip { display: grid; grid-template-columns: repeat(2, var(--icon)); } }
 .land-chip { display: block; width: var(--icon); height: var(--icon); }
+/* the button fits the column it is in, and a label that cannot fit one line
+   takes two rather than pushing the button's cap off the screen */
 .land-tap {
-  width: auto; align-self: flex-start;
-  height: calc(20 * var(--u)); padding: 0 calc(12 * var(--u));
+  width: auto; max-width: 100%; min-width: 0; align-self: flex-start;
+  height: auto; min-height: calc(20 * var(--u)); padding: var(--u2) calc(12 * var(--u));
+  white-space: normal; text-align: center;
   outline: var(--u3) solid var(--ink); outline-offset: var(--u);
 }
 .land-tap:disabled { outline-color: var(--grey-2); border-color: var(--grey-2); color: var(--grey-3); }
 .land-tap:not(:disabled):active { background: var(--ink); color: var(--paper); }
 .land.is-cover .land-foot { height: calc(16 * var(--u)); }
+
+/* 400 percent zoom on a 1280 desktop, and any window too short to hold the
+   cover: the fixed screen becomes a column that scrolls, so nothing is drawn
+   over anything else and nothing is out of reach (WCAG 1.4.10, WEB-053) */
+@media (max-height: 540px) {
+  .land { position: relative; inset: auto; min-height: 100dvh; overflow: visible; place-items: start center; }
+  .land-ground { position: fixed; }
+  .land-col, .land.is-cover .land-col { height: auto; min-height: 0; justify-content: flex-start; align-content: start; padding-top: 84px; padding-bottom: 32px; }
+  .land-card { max-height: none; display: block; }
+  .land-imac, .land-cue { display: none; }
+  .land-tap { display: inline-flex; }
+}
 
 @media (max-width: 767px) {
   .land-col { gap: calc(10 * var(--u)); padding: 24px; align-content: center; }
@@ -1005,7 +1140,7 @@ html.in .land, html:not(.js) .land { display: none !important; }
   .land-tap { display: inline-flex; }
   .land-col {
     display: flex; flex-direction: column; justify-content: center;
-    height: 100dvh; max-width: 520px; margin: 0 auto;
+    height: 100dvh; width: 100%; max-width: min(520px, 100%); min-width: 0; margin: 0 auto;
     padding: 26px 24px max(20px, env(safe-area-inset-bottom));
   }
   .land-head { text-align: left; max-width: none; gap: var(--u4); }
@@ -1026,15 +1161,20 @@ html.in .land, html:not(.js) .land { display: none !important; }
   .home {
     position: fixed; inset: 0; z-index: 6; display: grid;
     grid-template-rows: 1fr auto;
-    padding: calc(var(--bar) + var(--u4)) 0 max(var(--u4), env(safe-area-inset-bottom));
+    padding: calc(var(--bar-top) + var(--u4)) 0 max(var(--u4), env(safe-area-inset-bottom));
   }
-  .home-pad { display: grid; align-content: start; gap: var(--u6); padding: 0 var(--u4); }
+  .home-pad { display: grid; align-content: start; gap: var(--u6); padding: 0 var(--u4); min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
   /* the Read Me, open on the desk as a small window */
   .widget {
-    position: relative; display: grid; gap: var(--u2); align-content: start; text-align: left;
-    padding: calc(var(--tbar) + var(--u4)) var(--u6) var(--u6);
+    position: relative;
     background: var(--paper); color: var(--ink);
     border: var(--u) solid var(--ink); box-shadow: var(--shadow);
+  }
+  /* the note itself is the button that opens the rest; the close box is its
+     own button beside it, so neither control sits inside the other */
+  .widget-in {
+    display: grid; gap: var(--u2); align-content: start; text-align: left; width: 100%;
+    padding: calc(var(--tbar) + var(--u4)) var(--u6) var(--u6);
   }
   .widget::before {
     content: ''; position: absolute; left: 0; right: 0; top: 0; height: var(--tbar);
@@ -1052,13 +1192,17 @@ html.in .land, html:not(.js) .land { display: none !important; }
   .widget-h svg { display: none; }
   .widget-p { display: block; font-family: var(--geneva); font-size: var(--fs-10); line-height: var(--lh-9); }
   .widget-more { display: block; font-family: var(--geneva); font-size: var(--fs-9); line-height: var(--lh-9); text-decoration: underline; text-underline-offset: var(--u2); }
-  .pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: calc(10 * var(--u)) 0; justify-items: center; }
-  .pad-i { display: grid; justify-items: center; gap: 0; width: 100%; align-content: start; }
+  /* three equal columns whatever the names weigh: a name too long for its
+     column wraps to a second line, the way the desktop's labels do */
+  .pad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(10 * var(--u)) 0; justify-items: center; }
+  .pad-i { display: grid; justify-items: center; gap: 0; width: 100%; min-width: 0; align-content: start; }
   .pad-tile { width: var(--icon); height: var(--icon); display: block; }
   .pad-i:active .pad-tile .ico { filter: brightness(.45); }
   .pad-lbl {
-    font-family: var(--geneva); font-size: var(--fs-9); line-height: var(--lh-9);
-    max-width: none; padding: 0 var(--u); white-space: nowrap;
+    font-family: var(--geneva); font-size: var(--fs-9); line-height: var(--lh-9); text-align: center;
+    max-width: 100%; padding: 0 var(--u);
+    overflow: hidden; white-space: normal; overflow-wrap: break-word;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
     color: var(--ink); background: var(--paper);
   }
   .pad-i:active .pad-lbl { background: var(--ink); color: var(--paper); }
@@ -1066,7 +1210,7 @@ html.in .land, html:not(.js) .land { display: none !important; }
   .home-ind { display: none; }
 
   .sheet {
-    position: fixed; inset: var(--bar) 0 0; z-index: 12;
+    position: fixed; inset: var(--bar-top) 0 0; z-index: 12;
     display: grid; grid-template-rows: auto 1fr;
     background: var(--paper);
     transform: translateY(100%);
@@ -1074,23 +1218,25 @@ html.in .land, html:not(.js) .land { display: none !important; }
   }
   .sheet.is-on { transform: none; }
   .sheet.is-pull { transition: none; }
+  /* the sheet already starts under the menu bar, which carries the housing's
+     height, so its title bar is a plain title bar */
   .sheet-top {
     position: relative;
     display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-    height: calc(var(--tbar) + max(0px, env(safe-area-inset-top)));
-    padding: max(0px, env(safe-area-inset-top)) var(--u8) 0;
+    height: var(--tbar);
+    padding: 0 var(--u8);
     border-bottom: var(--u) solid var(--ink); background: var(--paper);
     touch-action: none; user-select: none; -webkit-user-select: none;
   }
   .sheet-top::before {
     content: ''; position: absolute; left: var(--u); right: var(--u);
-    top: calc(max(0px, env(safe-area-inset-top)) + var(--u4)); height: calc(var(--tbar) - 9 * var(--u));
+    top: var(--u4); height: calc(var(--tbar) - 9 * var(--u));
     background: var(--stripes);
   }
   .sheet-name { grid-column: 2; position: relative; z-index: 1; text-align: center; padding: 0 var(--u6); background: var(--paper); font-family: var(--chicago); font-size: var(--fs-12); line-height: 1; }
   /* Done is the close box */
   .sheet-x {
-    position: absolute; left: var(--u8); top: calc(max(0px, env(safe-area-inset-top)) + var(--u4)); z-index: 1;
+    position: absolute; left: var(--u8); top: var(--u4); z-index: 1;
     width: var(--box); height: var(--box); min-width: 0; padding: 0; border-radius: 0;
     font-size: 0; box-shadow: 0 0 0 var(--u) var(--paper);
   }
@@ -1110,45 +1256,46 @@ html.in .land, html:not(.js) .land { display: none !important; }
   .sheet-body .abt { padding: var(--u8) var(--u6) calc(12 * var(--u)); }
   .sheet-body .txt { padding: var(--u6); max-width: none; }
   .sheet-body [data-vterm] { font-size: var(--fs-9); }
-  .sheet[data-app='rin'] .sheet-body { background: var(--slate); }
-  .sheet[data-app='kyou'] .sheet-body { background: #000; }
-  .sheet[data-app='market'] .sheet-body { background: #f5f5f8; }
-  .sheet[data-app='volbase'] .sheet-body { background: var(--vb-page); }
-  .sheet[data-app='volbase'] .sf-tab { height: 44px; }
-  .sheet[data-app='volbase'] .sf-tabs { height: 44px; }
-  .sheet[data-app='volbase'] .safari { grid-template-rows: 52px 1fr; }
+  /* a browser window on a phone: the page fills the sheet, and the directory
+     strip grows to a finger's height */
+  .sheet-body .nav-btn, .sheet-body .nav-dir { height: 44px; }
+  .sheet-body .nav { grid-template-rows: 52px 1fr; }
   /* Photos on the phone: three across, a full screen viewer */
   .sheet-body .pho { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr); }
   .sheet-body .pho-side, .sheet-body .pho-status { display: none; }
   .sheet-body .pho-grid { grid-template-columns: repeat(3, 1fr); }
-  .sheet-body .pho-view { position: fixed; inset: 0; z-index: 30; }
+  /* the viewer fills the screen under the menu bar, so its own title bar and
+     the Done button are never painted over by the bar */
+  .sheet-body .pho-view { position: fixed; inset: var(--bar-top) 0 0; z-index: 30; }
   .sheet-body .pho-vbar {
     display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-    height: calc(var(--tbar) + max(0px, env(safe-area-inset-top)));
-    padding: max(0px, env(safe-area-inset-top)) var(--u4) 0 var(--u8);
+    height: var(--tbar);
+    padding: 0 var(--u4) 0 var(--u8);
     border-bottom: var(--u) solid var(--ink); background: var(--paper);
   }
   .sheet-body .pho-vtitle { grid-column: 2; text-align: center; line-height: 1.15; }
   .sheet-body .pho-vdone { display: inline-flex; grid-column: 3; justify-self: end; height: calc(14 * var(--u)); }
-  .sheet-body .pho-stage img { height: auto; max-height: 100%; }
+  /* the picture keeps its own shape and sits in the middle of the stage */
+  .sheet-body .pho-stage img {
+    position: absolute; inset: var(--u6); margin: auto; width: auto; height: auto;
+    max-width: calc(100% - 2 * var(--u6)); max-height: calc(100% - 2 * var(--u6));
+  }
   .sheet-body .pho-nav { top: auto; bottom: max(16px, env(safe-area-inset-bottom)); translate: 0 0; }
   .sheet-body .stash-h, .sheet-body .stash-p, .sheet-body .stash-meta { display: none; }
   .sheet-body .sfig { top: 0; left: 0; transform-origin: top left; transform: scale(var(--s, 1)); }
   .sheet-body .sbox { background: var(--grey-1); }
-  .sheet[data-app='rin'] .sbox { background: var(--slate); }
-  .sheet[data-app='kyou'] .sbox { background: #000; }
-  .sheet[data-app='volbase'] .safari .lights { display: none; }
-  .sheet[data-app='kyou'] .phone { padding: 0; background: #000; }
-  .sheet[data-app='kyou'] .ph-screen { border-radius: 0; }
-  .sheet[data-app='kyou'] .ph-status, .sheet[data-app='kyou'] .island { display: none; }
-  .sheet[data-app='kyou'] .ky-hero { padding-top: 18px; }
-  .sheet[data-app='kyou'] .ky-notif { top: 8px; }
+  .sheet-body .sbox.is-flat { background: var(--vb-page); }
   /* the sheet's last row: Sleep and Shut Down */
   .sheet { grid-template-rows: auto 1fr auto; }
   .sheet-power { display: flex; justify-content: center; gap: calc(10 * var(--u)); }
   .sheet-foot { padding: var(--u6) var(--u8) max(var(--u6), env(safe-area-inset-bottom)); background: var(--paper); border-top: var(--u) solid var(--ink); }
   .sheet-row { height: calc(20 * var(--u)); min-width: calc(59 * var(--u)); }
   .sheet-row:active { background: var(--ink); color: var(--paper); }
+  /* Find File on a phone: the words take a line of their own, and the field
+     sits under them, since the two side by side push the field off screen */
+  .spot-field { display: block; }
+  .spot-field::before { display: block; white-space: normal; margin-bottom: var(--u4); }
+  .spot-field input { width: 100%; }
 }
 
 @media (min-width: 768px) {
@@ -1167,8 +1314,179 @@ html.in .land, html:not(.js) .land { display: none !important; }
 
 /* while a screenshot renders, nothing needs hiding: there is no grain */
 
-/* ══ the zoom rectangles and the drag outline: dotted frames, nothing else ══ */
-.zoom-rects, .drag-outline { position: fixed; pointer-events: none; z-index: 99; }
+/* ══ the zoom rectangles and the drag outline: grey frames drawn in XOR ══
+   DragGrayRgn drew its outline with the grey pen in patXor: every pixel the
+   pen touched flipped, so over white the line was dotted, over black it was
+   dotted white, and over the desktop, where the pen's pattern lined up with
+   the desktop's own, the whole line came out solid. A painted line cannot
+   do that: three quarters black over the half black desktop is a hatch
+   nobody can see. So the frame is the white half of the dither, held to the
+   screen's grid where the desktop's pattern is, and composited by difference,
+   which flips what is under it exactly as the pen did. The frame alone is
+   painted: the box is masked down to its own one unit edge. */
+.zoom-rects, .drag-outline { position: fixed; pointer-events: none; z-index: 99; mix-blend-mode: difference; }
 .zoom-rects { inset: 0; }
-.zr, .drag-outline { position: fixed; border: var(--u) dotted var(--ink); }
-.drag-outline { border-style: solid; border-image: repeating-linear-gradient(45deg, var(--ink) 0 var(--u), transparent var(--u) var(--u2)) 2; }
+.zr, .drag-outline {
+  position: fixed; border: 0; padding: var(--u);
+  background: var(--dither-w) 0 0 / var(--dither-size) fixed;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+/* the landing's way back to the website: Geneva, underlined like a link on
+   paper, under the cue, always present so a shut-down Mac is never a dead end */
+.land-back { display: inline-block; margin-top: calc(10 * var(--u)); font: var(--fs-9) / 1 'FindersKeepers', Geneva, sans-serif; color: var(--ink); text-decoration: underline; text-underline-offset: var(--u); }
+.land-back:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+/* ══ the hidden things ═════════════════════════════════════════════════
+   Everything below belongs to scripts/mac/eggs.ts: the Page Setup dialog and
+   the dogcow in its Options, the back of the Mac in About This Macintosh,
+   Balloon Help, and the clock that shows the date. Nothing here is drawn
+   until a visitor has gone looking, so none of it is on the first frame. */
+
+/* ── a modal dialog, in the window frame the desk already draws ───────── */
+.win-dlg .win-pane { padding: calc(10 * var(--u)) calc(12 * var(--u)); }
+.dlg { display: grid; gap: var(--u6); align-content: start; font-family: var(--chicago); font-size: var(--fs-12); line-height: var(--lh-12); background: var(--paper); }
+.dlg-head { font-family: var(--chicago); }
+.dlg-grid { display: grid; grid-template-columns: auto 1fr; gap: var(--u4) var(--u6); align-items: start; }
+.dlg-lbl { font-family: var(--geneva); font-size: var(--fs-9); line-height: var(--lh-12); }
+.dlg-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--u6); }
+.dlg-col { display: grid; gap: var(--u2); justify-items: start; }
+/* a text field: a one unit box with the value in it, and nothing to type
+   into, because this dialog prints nothing */
+.dlg-field { display: inline-block; min-width: calc(30 * var(--u)); padding: 0 var(--u2); border: var(--u) solid var(--ink); text-align: right; }
+
+/* the radio button and the check box, drawn the way System 7 drew them: a
+   ring with a dot, a square with an X, both in whole units */
+.dlg-opt { display: inline-flex; align-items: center; gap: var(--u3); font-family: var(--geneva); font-size: var(--fs-9); line-height: var(--lh-12); color: inherit; text-align: left; }
+.dlg-rad, .dlg-box { position: relative; flex: none; width: calc(12 * var(--u)); height: calc(12 * var(--u)); border: var(--u) solid var(--ink); background: var(--paper); }
+.dlg-rad { border-radius: 50%; }
+.dlg-rad.is-on::after { content: ''; position: absolute; inset: var(--u2); border-radius: 50%; background: var(--ink); }
+/* the X in a ticked box, two strokes, each one unit thick and on the grid */
+.dlg-box.is-on::before, .dlg-box.is-on::after {
+  content: ''; position: absolute; left: 0; top: calc(4 * var(--u));
+  width: 100%; height: var(--u); background: var(--ink);
+}
+.dlg-box.is-on::before { rotate: 45deg; }
+.dlg-box.is-on::after { rotate: -45deg; }
+
+/* the two Orientation buttons: a little page, upright and on its side */
+.dlg-orient { flex: none; width: calc(24 * var(--u)); height: calc(24 * var(--u)); border: var(--u) solid var(--ink); background: var(--paper); display: grid; place-items: center; }
+.dlg-orient.is-on { background: var(--ink); }
+.dlg-orient.is-on .dlg-sheet { filter: invert(1); }
+.dlg-sheet { width: calc(20 * var(--u)); height: calc(20 * var(--u)); }
+
+/* the buttons along the bottom, the default one in its heavy ring */
+.dlg-btns { display: flex; flex-wrap: wrap; gap: var(--u6); justify-content: flex-end; }
+.dlg-btn { min-width: calc(56 * var(--u)); padding: var(--u) calc(8 * var(--u)); border: var(--u) solid var(--ink); background: var(--paper); color: var(--ink); font-family: var(--chicago); font-size: var(--fs-12); line-height: var(--lh-12); }
+.dlg-btn:active { background: var(--ink); color: var(--paper); }
+.dlg-btn.is-def { box-shadow: 0 0 0 var(--u) var(--paper), 0 0 0 calc(3 * var(--u)) var(--ink); }
+.dlg-btn:focus-visible { outline: var(--u) solid var(--ink); outline-offset: var(--u2); }
+
+/* ── the dogcow, standing on the little page ─────────────────────────── */
+.dlg-opts { grid-template-columns: auto 1fr; align-items: start; }
+.dlg-opts .dlg-btns { grid-column: 1 / -1; }
+.opt-well { position: relative; }
+/* the well the little page sits in, and the page itself: a white rectangle
+   with an edge, upright or on its side, with her standing on it */
+.opt-stage { position: relative; width: calc(104 * var(--u)); height: calc(120 * var(--u)); border: var(--u) solid var(--ink); background: var(--paper); display: grid; place-items: center; }
+.opt-stage.is-inv { background: var(--ink); }
+.opt-page { position: relative; display: grid; place-items: center; width: calc(68 * var(--u)); height: calc(88 * var(--u)); border: var(--u) solid var(--ink); background: var(--paper); }
+.opt-stage.is-land .opt-page { width: calc(88 * var(--u)); height: calc(68 * var(--u)); }
+.opt-cow { width: calc(44 * var(--u)); height: calc(44 * var(--u)); padding: 0; background: none; }
+.opt-cow-art { display: block; width: 100%; height: 100%; }
+.opt-boxes { padding-top: var(--u4); }
+
+/* ── About This Macintosh: the picture turns ─────────────────────────── */
+.amc-flip { position: relative; display: block; padding: 0; background: none; color: inherit; }
+.amc-hat { position: absolute; left: calc(6 * var(--u)); top: calc(-9 * var(--u)); width: calc(16 * var(--u)); height: calc(16 * var(--u)); }
+.amc-hat svg { width: 100%; height: 100%; }
+.amc-case { grid-column: 2; display: grid; gap: var(--u2); }
+.amc-case-note { font-family: var(--geneva); font-size: var(--fs-9); line-height: var(--lh-9); max-width: 44ch; }
+.amc-case-sig { font-family: var(--chicago); font-size: var(--fs-12); line-height: var(--lh-12); }
+
+/* ── Balloon Help ────────────────────────────────────────────────────── */
+/* the balloon: white, one unit of black around it, Geneva inside, and a tail
+   that steps in whole units toward whatever the balloon is about. System 7
+   rounded its corners; this Macintosh has no radius anywhere else, and the
+   tail is what says balloon, so the corners are square. */
+.bhelp {
+  position: fixed; z-index: 95; pointer-events: none;
+  max-width: calc(160 * var(--u));
+  padding: var(--u3) var(--u4);
+  border: var(--u) solid var(--ink); background: var(--paper); color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.bhelp-txt { font-family: var(--geneva); font-size: var(--fs-9); line-height: var(--lh-9); }
+.bhelp-tail { position: absolute; left: calc(8 * var(--u)); top: calc(-6 * var(--u)); width: calc(8 * var(--u)); height: calc(6 * var(--u)); }
+.bhelp-tail svg { display: block; width: 100%; height: 100%; }
+.bhelp.is-right .bhelp-tail { left: auto; right: calc(8 * var(--u)); scale: -1 1; }
+.bhelp.is-up .bhelp-tail { top: auto; bottom: calc(-6 * var(--u)); scale: 1 -1; }
+.bhelp.is-up.is-right .bhelp-tail { scale: -1 -1; }
+/* the dogcow's balloon sits over her head inside the preview and stays put,
+   so it is placed against the well rather than against the screen */
+.opt-moof { position: absolute; left: calc(34 * var(--u)); top: calc(12 * var(--u)); z-index: 2; }
+.opt-moof .bhelp-tail { left: calc(6 * var(--u)); top: auto; bottom: calc(-6 * var(--u)); scale: 1 -1; }
+/* while the balloons are on, the pointer says so, the way it did then */
+.balloons .item, .balloons .mb-item, .balloons .wbox, .balloons .win-bar { cursor: help; }
+
+/* ── the Terminal's one drawing ──────────────────────────────────────── */
+/* The cursive word the first Macintosh wrote, at two units per drawn pixel,
+   which is a whole multiple of this machine's grid and so still lands on it.
+   Left alone it would stretch to the window's width and its pixels would stop
+   being pixels. */
+.term-pix { display: block; width: calc(136 * var(--u)); height: calc(42 * var(--u)); margin: var(--u2) 0 var(--u4); }
+
+/* ── the clock, pressed ──────────────────────────────────────────────── */
+.mb-clock { color: inherit; }
+.mb-date { white-space: pre; }
+
+/* ── Snake's message box ─────────────────────────────────────────────── */
+/* Snake's field is a rectangle of Monaco, and its words are not on that
+   grid. Set in the field's own characters they have to blank the squares
+   they stand on, and the squares in the middle of the field are where the
+   snake starts, so the waiting message cut half the head off the snake it
+   was asking you to move. The words go in a box over the field instead:
+   white, with the same one unit rule every other line on this machine has,
+   in Geneva 9 to match the one Bricks draws on its canvas, and the play
+   carries on behind it the way it does behind any Macintosh message.
+   The box's size and its place are set from the game, in whole even pixels;
+   nothing here may put it half a unit off the grid. */
+.sn-wrap { position: relative; }
+.sn-say {
+  position: absolute; z-index: 1;
+  display: grid; align-content: center;
+  margin: 0; padding: var(--u4) calc(10 * var(--u));
+  background: var(--paper);
+  border: var(--u) solid var(--ink);
+  font-family: var(--geneva); font-size: var(--fs-9); line-height: var(--lh-9);
+  color: var(--ink);
+  text-align: center; white-space: pre;
+  user-select: none; -webkit-user-select: none;
+  cursor: inherit;
+}
+
+/* ══ what is out the window: the same sky the home page is having ══════
+   Five bands off the visitor's own clock (src/scripts/sky.ts). The room
+   itself never changes, because a room does not: the wall, the desk and the
+   machine are lit the same at every hour. Only the weather in the window
+   moves, which is what makes the light outside read as a time of day. */
+.rm-mare, .rm-stars { opacity: 0; }
+.rm-s1 { stop-color: var(--pane-top, #bed9f3); }
+.rm-s2 { stop-color: var(--pane-bot, #dcebfa); }
+:root[data-sky='dawn'] { --pane-top: #e8d6e6; --pane-bot: #fbdcc4; }
+:root[data-sky='dawn'] .rm-p1 { fill: #fde3c6; } :root[data-sky='dawn'] .rm-p2 { fill: #f7c9a4; }
+:root[data-sky='dawn'] .rm-cloud { fill: #fdf1ea; }
+:root[data-sky='golden'] { --pane-top: #f3ddc4; --pane-bot: #f3b988; }
+:root[data-sky='golden'] .rm-p1 { fill: #fbcf85; } :root[data-sky='golden'] .rm-p2 { fill: #ee9d68; }
+:root[data-sky='golden'] .rm-cloud { fill: #fdeee0; }
+:root[data-sky='dusk'] { --pane-top: #b7addd; --pane-bot: #e6c3cd; }
+:root[data-sky='dusk'] .rm-p1, :root[data-sky='dusk'] .rm-p2 { fill: #fbf6e4; }
+:root[data-sky='dusk'] .rm-cloud { fill: #e8e3ef; }
+:root[data-sky='dusk'] .rm-mare, :root[data-sky='dusk'] .rm-stars { opacity: .7; }
+:root[data-sky='night'] { --pane-top: #7887ab; --pane-bot: #a9b6d0; }
+:root[data-sky='night'] .rm-p1, :root[data-sky='night'] .rm-p2 { fill: #fbf6e4; }
+:root[data-sky='night'] .rm-cloud { fill: #a8b4cd; }
+:root[data-sky='night'] .rm-mare, :root[data-sky='night'] .rm-stars { opacity: 1; }

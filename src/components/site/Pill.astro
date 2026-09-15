@@ -1,0 +1,64 @@
+---
+/* The site's menu, for the two product pages.
+
+   /kyou and /market are their own designs with their own stylesheets, so they
+   cannot take the layout's glass pill (WEB-058). They get the same three
+   items, the same face and the same shapes, drawn here and carrying their own
+   styles, the way the Mac's cover already does. It is not the persisted
+   header, so it does not travel; it is the one piece of chrome that says a
+   visitor who landed here is still on somebody's website. */
+interface Props { current?: 'work' | 'about' }
+const { current = 'work' } = Astro.props;
+---
+<script is:inline>
+  /* inside the Macintosh's browser window this page is not the front door, it
+     is a page in a browser that already has its own address bar and its own
+     row of sites. A second floating menu on top of that is one menu too many
+     (Peter, 09-15: "i dont want the menu in the mac"). */
+  try { if (window.parent !== window) document.documentElement.classList.add('framed'); } catch (e) {}
+</script>
+<nav class="sp-nav" aria-label="Site">
+  <a class="sp-face" href="/" aria-label="petermei.com, home"><span aria-hidden="true">(｡•ᴗ•｡)</span></a>
+  <a class="sp-link" href="/" aria-current={current === 'work' ? 'page' : undefined}>Work</a>
+  <a class="sp-link" href="/about" aria-current={current === 'about' ? 'page' : undefined}>About</a>
+  <a class="sp-link" href="/mac">Playground</a>
+</nav>
+
+<style>
+  :global(html.framed) .sp-nav { display: none; }
+  .sp-nav {
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 120;
+    display: flex; align-items: center; gap: 4px;
+    height: 56px; padding: 0 8px 0 5px; border-radius: 9999px;
+    background: rgb(255 255 255 / .55); border: 1px solid rgb(255 255 255 / .6);
+    box-shadow: inset 0 4px 6px rgb(255 255 255 / .25), 0 6px 24px rgb(3 3 2 / .14);
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
+    backdrop-filter: blur(12px) saturate(160%);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
+    font-size: 16px; letter-spacing: -.01em; color: #030302;
+  }
+  .sp-face {
+    display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+    background: #fde99b; font-size: 11px; letter-spacing: -.06em; flex: none; color: #030302;
+    text-decoration: none; transition: transform 200ms cubic-bezier(.2, .8, .2, 1);
+  }
+  .sp-face:hover { transform: scale(1.06); }
+  .sp-link {
+    display: inline-flex; align-items: center; height: 44px; padding: 0 14px; border-radius: 99px;
+    font-weight: 500; white-space: nowrap; color: #030302; text-decoration: none;
+    transition: background-color 200ms cubic-bezier(.2, .8, .2, 1), transform 120ms cubic-bezier(.2, .8, .2, 1);
+  }
+  .sp-link:hover { background: rgb(3 3 2 / .08); }
+  .sp-link:active, .sp-face:active { transform: scale(.96); }
+  .sp-link[aria-current='page'] { background: #030302; color: #fcf9f7; }
+  /* the project's one ring, on every route (WEB-072) */
+  .sp-nav :focus-visible { outline: 3px solid #030302; outline-offset: 3px; }
+  @media (max-width: 560px) {
+    .sp-nav { top: 10px; padding: 0 6px 0 5px; gap: 2px; }
+    .sp-link { padding: 0 11px; font-size: 15px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sp-link, .sp-face { transition: none; }
+    .sp-face:hover, .sp-link:active, .sp-face:active { transform: none; }
+  }
+</style>

@@ -39,3 +39,8 @@ scratch/
 # raw captures for the staged mockups; the staged results live in public/img/mock
 capture/*
 !capture/stage/
+
+# the review notes and the bug tracker. They quote the exact place names the
+# site is careful never to publish, because that is what several of the bugs
+# WERE, so they stay on this machine. The vault keeps the real record.
+docs/

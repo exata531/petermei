@@ -86,17 +86,6 @@ export function byMonth(list = photos): Group[] {
   return out;
 }
 
-export function byDay(list = photos): Group[] {
-  const out: Group[] = [];
-  for (const p of list) {
-    let g = out.find((x) => x.key === p.date);
-    if (!g) { g = { key: p.date, label: '', sub: p.dayLabel, items: [] }; out.push(g); }
-    g.items.push(p);
-  }
-  for (const g of out) g.label = places(g.items);
-  return out;
-}
-
 export function byYear(list = photos): Group[] {
   const out: Group[] = [];
   for (const p of list) {
@@ -110,22 +99,16 @@ export function byYear(list = photos): Group[] {
 
 /* one sentence per album, in Peter's words, shown over the album's grid */
 export const blurbs: Record<string, string> = {
-  'Oahu, Hawaii': 'I spent a week on Oahu and I mostly photographed the coast and the tide pools.',
-  'Maui, Hawaii': 'I got one photo from under the water off Maui and that is the whole album.',
-  'Niagara Falls': 'I photographed Niagara from the Canadian side in June.',
-  'Valencia': 'I had one evening in Valencia and I spent all of it on the rooftops.',
-  'Dallas': 'I shot Dallas from a high floor, and then a mineral in a museum there a year later.',
+  'Hawaii': 'A week on the coast, mostly tide pools, and one photo from under the water.',
+  'New York': 'The falls from the Canadian side in June.',
+  'Spain': 'One evening in a city and I spent all of it on the rooftops.',
+  'Texas': 'Shot from a high floor, from inside a capitol dome, and from under a glass tower.',
   'From a plane': 'I always take the window seat, so these are the ones I took out of it.',
-  'Shanghai': 'I went out to the Bund at night on a summer trip and photographed the water.',
+  'China': 'Out on the river at night on a summer trip.',
   'Abstract': 'These are the two I took because of the pattern and not the place.',
-  'Austin': 'I stood inside the Texas Capitol and shot straight up.',
   'Michigan': 'This is where I live, so most of these are birds and flowers and whatever the weather was doing.',
-  'Colorado': 'I drove through the mountains in June and kept stopping to take pictures.',
-  'Red Rocks, Colorado': 'I got to Red Rocks on a day when there was nobody in it.',
-  'Rocky Mountain National Park': 'I walked the trails around Estes Park in June, when there was still snow in the gullies.',
-  'Houston': 'I stood under one glass tower and shot straight up.',
-  'the school': 'This is my school, and the campus is the best-looking thing for miles, so I have a lot of photos of it.',
-  'Yellowstone': 'I went to Yellowstone in July and mostly photographed the hot springs.',
+  'Colorado': 'Driving through the mountains in June and stopping for every view, with snow still in the gullies.',
+  'Wyoming': 'July, and mostly the hot springs.',
 };
 /* one album per place, the sidebar's list, in the order the places first
    appear in the roll */
@@ -146,6 +129,6 @@ export const albums: Album[] = (() => {
 })();
 
 /* the three that sit on the desktop as files: a landscape, a city, a bird */
-export const deskPhotos = ['grand-prismatic', 'the-bund', 'heron']
+export const deskPhotos = ['hot-spring-edge', 'city-skyline-night', 'heron']
   .map((n) => photos.find((p) => p.file.endsWith(`/${n}.webp`))!)
   .filter(Boolean);

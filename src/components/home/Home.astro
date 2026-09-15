@@ -22,7 +22,7 @@ const rowClass: Record<Slug, string> = { volbase: 'c-vb', rin: 'c-rin', kyou: 'c
 const chapterFrame: Record<Slug, string> = { volbase: 'browser', rin: 'mac', kyou: 'phone', market: 'wide' };
 const chapterTilt: Record<Slug, [number, number]> = { volbase: [14, -22], rin: [12, 24], kyou: [10, -30], market: [22, 0] };
 const mockOf = (p: (typeof products)[number], name: string) => p.gallery.find((g) => g.name === name) ?? (p.peek.name === name ? p.peek : pair(name, ''));
-const placeLabel = (place: string) => place.replace(/, .*$/, '').replace('Rocky Mountain National Park', 'Estes Park');
+const placeLabel = (place: string) => place.replace(/, .*$/, '');
 ---
 <!doctype html>
 <html lang="en" data-open={open}>
@@ -32,6 +32,10 @@ const placeLabel = (place: string) => place.replace(/, .*$/, '').replace('Rocky 
     <title>{title}</title>
     <meta name="description" content={desc} />
     <link rel="canonical" href={url.href} />
+    {/* The Macintosh at / replaced this design; it is parked, not live. It
+       still builds, so keep it out of the index rather than let a search
+       engine hand somebody a version of the site that no longer exists. */}
+    <meta name="robots" content="noindex, nofollow" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
@@ -47,7 +51,7 @@ const placeLabel = (place: string) => place.replace(/, .*$/, '').replace('Rocky 
     <style is:inline set:html={`:root{--crest:${crestMask};--torn:${tornMask}}`}></style>
   </head>
   <body>
-    <a class="skip" href="#work">Skip to the work</a>
+    <a class="skip" href="#work">Skip to the content</a>
 
     <!-- the loader: one face, one blink, gone -->
     <div class="loader" data-loader aria-hidden="true"><span class="face" data-face>(｡•ᴗ•｡)</span></div>
@@ -60,7 +64,7 @@ const placeLabel = (place: string) => place.replace(/, .*$/, '').replace('Rocky 
     <div class="grain" data-grain aria-hidden="true"></div>
 
     <div class="spacer" data-spacer aria-hidden="true"></div>
-    <div class="wrap" data-wrap>
+    <main class="wrap" data-wrap>
 
       <!-- ── 1. masthead ─────────────────────────────────────────── -->
       <header class="masthead" data-masthead>
@@ -70,8 +74,8 @@ const placeLabel = (place: string) => place.replace(/, .*$/, '').replace('Rocky 
         </div>
         <h1 class="name" data-name aria-label="Peter Mei"><span class="w"><span>Peter</span></span> <span class="w"><span>Mei</span></span></h1>
         <div class="lede">
-          <p class="fold rise">I am a <i>senior</i> at the school, outside Detroit. I taught myself all of this from the docs, mostly by getting it wrong first.</p>
-          <p class="quote rise">I am a senior in high school and I make software. These are the four things I have built that are <span class="hl"><i class="hl-bar" aria-hidden="true"></i>real enough</span> to show. Each one is running somewhere right now, and each one exists because I needed it first.</p>
+          <p class="fold rise">I am a <i>senior</i> in Michigan. I taught myself all of this from the docs, mostly by getting it wrong first.</p>
+          <p class="quote rise">I am a senior in high school and I make software. I have built four things that <span class="hl"><i class="hl-bar" aria-hidden="true"></i>work</span>. All of them are running somewhere right now, and I made each one because I needed it.</p>
         </div>
         <div class="cluster" aria-hidden="true">
           <span class="cl cl-plane rise" set:html={spot.plane} />
@@ -200,7 +204,7 @@ const placeLabel = (place: string) => place.replace(/, .*$/, '').replace('Rocky 
           {strip.map((ph, i) => (
             <figure class="card" style={`--rot:${tilt(i)}deg;--d:${i * 60}ms`}>
               <img src={ph.file} width={ph.w} height={ph.h} alt={ph.alt} loading="lazy" decoding="async" draggable="false" />
-              <figcaption>{placeLabel(ph.place)}{ph.place.startsWith('Red Rocks') || ph.place.startsWith('Rocky') ? <span class="bag" aria-hidden="true" set:html={spot.chalkbag} /> : null}</figcaption>
+              <figcaption>{placeLabel(ph.place)}</figcaption>
             </figure>
           ))}
         </div>
@@ -234,7 +238,7 @@ const placeLabel = (place: string) => place.replace(/, .*$/, '').replace('Rocky 
           </div>
         </div>
       </footer>
-    </div>
+    </main>
 
     <!-- the pill -->
     <nav class="pill" data-pill aria-label="Site">

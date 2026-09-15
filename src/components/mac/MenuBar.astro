@@ -7,31 +7,42 @@
    Measured off a 7.5.3 desktop at 1:1, right to left: the Application menu
    wearing the front app's icon hard against the edge, the Balloon Help menu
    beside it, then the clock the Date & Time panel paints. Rin sits left of
-   all three, where a menu bar app of her kind goes.
+   all three, where a menu bar app of her kind goes, and pressing her opens
+   her website, the same as her icon on the desktop does.
 
    Nothing in here is inside a transformed ancestor, on purpose: a fixed
-   element trapped inside one stops being fixed. */
+   element trapped inside one stops being fixed.
+
+   The clock is pressable, the way the Date & Time control panel's clock was:
+   it shows the date for a moment and goes back. What it says on one day a
+   year is in scripts/mac/eggs.ts. */
 import Icon from './Icon.astro';
 ---
 <header class="mbar" data-mbar>
   <div class="mbar-l">
     <button class="mb-item mb-apple" type="button" data-menu="apple" aria-haspopup="true" aria-expanded="false" aria-label="Apple menu">
-      <Icon id="apple" />
+      <Icon id="apple" size={16} />
     </button>
     <span class="mb-app" data-app-name hidden>Finder</span>
     <span class="mb-menus" data-app-menus></span>
   </div>
 
   <div class="mbar-r">
-    <button class="mb-item mb-rin" type="button" data-rin-status aria-haspopup="dialog" aria-expanded="false" aria-label="Rin" title="Rin">
-      <Icon id="rin" />
+    <button class="mb-item mb-rin" type="button" data-rin-status aria-label="Rin" title="Rin">
+      <Icon id="rin" size={16} />
     </button>
-    <span class="mb-item mb-clock"><time data-clock>4:42 PM</time></span>
+    {/* the 7.5 clock swapped to the date for a moment when it was pressed,
+        so this one is a button. The date is its own span rather than the
+        same element rewritten, because the clock's own minute tick would
+        otherwise paint the time straight back over it. */}
+    <button class="mb-item mb-clock" type="button" data-clock-flip aria-label="The date">
+      <time data-clock>4:42 PM</time><span class="mb-date" data-clock-date hidden></span>
+    </button>
     <button class="mb-item mb-help" type="button" data-menu="help" aria-haspopup="true" aria-expanded="false" aria-label="Help">
-      <Icon id="balloon" />
+      <Icon id="balloon" size={16} />
     </button>
     <button class="mb-item mb-appmenu" type="button" data-menu="app-0" aria-haspopup="true" aria-expanded="false" aria-label="Application menu">
-      <span class="mb-appico" data-app-ico><Icon id="finder" /></span>
+      <span class="mb-appico" data-app-ico><Icon id="finder" size={16} /></span>
     </button>
   </div>
 </header>

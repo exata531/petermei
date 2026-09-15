@@ -1,386 +1,634 @@
 [
- {
-  "file": "/img/photos/diamond-head.webp",
-  "w": 1024,
-  "h": 768,
-  "alt": "Green slopes of Diamond Head running down to the sea",
-  "place": "Oahu, Hawaii",
-  "date": "2022-03"
- },
- {
-  "file": "/img/photos/waikiki-sunset.webp",
-  "w": 1024,
-  "h": 768,
-  "alt": "Sunset over the water at Waikiki",
-  "place": "Oahu, Hawaii",
-  "date": "2022-03"
- },
- {
-  "file": "/img/photos/pupukea-tidepools.webp",
-  "w": 1025,
-  "h": 766,
-  "alt": "Lava rock tide pools at Pupukea",
-  "place": "Oahu, Hawaii",
-  "date": "2022-03"
- },
- {
-  "file": "/img/photos/oahu-coast.webp",
-  "w": 1024,
-  "h": 768,
-  "alt": "Cliffs above the sea on the east shore of Oahu",
-  "place": "Oahu, Hawaii",
-  "date": "2022-03"
- },
- {
-  "file": "/img/photos/maui-underwater.webp",
-  "w": 767,
-  "h": 1024,
-  "alt": "A school of fish seen from below the surface off Maui",
-  "place": "Maui, Hawaii",
-  "date": "2022-03"
- },
- {
-  "file": "/img/photos/horseshoe-falls.webp",
-  "w": 768,
-  "h": 1024,
-  "alt": "The lip of Horseshoe Falls from the Canadian side",
-  "place": "Niagara Falls",
-  "date": "2022-06"
- },
- {
-  "file": "/img/photos/niagara-falls.webp",
-  "w": 1165,
-  "h": 675,
-  "alt": "Niagara Falls with the mist rising",
-  "place": "Niagara Falls",
-  "date": "2022-06"
- },
- {
-  "file": "/img/photos/niagara-river.webp",
-  "w": 768,
-  "h": 1024,
-  "alt": "Turquoise water in the Niagara River below the falls",
-  "place": "Niagara Falls",
-  "date": "2022-06"
- },
- {
-  "file": "/img/photos/valencia-sunset.webp",
-  "w": 768,
-  "h": 1024,
-  "alt": "Valencia rooftops and church towers at sunset",
-  "place": "Valencia",
-  "date": "2022-12"
- },
- {
-  "file": "/img/photos/dallas-rooftops.webp",
-  "w": 768,
-  "h": 1024,
-  "alt": "Downtown Dallas from a high floor",
-  "place": "Dallas",
-  "date": "2023-04"
- },
- {
-  "file": "/img/photos/wing-over-clouds.webp",
-  "w": 768,
-  "h": 1024,
-  "alt": "A wingtip over a streak of cloud",
-  "place": "From a plane",
-  "date": "2023-06"
- },
- {
-  "file": "/img/photos/the-bund.webp",
-  "w": 1024,
-  "h": 768,
-  "alt": "The Pudong skyline lit up at night from the Bund",
-  "place": "Shanghai",
-  "date": "2023-07"
- },
- {
-  "file": "/img/photos/city-lights-from-above.webp",
-  "w": 768,
-  "h": 1024,
-  "alt": "City lights at night from the window seat",
-  "place": "From a plane",
-  "date": "2023-08"
- },
- {
-  "file": "/img/photos/water-caustics.webp",
-  "w": 1086,
-  "h": 724,
-  "alt": "Light bending through blue water",
-  "place": "Abstract",
-  "date": "2023-11"
- },
- {
-  "file": "/img/photos/blue-mineral.webp",
-  "w": 768,
-  "h": 1024,
-  "alt": "A blue mineral specimen at the Perot Museum",
-  "place": "Dallas",
-  "date": "2024-03"
- },
- {
-  "file": "/img/photos/texas-capitol-dome.webp",
-  "w": 768,
-  "h": 1024,
-  "alt": "Looking straight up into the Texas Capitol dome",
-  "place": "Austin",
-  "date": "2024-03"
- },
- {
-  "file": "/img/photos/basket-stack.webp",
-  "w": 768,
-  "h": 1024,
-  "alt": "Stacked wire shopping baskets in black and white, repeating to the top of the frame",
-  "place": "Abstract",
-  "date": "2024-03"
- },
- {
-  "file": "/img/photos/us-50-salida.webp",
-  "w": 1024,
-  "h": 768,
-  "alt": "A dead tree by US-50 with the Sawatch Range behind",
-  "place": "Colorado",
-  "date": "2024-06"
- },
- {
-  "file": "/img/photos/leadville-plain.webp",
-  "w": 1024,
-  "h": 768,
-  "alt": "Snow-capped mountains across a green plain near Leadville",
-  "place": "Colorado",
-  "date": "2024-06"
- },
- {
-  "file": "/img/photos/red-rocks.webp",
-  "w": 1024,
-  "h": 768,
-  "alt": "The empty stage and benches at Red Rocks",
-  "place": "Red Rocks, Colorado",
-  "date": "2024-06"
- },
- {
-  "file": "/img/photos/chasm-lake-peaks.webp",
-  "w": 1182,
-  "h": 665,
-  "alt": "Snow in the gullies below Longs Peak on the Chasm Lake trail",
-  "place": "Rocky Mountain National Park",
-  "date": "2024-06"
- },
- {
-  "file": "/img/photos/estes-park-ridge.webp",
-  "w": 768,
-  "h": 1024,
-  "alt": "A rocky ridge under clouds near Estes Park",
-  "place": "Rocky Mountain National Park",
-  "date": "2024-06"
- },
- {
-  "file": "/img/photos/estes-park-stream.webp",
-  "w": 768,
-  "h": 1024,
-  "alt": "A stream tumbling over boulders",
-  "place": "Rocky Mountain National Park",
-  "date": "2024-06"
- },
- {
-  "file": "/img/photos/lily-lake.webp",
-  "w": 1024,
-  "h": 768,
-  "alt": "Lily Lake with a storm over the ridge",
-  "place": "Rocky Mountain National Park",
-  "date": "2024-06"
- },
- {
-  "file": "/img/photos/autumn-lane.webp",
-  "w": 768,
-  "h": 1024,
-  "alt": "A straight path under orange maples in October",
-  "place": "Michigan",
-  "date": "2024-10"
- },
- {
-  "file": "/img/photos/frozen-pier.webp",
-  "w": 1024,
-  "h": 768,
-  "alt": "A frozen pier on a lake in December",
-  "place": "Michigan",
-  "date": "2024-12"
- },
- {
-  "file": "/img/photos/the school-arcade.webp",
-  "w": 768,
-  "h": 1024,
-  "alt": "A brick and stone arcade on the the school campus in winter",
-  "place": "the school",
-  "date": "2025-02"
- },
- {
-  "file": "/img/photos/orange-pillars.webp",
-  "w": 792,
-  "h": 990,
-  "alt": "Sunlit orange pillars at the the school Academy of Art",
-  "place": "the school",
-  "date": "2025-02"
- },
- {
-  "file": "/img/photos/squirrel.webp",
-  "w": 1086,
-  "h": 724,
-  "alt": "A squirrel on a bare branch",
-  "place": "Michigan",
-  "date": "2025-02"
- },
- {
-  "file": "/img/photos/deer-in-snow.webp",
-  "w": 768,
-  "h": 1024,
-  "alt": "A deer sitting in the snow at the edge of the woods",
-  "place": "Michigan",
-  "date": "2025-03"
- },
- {
-  "file": "/img/photos/hyacinth.webp",
-  "w": 1086,
-  "h": 724,
-  "alt": "Purple hyacinths in bloom",
-  "place": "Michigan",
-  "date": "2025-04"
- },
- {
-  "file": "/img/photos/cherry-blossom.webp",
-  "w": 1086,
-  "h": 724,
-  "alt": "Cherry blossom against a white sky",
-  "place": "Michigan",
-  "date": "2025-04"
- },
- {
-  "file": "/img/photos/gmc-grille.webp",
-  "w": 1086,
-  "h": 724,
-  "alt": "The grille of an old orange GMC truck",
-  "place": "Michigan",
-  "date": "2025-04"
- },
- {
-  "file": "/img/photos/crocus.webp",
-  "w": 1086,
-  "h": 724,
-  "alt": "A single purple crocus",
-  "place": "Michigan",
-  "date": "2025-04"
- },
- {
-  "file": "/img/photos/daffodils.webp",
-  "w": 1086,
-  "h": 724,
-  "alt": "Daffodils among violets",
-  "place": "Michigan",
-  "date": "2025-04"
- },
- {
-  "file": "/img/photos/turtle.webp",
-  "w": 1086,
-  "h": 724,
-  "alt": "A turtle sunning on a log",
-  "place": "Michigan",
-  "date": "2025-04"
- },
- {
-  "file": "/img/photos/mallard.webp",
-  "w": 1086,
-  "h": 724,
-  "alt": "A mallard preening on the bank",
-  "place": "Michigan",
-  "date": "2025-04"
- },
- {
-  "file": "/img/photos/houston-tower.webp",
-  "w": 768,
-  "h": 1024,
-  "alt": "A glass tower shot straight up from the sidewalk",
-  "place": "Houston",
-  "date": "2025-04"
- },
- {
-  "file": "/img/photos/heron.webp",
-  "w": 768,
-  "h": 1024,
-  "alt": "A great blue heron at the edge of a lake",
-  "place": "Michigan",
-  "date": "2025-04"
- },
- {
-  "file": "/img/photos/robin.webp",
-  "w": 1086,
-  "h": 724,
-  "alt": "A robin on a branch heavy with berries",
-  "place": "Michigan",
-  "date": "2025-06"
- },
- {
-  "file": "/img/photos/thunderhead.webp",
-  "w": 1024,
-  "h": 768,
-  "alt": "A thunderhead building over the trees",
-  "place": "Michigan",
-  "date": "2025-07"
- },
- {
-  "file": "/img/photos/blue-morpho.webp",
-  "w": 768,
-  "h": 1024,
-  "alt": "A blue morpho butterfly with its wings closed",
-  "place": "Michigan",
-  "date": "2025-07"
- },
- {
-  "file": "/img/photos/autumn-canopy.webp",
-  "w": 768,
-  "h": 1024,
-  "alt": "Autumn canopy seen straight up",
-  "place": "Michigan",
-  "date": "2025-10"
- },
- {
-  "file": "/img/photos/grand-prismatic.webp",
-  "w": 1024,
-  "h": 768,
-  "alt": "The orange edge of Grand Prismatic Spring under cumulus",
-  "place": "Yellowstone",
-  "date": "2026-07"
- },
- {
-  "file": "/img/photos/midway-geyser.webp",
-  "w": 1024,
-  "h": 768,
-  "alt": "Steam over a blue pool in the Midway Geyser Basin",
-  "place": "Yellowstone",
-  "date": "2026-07"
- },
- {
-  "file": "/img/photos/the school-garden.webp",
-  "w": 1024,
-  "h": 768,
-  "alt": "The flower beds of the the school garden allee",
-  "place": "the school",
-  "date": "2026-07"
- },
- {
-  "file": "/img/photos/the school-path.webp",
-  "w": 1024,
-  "h": 768,
-  "alt": "A brick path across the the school campus at dusk",
-  "place": "the school",
-  "date": "2026-08"
- },
- {
-  "file": "/img/photos/rain-on-glass.webp",
-  "w": 768,
-  "h": 1024,
-  "alt": "Rain drops on a window in black and white",
-  "place": "the school",
-  "date": "2026-08"
- }
+  {
+    "file": "/img/photos/cathedral-facade.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "A Gothic cathedral facade from below, rose window and spires",
+    "place": "France",
+    "date": "2019-07"
+  },
+  {
+    "file": "/img/photos/cosmos.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "Pink cosmos in tall grass",
+    "place": "China",
+    "date": "2020-07"
+  },
+  {
+    "file": "/img/photos/covered-bridge.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "Inside a wooden covered bridge with a village beyond",
+    "place": "China",
+    "date": "2020-07"
+  },
+  {
+    "file": "/img/photos/sawgrass-prairie.webp",
+    "w": 1024,
+    "h": 769,
+    "alt": "Sawgrass prairie under a rippled sheet of cloud",
+    "place": "Florida",
+    "date": "2021-12"
+  },
+  {
+    "file": "/img/photos/morning-glory.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A purple morning glory among leaves",
+    "place": "Florida",
+    "date": "2021-12"
+  },
+  {
+    "file": "/img/photos/headland-slopes.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "Green slopes running down to the sea",
+    "place": "Hawaii",
+    "date": "2022-03"
+  },
+  {
+    "file": "/img/photos/beach-sunset.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "Sunset over the water from the beach",
+    "place": "Hawaii",
+    "date": "2022-03"
+  },
+  {
+    "file": "/img/photos/lava-tidepools.webp",
+    "w": 1025,
+    "h": 766,
+    "alt": "Lava rock tide pools on the shore",
+    "place": "Hawaii",
+    "date": "2022-03"
+  },
+  {
+    "file": "/img/photos/sea-cliffs.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "Cliffs above the sea on the east shore",
+    "place": "Hawaii",
+    "date": "2022-03"
+  },
+  {
+    "file": "/img/photos/fish-underwater.webp",
+    "w": 767,
+    "h": 1024,
+    "alt": "A school of fish seen from below the surface",
+    "place": "Hawaii",
+    "date": "2022-03"
+  },
+  {
+    "file": "/img/photos/desert-canyons-from-above.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "Eroded desert canyons under the wing",
+    "place": "From a plane",
+    "date": "2022-03"
+  },
+  {
+    "file": "/img/photos/bird-over-reef.webp",
+    "w": 1017,
+    "h": 772,
+    "alt": "A seabird banking over the reef off a headland",
+    "place": "Hawaii",
+    "date": "2022-03"
+  },
+  {
+    "file": "/img/photos/rooster.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "A rooster on lava rock in front of ferns",
+    "place": "Hawaii",
+    "date": "2022-03"
+  },
+  {
+    "file": "/img/photos/crater-cinder-cones.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "Cinder cones on a crater floor with cloud spilling in",
+    "place": "Hawaii",
+    "date": "2022-03"
+  },
+  {
+    "file": "/img/photos/falls-lip.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "The lip of the falls from the Canadian side",
+    "place": "New York",
+    "date": "2022-06"
+  },
+  {
+    "file": "/img/photos/falls-rising-mist.webp",
+    "w": 1165,
+    "h": 675,
+    "alt": "The falls with the mist rising",
+    "place": "New York",
+    "date": "2022-06"
+  },
+  {
+    "file": "/img/photos/turquoise-river.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "Turquoise water in the river below the falls",
+    "place": "New York",
+    "date": "2022-06"
+  },
+  {
+    "file": "/img/photos/stained-glass-dome.webp",
+    "w": 864,
+    "h": 908,
+    "alt": "A round stained glass skylight with a grapevine pattern, shot straight up",
+    "place": "Canada",
+    "date": "2022-06"
+  },
+  {
+    "file": "/img/photos/falls-mist-mono.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "The mist of the falls above a railed rock stair, in black and white",
+    "place": "New York",
+    "date": "2022-06"
+  },
+  {
+    "file": "/img/photos/rooftops-sunset.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "Rooftops and church towers at sunset",
+    "place": "Spain",
+    "date": "2022-12"
+  },
+  {
+    "file": "/img/photos/branching-columns.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "Columns branching into the ceiling of a basilica nave",
+    "place": "Spain",
+    "date": "2022-12"
+  },
+  {
+    "file": "/img/photos/olive-valley.webp",
+    "w": 1024,
+    "h": 720,
+    "alt": "Olive groves in a valley under a fan of cirrus",
+    "place": "Spain",
+    "date": "2022-12"
+  },
+  {
+    "file": "/img/photos/cliff-town.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "An old town perched on limestone cliffs above a gorge",
+    "place": "Spain",
+    "date": "2022-12"
+  },
+  {
+    "file": "/img/photos/downtown-from-above.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A Texas downtown from a high floor",
+    "place": "Texas",
+    "date": "2023-04"
+  },
+  {
+    "file": "/img/photos/wing-over-clouds.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A wingtip over a streak of cloud",
+    "place": "From a plane",
+    "date": "2023-06"
+  },
+  {
+    "file": "/img/photos/lantern-roofs.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "Lantern lit tiled roofs of a pavilion at blue hour",
+    "place": "China",
+    "date": "2023-06"
+  },
+  {
+    "file": "/img/photos/city-skyline-night.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "A city skyline lit up at night from across the river",
+    "place": "China",
+    "date": "2023-07"
+  },
+  {
+    "file": "/img/photos/river-delta-wingtip.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A wingtip over a braided brown river delta",
+    "place": "From a plane",
+    "date": "2023-07"
+  },
+  {
+    "file": "/img/photos/supertall.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A supertall tower shot straight up against cloud",
+    "place": "China",
+    "date": "2023-07"
+  },
+  {
+    "file": "/img/photos/city-lights-from-above.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "City lights at night from the window seat",
+    "place": "From a plane",
+    "date": "2023-08"
+  },
+  {
+    "file": "/img/photos/lake-at-dusk.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A calm lake at dusk framed by leaves",
+    "place": "Indiana",
+    "date": "2023-09"
+  },
+  {
+    "file": "/img/photos/water-caustics.webp",
+    "w": 1086,
+    "h": 724,
+    "alt": "Light bending through blue water",
+    "place": "Abstract",
+    "date": "2023-11"
+  },
+  {
+    "file": "/img/photos/blue-mineral.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A blue mineral specimen in a museum case",
+    "place": "Texas",
+    "date": "2024-03"
+  },
+  {
+    "file": "/img/photos/capitol-dome-from-below.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "Looking straight up into a state capitol dome",
+    "place": "Texas",
+    "date": "2024-03"
+  },
+  {
+    "file": "/img/photos/basket-stack.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "Stacked wire shopping baskets in black and white, repeating to the top of the frame",
+    "place": "Abstract",
+    "date": "2024-03"
+  },
+  {
+    "file": "/img/photos/peacock.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A peacock crossing a path with its train trailing",
+    "place": "Texas",
+    "date": "2024-03"
+  },
+  {
+    "file": "/img/photos/dead-tree-highway.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "A dead tree by the highway with mountains behind",
+    "place": "Colorado",
+    "date": "2024-06"
+  },
+  {
+    "file": "/img/photos/mountains-across-plain.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "Snow-capped mountains across a green plain",
+    "place": "Colorado",
+    "date": "2024-06"
+  },
+  {
+    "file": "/img/photos/amphitheatre-benches.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "The empty stage and benches of an outdoor amphitheatre",
+    "place": "Colorado",
+    "date": "2024-06"
+  },
+  {
+    "file": "/img/photos/snow-gullies.webp",
+    "w": 1182,
+    "h": 665,
+    "alt": "Snow in the gullies below a high peak",
+    "place": "Colorado",
+    "date": "2024-06"
+  },
+  {
+    "file": "/img/photos/rocky-ridge.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A rocky ridge under clouds",
+    "place": "Colorado",
+    "date": "2024-06"
+  },
+  {
+    "file": "/img/photos/boulder-stream.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A stream tumbling over boulders",
+    "place": "Colorado",
+    "date": "2024-06"
+  },
+  {
+    "file": "/img/photos/lake-under-storm.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "A lake with a storm over the ridge",
+    "place": "Colorado",
+    "date": "2024-06"
+  },
+  {
+    "file": "/img/photos/moored-sailboats.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "Sailboats moored on the river with the city skyline under clouds",
+    "place": "Massachusetts",
+    "date": "2024-06"
+  },
+  {
+    "file": "/img/photos/grey-horse.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A dappled gray horse eating hay in a barn",
+    "place": "Iowa",
+    "date": "2024-06"
+  },
+  {
+    "file": "/img/photos/columbine.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "White columbine flowers",
+    "place": "Colorado",
+    "date": "2024-06"
+  },
+  {
+    "file": "/img/photos/bee-on-thistle.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A bee on a purple thistle head",
+    "place": "Colorado",
+    "date": "2024-06"
+  },
+  {
+    "file": "/img/photos/forest-cascade.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A cascade over granite in a pine forest",
+    "place": "Colorado",
+    "date": "2024-06"
+  },
+  {
+    "file": "/img/photos/gorge-rail-line.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "Looking down into a gorge with a river and a rail line",
+    "place": "Colorado",
+    "date": "2024-06"
+  },
+  {
+    "file": "/img/photos/geese.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A skein of geese crossing a clear sky between two trees",
+    "place": "Michigan",
+    "date": "2024-09"
+  },
+  {
+    "file": "/img/photos/autumn-lane.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A straight path under orange maples in October",
+    "place": "Michigan",
+    "date": "2024-10"
+  },
+  {
+    "file": "/img/photos/frozen-pier.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "A frozen pier on a lake in December",
+    "place": "Michigan",
+    "date": "2024-12"
+  },
+  {
+    "file": "/img/photos/turbines-in-snow.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "Wind turbines over a snowy field under a mackerel sky",
+    "place": "Canada",
+    "date": "2024-12"
+  },
+  {
+    "file": "/img/photos/axolotl.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "A pale axolotl on the sand of an aquarium tank",
+    "place": "Canada",
+    "date": "2024-12"
+  },
+  {
+    "file": "/img/photos/winter-arcade.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A brick and stone arcade in winter",
+    "place": "Michigan",
+    "date": "2025-02"
+  },
+  {
+    "file": "/img/photos/orange-pillars.webp",
+    "w": 792,
+    "h": 990,
+    "alt": "Sunlit orange pillars outside an art museum",
+    "place": "Michigan",
+    "date": "2025-02"
+  },
+  {
+    "file": "/img/photos/squirrel.webp",
+    "w": 1086,
+    "h": 724,
+    "alt": "A squirrel on a bare branch",
+    "place": "Michigan",
+    "date": "2025-02"
+  },
+  {
+    "file": "/img/photos/deer-in-snow.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A deer sitting in the snow at the edge of the woods",
+    "place": "Michigan",
+    "date": "2025-03"
+  },
+  {
+    "file": "/img/photos/hyacinth.webp",
+    "w": 1086,
+    "h": 724,
+    "alt": "Purple hyacinths in bloom",
+    "place": "Michigan",
+    "date": "2025-04"
+  },
+  {
+    "file": "/img/photos/cherry-blossom.webp",
+    "w": 1086,
+    "h": 724,
+    "alt": "Cherry blossom against a white sky",
+    "place": "Michigan",
+    "date": "2025-04"
+  },
+  {
+    "file": "/img/photos/gmc-grille.webp",
+    "w": 1086,
+    "h": 724,
+    "alt": "The grille of an old orange GMC truck",
+    "place": "Michigan",
+    "date": "2025-04"
+  },
+  {
+    "file": "/img/photos/crocus.webp",
+    "w": 1086,
+    "h": 724,
+    "alt": "A single purple crocus",
+    "place": "Michigan",
+    "date": "2025-04"
+  },
+  {
+    "file": "/img/photos/daffodils.webp",
+    "w": 1086,
+    "h": 724,
+    "alt": "Daffodils among violets",
+    "place": "Michigan",
+    "date": "2025-04"
+  },
+  {
+    "file": "/img/photos/turtle.webp",
+    "w": 1086,
+    "h": 724,
+    "alt": "A turtle sunning on a log",
+    "place": "Michigan",
+    "date": "2025-04"
+  },
+  {
+    "file": "/img/photos/mallard.webp",
+    "w": 1086,
+    "h": 724,
+    "alt": "A mallard preening on the bank",
+    "place": "Michigan",
+    "date": "2025-04"
+  },
+  {
+    "file": "/img/photos/glass-tower.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A glass tower shot straight up from the sidewalk",
+    "place": "Texas",
+    "date": "2025-04"
+  },
+  {
+    "file": "/img/photos/heron.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A great blue heron at the edge of a lake",
+    "place": "Michigan",
+    "date": "2025-04"
+  },
+  {
+    "file": "/img/photos/sun-halo.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A halo around the sun over the wing above an overcast",
+    "place": "From a plane",
+    "date": "2025-04"
+  },
+  {
+    "file": "/img/photos/robin.webp",
+    "w": 1086,
+    "h": 724,
+    "alt": "A robin on a branch heavy with berries",
+    "place": "Michigan",
+    "date": "2025-06"
+  },
+  {
+    "file": "/img/photos/thunderhead.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "A thunderhead building over the trees",
+    "place": "Michigan",
+    "date": "2025-07"
+  },
+  {
+    "file": "/img/photos/blue-morpho.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A blue morpho butterfly with its wings closed",
+    "place": "Michigan",
+    "date": "2025-07"
+  },
+  {
+    "file": "/img/photos/obelisk-at-dusk.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A stone obelisk at dusk over a line of trees",
+    "place": "Washington DC",
+    "date": "2025-07"
+  },
+  {
+    "file": "/img/photos/rotunda-dome.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "A rotunda dome and its frieze, straight up",
+    "place": "Washington DC",
+    "date": "2025-07"
+  },
+  {
+    "file": "/img/photos/autumn-canopy.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "Autumn canopy seen straight up",
+    "place": "Michigan",
+    "date": "2025-10"
+  },
+  {
+    "file": "/img/photos/hot-spring-edge.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "The orange edge of a hot spring under cumulus",
+    "place": "Wyoming",
+    "date": "2026-07"
+  },
+  {
+    "file": "/img/photos/blue-pool-steam.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "Steam over a blue pool in a geyser basin",
+    "place": "Wyoming",
+    "date": "2026-07"
+  },
+  {
+    "file": "/img/photos/garden-allee.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "Flower beds along a garden allee in July",
+    "place": "Michigan",
+    "date": "2026-07"
+  },
+  {
+    "file": "/img/photos/brick-path.webp",
+    "w": 1024,
+    "h": 768,
+    "alt": "A brick path at dusk",
+    "place": "Michigan",
+    "date": "2026-08"
+  },
+  {
+    "file": "/img/photos/rain-on-glass.webp",
+    "w": 768,
+    "h": 1024,
+    "alt": "Rain drops on a window in black and white",
+    "place": "Michigan",
+    "date": "2026-08"
+  }
 ]

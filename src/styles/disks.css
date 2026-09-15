@@ -1,0 +1,131 @@
+/* The floppy disks, out on the website.
+
+   Drawn in the site's own materials rather than the Mac's: paper and ink,
+   the site's radius, one soft shadow. A disk lies on the page like an object
+   somebody put down, tilted a few degrees, and picks up in six whole frames
+   because whole frames are how the other half of this site moves.
+
+   Every animation here has a still, and each one is written so that reduced
+   motion means the end state appears rather than nothing happening. */
+
+.fd {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  vertical-align: middle;
+  margin: 0 0 0 10px;
+  padding: 4px 8px 4px 4px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transform: rotate(-6deg);
+  transition: transform .18s var(--spring, ease), filter .18s ease;
+}
+.fd:hover, .fd:focus-visible { transform: rotate(-6deg) translateY(-3px); }
+.fd:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.fd:active { transform: rotate(-6deg) translateY(-1px); }
+
+.fd-art {
+  display: block;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  filter: drop-shadow(0 2px 3px rgba(41, 37, 36, .22));
+}
+.fd-body { fill: #46403b; }
+.fd-shutter { fill: #cfc8c0; }
+.fd-slot { fill: #6f6862; }
+.fd-notch { fill: #2f2a26; }
+.fd-label { fill: #fdf7ec; }
+.fd-rule { fill: #cbbfae; }
+
+.fd-lbl {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 13px;
+  letter-spacing: .01em;
+  color: var(--ink-2, #6b6560);
+  white-space: nowrap;
+}
+/* the label on the buried one has been in the sun */
+.fd.is-snake .fd-lbl { color: #8a8079; }
+
+/* the sentence left where a disk was */
+.fd-say { color: var(--ink-2, #6b6560); }
+/* the reading disk lies on the ink panel, where a grey label disappears */
+.panel.is-dark .fd-lbl, .panel.is-dark .fd-say { color: rgba(255, 249, 241, .62); }
+.fd-sand-say { margin: 10px 0 0; font-size: 15px; }
+
+/* ── the flight ────────────────────────────────────────────────────── */
+/* six whole steps to the way in, and then it is gone. Transform only. */
+.fd.is-off {
+  animation: fd-fly .48s steps(6, end) forwards;
+  pointer-events: none;
+}
+@keyframes fd-fly {
+  from { transform: rotate(-6deg) translate(0, 0) scale(1); }
+  to   { transform: rotate(-6deg) translate(var(--dx, 0), var(--dy, -200px)) scale(.3); }
+}
+
+/* ── the sand ──────────────────────────────────────────────────────── */
+.foot .foot-in { position: relative; }
+.foot .foot-in span[role='button'] { cursor: pointer; border-radius: 8px; }
+.foot .foot-in span[role='button']:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+
+/* a corner of something, barely darker than the sand it is in */
+.fd-corner {
+  position: relative;
+  display: inline-block;
+  width: 22px;
+  height: 16px;
+  margin-left: 40px;
+  padding: 0;
+  border: 0;
+  background: none;
+  vertical-align: middle;
+  cursor: pointer;
+  transform: rotate(18deg);
+}
+.fd-corner:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.fd-corner-edge {
+  position: absolute;
+  inset: 2px 0 0 0;
+  border-radius: 3px 3px 0 0;
+  background: #6d655d;
+  box-shadow: 0 1px 0 rgba(41, 37, 36, .25);
+}
+.fd-corner-paper {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 7px;
+  height: 7px;
+  border-radius: 2px 2px 0 0;
+  background: #efe5d5;
+}
+
+/* out of the sand in four whole frames */
+.fd.is-buried { clip-path: inset(75% 0 0 0); }
+.fd.is-rising { animation: fd-rise .32s steps(4, end) forwards; }
+@keyframes fd-rise {
+  from { clip-path: inset(75% 0 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+
+/* ── leaning on the timeline ───────────────────────────────────────── */
+.fd.is-leaning { transform: rotate(4deg); margin-left: 8px; }
+.fd.is-leaning:hover, .fd.is-leaning:focus-visible { transform: rotate(4deg) translateY(-3px); }
+.fd.is-leaning.is-off { animation-name: fd-fly-lean; }
+@keyframes fd-fly-lean {
+  from { transform: rotate(4deg) translate(0, 0) scale(1); }
+  to   { transform: rotate(4deg) translate(var(--dx, 0), var(--dy, -200px)) scale(.3); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fd, .fd:hover, .fd:focus-visible, .fd:active { transition: none; }
+  .fd.is-off { animation: none; }
+  .fd.is-rising { animation: none; }
+  .fd.is-buried { clip-path: none; }
+}

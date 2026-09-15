@@ -1,0 +1,136 @@
+---
+/* A year of GitHub, drawn as one inline SVG: a rect per day on a 14px
+   pitch, five steps of ink for the five levels GitHub assigns by count,
+   the months across the top and three weekday initials down the left.
+   The figure is centred and says nothing under itself; the grid is the
+   sentence. The whole figure is a link to the profile.
+
+   It paints first from the build-time snapshot in src/data/github.ts, so
+   there is never a hole where it goes, then asks /api/contributions for
+   today's numbers and redraws in place. If that call fails, the snapshot
+   stays. When the calendar could not be read at build time, nothing
+   renders. */
+import { github } from '../../data/github';
+import { links } from '../../data/site';
+
+const cal = github;
+const CELL = 11;
+const PITCH = 14;
+const LEFT = 30;
+const TOP = 20;
+const W = LEFT + 53 * PITCH - (PITCH - CELL);
+const H = TOP + 7 * PITCH - (PITCH - CELL);
+
+const say = (n: number) => (n === 0 ? 'No contributions' : n === 1 ? '1 contribution' : `${n} contributions`);
+const pretty = (iso: string) => {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' });
+};
+const total = cal ? cal.total.toLocaleString('en-US') : '';
+---
+{cal && (
+  <section class="heat-sec" data-nav-tone="light" aria-labelledby="heat-h">
+    <div class="wrap">
+      <h2 class="h-section" id="heat-h" data-rise>A year on GitHub, <span data-heat-total>{total}</span> contributions.</h2>
+      <a class="heat" href={links.github} rel="me noopener" target="_blank" aria-label="My GitHub profile" data-heat data-total={cal.total}>
+        <div class="heat-scroll">
+          <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} role="img" aria-label={`A year of GitHub contributions, ${total} in total`} shape-rendering="crispEdges" data-heat-svg>
+            <g data-heat-months>
+              {cal.months.map((m) => (
+                <text class="lab" x={LEFT + m.col * PITCH} y="11">{m.label}</text>
+              ))}
+            </g>
+            {['M', 'W', 'F'].map((d, i) => (
+              <text class="lab" x="0" y={TOP + (i * 2 + 1) * PITCH + CELL - 2}>{d}</text>
+            ))}
+            <g data-heat-days>
+              {cal.weeks.map((week, col) =>
+                week.map((d, row) => d && (
+                  <rect class={`l${d.level}`} x={LEFT + col * PITCH} y={TOP + row * PITCH} width={CELL} height={CELL} rx="2">
+                    <title>{say(d.count)} on {pretty(d.date)}</title>
+                  </rect>
+                ))
+              )}
+            </g>
+          </svg>
+        </div>
+      </a>
+    </div>
+  </section>
+)}
+
+<style is:global>
+  /* global on purpose: the live redraw builds its rects from a string and they would
+     not carry Astro's scope attribute, so every selector here is namespaced by hand */
+  .heat-sec { position: relative; z-index: 11; background: var(--paper); padding: 96px 0 140px; }
+  /* the heading sits over the middle of the grid, since the grid is centred
+     and a line hanging off its left edge reads as a different section
+     (Peter, 09-14) */
+  .heat-sec h2 { text-align: center; max-width: 24ch; margin-inline: auto; }
+  /* the grid shares the page's one left edge (WEB-065) */
+  /* auto on the sides, or the grid sits at the left edge under a centred heading */
+  .heat { display: block; width: fit-content; max-width: 100%; margin: 44px auto 0; border-radius: 8px; }
+  .heat-scroll { overflow-x: auto; overscroll-behavior-x: contain; padding-bottom: 6px; }
+  .heat svg {
+    display: block; width: 772px; max-width: none; height: auto;
+    /* GitHub's five levels, by how many commits the day had: none, a
+       little, some, more, most. Ink at five strengths so the grid reads
+       as one figure and the busy weeks are unmistakable. */
+    --h0: var(--hair);
+    --h1: rgb(3 3 2 / .28);
+    --h2: rgb(3 3 2 / .52);
+    --h3: rgb(3 3 2 / .76);
+    --h4: var(--ink);
+  }
+  .heat .lab { font-family: inherit; font-size: 11px; fill: var(--muted); }
+  .heat .l0 { fill: var(--h0); } .heat .l1 { fill: var(--h1); } .heat .l2 { fill: var(--h2); } .heat .l3 { fill: var(--h3); } .heat .l4 { fill: var(--h4); }
+  @media (min-width: 900px) { .heat svg { width: 840px; } }
+</style>
+
+<script is:inline data-astro-rerun>
+  /* Live: one request after the page is up, then the grid is today's. It runs
+     again on every arrival, so plain JS inside a closure: the router re-adds
+     this block, and a second top-level const would throw on the second run.
+     Astro leaves an inline block alone, so nothing here may be TypeScript. */
+  (function () {
+    var CELL = 11, PITCH = 14, LEFT = 30, TOP = 20;
+    var say = function (n) { return n === 0 ? 'No contributions' : n === 1 ? '1 contribution' : n + ' contributions'; };
+    var pretty = function (iso) {
+      var p = iso.split('-').map(Number);
+      return new Date(Date.UTC(p[0], p[1] - 1, p[2])).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric', year: 'numeric' });
+    };
+    var esc = function (s) { return s.replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); };
+
+    function draw(root, cal) {
+      var svg = root.querySelector('[data-heat-svg]');
+      var months = root.querySelector('[data-heat-months]');
+      var days = root.querySelector('[data-heat-days]');
+      if (!svg || !months || !days) return;
+      months.innerHTML = cal.months.map(function (m) {
+        return '<text class="lab" x="' + (LEFT + m.col * PITCH) + '" y="11">' + esc(m.label) + '</text>';
+      }).join('');
+      var out = '';
+      cal.weeks.forEach(function (week, col) {
+        week.forEach(function (d, row) {
+          if (!d) return;
+          out += '<rect class="l' + d.level + '" x="' + (LEFT + col * PITCH) + '" y="' + (TOP + row * PITCH) + '" width="' + CELL + '" height="' + CELL + '" rx="2"><title>' + say(d.count) + ' on ' + pretty(d.date) + '</title></rect>';
+        });
+      });
+      days.innerHTML = out;
+      var total = cal.total.toLocaleString('en-US');
+      svg.setAttribute('aria-label', 'A year of GitHub contributions, ' + total + ' in total');
+      var said = document.querySelector('[data-heat-total]');
+      if (said) said.textContent = total;
+      root.dataset.total = String(cal.total);
+      root.dataset.live = '1';
+    }
+
+    var root = document.querySelector('[data-heat]');
+    if (root) {
+      fetch('/api/contributions', { headers: { accept: 'application/json' } })
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)); })
+        .then(function (cal) { if (cal && Array.isArray(cal.weeks) && cal.weeks.length === 53) draw(root, cal); })
+        .catch(function () { /* the build-time grid stays */ });
+    }
+  })();
+</script>

@@ -1,0 +1,401 @@
+---
+/* Market Station's own page. It is deliberately not a chapter of the portfolio:
+   its own head, its own tokens in styles/market.css, no Site layout, no serif,
+   no font file, no shadow, no radius past 2px. An instrument panel reads in
+   four seconds, so this page is set rather than laid out.
+
+   Every picture is a real capture of the running station, staged into a device
+   on the cold ground that matches this page. Nothing here is invented; the
+   claims trace to the station's README, its config, its code, and Peter's own
+   copy in src/data. */
+import '../../styles/market.css';
+import Pill from '../../components/site/Pill.astro';
+import mocks from '../../data/mocks.json';
+
+type Mock = { name: string; theme: string; product: string; src: string; width: number; height: number; description: string };
+const all = mocks as Mock[];
+/* a shot is a pair, one per appearance. Missing means the figure is not drawn,
+   which is how the phone shot stays out until it is taken on the real phone. */
+const shot = (name: string) => {
+  const light = all.find((m) => m.name === name && m.theme === 'light');
+  const dark = all.find((m) => m.name === name && m.theme === 'dark');
+  return light && dark ? { light, dark } : null;
+};
+
+const dashboard = shot('market-site-dashboard');
+const reading = shot('market-site-reading');
+const sections = shot('market-site-sections');
+const phone = shot('market-site-phone-alert');
+const easing = shot('market-site-easing');
+const settings = shot('market-site-settings');
+const briefing = shot('market-site-briefing');
+const connections = shot('market-site-connections');
+const desk = shot('market-site-desk');
+
+/* WEB-076: every capture ships at two widths, so a phone stops downloading a
+   3200px master for a 360px column. The half file sits beside the full one. */
+const half = (src: string) => src.replace(/\.webp$/, '-half.webp');
+const set = (m: Mock) => `${half(m.src)} ${Math.round(m.width / 2)}w, ${m.src} ${m.width}w`;
+const SIZES = '(max-width: 767px) 92vw, min(1120px, 74vw)';
+
+/* how many pictures had a line moved by hand before they were taken */
+const staged = phone ? 'In two of them' : 'In one of them';
+
+const ledger: { group: string; rows: [string, string, string][] }[] = [
+  {
+    group: 'Markets',
+    rows: [
+      ['VIX', 'the market’s fear gauge', 'above 30'],
+      ['Fear & Greed', 'CNN’s daily read on investor mood, 0 to 100', 'below 40'],
+      ['QQQ pullback', 'how far the Nasdaq-100 has fallen from its record high', 'a drop past 15%'],
+      ['VOO momentum', '14-day RSI on the S&P 500 tracker', 'below 30 or above 70'],
+      ['Market breadth', 'the share of S&P 500 stocks above their own 50-day average', 'below 20%'],
+      ['CAPE', 'how expensive stocks are on a ten-year view', 'below 20 or above 40'],
+    ],
+  },
+  {
+    group: 'Jobs',
+    rows: [
+      ['Unemployment', 'people out of work', 'above 4.5%'],
+      ['Jobs added', 'the change in payrolls last month', 'below minus 50k'],
+      ['Jobless claims', 'new unemployment filings each week', 'above 300k'],
+      ['Sahm Rule', 'a recession signal built out of rising unemployment', 'above 0.5'],
+    ],
+  },
+  {
+    group: 'Growth',
+    rows: [
+      ['GDP nowcast', 'the Atlanta Fed’s running estimate of this quarter', 'below 0%'],
+      ['Economic activity', 'the Chicago Fed’s national index, averaged over three months', 'below minus 0.70'],
+      ['Real retail sales', 'what households bought against a year ago, after inflation', 'below 0%'],
+      ['Factory new orders', 'the Philadelphia Fed’s manufacturing survey, where zero is neutral', 'below minus 10'],
+      ['Building permits', 'new homes authorized', 'below 1,200k'],
+      ['Leading indicators', 'the Conference Board’s index of where the economy is headed', 'below 95'],
+    ],
+  },
+  {
+    group: 'Prices and rates',
+    rows: [
+      ['Inflation', 'the Cleveland Fed’s median measure of what prices are doing', 'above 3%'],
+      ['Core inflation', 'core PCE against a year ago, the one the Fed steers by', 'above 3%'],
+      ['10-year rate', 'what the US government pays to borrow for ten years', 'above 4.5%'],
+      ['Yield curve', 'the 10-year minus the 3-month, the old recession signal', 'below 0'],
+    ],
+  },
+  {
+    group: 'Debt and credit stress',
+    rows: [
+      ['High-yield spread', 'how worried lenders are', 'above 5%'],
+      ['Financial conditions', 'the Chicago Fed’s index, where zero is average', 'above 0'],
+      ['Government debt', 'federal debt held by the public, against GDP', 'above 105%'],
+      ['Interest burden', 'federal interest payments as a share of tax revenue', 'above 25%'],
+      ['Household debt payments', 'debt payments as a share of after-tax income', 'above 13%'],
+      ['Loan delinquencies', 'consumer loans past due at commercial banks', 'above 3.5%'],
+    ],
+  },
+  {
+    group: 'How households feel',
+    rows: [
+      ['Consumer confidence', 'the Conference Board’s index', 'below 80'],
+      ['Consumer expectations', 'the University of Michigan’s index', 'below 50'],
+    ],
+  },
+];
+
+const title = 'Market Station';
+const desc = 'Twenty eight public readings, watched all day by an old laptop with the lid shut. When one crosses a line your phone gets exactly one message.';
+const url = new URL(Astro.url.pathname, Astro.site ?? 'https://petermei.com');
+const og = dashboard ? new URL(dashboard.light.src, url).href : new URL('/og.png', url).href;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={desc} />
+    <link rel="canonical" href={url.href} />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#eef0f4" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b0e11" media="(prefers-color-scheme: dark)" />
+    <meta name="author" content="Peter Mei" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Peter Mei" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={url.href} />
+    <meta property="og:image" content={og} />
+    {dashboard && <meta property="og:image:width" content={String(dashboard.light.width)} />}
+    {dashboard && <meta property="og:image:height" content={String(dashboard.light.height)} />}
+    <meta property="og:image:alt" content="The Market Station dashboard on a monitor, with a band across the top naming the readings that are over their lines." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={desc} />
+    <meta name="twitter:image" content={og} />
+  </head>
+  <body>
+    <a class="skip" href="#top">Skip to the content</a>
+    <Pill />
+    <header class="band">
+      <span>Market Station</span>
+      <span>28 readings. One alert.</span>
+    </header>
+
+    <main id="main">
+      <!-- the hero. No rail here, and the figure breaks out to the full column,
+           which is the shape the page closes on too. -->
+      <section class="hero wrap" id="top">
+        <h1>It watches 28 numbers so nobody has to</h1>
+        <p class="lead">A dashboard for one guy who does not read charts.</p>
+        <p class="lead">A number crosses a line, his phone buzzes once, and then it shuts up. Most weeks it has nothing to say at all. Those are the good weeks.</p>
+        <div class="acts">
+          <a class="btn" href="/">The other three things</a>
+          <a class="btn2" href="https://github.com/exata531" rel="me noopener" target="_blank">github.com/exata531</a>
+        </div>
+        {dashboard && (
+          <figure class="fig">
+            <picture>
+              <source media="(prefers-color-scheme: dark)" srcset={set(dashboard.dark)} sizes={SIZES} />
+              <img src={dashboard.light.src} srcset={set(dashboard.light)} sizes={SIZES} width={dashboard.light.width} height={dashboard.light.height} loading="eager" fetchpriority="high" decoding="async" draggable="false" alt="The Market Station dashboard on a monitor. A band across the top reads 5 readings need attention and lists each one, and the first row of tiles under it shows VIX at 14.3 marked OK and Fear and Greed at 35.3 marked ALERT." />
+            </picture>
+            <figcaption>The top of the dashboard on September 3, 2026. Five readings are over their lines, and the band names each one and what it went past.</figcaption>
+          </figure>
+        )}
+        <p class="fine">The numbers in these pictures are whatever the day looked like when they were taken. {staged} a line was moved by hand so there would be an alert to photograph.</p>
+      </section>
+
+      <section class="sec wrap" id="reader">
+        <div class="tickrule"><span class="tick">01</span></div>
+        <div class="grid">
+          <p class="railname">The reader</p>
+          <div class="col">
+            <h2>One reader</h2>
+            <p class="lead">Market Station has exactly one user.</p>
+            <p>He does not read charts and has no plans to start. So every reading says what it means in one sentence, and whether it is fine in one word, and neither of those contains the phrase basis points.</p>
+            <p><span class="s-ok">Green is fine</span>. <span class="s-watch">Amber is close</span>. <span class="s-alert">Red is crossed</span>. <span class="s-opp">Teal is good news</span>. Four colors. No logo. There was a fifth color for about a day, and then it was put down.</p>
+            {reading && (
+              <figure class="fig fig--card">
+                <picture>
+                  <source media="(prefers-color-scheme: dark)" srcset={set(reading.dark)} sizes={SIZES} />
+                  <img src={reading.light.src} srcset={set(reading.light)} sizes={SIZES} width={reading.light.width} height={reading.light.height} loading="lazy" decoding="async" draggable="false" alt="One reading open on its own: the 10-year rate at 4.79 percent, marked ALERT, above a low to high bar and five years of history with a dashed line across it labeled your line." />
+                </picture>
+                <figcaption>The 10-year rate opened on its own. The dashed line across the history is his, and the bar above it puts the number between low and high.</figcaption>
+              </figure>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section class="sec wrap" id="watches">
+        <div class="tickrule"><span class="tick">02</span></div>
+        <div class="grid">
+          <p class="railname">What it watches</p>
+          <div class="col">
+            <h2>28 readings, six groups</h2>
+            <p class="lead">They used to sit in one flat grid. On a phone that is a wall.</p>
+            <p>Markets is today. The other five are the economy underneath it, arranged roughly in the order things go wrong.</p>
+            <p>Most of the numbers come from the Federal Reserve, which is dull and reliable and exactly what you want at six in the morning. The rest get scraped off public pages that can change without telling anyone, so each collector fails on its own and grays out its own tile. It has been trained to die quietly.</p>
+            {sections && (
+              <figure class="fig">
+                <picture>
+                  <source media="(prefers-color-scheme: dark)" srcset={set(sections.dark)} sizes={SIZES} />
+                  <img src={sections.light.src} srcset={set(sections.light)} sizes={SIZES} width={sections.light.width} height={sections.light.height} loading="lazy" decoding="async" draggable="false" alt="Three group headings on the dashboard in one browser window: Growth, Prices and rates, and Debt and credit stress, each with a row of tiles under it." />
+                </picture>
+                <figcaption>Three of the six groups in one screen, on September 10, 2026. Every tile says its status in a word, and the three over their lines here are together in Prices and rates.</figcaption>
+              </figure>
+            )}
+
+            <details class="fold">
+              <summary>All 28, with the line each one alerts at</summary>
+              <div class="fold-in">
+                {ledger.map((g) => (
+                  <table class="led">
+                    <caption>{g.group}</caption>
+                    <tbody>
+                      {g.rows.map((r) => (
+                        <tr>
+                          <th scope="row">{r[0]}</th>
+                          <td class="c-mean">{r[1]}</td>
+                          <td class="c-line">{r[2]}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ))}
+              </div>
+            </details>
+
+            <p class="after-fold">Four of them are not published anywhere as a single number, so the station works them out itself. Market breadth chews through about 500 tickers before breakfast, every day, without being asked, which makes it the hardest worker in this house.</p>
+            <p>One tile is a substitute and says so. ISM wanted money.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec wrap" id="speaks">
+        <div class="tickrule"><span class="tick">03</span></div>
+        <div class="grid">
+          <p class="railname">What the phone gets</p>
+          <div class="col">
+            <h2>One push</h2>
+            <p class="lead">Nobody is sitting in front of 28 charts all day.</p>
+            <p>That is the laptop’s job, and the laptop does not get bored, does not need lunch, and has never once brought the market up at dinner. One crossing, one push, and then nothing. Tap it and the dashboard opens.</p>
+            <div class:list={['split', phone && 'split--fig']}>
+              {phone && (
+                <figure class="fig fig--phone">
+                  <picture>
+                    <source media="(prefers-color-scheme: dark)" srcset={set(phone.dark)} sizes={SIZES} />
+                    <img src={phone.light.src} srcset={set(phone.light)} sizes={SIZES} width={phone.light.width} height={phone.light.height} loading="lazy" decoding="async" draggable="false" alt="A phone lock screen with two notifications from Market Station on it: the briefing headline above, and an alert naming a reading and the line it went past below." />
+                  </picture>
+                  <figcaption>Two pushes on the lock screen: the briefing headline, and a crossing.</figcaption>
+                </figure>
+              )}
+              <div class="split-t">
+                <p>It also speaks up when a source goes dark, or comes back, or when it has updated itself. None of it runs on a timer, so a source that is down all day sends two messages instead of four hundred. The four hundred version existed. It lasted one afternoon.</p>
+                <p>The one thing it cannot tell you is that it is dead, on account of being dead. Something outside pings it every minute and does the talking when the pings stop.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec wrap" id="once">
+        <div class="tickrule"><span class="tick">04</span></div>
+        <div class="grid">
+          <p class="railname">How it decides</p>
+          <div class="col">
+            <h2>One alert per crossing</h2>
+            <ul class="states">
+              <li>armed</li>
+              <li class="is-fired">fired</li>
+              <li>easing</li>
+              <li>clear</li>
+              <li>armed</li>
+            </ul>
+            <p class="lead">An alarm that cries wolf gets switched off inside a week.</p>
+            <p>So a line fires once and stays fired, whatever the number does next, until it clears by three percent. One alert and one all-clear for the whole episode, however long it drags on. There is a state called <span class="d s-alert">EASING</span> for the awkward bit in between, named by committee, and the committee was one person.</p>
+            <p>Three percent of zero is zero. The yield curve’s line sits at zero. You can see where this is going, and so could the phone, which went off all afternoon.</p>
+            {easing && (
+              <figure class="fig">
+                <picture>
+                  <source media="(prefers-color-scheme: dark)" srcset={set(easing.dark)} sizes={SIZES} />
+                  <img src={easing.light.src} srcset={set(easing.light)} sizes={SIZES} width={easing.light.width} height={easing.light.height} loading="lazy" decoding="async" draggable="false" alt="The dashboard with one reading mid-episode. The band across the top reads 1 reading needs attention, and the VIX tile under it is marked EASING at 17.8 while every other tile is marked OK." />
+                </picture>
+                <figcaption>Staged: I moved the VIX line to 18 so there would be an episode to photograph. The reading is back inside it at 17.8, and the tile says this alert clears at 17.46.</figcaption>
+              </figure>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section class="sec wrap" id="lines">
+        <div class="tickrule"><span class="tick">05</span></div>
+        <div class="grid">
+          <p class="railname">The lines</p>
+          <div class="col">
+            <h2>Moving a line</h2>
+            <p class="lead">Every line moves. Most of them should not.</p>
+            <p>For a while every field accepted anything between minus a million and a million, which meant that typing <span class="d">2200</span> for a VIX line instead of <span class="d">22</span> saved fine, looked fine, and switched that alarm off forever without a word of complaint. A VIX of <span class="d">2200</span> would mean the end of the financial system. The tile would have said OK.</p>
+            <p>It has bounds now.</p>
+            {settings && (
+              <figure class="fig">
+                <picture>
+                  <source media="(prefers-color-scheme: dark)" srcset={set(settings.dark)} sizes={SIZES} />
+                  <img src={settings.light.src} srcset={set(settings.light)} sizes={SIZES} width={settings.light.width} height={settings.light.height} loading="lazy" decoding="async" draggable="false" alt="The alert lines section of the settings page in a browser window. Each reading has a field holding its line, a note underneath saying what the reading is now and what a normal range looks like, and a tick marked On." />
+                </picture>
+                <figcaption>Under every field is what that reading is right now and what a normal range for it looks like.</figcaption>
+              </figure>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section class="sec wrap" id="briefing">
+        <div class="tickrule"><span class="tick">06</span></div>
+        <div class="grid">
+          <p class="railname">The briefing</p>
+          <div class="col">
+            <h2>Two briefings a day</h2>
+            <p class="lead">8 in the morning and 4:45 in the afternoon, whether anything happened or not.</p>
+            <p>A model gets the whole snapshot and the run of the web, writes a few paragraphs on why something moved, and pushes the headline to the phone. It cites its sources, which puts it ahead of most people.</p>
+            <p>On a quiet day it has to work very hard to sound interested. We have read some brave work.</p>
+            {briefing && (
+              <figure class="fig">
+                <picture>
+                  <source media="(prefers-color-scheme: dark)" srcset={set(briefing.dark)} sizes={SIZES} />
+                  <img src={briefing.light.src} srcset={set(briefing.light)} sizes={SIZES} width={briefing.light.width} height={briefing.light.height} loading="lazy" decoding="async" draggable="false" alt="A written briefing on a monitor: a stance line, what changed, each active alert taken in turn, and a list of five dated sources at the end. An alert history panel beside it lists that day’s crossings with timestamps." />
+                </picture>
+                <figcaption>The post-close briefing from September 3, 2026, with that evening’s crossings listed beside it. The wording is the model’s and every number in it comes out of the station’s own snapshot.</figcaption>
+              </figure>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section class="sec wrap" id="runs">
+        <div class="tickrule"><span class="tick">07</span></div>
+        <div class="grid">
+          <p class="railname">Where it runs</p>
+          <div class="col">
+            <h2>Where it runs</h2>
+            <p class="lead">On a laptop. With the lid shut.</p>
+            <p>An old Windows 10 machine, plugged in, sleep switched off, running as a service that starts at boot with nobody logged in. The cloud bill is zero dollars, which is also the marketing budget, the design budget, and the budget.</p>
+            <p>Crashes, restarts. Power cuts out, comes back. It pulls its own updates every fifteen minutes and rolls itself back if the dashboard stops answering. Pushing to the main branch is the deploy. There is no staging environment. There is a laptop.</p>
+            {connections && (
+              <figure class="fig fig--tight">
+                <picture>
+                  <source media="(prefers-color-scheme: dark)" srcset={set(connections.dark)} sizes={SIZES} />
+                  <img src={connections.light.src} srcset={set(connections.light)} sizes={SIZES} width={connections.light.width} height={connections.light.height} loading="lazy" decoding="async" draggable="false" alt="A list of connection checks in a browser window, every row marked PASS: the web server, the collection schedule, the internet, the database, the eight data sources, the phone alerts and Claude Code, each with what it returned and how long it took." />
+                </picture>
+                <figcaption>Fourteen of the fifteen checks. The station’s own computer is the row above these, cropped out because it prints the machine’s name and how long it has been up.</figcaption>
+              </figure>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section class="sec wrap" id="wrong">
+        <div class="tickrule"><span class="tick">08</span></div>
+        <div class="grid">
+          <p class="railname">Not done</p>
+          <div class="col">
+            <h2>What is wrong with it</h2>
+            <p>Plenty.</p>
+            <p>The little bar on each tile is the worst thing on the page. Two marks that look identical, and on CAPE they collide into a smudge. We call it the smudge. We have not fixed the smudge.</p>
+            <p>Hovering a chart has never highlighted a point. One option left unset. Embarrassing.</p>
+            <p>The daily summary pushes all 28 readings in one message. That was fine at 12.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="end wrap" id="close">
+        <div class="endrule"></div>
+        <h2>Not for you</h2>
+        <p>One reader. Behind a login. No download, no link, and no waitlist to put your email into, which is the part of this we are proudest of.</p>
+        <p>Go look at the other three.</p>
+        <div class="acts">
+          <a class="btn" href="/">The other three things</a>
+          <a class="btn2" href="https://github.com/exata531" rel="me noopener" target="_blank">github.com/exata531</a>
+        </div>
+        {desk && (
+          <figure class="fig">
+            <picture>
+              <source media="(prefers-color-scheme: dark)" srcset={set(desk.dark)} sizes={SIZES} />
+              <img src={desk.light.src} srcset={set(desk.light)} sizes={SIZES} width={desk.light.width} height={desk.light.height} loading="lazy" decoding="async" draggable="false" alt="The dashboard on a monitor with a phone standing in front of it showing the same day in the phone layout, where the alert band and the first reading fill the screen." />
+            </picture>
+            <figcaption>The same readings on both screens. On the phone the band and the first reading fill it.</figcaption>
+          </figure>
+        )}
+      </section>
+    </main>
+
+    <footer class="wrap">
+        <div class="foot">
+          <span>Market Station, 2026</span>
+          <span><a href="/">petermei.com</a></span>
+        </div>
+    </footer>
+  </body>
+</html>

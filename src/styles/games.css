@@ -1,0 +1,170 @@
+/* The floppy disks, and the three games on them.
+
+   Everything here is drawn the way the rest of this Macintosh is drawn: one
+   unit is two CSS pixels, no radius, no shadow but the hard one a document
+   casts, no gradient, no easing. Nothing animates on a curve; the only
+   motion in this file is a progress bar that steps and a tile that is in one
+   slot or the next.
+
+   The three games share a shell (a field and one line of Geneva under it) so
+   their windows are the same shape of thing, and each adds only what it is:
+   a grid, a sheet of text, or a canvas. */
+
+/* ── the floppy on the desktop ─────────────────────────────────────── */
+/* System 7 left an ejected disk's icon on the desk, drawn through the 50
+   percent pattern, and put it back when the disk was inserted again */
+.item-disk.is-ejected .item-ico { -webkit-mask: var(--dither); mask: var(--dither); -webkit-mask-size: var(--dither-size); mask-size: var(--dither-size); }
+.item-disk.is-ejected .item-lbl { color: var(--ink-3); }
+
+/* ── the Installer ─────────────────────────────────────────────────── */
+/* the alert frame is the desktop's own; what this adds is the bar, which a
+   System 7 installer drew as an outlined well filling from the left */
+.inst-veil .alert { max-width: calc(340 * var(--u)); }
+.inst-bar {
+  grid-column: 2;
+  height: calc(12 * var(--u));
+  margin-top: var(--u4);
+  border: var(--u) solid var(--ink);
+  background: var(--paper);
+  padding: var(--u);
+}
+.inst-bar span {
+  display: block;
+  height: 100%;
+  width: calc(var(--f, 0) * 100%);
+  background: var(--ink);
+}
+
+/* ── what every game has ───────────────────────────────────────────── */
+.game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--u6);
+  padding: var(--u8);
+  background: var(--paper);
+  min-height: 100%;
+}
+.game:focus { outline: none; }
+/* the field gives way first. On a screen too short to hold the whole window
+   the score is the part that must survive, so it never shrinks and the play
+   field is the one that gets cropped. */
+.game-field { display: flex; justify-content: center; min-height: 0; overflow: hidden; }
+.game-canvas { display: block; image-rendering: pixelated; }
+.game-stat {
+  flex: none;
+  font-family: var(--geneva);
+  font-size: var(--fs-9);
+  line-height: var(--lh-9);
+  color: var(--ink);
+  text-align: center;
+  margin: 0;
+  /* the parts of the line are held apart by run of spaces, because Geneva's
+     middle dot is a solid four unit blob and reads heavier than any letter
+     beside it. Collapsed whitespace would run them together. */
+  white-space: pre;
+}
+/* a game window has no scroll bars and no grow box, so its pane is the
+   whole of it and nothing inside it may push the pane wider. A document
+   window's body holds a 16 unit column and a 16 unit row for the two scroll
+   bars and the grow box between them; a window that draws none of the three
+   must not keep the space, or the field sits 16 units left of centre with a
+   band of white down the right edge and along the bottom. */
+.win-game .win-body,
+.win-about-game .win-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+.win-game .win-pane { overflow: hidden; background: var(--paper); }
+/* a System 7 About box did not scroll: it was made to hold what it said */
+.win-about-game .win-pane { overflow: hidden; }
+
+/* ── Puzzle ────────────────────────────────────────────────────────── */
+/* sixteen slots on a four by four grid. Every black line in the board is one
+   unit: the four between the tiles are the ink behind them showing through
+   the grid's gaps, and the frame is the border, so the edge cannot read
+   twice as heavy as the middle. The gap slot is the desktop's own pattern,
+   which is what the hole in the real desk accessory showed. */
+.pz {
+  display: grid;
+  grid-template-columns: repeat(4, calc(32 * var(--u)));
+  grid-template-rows: repeat(4, calc(32 * var(--u)));
+  gap: var(--u);
+  border: var(--u) solid var(--ink);
+  background: var(--ink);
+}
+.pz-t {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--chicago);
+  font-size: var(--fs-12);
+  line-height: var(--lh-12);
+  color: var(--ink);
+  background: var(--paper);
+  border: 0;
+  /* Chicago's digits carry two units of side bearing on the right and none
+     on the left, so a number centred on its advance sits one unit left of
+     the middle of the tile. This puts it back. */
+  padding: 0 0 0 var(--u2);
+  cursor: inherit;
+}
+.pz-t.is-gap {
+  background-color: var(--paper);
+  background-image: var(--dither);
+  background-size: var(--dither-size);
+}
+.pz-t:focus-visible { outline: var(--u2) solid var(--ink); outline-offset: calc(-2 * var(--u)); }
+.pz-t:active:not(.is-gap):not(:disabled) { background: var(--ink); color: var(--paper); }
+/* solved: the numbers go and the sixteen faces hold one picture. The board
+   keeps its lines and its size, so nothing jumps at the moment it lands. */
+.pz.is-done .pz-t { background: var(--paper); padding: 0; }
+.pz-art { display: block; width: 100%; height: 100%; }
+
+/* ── Snake ─────────────────────────────────────────────────────────── */
+/* the field is text in the Terminal's own face, but it sets its own line.
+   Two Monaco cells across and one line down make a square, and at the
+   Terminal's thirteen unit line that square is 12 by 13 with the hash only
+   seven units of ink in it, so a column of the snake's body reads as six
+   loose blocks. At ten it reads as a body. The wall is the one unit rule
+   around the grid: a wall built out of characters cannot be a wall in this
+   face, since the bar inks eighteen of twenty-six units and a column of them
+   is a dashed rule with daylight at every row. */
+.sn {
+  font-family: var(--monaco);
+  font-size: var(--fs-9);
+  line-height: calc(10 * var(--u));
+  color: var(--ink);
+  background: var(--paper);
+  margin: 0;
+  padding: var(--u2);
+  border: var(--u) solid var(--ink);
+  white-space: pre;
+  letter-spacing: 0;
+  user-select: none;
+  cursor: inherit;
+}
+
+/* ── Bricks ────────────────────────────────────────────────────────── */
+/* the canvas carries its own one unit frame, so the element must be exactly
+   as many CSS pixels as the bitmap is: a border here would eat into the box
+   and leave the browser resampling 368 pixels into 364, which bends every
+   brick in the wall by a pixel or two */
+.is-bricks .game-canvas { touch-action: none; }
+
+/* ── the Games folder ──────────────────────────────────────────────── */
+.win-games .fnd { min-height: 100%; }
+
+/* ── the phone ─────────────────────────────────────────────────────── */
+/* a game opens as a sheet, and the field fits the width rather than being
+   scrolled to, because a game you have to scroll is not a game. Puzzle and
+   All three fit at the doubled size, which is the only size this machine
+   has: Snake is handed fewer squares on a phone rather than smaller ones,
+   and that is decided in the game itself. */
+@media (max-width: 767px) {
+  /* a sheet strips the padding off whatever it is handed, because most of
+     what it is handed is a document that wants the whole width. A game is
+     not, and it sits in the middle of the sheet rather than at the top of a
+     screen that is mostly empty below it. */
+  .sheet-body > [data-body].game {
+    padding: var(--u6) var(--u4) var(--u8);
+    justify-content: center;
+  }
+}

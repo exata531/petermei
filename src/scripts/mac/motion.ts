@@ -6,8 +6,8 @@
    more than one requestAnimationFrame at a time and every subscriber sees the
    same delta.
 
-   Nothing in here touches layout. Springs and damps write transforms, the dock
-   writes a custom property, and reads happen once at pointerdown. */
+   Nothing in here touches layout. Damps write transforms, and reads happen
+   once at pointerdown. */
 
 export const reduced = () =>
   matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -39,61 +39,3 @@ export function onFrame(step: Step) {
 export function damp(current: number, target: number, smooth: number, dt: number) {
   return target + (current - target) * Math.exp(-dt / Math.max(0.0001, smooth));
 }
-
-/* A critically-damped-ish spring, integrated semi-implicitly. Stiffness and
-   damping are named the way SwiftUI names them so the numbers below read like
-   the ones on the Mac this page is imitating. */
-export class Spring {
-  value: number;
-  target: number;
-  vel = 0;
-  stiffness: number;
-  damping: number;
-  private eps: number;
-
-  constructor(value: number, stiffness = 210, damping = 26, eps = 0.0015) {
-    this.value = value;
-    this.target = value;
-    this.stiffness = stiffness;
-    this.damping = damping;
-    this.eps = eps;
-  }
-  set(v: number) { this.value = v; this.target = v; this.vel = 0; }
-  to(v: number) { this.target = v; }
-  get done() {
-    return Math.abs(this.vel) < this.eps && Math.abs(this.target - this.value) < this.eps;
-  }
-  step(dt: number) {
-    /* substep so a long frame cannot make the integration explode */
-    const n = dt > 0.02 ? Math.ceil(dt / 0.016) : 1;
-    const h = dt / n;
-    for (let i = 0; i < n; i++) {
-      const a = (this.target - this.value) * this.stiffness - this.vel * this.damping;
-      this.vel += a * h;
-      this.value += this.vel * h;
-    }
-    if (this.done) { this.value = this.target; this.vel = 0; }
-    return this.value;
-  }
-}
-
-/* Velocity over the last few pointer samples, so a throw carries the speed the
-   hand actually had rather than the speed of one accidental last pixel. */
-export class Velocity {
-  private s: { x: number; y: number; t: number }[] = [];
-  push(x: number, y: number, t = performance.now()) {
-    this.s.push({ x, y, t });
-    if (this.s.length > 6) this.s.shift();
-  }
-  read() {
-    if (this.s.length < 2) return { x: 0, y: 0 };
-    const a = this.s[0], b = this.s[this.s.length - 1];
-    const dt = (b.t - a.t) / 1000;
-    if (dt <= 0) return { x: 0, y: 0 };
-    return { x: (b.x - a.x) / dt, y: (b.y - a.y) / dt };
-  }
-  clear() { this.s.length = 0; }
-}
-
-/* A tiny promise-shaped waiter, used by the boot sequence. */
-export const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));

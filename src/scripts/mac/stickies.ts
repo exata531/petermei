@@ -53,16 +53,23 @@ export function initStickies(layer: HTMLElement, hooks: StickyHooks = {}) {
       `<div class="sticky-bar" data-sticky-drag>
          <button class="sticky-x" type="button" aria-label="Close note"></button>
          <span class="sticky-dots">${Array.from({ length: COLORS }, (_, i) =>
-           `<button class="sticky-dot sticky-dc${i}" type="button" data-c="${i}" aria-label="Colour ${i + 1}"${i === n.c ? ' aria-current="true"' : ''}></button>`).join('')}</span>
+           `<button class="sticky-dot sticky-dc${i}" type="button" data-c="${i}" aria-label="Color ${i + 1}"${i === n.c ? ' aria-current="true"' : ''}></button>`).join('')}</span>
        </div>
        <textarea aria-label="Sticky note" spellcheck="false" placeholder="Write something. It stays in your browser and I never see it."></textarea>`;
     const ta = el.querySelector<HTMLTextAreaElement>('textarea')!;
     ta.value = n.t;
     /* the note grows to its own text instead of clipping the last line's
        descenders on the bottom edge */
-    const fit = () => { ta.style.height = 'auto'; ta.style.height = `${ta.scrollHeight}px`; };
+    /* and it stops growing before it walks off the bottom of the screen. Past
+       that the text scrolls inside the note, which is what a Note Pad did. */
+    const fit = () => {
+      ta.style.height = 'auto';
+      const room = Math.max(80, innerHeight - el.getBoundingClientRect().top - 48);
+      ta.style.height = `${Math.min(ta.scrollHeight, room)}px`;
+    };
     ta.addEventListener('input', () => { n.t = ta.value.slice(0, 2000); fit(); put(); });
     requestAnimationFrame(fit);
+    addEventListener('resize', fit);
 
     el.querySelector('.sticky-x')!.addEventListener('click', () => {
       notes = notes.filter((x) => x !== n);

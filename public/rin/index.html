@@ -3,22 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rin: an assistant that knows your whole life, for Mac</title>
-<meta name="description" content="Rin gives your Mac a second brain and drops it down from the menu bar whenever you need it. Free, open source, and the brain is a folder on your own disk.">
+<title>Rin, a menu bar assistant for Mac</title>
+<meta name="description" content="Rin is a terminal that drops down from the menu bar with a folder of notes already set up behind it. Free, open source, and the notes stay on your own disk.">
 <meta name="theme-color" content="#fff7ed" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#171310" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
 <link rel="canonical" href="https://petermei.com/rin/">
-<meta property="og:title" content="Rin: an assistant that knows your whole life">
-<meta property="og:description" content="A Claude brain wrapped in an app, dropped down from the menu bar. Free, open source, Mac only.">
+<meta property="og:title" content="Rin, a menu bar assistant for Mac">
+<meta property="og:description" content="Claude Code in a panel that drops down from the menu bar. Free, open source, Mac only.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="en_US">
 <meta property="og:url" content="https://petermei.com/rin/">
-<meta property="og:site_name" content="Rin">
+<meta property="og:site_name" content="Peter Mei">
 <meta property="og:image" content="https://petermei.com/rin/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Rin. An assistant that knows your whole life. A dark session panel showing a question about Thursday's homework and the answer.">
+<meta property="og:image:alt" content="Rin. A dark session panel with the question what is due thursday typed in and the answer under it.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://petermei.com/rin/og.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='15' fill='%231c1917'/><text x='32' y='45' font-size='40' text-anchor='middle' fill='%23fff7ed' font-family='sans-serif'>凛</text></svg>">
@@ -170,7 +170,7 @@ body {
 h1, h2, h3, h4, p { margin: 0; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
-:focus-visible { outline: 2.5px solid var(--ink); outline-offset: 3px; border-radius: var(--r-tile); }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 main:focus { outline: none; }
 ::selection { background: var(--mark); color: var(--ink); }
 .wrap { max-width: 1140px; margin-inline: auto; padding-inline: var(--gut); }
@@ -228,7 +228,17 @@ main:focus { outline: none; }
   background: var(--solid); opacity: 0; transition: opacity .18s var(--settle);
 }
 .mark:hover .sq::after { opacity: 1; }
-.nav .right { margin-left: auto; display: flex; align-items: center; gap: 18px; }
+.nav .right { margin-left: auto; display: flex; align-items: center; gap: 18px; min-width: 0; }
+/* at 320 CSS pixels, which is also 400 percent zoom on a 1280 desktop, the
+   header closes up instead of running off the edge and clipping the one thing
+   the page exists for (WEB-054) */
+@media (max-width: 400px) {
+  .nav { gap: 10px; padding-inline: 14px; }
+  .nav .right { gap: 10px; }
+  .nav .btn { padding: 11px 12px; }
+  .nav .quiet { font-size: 13px; }
+}
+@media (max-width: 340px) { .nav .quiet { display: none; } }
 .nav .quiet { font-size: var(--t-ui); font-weight: 700; color: var(--ink-2); transition: color .2s var(--settle); }
 .nav .quiet:hover { color: var(--ink); }
 /* Only a link duplicated in the footer may vanish on a phone. Source is;
@@ -878,11 +888,11 @@ html:not(.motion) .legend { display: none; }
       </div>
 
       <div class="hero-in" id="heroIn">
-        <h1 class="rise">An assistant that <span class="hl">knows</span> your whole life</h1>
+        <h1 class="rise">A Claude Code terminal in the <span class="hl">menu bar</span></h1>
         <p class="sub rise d2">
-          Rin gives your Mac a second brain and drops it down from the menu bar whenever
-          you need it. You answer three questions on first run, and from then on it just
-          knows your stuff: your deadlines, your projects, your week.
+          Rin drops down from the menu bar with a folder of notes already set up behind
+          it. You answer three questions the first time. After that it already knows
+          your deadlines and your week when you open it.
         </p>
         <div class="cta-row rise d3">
           <a class="btn btn--black" href="https://github.com/exata531/Rin/releases">Download for Mac</a>
@@ -913,29 +923,27 @@ html:not(.motion) .legend { display: none; }
           <article class="act">
             <p class="eyebrow">Drop</p>
             <h3>It lives in the menu bar</h3>
-            <p>Control and backtick. It drops down over whatever you're doing, and gets
-              out of the way just as fast.</p>
+            <p>Control and backtick. It drops down over whatever you’re doing.</p>
           </article>
 
           <article class="act">
             <p class="eyebrow">Ask</p>
             <h3>It already knows your week</h3>
-            <p>Nothing to explain, no notes to paste in. It's read the folder before you
-              even open the panel, so the first thing you type can be a real
+            <p>You don’t have to explain anything or paste notes in. It reads the folder
+              before you open the panel. The first thing you type can be a real
               question.</p>
           </article>
 
           <article class="act">
             <p class="eyebrow">Read</p>
-            <h3>One dot says who needs you</h3>
-            <p>A pale dot pulsing wants an answer, a grey one breathing is still working,
-              amber has ended. A hollow ring hasn't started yet. You read the whole
-              panel in half a second.</p>
+            <h3>One dot per tab</h3>
+            <p>A pale dot pulsing wants an answer. A gray one breathing is still working.
+              Amber has ended, and a hollow ring hasn’t started yet.</p>
           </article>
 
           <article class="act">
             <p class="eyebrow">Keep</p>
-            <h3>Quit. It's all still there</h3>
+            <h3>The tabs survive quitting</h3>
             <p>Close the app, restart the Mac, come back in a week. Every tab reopens
               right where you left it.</p>
           </article>
@@ -943,12 +951,12 @@ html:not(.motion) .legend { display: none; }
 
         <p class="sr">
           The illustration alongside shows a Mac desktop, where the menu bar glyph 凛
-          wears a small text face and a faint Tokyo Tower skyline sits in the wallpaper. Rin's panel drops down out of the
+          shows a small text face and a faint Tokyo Tower skyline sits in the wallpaper. Rin’s panel drops down out of the
           menu bar carrying three session tabs named vault, essay and rin on a pale tab
           bar, with a pin and a new-tab button at its end. The question
-          "what is due thursday" is typed, and the answer comes back: bio lab writeup and
+          “what is due thursday” is typed, and the answer comes back: bio lab writeup and
           the history reading response, with the writeup named as the one that eats the
-          evening. Each tab carries a status dot, and the working one carries the engine's
+          evening. Each tab carries a status dot, and the working one carries Claude Code’s
           asterisk spinner. Below the answer sits the framed prompt line. The app then
           quits and reopens with the same conversation still on screen.
         </p>
@@ -990,7 +998,7 @@ html:not(.motion) .legend { display: none; }
                 <div class="u">&#10095; <span class="type" id="type">what is due thursday</span><span class="caret" id="caret"></span></div>
                 <div class="gap"></div>
                 <div class="ln" data-ln>bio lab writeup and the history reading</div>
-                <div class="ln" data-ln>response. that's the whole list.</div>
+                <div class="ln" data-ln>response. that’s the whole list.</div>
                 <div class="gap"></div>
                 <div class="ln" data-ln>the writeup is the one that eats your</div>
                 <div class="ln" data-ln>evening, so start there.</div>
@@ -1005,9 +1013,9 @@ html:not(.motion) .legend { display: none; }
               <div class="legend" id="legend">
                 <div class="cap">three sessions, three states</div>
                 <div class="row" data-row><span class="dot wants"></span><span class="k">pale</span><span class="v">it asked you something</span></div>
-                <div class="row" data-row><span class="dot working"></span><span class="k">grey</span><span class="v">still working, leave it alone</span></div>
+                <div class="row" data-row><span class="dot working"></span><span class="k">gray</span><span class="v">still working, leave it alone</span></div>
                 <div class="row" data-row><span class="dot ended"></span><span class="k">amber</span><span class="v">that session has ended</span></div>
-                <div class="cap tail" data-row>close the panel. the grey one keeps going without you.</div>
+                <div class="cap tail" data-row>close the panel. the gray one keeps going without you.</div>
               </div>
             </div>
           </div>
@@ -1020,9 +1028,10 @@ html:not(.motion) .legend { display: none; }
     <section class="pair" aria-labelledby="pair-title">
       <h2 class="sr" id="pair-title">What you get</h2>
       <div class="card up">
-        <h3>The brain ships built</h3>
-        <p>The folders and the daily rhythm arrive ready and empty. Nothing to name,
-          nothing to design. You just talk and it files things where they go.</p>
+        <h3>The folders come already made</h3>
+        <p>The folders and the daily note come already made, and empty. There is
+          nothing to name or set up. Say something in passing and it goes in the
+          inbox.</p>
         <div class="art tree">
           <div><b>brain/</b></div>
           <div><i>├──</i> inbox <span>anything you say in passing</span></div>
@@ -1035,10 +1044,10 @@ html:not(.motion) .legend { display: none; }
       </div>
 
       <div class="card up">
-        <h3>Rin has nowhere to send it</h3>
-        <p>No server, no account, no sync. The brain is a folder on your disk you can
-          open with any text editor. A module you add can change that, which is why
-          every module's card says whether it reaches the network.</p>
+        <h3>It has no server</h3>
+        <p>There is no account and no sync. Nothing gets sent anywhere. The notes are a
+          folder on your disk that any text editor opens. A module you add can change
+          that. Every module’s card says whether it reaches the network.</p>
         <div class="art lockart" aria-hidden="true">
           <svg viewBox="0 0 24 24"><rect x="4" y="10.5" width="16" height="10" rx="3"/><path d="M8 10.5V7.6a4 4 0 0 1 8 0v2.9"/><circle cx="12" cy="15.5" r="1.1"/></svg>
         </div>
@@ -1049,29 +1058,29 @@ html:not(.motion) .legend { display: none; }
     <section aria-labelledby="bento-title">
       <div class="bento-head up">
         <p class="eyebrow">The rest of it</p>
-        <h2 id="bento-title">Small things that make it worth keeping open</h2>
+        <h2 id="bento-title">What else it does</h2>
       </div>
 
       <div class="bento">
       <div class="tile up">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="9.5" width="17" height="10" rx="2.5"/><path d="M6 6.5h12M8 3.5h8"/></svg>
         <h3>Tabs that outlive the app</h3>
-        <p>Every session is on disk as it goes, and a tab still working won't let you close it on a stray click.</p>
+        <p>Every session is saved to disk as it goes. A tab that is still working won’t close on a stray click.</p>
       </div>
       <div class="tile up">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5c0-1.4 1.1-2.5 2.5-2.5h3l2 2.5h6c1.4 0 2.5 1.1 2.5 2.5v7c0 1.4-1.1 2.5-2.5 2.5h-11C5.1 19.5 4 18.4 4 17z"/><path d="M8.5 13h7M8.5 16h4.5"/></svg>
-        <h3>One brain, many windows</h3>
-        <p>Every tab reads the same notes. Ask in one, and the next one already knows.</p>
+        <h3>One folder, every tab</h3>
+        <p>Every tab reads the same notes. Write something in one and the next one has it.</p>
       </div>
       <div class="tile up">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.6 14.4 14.4 9.6"/><path d="M11.4 7.8 13 6.2a3.7 3.7 0 0 1 5.2 5.2l-1.6 1.6"/><path d="M12.6 16.2 11 17.8a3.7 3.7 0 0 1-5.2-5.2l1.6-1.6"/></svg>
-        <h3>Starts blind, on purpose</h3>
-        <p>It sees your notes and nothing else until you say "connect my calendar". One thing at a time, explained first.</p>
+        <h3>Starts with just the notes</h3>
+        <p>It sees your notes and nothing else until you say “connect my calendar”. One connection at a time.</p>
       </div>
       <div class="tile up">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 4.5 6.6v5c0 4.3 3.1 7.6 7.5 8.9 4.4-1.3 7.5-4.6 7.5-8.9v-5z"/><path d="M9.3 12.1l1.9 1.9 3.6-3.9"/></svg>
         <h3>Readable line by line</h3>
-        <p>MIT licensed and small enough to actually read before you trust it with your week.</p>
+        <p>MIT licensed, and small enough to read all the way through.</p>
       </div>
       <div class="tile up">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><path d="M3.5 9.2h17M7.5 13.4h5"/></svg>
@@ -1098,10 +1107,10 @@ html:not(.motion) .legend { display: none; }
       <div class="qs">
         <details class="q up">
           <summary>Is this just a wrapper around Claude Code?</summary>
-          <p>Partly, and it says so on the tin. Claude Code is the engine. What Rin adds
-            is the panel falling out of the menu bar, tabs that survive quitting, and a
-            brain that already exists on first launch instead of an empty folder you
-            have to figure out yourself.</p>
+          <p>Partly. Claude Code is what runs inside it. What Rin adds is the panel that
+            drops out of the menu bar, tabs that survive quitting, and a folder of notes
+            that already exists on first launch. Otherwise you would be starting from an
+            empty folder.</p>
         </details>
 
         <details class="q up">
@@ -1113,34 +1122,32 @@ html:not(.motion) .legend { display: none; }
 
         <details class="q up">
           <summary>Does it work with Obsidian?</summary>
-          <p>Yes. The brain is markdown with wikilinks between the notes, which is exactly
-            what Obsidian reads. Point a vault at the same folder and both see the same
+          <p>Yes. The notes are markdown with wikilinks between them, and that is what
+            Obsidian reads. Point a vault at the same folder and both see the same
             files.</p>
         </details>
 
         <details class="q up">
           <summary>Can I point it at a folder I already have?</summary>
-          <p>Yes. If you already keep notes somewhere, give it that folder instead and it
-            works with what's there. The starter structure is a convenience, not a
-            requirement.</p>
+          <p>Yes. If you already keep notes somewhere, give it that folder and it works
+            with what’s there. The starter folders are optional.</p>
         </details>
 
         <details class="q up">
           <summary>What does it cost?</summary>
-          <p>Rin is free and MIT licensed, and it always will be. Claude Code isn't, so
-            you need a plan that covers it. That's the only bill involved, and Rin
-            doesn't see a cent of it.</p>
+          <p>Rin is free and MIT licensed. Claude Code isn’t, so you need a plan that
+            covers it. That is the only bill.</p>
         </details>
 
         <details class="q up">
           <summary>What can it see on my Mac?</summary>
-          <p>Your brain folder, plus Claude's own session files in <code>~/.claude</code>,
-            which is how tabs come back labelled after a quit. That's it. It starts with
-            no access to your calendar, mail or anything else until you ask, one
-            connection at a time, and Rin has no server to send any of it to. Modules
-            are the one exception worth knowing: one you add can ship scripts or talk
-            to a service of its own, and the <a href="modules.html">modules page</a>
-            says which do.</p>
+          <p>Your notes folder, plus Claude’s own session files in <code>~/.claude</code>,
+            so tabs come back with their names after a quit. That’s it. It starts with
+            no access to your calendar, mail or anything else until you ask for a
+            connection, one at a time. There is no server for any of it to go to.
+            Modules are the one exception. One you add can ship scripts or talk to a
+            service of its own, and the <a href="modules.html">modules page</a> says
+            which do.</p>
         </details>
       </div>
     </section>
@@ -1149,31 +1156,28 @@ html:not(.motion) .legend { display: none; }
     <section class="notes" aria-labelledby="notes-title">
       <h2 class="sr" id="notes-title">Before you download</h2>
       <div class="note up">
-        <h3>Bring a plan that covers Claude Code</h3>
-        <p>Rin is the window, Claude Code is what runs in it. Every tab is a real
-          session spending real usage, so bring a subscription that covers it. On
-          pay as you go, a few open tabs will drain your balance fast.</p>
+        <h3>It needs a Claude Code plan</h3>
+        <p>Rin is the window and Claude Code is what runs in it. Every tab is a real
+          session and it counts against your usage, so you need a subscription that
+          covers it. On pay as you go, a few open tabs will drain your balance fast.</p>
       </div>
       <div class="note up">
         <h3>About that first launch warning</h3>
-        <p>Rin isn't signed with a paid certificate (that costs about a hundred bucks a
-          year and this app is free, so, no), which means the first launch gets blocked
-          and you have to wave it through by hand. Once, and never again.</p>
+        <p>Rin isn’t signed with a paid certificate. That costs about 100 bucks a year
+          and this app is free. Because of that the first launch gets blocked
+          and you have to wave it through by hand, once.</p>
         <p>Double click Rin and let the warning appear. Press <strong>Done</strong>, not
           Move to Trash. Then open System Settings, go to
-          Privacy&nbsp;&amp;&nbsp;Security, and scroll to the bottom: there's a line
+          Privacy&nbsp;&amp;&nbsp;Security, and scroll to the bottom: there’s a line
           saying Rin was blocked, with an <strong>Open Anyway</strong> button beside it.
           Click it and confirm with your password or Touch&nbsp;ID. Rin opens, and every
           launch after this one is an ordinary double click.</p>
         <p>On a Mac older than macOS&nbsp;15 there is a shortcut: right click the app,
           choose Open, then Open again. Apple retired that route in Sequoia.</p>
-        <p>A signature tells you who wrote an app, not what it does. The source tells you
-          what it does.</p>
       </div>
     </section>
 
     <section class="cta2">
-      <h2 class="up">Give your Mac a memory</h2>
       <a class="btn btn--black up" href="https://github.com/exata531/Rin/releases">Download for Mac</a>
       <div class="chips up">
         <a class="chip-link" href="https://github.com/exata531/Rin" aria-label="Source on GitHub">
@@ -1191,7 +1195,7 @@ html:not(.motion) .legend { display: none; }
       <div class="cols">
         <div class="about">
           <div class="mark"><span class="sq" aria-hidden="true">凛</span> Rin</div>
-          <p>A Claude brain wrapped in an app. Made by one person, given away.</p>
+          <p>Free and MIT licensed. I made it for myself first.</p>
         </div>
 
         <nav aria-labelledby="f-get">

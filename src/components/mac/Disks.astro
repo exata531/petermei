@@ -1,0 +1,26 @@
+---
+/* The drawings the floppy disks bring with them.
+
+   The desktop clones its icons out of templates the page rendered once, so
+   anything the scripts draw later has to have been rendered here first. The
+   four the disks need are a 3.5 inch floppy and one application icon per
+   game, each at 32 and at 16, in the same idiom and on the same palette as
+   the rest of the icon set.
+
+   They live in their own file rather than in the Stash because a disk is
+   not part of this Macintosh until somebody finds one on the website, and a
+   drawing nobody has earned should not be sitting in the middle of the
+   desktop's own furniture. The markup matches Icon.astro exactly, since
+   that is what the scripts expect to find inside a template. */
+import { diskIcons, diskSvg } from '../../data/pixels-disks';
+---
+{diskIcons.map((id) => (
+  <template data-icon={id}>
+    <svg class:list={['ico', `ico-${id}`]} viewBox="0 0 32 32" shape-rendering="crispEdges" role="img" aria-hidden="true" set:html={diskSvg(id, 32)} />
+  </template>
+))}
+{diskIcons.map((id) => (
+  <template data-icon-s={id}>
+    <svg class:list={['ico', 'ico-s', `ico-${id}`]} viewBox="0 0 16 16" shape-rendering="crispEdges" role="img" aria-hidden="true" set:html={diskSvg(id, 16)} />
+  </template>
+))}

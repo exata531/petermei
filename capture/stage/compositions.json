@@ -1,720 +1,1162 @@
 {
-  "_doc": "One entry per composition. Each renders once per theme (light and dark ground). `file` is a path under capture/, or {light, dark} to pick a capture per ground. Frames: browser, mac, monitor, phone, card. Coordinates are CSS px on the canvas; rotate is clamped to 3 degrees; persp is a rotateY in degrees. `aspect` is the screen w/h (default 16:10). `pos` is object-position for the cover crop. `safeTop` pads a phone capture that came without an iOS status bar, in `safeColor`, and `statusbar` draws one (light or dark glyphs). `zoom` scales the capture inside the screen (1.45 = 145% width, anchored top-left) so a cropped window shows a region large. `ui` picks the browser chrome tone (light|dark). `screenH` sets the browser screen height explicitly, cropping the page from the top so anything below the line (here, listing photos of identifiable people) stays out of frame.",
-  "compositions": [
+ "_doc": "One entry per composition. Each renders once per theme (light and dark ground). `file` is a path under capture/, or {light, dark} to pick a capture per ground. Frames: browser, mac, monitor, phone, card. Coordinates are CSS px on the canvas; rotate is clamped to 3 degrees; persp is a rotateY in degrees. `aspect` is the screen w/h (default 16:10). `pos` is object-position for the cover crop. `safeTop` pads a phone capture that came without an iOS status bar, in `safeColor`, and `statusbar` draws one (light or dark glyphs). `zoom` scales the capture inside the screen (1.45 = 145% width, anchored top-left) so a cropped window shows a region large. `ui` picks the browser chrome tone (light|dark). `screenH` sets the browser screen height explicitly, cropping the page from the top so anything below the line (here, listing photos of identifiable people) stays out of frame.",
+ "compositions": [
+  {
+   "name": "volbase-landing",
+   "product": "volbase",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "volbase landing page in a browser window, with the phone version in front",
+   "devices": [
     {
-      "name": "volbase-landing",
-      "product": "volbase",
-      "canvas": [
-        1600,
-        1000
-      ],
-      "desc": "volbase landing page in a browser window, with the phone version in front",
-      "devices": [
-        {
-          "frame": "browser",
-          "file": {
-            "light": "volbase/landing-1440-light.png",
-            "dark": "volbase/landing-1440-dark.png"
-          },
-          "url": "volbase.app",
-          "layer": "back",
-          "x": 100,
-          "y": 70,
-          "w": 1200,
-          "rotate": -1,
-          "pos": "50% 0%",
-          "ui": {
-            "light": "light",
-            "dark": "dark"
-          }
-        },
-        {
-          "frame": "phone",
-          "file": {
-            "light": "volbase/landing-390-light.png",
-            "dark": "volbase/landing-390-dark.png"
-          },
-          "layer": "front",
-          "x": 1180,
-          "y": 250,
-          "w": 330,
-          "rotate": 2,
-          "statusbar": {
-            "light": "dark",
-            "dark": "light"
-          },
-          "safeTop": 60,
-          "safeColor": {
-            "light": "#faf7ef",
-            "dark": "#0e151c"
-          },
-          "pos": "50% 0%"
-        }
-      ]
+     "frame": "browser",
+     "file": {
+      "light": "volbase/landing-1440-light.png",
+      "dark": "volbase/landing-1440-dark.png"
+     },
+     "url": "volbase.app",
+     "layer": "back",
+     "x": 100,
+     "y": 70,
+     "w": 1200,
+     "rotate": -1,
+     "pos": "50% 0%",
+     "ui": {
+      "light": "light",
+      "dark": "dark"
+     }
     },
     {
-      "name": "volbase-landing-solo",
-      "product": "volbase",
-      "canvas": [
-        1600,
-        1000
-      ],
-      "desc": "volbase landing page in a browser window",
-      "devices": [
-        {
-          "frame": "browser",
-          "file": {
-            "light": "volbase/landing-1440-light.png",
-            "dark": "volbase/landing-1440-dark.png"
-          },
-          "url": "volbase.app",
-          "x": 180,
-          "y": 90,
-          "w": 1240,
-          "rotate": -1.2,
-          "pos": "50% 0%",
-          "ui": {
-            "light": "light",
-            "dark": "dark"
-          }
-        }
-      ]
-    },
-    {
-      "name": "volbase-browse",
-      "product": "volbase",
-      "canvas": [
-        1600,
-        1000
-      ],
-      "desc": "volbase's Browse page in a browser window cropped at the right edge",
-      "devices": [
-        {
-          "frame": "browser",
-          "file": {
-            "light": "volbase/opportunities-1440-light.png",
-            "dark": "volbase/opportunities-1440-dark.png"
-          },
-          "url": "volbase.app/opportunities",
-          "ui": {
-            "light": "light",
-            "dark": "dark"
-          },
-          "x": 150,
-          "y": 325,
-          "w": 2000,
-          "rotate": -1,
-          "persp": 0,
-          "pos": "0% 0%",
-          "layer": "back",
-          "screenH": 310
-        }
-      ]
-    },
-    {
-      "name": "volbase-organization",
-      "product": "volbase",
-      "canvas": [
-        1600,
-        1000
-      ],
-      "desc": "An organization page on volbase, the window cropped at the right edge",
-      "devices": [
-        {
-          "frame": "browser",
-          "file": {
-            "light": "volbase/organization-usc-1440-light.png",
-            "dark": "volbase/organization-usc-1440-dark.png"
-          },
-          "url": "volbase.app/organizations",
-          "x": 140,
-          "y": 300,
-          "w": 1800,
-          "rotate": 1,
-          "persp": 0,
-          "pos": "0% 0%",
-          "ui": {
-            "light": "light",
-            "dark": "dark"
-          },
-          "screenH": 358
-        }
-      ]
-    },
-    {
-      "name": "volbase-phone",
-      "product": "volbase",
-      "canvas": [
-        1000,
-        1200
-      ],
-      "desc": "volbase landing page on an iPhone",
-      "devices": [
-        {
-          "frame": "phone",
-          "file": {
-            "light": "volbase/landing-390-light.png",
-            "dark": "volbase/landing-390-dark.png"
-          },
-          "x": 265,
-          "y": 100,
-          "w": 470,
-          "rotate": -1.5,
-          "statusbar": {
-            "light": "dark",
-            "dark": "light"
-          },
-          "safeTop": 68,
-          "safeColor": {
-            "light": "#faf7ef",
-            "dark": "#0e151c"
-          },
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "rin-hero",
-      "product": "rin",
-      "canvas": [
-        1600,
-        1000
-      ],
-      "desc": "The Rin site's hero on a Mac display",
-      "devices": [
-        {
-          "frame": "mac",
-          "file": "rin/site-hero-1440.png",
-          "x": 150,
-          "y": 70,
-          "w": 1300,
-          "rotate": -1,
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "rin-reel",
-      "product": "rin",
-      "canvas": [
-        1600,
-        1000
-      ],
-      "desc": "Rin dropping down from the menu bar, on a Mac display",
-      "devices": [
-        {
-          "frame": "mac",
-          "file": "rin/site-reel-dropdown-1440.png",
-          "x": 150,
-          "y": 70,
-          "w": 1300,
-          "rotate": 1,
-          "persp": -2,
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "rin-reel-desktop",
-      "product": "rin",
-      "canvas": [
-        1600,
-        1000
-      ],
-      "desc": "Rin's desktop reel on a Mac display",
-      "devices": [
-        {
-          "frame": "mac",
-          "file": "rin/site-reel-desktop-1440.png",
-          "x": 150,
-          "y": 70,
-          "w": 1300,
-          "rotate": 0,
-          "persp": 3,
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "rin-og",
-      "product": "rin",
-      "canvas": [
-        1600,
-        1000
-      ],
-      "desc": "Rin's social card in a browser window",
-      "devices": [
-        {
-          "frame": "browser",
-          "file": "rin/og.png",
-          "url": "exata531.github.io/Rin",
-          "aspect": 1.9048,
-          "x": 210,
-          "y": 150,
-          "w": 1180,
-          "rotate": -1.2,
-          "pos": "50% 50%"
-        }
-      ]
-    },
-    {
-      "name": "kyou-day",
-      "product": "kyou",
-      "canvas": [
-        1000,
-        1200
-      ],
-      "desc": "Kyou's day view on an iPhone, light and dark",
-      "devices": [
-        {
-          "frame": "phone",
-          "file": {
-            "light": "kyou/01-day-light.png",
-            "dark": "kyou/02-day-dark.png"
-          },
-          "x": 265,
-          "y": 100,
-          "w": 470,
-          "rotate": -1.5,
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "kyou-day-lightmode",
-      "product": "kyou",
-      "canvas": [
-        1000,
-        1200
-      ],
-      "desc": "Kyou's day view, light appearance",
-      "devices": [
-        {
-          "frame": "phone",
-          "file": "kyou/01-day-light.png",
-          "x": 265,
-          "y": 100,
-          "w": 470,
-          "rotate": 1.2,
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "kyou-day-darkmode",
-      "product": "kyou",
-      "canvas": [
-        1000,
-        1200
-      ],
-      "desc": "Kyou's day view, dark appearance",
-      "devices": [
-        {
-          "frame": "phone",
-          "file": "kyou/02-day-dark.png",
-          "x": 265,
-          "y": 100,
-          "w": 470,
-          "rotate": -1.2,
-          "persp": 2,
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "kyou-pair",
-      "product": "kyou",
-      "canvas": [
-        1600,
-        1000
-      ],
-      "desc": "Two Kyou phones, the day view and quick-add, overlapping",
-      "devices": [
-        {
-          "frame": "phone",
-          "file": {
-            "light": "kyou/01-day-light.png",
-            "dark": "kyou/02-day-dark.png"
-          },
-          "layer": "back",
-          "x": 420,
-          "y": 60,
-          "w": 400,
-          "rotate": -2,
-          "pos": "50% 0%"
-        },
-        {
-          "frame": "phone",
-          "file": "kyou/08-quickadd-typing.png",
-          "layer": "front",
-          "x": 800,
-          "y": 120,
-          "w": 400,
-          "rotate": 2,
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "kyou-overlap",
-      "product": "kyou",
-      "canvas": [
-        1000,
-        1200
-      ],
-      "desc": "Overlapping events in Kyou's timeline",
-      "devices": [
-        {
-          "frame": "phone",
-          "file": {
-            "light": "kyou/11-day-overlap-light.png",
-            "dark": "kyou/03-day-overlap-dark.png"
-          },
-          "x": 265,
-          "y": 100,
-          "w": 470,
-          "rotate": 1.5,
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "kyou-quickadd",
-      "product": "kyou",
-      "canvas": [
-        1000,
-        1200
-      ],
-      "desc": "Typing a plan into Kyou's quick-add",
-      "devices": [
-        {
-          "frame": "phone",
-          "file": "kyou/08-quickadd-typing.png",
-          "x": 265,
-          "y": 100,
-          "w": 470,
-          "rotate": -1.5,
-          "persp": -2,
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "kyou-ticked",
-      "product": "kyou",
-      "canvas": [
-        1000,
-        1200
-      ],
-      "desc": "A to-do ticked off in Kyou",
-      "devices": [
-        {
-          "frame": "phone",
-          "file": "kyou/04-todo-ticked.png",
-          "x": 265,
-          "y": 100,
-          "w": 470,
-          "rotate": 1.2,
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "kyou-evening",
-      "product": "kyou",
-      "canvas": [
-        1000,
-        1200
-      ],
-      "desc": "Kyou closing out the evening",
-      "devices": [
-        {
-          "frame": "phone",
-          "file": "kyou/05-evening-close.png",
-          "x": 265,
-          "y": 100,
-          "w": 470,
-          "rotate": -1.2,
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "kyou-work",
-      "product": "kyou",
-      "canvas": [
-        1000,
-        1200
-      ],
-      "desc": "Kyou's work tab",
-      "devices": [
-        {
-          "frame": "phone",
-          "file": "kyou/06-work-dark.png",
-          "x": 265,
-          "y": 100,
-          "w": 470,
-          "rotate": 1.5,
-          "persp": 2,
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "kyou-notification",
-      "product": "kyou",
-      "canvas": [
-        1000,
-        1200
-      ],
-      "desc": "A Kyou notification on the Home Screen",
-      "devices": [
-        {
-          "frame": "phone",
-          "file": "kyou/09-notification.png",
-          "x": 265,
-          "y": 100,
-          "w": 470,
-          "rotate": -1.5,
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "kyou-month",
-      "product": "kyou",
-      "canvas": [
-        1000,
-        1200
-      ],
-      "desc": "Kyou's month calendar",
-      "devices": [
-        {
-          "frame": "phone",
-          "file": "kyou/10-month-calendar-dark.png",
-          "x": 265,
-          "y": 100,
-          "w": 470,
-          "rotate": 1.2,
-          "persp": -2,
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "kyou-settings",
-      "product": "kyou",
-      "canvas": [
-        1000,
-        1200
-      ],
-      "desc": "Kyou's settings",
-      "devices": [
-        {
-          "frame": "phone",
-          "file": "kyou/07-settings-dark.png",
-          "x": 265,
-          "y": 100,
-          "w": 470,
-          "rotate": -1.2,
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "market-dashboard",
-      "product": "market",
-      "canvas": [
-        1600,
-        1000
-      ],
-      "desc": "Market Station's dashboard on a bare monitor",
-      "devices": [
-        {
-          "frame": "monitor",
-          "file": {
-            "light": "market/dashboard-light.png",
-            "dark": "market/dashboard-dark.png"
-          },
-          "x": 150,
-          "y": 80,
-          "w": 1300,
-          "rotate": -1,
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "market-reading",
-      "product": "market",
-      "canvas": [
-        1600,
-        1000
-      ],
-      "desc": "One reading pulled forward off the Market Station dashboard",
-      "devices": [
-        {
-          "frame": "monitor",
-          "file": {
-            "light": "market/dashboard-light.png",
-            "dark": "market/dashboard-dark.png"
-          },
-          "layer": "back",
-          "x": 90,
-          "y": 70,
-          "w": 1240,
-          "rotate": 0,
-          "persp": -2,
-          "origin": "left center",
-          "pos": "50% 0%"
-        },
-        {
-          "frame": "card",
-          "file": {
-            "light": "market/reading-detail-light.png",
-            "dark": "market/reading-detail-dark.png"
-          },
-          "layer": "front",
-          "x": 1090,
-          "y": 430,
-          "w": 420,
-          "rotate": 1.5
-        }
-      ]
-    },
-    {
-      "name": "market-briefing",
-      "product": "market",
-      "canvas": [
-        1600,
-        1000
-      ],
-      "desc": "The morning briefing in Market Station",
-      "devices": [
-        {
-          "frame": "monitor",
-          "file": {
-            "light": "market/briefing-viewport-light.png",
-            "dark": "market/briefing-viewport-dark.png"
-          },
-          "x": 150,
-          "y": 80,
-          "w": 1300,
-          "rotate": 1,
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "market-alerts",
-      "product": "market",
-      "canvas": [
-        1600,
-        1000
-      ],
-      "desc": "Alert lines drawn on Market Station's charts",
-      "devices": [
-        {
-          "frame": "monitor",
-          "file": {
-            "light": "market/alert-lines-light.png",
-            "dark": "market/alert-lines-dark.png"
-          },
-          "x": 150,
-          "y": 80,
-          "w": 1300,
-          "rotate": 0,
-          "persp": 3,
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "market-mobile",
-      "product": "market",
-      "canvas": [
-        1000,
-        1200
-      ],
-      "desc": "Market Station on an iPhone",
-      "devices": [
-        {
-          "frame": "phone",
-          "file": {
-            "light": "market/mobile-dashboard-light.png",
-            "dark": "market/mobile-dashboard-dark.png"
-          },
-          "x": 265,
-          "y": 100,
-          "w": 470,
-          "rotate": -1.5,
-          "statusbar": {
-            "light": "dark",
-            "dark": "light"
-          },
-          "safeTop": 68,
-          "safeColor": {
-            "light": "#f5f5f8",
-            "dark": "#1a1b1f"
-          },
-          "pos": "50% 0%"
-        }
-      ]
-    },
-    {
-      "name": "market-desk",
-      "product": "market",
-      "canvas": [
-        1600,
-        1000
-      ],
-      "desc": "Market Station on a monitor with the phone version in front",
-      "devices": [
-        {
-          "frame": "monitor",
-          "file": {
-            "light": "market/dashboard-light.png",
-            "dark": "market/dashboard-dark.png"
-          },
-          "layer": "back",
-          "x": 80,
-          "y": 90,
-          "w": 1200,
-          "rotate": -1,
-          "pos": "50% 0%"
-        },
-        {
-          "frame": "phone",
-          "file": {
-            "light": "market/mobile-dashboard-light.png",
-            "dark": "market/mobile-dashboard-dark.png"
-          },
-          "layer": "front",
-          "x": 1170,
-          "y": 250,
-          "w": 330,
-          "rotate": 2,
-          "statusbar": {
-            "light": "dark",
-            "dark": "light"
-          },
-          "safeTop": 54,
-          "safeColor": {
-            "light": "#f5f5f8",
-            "dark": "#1a1b1f"
-          },
-          "pos": "50% 0%"
-        }
-      ]
+     "frame": "phone",
+     "file": {
+      "light": "volbase/landing-390-light.png",
+      "dark": "volbase/landing-390-dark.png"
+     },
+     "layer": "front",
+     "x": 1180,
+     "y": 250,
+     "w": 330,
+     "rotate": 2,
+     "statusbar": {
+      "light": "dark",
+      "dark": "light"
+     },
+     "safeTop": 60,
+     "safeColor": {
+      "light": "#faf7ef",
+      "dark": "#0e151c"
+     },
+     "pos": "50% 0%"
     }
-  ],
-  "_skipped": {
-    "market/alert-banner-*.png": "a 1392x146 strip with no context; the same banner is visible at the top of the dashboard captures.",
-    "market/briefing-*.png (element crop)": "the viewport capture of the same screen is used instead.",
-    "market/reading-cape-light.png": "has no dark twin; reading-detail is used for the card.",
-    "rin/icon.png": "an icon, not a screen.",
-    "volbase/*.png without -light/-dark suffix": "the first-pass captures, superseded by the themed pairs.",
-    "volbase/listing-usc-1440-*.png": "the page is a full-bleed photo of identifiable people; no realistic-scale framing avoids it, so the composition was dropped.",
-    "volbase/opportunities-list-390-*.png": "the listing card photo of identifiable people sits mid-screen; a phone-shaped crop cannot avoid it, so the composition was dropped."
+   ]
+  },
+  {
+   "name": "volbase-landing-solo",
+   "product": "volbase",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "volbase landing page in a browser window",
+   "devices": [
+    {
+     "frame": "browser",
+     "file": {
+      "light": "volbase/landing-1440-light.png",
+      "dark": "volbase/landing-1440-dark.png"
+     },
+     "url": "volbase.app",
+     "x": 180,
+     "y": 90,
+     "w": 1240,
+     "rotate": -1.2,
+     "pos": "50% 0%",
+     "ui": {
+      "light": "light",
+      "dark": "dark"
+     }
+    }
+   ]
+  },
+  {
+   "name": "volbase-browse",
+   "product": "volbase",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "volbase's Browse page in a browser window cropped at the right edge",
+   "devices": [
+    {
+     "frame": "browser",
+     "file": {
+      "light": "volbase/opportunities-1440-light.png",
+      "dark": "volbase/opportunities-1440-dark.png"
+     },
+     "url": "volbase.app/opportunities",
+     "ui": {
+      "light": "light",
+      "dark": "dark"
+     },
+     "x": 150,
+     "y": 325,
+     "w": 2000,
+     "rotate": -1,
+     "persp": 0,
+     "pos": "0% 0%",
+     "layer": "back",
+     "screenH": 310
+    }
+   ]
+  },
+  {
+   "name": "volbase-organization",
+   "product": "volbase",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "An organization page on volbase, the window cropped at the right edge",
+   "devices": [
+    {
+     "frame": "browser",
+     "file": {
+      "light": "volbase/organization-usc-1440-light.png",
+      "dark": "volbase/organization-usc-1440-dark.png"
+     },
+     "url": "volbase.app/organizations",
+     "x": 140,
+     "y": 300,
+     "w": 1800,
+     "rotate": 1,
+     "persp": 0,
+     "pos": "0% 0%",
+     "ui": {
+      "light": "light",
+      "dark": "dark"
+     },
+     "screenH": 358
+    }
+   ]
+  },
+  {
+   "name": "volbase-phone",
+   "product": "volbase",
+   "canvas": [
+    1000,
+    1200
+   ],
+   "desc": "volbase landing page on an iPhone",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": {
+      "light": "volbase/landing-390-light.png",
+      "dark": "volbase/landing-390-dark.png"
+     },
+     "x": 265,
+     "y": 100,
+     "w": 470,
+     "rotate": -1.5,
+     "statusbar": {
+      "light": "dark",
+      "dark": "light"
+     },
+     "safeTop": 68,
+     "safeColor": {
+      "light": "#faf7ef",
+      "dark": "#0e151c"
+     },
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "rin-hero",
+   "product": "rin",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "The Rin site's hero on a Mac display",
+   "devices": [
+    {
+     "frame": "mac",
+     "file": "rin/site-hero-1440.png",
+     "x": 150,
+     "y": 70,
+     "w": 1300,
+     "rotate": -1,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "rin-reel",
+   "product": "rin",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "Rin dropping down from the menu bar, on a Mac display",
+   "devices": [
+    {
+     "frame": "mac",
+     "file": "rin/site-reel-dropdown-1440.png",
+     "x": 150,
+     "y": 70,
+     "w": 1300,
+     "rotate": 1,
+     "persp": -2,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "rin-reel-desktop",
+   "product": "rin",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "Rin's desktop reel on a Mac display",
+   "devices": [
+    {
+     "frame": "mac",
+     "file": "rin/site-reel-desktop-1440.png",
+     "x": 150,
+     "y": 70,
+     "w": 1300,
+     "rotate": 0,
+     "persp": 3,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "rin-og",
+   "product": "rin",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "Rin's social card in a browser window",
+   "devices": [
+    {
+     "frame": "browser",
+     "file": "rin/og.png",
+     "url": "exata531.github.io/Rin",
+     "aspect": 1.9048,
+     "x": 210,
+     "y": 150,
+     "w": 1180,
+     "rotate": -1.2,
+     "pos": "50% 50%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-day",
+   "product": "kyou",
+   "canvas": [
+    1000,
+    1200
+   ],
+   "desc": "Kyou's day view on an iPhone, light and dark",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": {
+      "light": "kyou/01-day-light.png",
+      "dark": "kyou/02-day-dark.png"
+     },
+     "x": 265,
+     "y": 100,
+     "w": 470,
+     "rotate": -1.5,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-day-lightmode",
+   "product": "kyou",
+   "canvas": [
+    1000,
+    1200
+   ],
+   "desc": "Kyou's day view, light appearance",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": "kyou/01-day-light.png",
+     "x": 265,
+     "y": 100,
+     "w": 470,
+     "rotate": 1.2,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-day-darkmode",
+   "product": "kyou",
+   "canvas": [
+    1000,
+    1200
+   ],
+   "desc": "Kyou's day view, dark appearance",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": "kyou/02-day-dark.png",
+     "x": 265,
+     "y": 100,
+     "w": 470,
+     "rotate": -1.2,
+     "persp": 2,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-pair",
+   "product": "kyou",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "Two Kyou phones, the day view and quick-add, overlapping",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": {
+      "light": "kyou/01-day-light.png",
+      "dark": "kyou/02-day-dark.png"
+     },
+     "layer": "back",
+     "x": 420,
+     "y": 60,
+     "w": 400,
+     "rotate": -2,
+     "pos": "50% 0%"
+    },
+    {
+     "frame": "phone",
+     "file": "kyou/08-quickadd-typing.png",
+     "layer": "front",
+     "x": 800,
+     "y": 120,
+     "w": 400,
+     "rotate": 2,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-overlap",
+   "product": "kyou",
+   "canvas": [
+    1000,
+    1200
+   ],
+   "desc": "Overlapping events in Kyou's timeline",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": {
+      "light": "kyou/11-day-overlap-light.png",
+      "dark": "kyou/03-day-overlap-dark.png"
+     },
+     "x": 265,
+     "y": 100,
+     "w": 470,
+     "rotate": 1.5,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-quickadd",
+   "product": "kyou",
+   "canvas": [
+    1000,
+    1200
+   ],
+   "desc": "Typing a plan into Kyou's quick-add",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": "kyou/08-quickadd-typing.png",
+     "x": 265,
+     "y": 100,
+     "w": 470,
+     "rotate": -1.5,
+     "persp": -2,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-ticked",
+   "product": "kyou",
+   "canvas": [
+    1000,
+    1200
+   ],
+   "desc": "A to-do ticked off in Kyou",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": "kyou/04-todo-ticked.png",
+     "x": 265,
+     "y": 100,
+     "w": 470,
+     "rotate": 1.2,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-evening",
+   "product": "kyou",
+   "canvas": [
+    1000,
+    1200
+   ],
+   "desc": "Kyou closing out the evening",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": "kyou/05-evening-close.png",
+     "x": 265,
+     "y": 100,
+     "w": 470,
+     "rotate": -1.2,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-work",
+   "product": "kyou",
+   "canvas": [
+    1000,
+    1200
+   ],
+   "desc": "Kyou's work tab",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": "kyou/06-work-dark.png",
+     "x": 265,
+     "y": 100,
+     "w": 470,
+     "rotate": 1.5,
+     "persp": 2,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-notification",
+   "product": "kyou",
+   "canvas": [
+    1000,
+    1200
+   ],
+   "desc": "A Kyou notification on the Home Screen",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": "kyou/09-notification.png",
+     "x": 265,
+     "y": 100,
+     "w": 470,
+     "rotate": -1.5,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-month",
+   "product": "kyou",
+   "canvas": [
+    1000,
+    1200
+   ],
+   "desc": "Kyou's month calendar",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": "kyou/10-month-calendar-dark.png",
+     "x": 265,
+     "y": 100,
+     "w": 470,
+     "rotate": 1.2,
+     "persp": -2,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-settings",
+   "product": "kyou",
+   "canvas": [
+    1000,
+    1200
+   ],
+   "desc": "Kyou's settings",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": "kyou/07-settings-dark.png",
+     "x": 265,
+     "y": 100,
+     "w": 470,
+     "rotate": -1.2,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "market-dashboard",
+   "product": "market",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "Market Station's dashboard on a bare monitor",
+   "devices": [
+    {
+     "frame": "monitor",
+     "file": {
+      "light": "market/dashboard-light.png",
+      "dark": "market/dashboard-dark.png"
+     },
+     "x": 150,
+     "y": 80,
+     "w": 1300,
+     "rotate": -1,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "market-reading",
+   "product": "market",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "One reading pulled forward off the Market Station dashboard",
+   "devices": [
+    {
+     "frame": "monitor",
+     "file": {
+      "light": "market/dashboard-light.png",
+      "dark": "market/dashboard-dark.png"
+     },
+     "layer": "back",
+     "x": 90,
+     "y": 70,
+     "w": 1240,
+     "rotate": 0,
+     "persp": -2,
+     "origin": "left center",
+     "pos": "50% 0%"
+    },
+    {
+     "frame": "card",
+     "file": {
+      "light": "market/reading-detail-light.png",
+      "dark": "market/reading-detail-dark.png"
+     },
+     "layer": "front",
+     "x": 1090,
+     "y": 430,
+     "w": 420,
+     "rotate": 1.5
+    }
+   ]
+  },
+  {
+   "name": "market-briefing",
+   "product": "market",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "The morning briefing in Market Station",
+   "devices": [
+    {
+     "frame": "monitor",
+     "file": {
+      "light": "market/briefing-viewport-light.png",
+      "dark": "market/briefing-viewport-dark.png"
+     },
+     "x": 150,
+     "y": 80,
+     "w": 1300,
+     "rotate": 1,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "market-alerts",
+   "product": "market",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "Alert lines drawn on Market Station's charts",
+   "devices": [
+    {
+     "frame": "monitor",
+     "file": {
+      "light": "market/alert-lines-light.png",
+      "dark": "market/alert-lines-dark.png"
+     },
+     "x": 150,
+     "y": 80,
+     "w": 1300,
+     "rotate": 0,
+     "persp": 3,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "market-mobile",
+   "product": "market",
+   "canvas": [
+    1000,
+    1200
+   ],
+   "desc": "Market Station on an iPhone",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": {
+      "light": "market/mobile-dashboard-light.png",
+      "dark": "market/mobile-dashboard-dark.png"
+     },
+     "x": 265,
+     "y": 100,
+     "w": 470,
+     "rotate": -1.5,
+     "statusbar": {
+      "light": "dark",
+      "dark": "light"
+     },
+     "safeTop": 68,
+     "safeColor": {
+      "light": "#f5f5f8",
+      "dark": "#1a1b1f"
+     },
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "market-desk",
+   "product": "market",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "Market Station on a monitor with the phone version in front",
+   "devices": [
+    {
+     "frame": "monitor",
+     "file": {
+      "light": "market/dashboard-light.png",
+      "dark": "market/dashboard-dark.png"
+     },
+     "layer": "back",
+     "x": 80,
+     "y": 90,
+     "w": 1200,
+     "rotate": -1,
+     "pos": "50% 0%"
+    },
+    {
+     "frame": "phone",
+     "file": {
+      "light": "market/mobile-dashboard-light.png",
+      "dark": "market/mobile-dashboard-dark.png"
+     },
+     "layer": "front",
+     "x": 1170,
+     "y": 250,
+     "w": 330,
+     "rotate": 2,
+     "statusbar": {
+      "light": "dark",
+      "dark": "light"
+     },
+     "safeTop": 54,
+     "safeColor": {
+      "light": "#f5f5f8",
+      "dark": "#1a1b1f"
+     },
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "market-site-dashboard",
+   "product": "market-site",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "The Market Station dashboard on a monitor, five readings alerting",
+   "devices": [
+    {
+     "frame": "monitor",
+     "file": {
+      "light": "market/dashboard-light.png",
+      "dark": "market/dashboard-dark.png"
+     },
+     "x": 150,
+     "y": 90,
+     "w": 1300,
+     "rotate": -1,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "market-site-reading",
+   "product": "market-site",
+   "canvas": [
+    1000,
+    800
+   ],
+   "desc": "One reading on its own: the 10-year rate, alerting",
+   "devices": [
+    {
+     "frame": "card",
+     "file": {
+      "light": "market/reading-detail-light.png",
+      "dark": "market/reading-detail-dark.png"
+     },
+     "x": 220,
+     "y": 108,
+     "w": 560,
+     "rotate": 1.5
+    }
+   ]
+  },
+  {
+   "name": "market-site-sections",
+   "product": "market-site",
+   "canvas": [
+    1600,
+    1200
+   ],
+   "desc": "Three of the six groups on the dashboard at once, in a browser window",
+   "devices": [
+    {
+     "frame": "browser",
+     "file": {
+      "light": "market/sections-light.png",
+      "dark": "market/sections-dark.png"
+     },
+     "url": "localhost:8080",
+     "ui": {
+      "light": "light",
+      "dark": "dark"
+     },
+     "x": 310,
+     "y": 70,
+     "w": 980,
+     "screenH": 1004,
+     "rotate": -0.8,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "market-site-easing",
+   "product": "market-site",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "One reading mid-episode: the VIX tile easing, everything else quiet",
+   "devices": [
+    {
+     "frame": "monitor",
+     "file": {
+      "light": "market/easing-light.png",
+      "dark": "market/easing-dark.png"
+     },
+     "x": 150,
+     "y": 90,
+     "w": 1300,
+     "rotate": 1,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "market-site-settings",
+   "product": "market-site",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "The alert lines in Market Station's settings, in a browser window",
+   "devices": [
+    {
+     "frame": "browser",
+     "file": {
+      "light": "market/alert-lines-light.png",
+      "dark": "market/alert-lines-dark.png"
+     },
+     "url": "localhost:8080/settings",
+     "ui": {
+      "light": "light",
+      "dark": "dark"
+     },
+     "x": 180,
+     "y": 85,
+     "w": 1240,
+     "rotate": -1,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "market-site-briefing",
+   "product": "market-site",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "A written briefing and the morning's alert history, on a monitor",
+   "devices": [
+    {
+     "frame": "monitor",
+     "file": {
+      "light": "market/briefing-viewport-light.png",
+      "dark": "market/briefing-viewport-dark.png"
+     },
+     "x": 150,
+     "y": 90,
+     "w": 1300,
+     "rotate": 1,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "market-site-connections",
+   "product": "market-site",
+   "canvas": [
+    1600,
+    1120
+   ],
+   "desc": "Every connection tested and passing, in a browser window",
+   "devices": [
+    {
+     "frame": "browser",
+     "file": {
+      "light": "market/connections-light.png",
+      "dark": "market/connections-dark.png"
+     },
+     "url": "localhost:8080/settings",
+     "ui": {
+      "light": "light",
+      "dark": "dark"
+     },
+     "x": 280,
+     "y": 72,
+     "w": 1040,
+     "screenH": 924,
+     "rotate": -0.8,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "market-site-desk",
+   "product": "market-site",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "The dashboard on a monitor with the phone layout standing in front",
+   "devices": [
+    {
+     "frame": "monitor",
+     "file": {
+      "light": "market/dashboard-light.png",
+      "dark": "market/dashboard-dark.png"
+     },
+     "layer": "back",
+     "x": 80,
+     "y": 90,
+     "w": 1200,
+     "rotate": -1,
+     "pos": "50% 0%"
+    },
+    {
+     "frame": "phone",
+     "file": {
+      "light": "market/mobile-dashboard-light.png",
+      "dark": "market/mobile-dashboard-dark.png"
+     },
+     "layer": "front",
+     "x": 1170,
+     "y": 250,
+     "w": 330,
+     "rotate": 2,
+     "statusbar": {
+      "light": "dark",
+      "dark": "light"
+     },
+     "safeTop": 54,
+     "safeColor": {
+      "light": "#f5f5f8",
+      "dark": "#1a1b1f"
+     },
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-site-day",
+   "product": "kyou",
+   "canvas": [
+    1000,
+    1200
+   ],
+   "desc": "Kyou's day screen on the staged Thursday, dark, with the live free block and the red now-line",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": "kyou/01-day-dark.png",
+     "x": 265,
+     "y": 100,
+     "w": 470,
+     "rotate": -1.5,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-site-gap-live",
+   "product": "kyou",
+   "canvas": [
+    1000,
+    1200
+   ],
+   "desc": "The free block between the last class and practice, drawn live with the now-line inside it",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": "kyou/02-gap-live.png",
+     "x": 265,
+     "y": 100,
+     "w": 470,
+     "rotate": 1.2,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-site-gap-crop",
+   "product": "kyou",
+   "canvas": [
+    1000,
+    760
+   ],
+   "desc": "A tight crop of the live free block: Physics above, the red now-line inside the block, the 4 PM to-do below",
+   "devices": [
+    {
+     "frame": "card",
+     "file": "kyou/02-gap-live-crop.png",
+     "x": 110,
+     "y": 140,
+     "w": 780,
+     "rotate": -1
+    }
+   ]
+  },
+  {
+   "name": "kyou-site-side-by-side",
+   "product": "kyou",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "Apple Calendar and Kyou on the same Thursday: the same events, with the to-dos merged in",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": "kyou/03-apple-calendar-light.png",
+     "layer": "back",
+     "x": 420,
+     "y": 60,
+     "w": 400,
+     "rotate": -2,
+     "pos": "50% 0%"
+    },
+    {
+     "frame": "phone",
+     "file": "kyou/04-day-light.png",
+     "layer": "front",
+     "x": 800,
+     "y": 120,
+     "w": 400,
+     "rotate": 2,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-site-quickadd",
+   "product": "kyou",
+   "canvas": [
+    1000,
+    1200
+   ],
+   "desc": "Typing a plan into quick-add, the date coloured by the parser and the draft card underneath",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": "kyou/05-quickadd-light.png",
+     "x": 265,
+     "y": 100,
+     "w": 470,
+     "rotate": -1.2,
+     "persp": -2,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-site-work",
+   "product": "kyou",
+   "canvas": [
+    1000,
+    1200
+   ],
+   "desc": "The work list: everything outstanding, grouped by when it is owed, one ticked row still in place",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": "kyou/06-work-light.png",
+     "x": 265,
+     "y": 100,
+     "w": 470,
+     "rotate": 1.5,
+     "persp": 2,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-site-month",
+   "product": "kyou",
+   "canvas": [
+    1000,
+    1200
+   ],
+   "desc": "The month card over the day, with dots on the dates that carry something",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": "kyou/07-month-dark.png",
+     "x": 265,
+     "y": 100,
+     "w": 470,
+     "rotate": 1.2,
+     "persp": -2,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-site-faces",
+   "product": "kyou",
+   "canvas": [
+    1600,
+    1000
+   ],
+   "desc": "A clear day beside a packed one: the face changes with the load, the rows never do",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": "kyou/08-hero-clear-light.png",
+     "x": 250,
+     "y": 55,
+     "w": 430,
+     "pos": "50% 0%"
+    },
+    {
+     "frame": "phone",
+     "file": "kyou/09-hero-packed-light.png",
+     "x": 920,
+     "y": 55,
+     "w": 430,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-site-settings",
+   "product": "kyou",
+   "canvas": [
+    1000,
+    1200
+   ],
+   "desc": "Kyou's settings: the calendars and lists it reads, haptics, and the version line",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": "kyou/12-settings-light.png",
+     "x": 265,
+     "y": 100,
+     "w": 470,
+     "rotate": -1.2,
+     "pos": "50% 0%"
+    }
+   ]
+  },
+  {
+   "name": "kyou-tile",
+   "product": "kyou",
+   "canvas": [
+    900,
+    1700
+   ],
+   "desc": "Kyou's day view on an upright iPhone, for the website's tile and case study: no tilt, so the picture can be cropped tight to the device",
+   "devices": [
+    {
+     "frame": "phone",
+     "file": "kyou/01-day-light.png",
+     "x": 200,
+     "y": 90,
+     "w": 500,
+     "pos": "50% 0%"
+    }
+   ]
   }
+ ],
+ "_skipped": {
+  "market/alert-banner-*.png": "a 1392x146 strip with no context; the same banner is visible at the top of the dashboard captures.",
+  "market/briefing-*.png (element crop)": "the viewport capture of the same screen is used instead.",
+  "market/reading-cape-light.png": "has no dark twin; reading-detail is used for the card.",
+  "rin/icon.png": "an icon, not a screen.",
+  "volbase/*.png without -light/-dark suffix": "the first-pass captures, superseded by the themed pairs.",
+  "volbase/listing-usc-1440-*.png": "the page is a full-bleed photo of identifiable people; no realistic-scale framing avoids it, so the composition was dropped.",
+  "volbase/opportunities-list-390-*.png": "the listing card photo of identifiable people sits mid-screen; a phone-shaped crop cannot avoid it, so the composition was dropped."
+ }
 }

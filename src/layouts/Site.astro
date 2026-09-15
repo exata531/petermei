@@ -1,88 +1,113 @@
 ---
-/* petermei.com, the page inside the Mac's Safari window.
+/* petermei.com, the website's frame.
 
    Craft's paper, pastels and shadow; Zainab's structure: a glass pill that
-   folds on the way down, sections that scroll up over each other with a
-   wavy edge, and a footer with something to click. The system font, no web
-   fonts, and the appearance follows the Mac's: the frame is told when the
-   desktop switches, and a page standing on its own reads the same setting. */
-import '../styles/mac-tokens.css';
+   folds on the way down, sections that scroll up over each other, and a
+   footer with sand. The system font, no web fonts, one appearance. The pages
+   swap with a short crossfade and the pill stays put across it. */
+import { ClientRouter, fade } from 'astro:transitions';
 import '../styles/site.css';
-import { copy, links } from '../data/site';
+import '../styles/disk-banner.css';
+import { links, build, copy } from '../data/site';
+import { skyBoot } from '../scripts/sky';
+/* the drawing of a floppy disk, rendered once into a template so the script
+   that hides the three of them has one thing to clone */
+import Floppy from '../components/site/Floppy.astro';
 
 interface Props { title: string; desc: string; route: 'work' | 'about' | 'playground' | 'project'; back?: string; footer?: boolean; nav?: 'light' | 'dark' }
 const { title, desc, route, back, footer = true, nav = 'light' } = Astro.props;
 const url = new URL(Astro.url.pathname, Astro.site ?? 'https://petermei.com');
 const full = title === 'petermei.com' ? 'Peter Mei' : `${title} · Peter Mei`;
-const holds = ['sky', 'green', 'peri', 'apri', 'lemon', 'sky', 'apri', 'green', 'lemon', 'peri', 'sky', 'apri'];
+const og = new URL('/og.png', url).href;
 ---
 <!doctype html>
-<html lang="en" data-route={route}>
+<html class="is-first" lang="en" data-route={route} style="background:#fcf9f7">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{full}</title>
     <meta name="description" content={desc} />
+    <link rel="preload" href="/fonts/name.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="canonical" href={url.href} />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
-    <meta name="theme-color" content="#fcf9f7" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#141312" media="(prefers-color-scheme: dark)" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#fcf9f7" />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Peter Mei" />
     <meta property="og:title" content={full} />
     <meta property="og:description" content={desc} />
     <meta property="og:url" content={url.href} />
-    <meta property="og:image" content={new URL('/og.png', url).href} />
-    <script is:inline>
+    <meta property="og:image" content={og} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Peter Mei, petermei.com" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={full} />
+    <meta name="twitter:description" content={desc} />
+    <meta name="twitter:image" content={og} />
+    {/* the hour, before the first pixel. A module runs after the first paint,
+        so reading the clock there meant the sky and the name painted midday
+        and then slid to whatever time it really was (Peter, 09-15) */}
+    <script is:inline set:html={skyBoot} data-astro-rerun></script>
+    <ClientRouter />
+    <script is:inline data-astro-rerun>
       (function () {
         var d = document.documentElement;
         d.classList.add('js');
-        try { var t = localStorage.getItem('appearance'); if (t === 'light' || t === 'dark') d.dataset.theme = t; } catch (e) {}
         try { if (window.parent !== window) d.classList.add('framed'); } catch (e) {}
+        /* the entrance plays once, on the first paint. Every page ships the
+           class; a navigation strips it so nothing replays on a swap. */
+        document.addEventListener('astro:after-swap', function () { document.documentElement.classList.remove('is-first'); });
       })();
     </script>
   </head>
   <body>
-    <a class="skip" href="#main">Skip to the page</a>
-    <header class="nav" data-nav data-tone={nav}>
+    <a class="skip" href="#main">Skip to the content</a>
+    <header class="nav" data-nav data-tone={nav} transition:persist transition:name="site-nav" transition:animate="none">
+      {/* the header is persisted, so Back is always here and the arriving page
+          says whether it is shown and where it goes (WEB-049) */}
       <div class="nav-l">
-        {back && <a class="nav-back" href={back}><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 3.5 5 8l4.5 4.5"/></svg>Back</a>}
+        <a class="nav-back" data-nav-back href={back ?? '/'} hidden={!back}><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 3.5 5 8l4.5 4.5"/></svg><span>Back</span></a>
       </div>
-      <nav class="pill" data-pill aria-label="Site">
-        <a class="pill-face" href="/site" aria-label="petermei.com"><span aria-hidden="true">(｡•ᴗ•｡)</span></a>
-        <span class="pill-links">
-          <a class="pill-link" href="/site" aria-current={route === 'work' || route === 'project' ? 'page' : undefined}>Work</a>
-          <a class="pill-link" href="/site/about" aria-current={route === 'about' ? 'page' : undefined}>About</a>
-          <a class="pill-link" href="/site/playground" aria-current={route === 'playground' ? 'page' : undefined}>Playground</a>
-        </span>
-        <span class="pill-status"><i aria-hidden="true"></i>{copy.status}</span>
-      </nav>
-      <div class="nav-r">
-        <a class="nav-mac" href="/mac?open=safari" data-mac-link title="Open this page inside the Mac">
-          <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2" y="3.5" width="16" height="10.5" rx="2"/><path d="M7 17h6M10 14v3"/></svg><span>The Mac</span>
-        </a>
+      {/* the fold is a clip on the glass and a slide of this wrapper, never a
+          width; the shadow sits beside the glass so the clip cannot cut it */}
+      <div class="nav-c" data-pill>
+        <span class="pill-shade" aria-hidden="true"></span>
+        <nav class="pill" aria-label="Site">
+          <a class="pill-face" href="/" aria-label="petermei.com, home"><span data-face aria-hidden="true">(｡•ᴗ•｡)</span></a>
+          <span class="pill-links">
+            {/* one bubble, which slides to whichever page you are on */}
+            <span class="pill-dot" data-dot-here aria-hidden="true"></span>
+            <a class="pill-link" href="/" aria-current={route === 'work' || route === 'project' ? 'page' : undefined}>Work</a>
+            <a class="pill-link" href="/about" aria-current={route === 'about' ? 'page' : undefined}>About</a>
+            <a class="pill-link" href="/mac" data-mac-link>Playground</a>
+          </span>
+        </nav>
       </div>
+      <div class="nav-r"></div>
     </header>
 
-    <main id="main" class="page">
+    <main id="main" class="page" data-back={back} data-nav-default={nav} transition:animate={fade({ duration: '0.22s' })}>
       <slot />
     </main>
 
     {footer && (
       <footer class="foot" data-nav-tone="light">
+        {/* the small print slot, and there is no small print, so it says
+            whatever he wants it to say (Peter, 09-15). The face he signs
+            things with sits at the head of it: off in its own corner it
+            left the sand lopsided, a signature up one end and a paragraph
+            down the middle. Two things hide in this wrapper, so it stays. */}
         <div class="foot-in">
-          <p class="foot-sub">{copy.footer}</p>
-          <h2 class="foot-h" data-foot-h>{copy.footerHeadline}</h2>
-          <p class="foot-note">The holds along the bottom are a small climbing wall. Click one and it counts as sent.</p>
-        </div>
-        <div class="wall" data-wall>
-          {holds.map((h, i) => (
-            <button class={`hold hold-${h}`} type="button" style={`--i:${i}`} data-hold aria-label={`Hold ${i + 1}`}></button>
-          ))}
-          <span class="wall-count" data-wall-count aria-live="polite"></span>
+          <div class="foot-note">
+            <span class="foot-face" data-face aria-hidden="true">(｡•ᴗ•｡)</span>
+            {copy.footNote.map((line) => <p>{line}</p>)}
+          </div>
         </div>
         <div class="foot-bar">
-          <span>Peter Mei · Michigan · 2026</span>
+          <span>Peter Mei · Michigan · <button class="egg-year" type="button" data-egg-year aria-label="2026, the version of this site before this one">{build.year}</button></span>
           <span class="foot-links">
             <a href={links.github} rel="me noopener" target="_blank">GitHub</a>
             <a href={links.volbase} rel="noopener" target="_blank" data-tab="volbase">volbase</a>
@@ -91,7 +116,8 @@ const holds = ['sky', 'green', 'peri', 'apri', 'lemon', 'sky', 'apri', 'green', 
       </footer>
     )}
 
-    <div class="dot" data-dot aria-hidden="true"><span data-dot-label></span></div>
+    <Floppy />
     <script>import '../scripts/site/site';</script>
+    <script>import '../scripts/site/disks';</script>
   </body>
 </html>

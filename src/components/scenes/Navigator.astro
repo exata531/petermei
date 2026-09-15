@@ -1,0 +1,189 @@
+---
+/* Navigator: a browser window with one real website inside it.
+
+   Every product on this desktop opens one of these. The frame holds the
+   product's own site at 1:1, the toolbar in the window's title bar holds
+   back, forward, the address and reload, and none of it is a drawing of an
+   app. The four pages under petermei.com are this origin, so the address
+   field follows a click made inside the frame; volbase.app is somebody
+   else's origin and cannot report where it went, so there the field only
+   knows the page the window asked for, and the captured film stands behind
+   it for any origin the live site refuses to be framed by.
+
+   The strip under the toolbar is a row of directory buttons, the way a 1995
+   browser drew it: flat rectangles, one unit of black around each, Chicago 12
+   inside, no icon. Tabbed browsing did not exist yet, so there are no tabs
+   here; a button opens that site's own window instead. The one you are
+   looking at is drawn inverted, which is how a Macintosh showed a selection
+   everywhere (system7-spec.md, section 14 and detail 5 of the authenticity
+   list: solid black fill plus white text, never a coloured highlight).
+
+   The script is scripts/scenes/navigator.ts. */
+import { directory, type Site } from '../../data/apps';
+
+interface Props { id: string; title: string; site: Site }
+const { id, title, site } = Astro.props;
+const cross = !!site.origin;
+
+/* the film: volbase's captured landing and its map, kept as the fallback for
+   any origin the live site will not be framed by */
+const pins = [
+  { x: 36, y: 58, d: '1.4 mi', name: 'Library · reading buddies' },
+  { x: 68, y: 30, d: '2.9 mi', name: 'Food bank · sort shift' },
+  { x: 52, y: 44, d: '3.0 mi', name: "Children's hospital · patient support" },
+  { x: 24, y: 34, d: '4.1 mi', name: 'Zoo · summer program' },
+  { x: 78, y: 66, d: '6.7 mi', name: 'Science center · camp lead' },
+];
+---
+<div
+  class="nav"
+  data-nav
+  data-nav-id={id}
+  data-nav-start={site.start}
+  data-nav-host={site.host}
+  data-nav-title={title}
+  data-nav-origin={site.origin}
+  data-nav-hasfilm={site.film ? '' : undefined}
+>
+  <div class="nav-bar" data-drag>
+    <div class="nav-dir" role="group" aria-label="Directory">
+      {directory.map((d) => (
+        <button
+          class:list={['nav-btn', { 'is-on': d.id === id }]}
+          type="button"
+          data-nav-go={d.id}
+          aria-current={d.id === id ? 'page' : undefined}
+        >{d.label}</button>
+      ))}
+    </div>
+    {site.film && <span class="nav-demo" data-nav-demo hidden>Demo</span>}
+  </div>
+
+  <div class="nav-page">
+    <iframe
+      class="nav-frame"
+      data-nav-frame
+      title={title}
+      allow={cross ? 'geolocation' : undefined}
+      referrerpolicy={cross ? 'strict-origin-when-cross-origin' : 'same-origin'}
+    ></iframe>
+
+    {site.film && (
+      <Fragment>
+        <img class="nav-still" data-nav-still src="/img/volbase-landing.webp" width="1280" height="2400" alt="" decoding="async" />
+        <div class="nav-film" data-nav-film hidden>
+          <div class="vb-tabs" role="group" aria-label="Demo pages">
+            <button class="vb-tab is-on" type="button" data-vb-tab="landing">volbase.app</button>
+            <button class="vb-tab" type="button" data-vb-tab="map">Opportunities near you</button>
+          </div>
+          <div class="vb-landing" data-vb-view="landing">
+            <img class="vb-shot vb-shot-wide" src="/img/volbase-landing.webp" width="1280" height="2400" alt="The volbase.app landing page, captured" loading="lazy" decoding="async" data-vb-shot />
+            <img class="vb-shot vb-shot-hand" src="/img/volbase-landing-m.webp" width="390" height="1740" alt="The volbase.app landing page, captured on a phone" loading="lazy" decoding="async" data-vb-shot-m />
+          </div>
+          <div class="vb-map" data-vb-view="map" aria-hidden="true">
+            <svg class="vb-roads" viewBox="0 0 960 520" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M0 140 C 180 120, 320 180, 520 150 S 820 90, 960 130" /><path d="M0 300 C 200 280, 380 340, 600 300 S 860 260, 960 290" />
+              <path d="M0 430 C 160 450, 400 400, 620 440 S 900 470, 960 430" /><path d="M140 0 C 160 160, 120 320, 170 520" /><path d="M420 0 C 400 180, 460 340, 430 520" />
+              <path d="M700 0 C 690 200, 740 360, 720 520" /><path d="M860 0 C 880 160, 840 380, 870 520" />
+            </svg>
+            <div class="vb-you" aria-hidden="true"><span></span></div>
+            <ul class="vb-pins" aria-label="Nearest opportunities">
+              {pins.map((p, i) => (<li class="vb-pin" style={`--x:${p.x}%;--y:${p.y}%;--i:${i}`} data-vb-pin><span class="pin-head"></span><span class="pin-lbl">{p.d}</span></li>))}
+            </ul>
+            <ol class="vb-list" data-vb-list>
+              {pins.map((p, i) => (<li class="vb-card" style={`--i:${i}`}><b class="num">{p.d}</b><span>{p.name}</span></li>))}
+            </ol>
+            <div class="vb-sort" data-vb-sort>sorted <b>nearest first</b></div>
+          </div>
+        </div>
+      </Fragment>
+    )}
+  </div>
+</div>
+
+<style>
+  /* the strip is one --tool-h row plus the one unit rule that closes it, the
+     same geometry mac.css gives every strip of buttons under a title bar */
+  /* the column is stated, not left to auto: an auto track floors at the
+     strip's min-content, which on a phone is wider than the window and would
+     push the page sideways under the chrome */
+  .nav { position: absolute; inset: 0; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: calc(var(--tool-h) + var(--u)) 1fr; background: var(--vb-page); color: var(--ink); font-family: var(--chicago); font-size: var(--fs-12); }
+  .nav-bar {
+    display: flex; align-items: center; gap: var(--u4);
+    padding: 0 var(--u4);
+    background: var(--paper);
+    border-bottom: var(--u) solid var(--ink);
+    user-select: none; -webkit-user-select: none;
+    /* the strip is the machine talking, not the page: the bitmap type stays
+       unsmoothed here even though .sframe antialiases everything inside it */
+    -webkit-font-smoothing: none;
+  }
+  /* the strip slides when five names do not fit, rather than chopping them:
+     Chicago has one size, so an ellipsis is the only other way to lose */
+  .nav-dir { display: flex; align-items: center; gap: var(--u2); flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+  .nav-dir::-webkit-scrollbar { width: 0; height: 0; display: none; }
+  /* a directory button: a flat rectangle, no radius, no fill but the paper,
+     sized to its name off a 59 unit floor (the HIG's own standard button
+     width, spec section 7) and 20 units tall (its standard height) */
+  .nav-btn {
+    position: relative;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex: none; min-width: calc(59 * var(--u)); max-width: calc(150 * var(--u));
+    height: calc(20 * var(--u)); padding: 0 var(--u6);
+    border: var(--u) solid var(--ink); border-radius: 0;
+    background: var(--paper); color: var(--ink);
+    font-family: var(--chicago); font-size: var(--fs-12); line-height: 1;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: default;
+  }
+  /* the finger gets a 22 unit target whatever the button measures */
+  .nav-btn::before { content: ''; position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: 100%; height: calc(22 * var(--u)); }
+  /* the chosen one is inverted, and a press inverts too (HIG p. 205) */
+  .nav-btn.is-on, .nav-btn:active { background: var(--ink); color: var(--paper); }
+  .nav-demo {
+    flex: none; padding: 0 var(--u2);
+    border: var(--u) solid var(--ink); background: var(--paper); color: var(--ink);
+    font-family: var(--geneva); font-size: var(--fs-9); line-height: var(--lh-9);
+  }
+  .nav-page { position: relative; overflow: clip; }
+  .nav-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--vb-page); }
+  /* the captured first frame sits over the live frame until it answers */
+  .nav-still { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; transition: opacity var(--t-fast) var(--soft); }
+  .nav-still.is-gone { opacity: 0; pointer-events: none; }
+  /* the film keeps the old figure's own pixels and is scaled to the pane */
+  .nav-film { position: absolute; left: 50%; top: 50%; width: 1060px; height: 606px; transform: translate(-50%, -50%) scale(var(--s, 1)); overflow: clip; background: #f6f3ee; }
+  .vb-tabs { position: absolute; right: 14px; bottom: 14px; z-index: 3; display: inline-flex; gap: 2px; padding: 2px; border-radius: 8px; background: rgb(255 255 255 / .85); box-shadow: 0 1px 2px rgb(0 0 0 / .12), 0 0 0 .5px rgb(0 0 0 / .08); --bf: blur(8px); backdrop-filter: var(--bf); }
+  .vb-tab { padding: 4px 10px; border-radius: 6px; font-size: 11px; color: #6b655e; transition: background-color var(--t-fast) var(--soft); }
+  .vb-tab.is-on { background: #030302; color: #fcf9f7; }
+  .vb-tab:active { transform: scale(.98); }
+  .vb-landing { position: absolute; inset: 0; will-change: transform; transition: opacity var(--t-fast) var(--soft); }
+  .vb-shot { width: 100%; height: auto; transform: translateY(var(--vb-scroll, 0px)); will-change: transform; }
+  .vb-shot-hand { display: none; }
+  :global(.is-narrow) .vb-shot-wide { display: none; }
+  :global(.is-narrow) .vb-shot-hand { display: block; }
+
+  .vb-map { position: absolute; inset: 0; background: #ece9e2; opacity: 0; pointer-events: none; transition: opacity var(--t-fast) var(--soft); }
+  .vb-map.is-on { opacity: 1; pointer-events: auto; }
+  .vb-roads { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .vb-roads path { fill: none; stroke: #fff; stroke-width: 10; stroke-linecap: round; }
+  .vb-you { position: absolute; left: 47%; top: 50%; width: 18px; height: 18px; margin: -9px; border-radius: 50%; background: #5c79b8; border: 3px solid #fff; box-shadow: 0 0 0 6px rgb(92 121 184 / .18); }
+  .vb-pin { position: absolute; left: var(--x); top: var(--y); transform: translate(-50%, -100%) translateY(-24px) scale(.6); opacity: 0; display: grid; justify-items: center; gap: 4px; }
+  .vb-pin.is-in { transform: translate(-50%, -100%); opacity: 1; transition: transform .45s var(--out), opacity .25s var(--soft); transition-delay: calc(var(--i) * 90ms); }
+  .pin-head { width: 22px; height: 22px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: #5c79b8; box-shadow: 0 6px 12px -4px rgb(0 0 0 / .4), inset 0 0 0 5px #fff; }
+  .pin-lbl { font-size: 10px; font-weight: 600; background: #fff; padding: 2px 6px; border-radius: 6px; box-shadow: 0 1px 2px rgb(0 0 0 / .12); color: #030302; }
+  .vb-list { position: absolute; left: 14px; top: 14px; width: 250px; display: grid; gap: 8px; }
+  .vb-card { display: grid; grid-template-columns: 48px 1fr; gap: 10px; align-items: center; padding: 10px 12px; background: #fff; border-radius: 12px; box-shadow: 0 1px 2px rgb(0 0 0 / .08), 0 8px 20px -14px rgb(0 0 0 / .3); font-size: 12px; line-height: 1.3; opacity: 0; transform: translateY(10px); }
+  .vb-card.is-in { opacity: 1; transform: none; transition: opacity .4s var(--soft), transform .5s var(--out); transition-delay: calc(var(--i) * 80ms + 150ms); }
+  .vb-card b { color: #4b68c3; font-weight: 700; font-size: 12px; }
+  .vb-sort { position: absolute; right: 14px; top: 44px; font-size: 11px; padding: 6px 10px; border-radius: 999px; background: #fff; box-shadow: 0 1px 2px rgb(0 0 0 / .1); color: #4b4640; opacity: 0; transform: translateY(6px); }
+  .vb-sort.is-in { opacity: 1; transform: none; transition: opacity .4s var(--out) .6s, transform .4s var(--out) .6s; }
+  .vb-sort b { color: #4b68c3; }
+  /* narrow: the buttons give up the 59 unit floor and their air, never the
+     type, because Chicago is a bitmap and has exactly one size */
+  :global(.is-narrow) .nav-btn { min-width: 0; padding: 0 var(--u3); }
+  :global(.is-narrow) .vb-list { width: 160px; }
+  :global(.is-narrow) .vb-card { grid-template-columns: 40px 1fr; padding: 7px 9px; font-size: 10.5px; }
+  :global(.is-narrow) .vb-sort { display: none; }
+
+  /* the alias sits apart so the CSS minifier keeps both properties */
+  .vb-tabs { -webkit-backdrop-filter: var(--bf); }
+</style>

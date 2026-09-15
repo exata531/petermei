@@ -91,6 +91,10 @@ body { font-family: var(--font); -webkit-font-smoothing: antialiased; }
 #stage[data-product="rin"]     { --ground: color-mix(in srgb, #d9cfc2 34%, var(--cream)); }
 #stage[data-product="kyou"]    { --ground: color-mix(in srgb, var(--kyou) 9%, #fff3ec); }
 #stage[data-product="market"]  { --ground: color-mix(in srgb, var(--apricot) 46%, var(--cream)); }
+/* the Market Station product page runs its own cold grey, not the home page's
+   apricot, so the plates and that page agree. Leave "market" alone: the home
+   page still uses it. */
+#stage[data-product="market-site"] { --ground: #e7e9ee; }
 
 /* the chapter washes, dark (spec 2.2) */
 #stage[data-theme="dark"][data-product="volbase"] {
@@ -104,6 +108,9 @@ body { font-family: var(--font); -webkit-font-smoothing: antialiased; }
 }
 #stage[data-theme="dark"][data-product="market"] {
   --ground: radial-gradient(120% 60% at 50% 80%, rgba(255,138,31,.10), rgba(255,138,31,0) 60%), #0c0c0c;
+}
+#stage[data-theme="dark"][data-product="market-site"] {
+  --ground: radial-gradient(120% 60% at 50% 80%, rgba(150,178,214,.10), rgba(150,178,214,0) 60%), #0a0c0f;
 }
 
 /* light from the top left */

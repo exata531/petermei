@@ -1,10 +1,14 @@
 ---
 import '../styles/mac-tokens.css';
 import '../styles/mac.css';
+import { skyBoot } from '../scripts/sky';
 
-interface Props { title: string; desc: string; }
-const { title, desc } = Astro.props;
+/* the 404 draws a Macintosh with nothing on it, so it leaves the desktop's
+   script out: there is no desk for it to wire */
+interface Props { title: string; desc: string; script?: boolean; canonical?: boolean; }
+const { title, desc, script = true, canonical = true } = Astro.props;
 const url = new URL(Astro.url.pathname, Astro.site ?? 'https://petermei.com');
+const og = new URL('/og.png', url).href;
 ---
 <!doctype html>
 <html lang="en">
@@ -13,7 +17,7 @@ const url = new URL(Astro.url.pathname, Astro.site ?? 'https://petermei.com');
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={desc} />
-    <link rel="canonical" href={url.href} />
+    {canonical && <link rel="canonical" href={url.href} />}
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
@@ -22,22 +26,39 @@ const url = new URL(Astro.url.pathname, Astro.site ?? 'https://petermei.com');
     <link rel="preload" href="/fonts/ChiKareGo2.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/FindersKeepers.woff2" as="font" type="font/woff2" crossorigin />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Peter Mei" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={desc} />
     <meta property="og:url" content={url.href} />
-    <meta property="og:image" content={new URL('/og.png', url).href} />
+    <meta property="og:image" content={og} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Peter Mei, petermei.com" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={desc} />
+    <meta name="twitter:image" content={og} />
+    {/* the hour goes on the page before anything is drawn, or the window in
+        the room paints a bright afternoon and then corrects itself to night
+        while you watch (Peter, 09-15) */}
+    <script is:inline set:html={skyBoot}></script>
     <script is:inline>
       (function () {
         var d = document.documentElement;
         d.classList.add('js');
         /* the landing shows once per tab: after that a reload lands on the desktop */
-        try { if (sessionStorage.getItem('mac-in')) d.classList.add('in'); } catch (e) {}
+        /* the landing shows every time now (Peter, 09-13: he wants the laptop on the desk), so nothing skips it */
       })();
     </script>
   </head>
   <body>
+    <a class="skip" href="#main">Skip to the content</a>
+    {/* the head already set the hour; this keeps it true on a page left open */}
+    <script>import { watchSky } from '../scripts/sky'; watchSky();</script>
     <slot />
-    <script>import '../scripts/mac/desk';</script>
+    {script && <script>import '../scripts/mac/desk';</script>}
+    {/* the desk first, then the things hiding on it: eggs.ts hangs itself off
+        the desk's registry, so it has to run after the desk has filled it */}
+    {script && <script>import '../scripts/mac/eggs';</script>}
   </body>
 </html>
