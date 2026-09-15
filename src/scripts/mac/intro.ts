@@ -151,10 +151,11 @@ export function initIntro(mac: HTMLElement, landing: HTMLElement | null, hooks: 
   let tap: { x: number; y: number } | null = null;
   let anims: Animation[] = [];
   let blankAnim: Animation | null = null;
-  /* window.setTimeout, not the bare one: with Node's types in scope the bare
-     name resolves to Node's timer, which is an object rather than a number and
-     does not fit this array. This is browser code, so it says so. */
-  let bootTimers: ReturnType<typeof window.setTimeout>[] = [];
+  /* Reached through window on purpose. With Node's types in scope the bare
+     setTimeout is Node's, which hands back an object rather than a number;
+     window's is the DOM one and hands back the number this array holds. The
+     matching clearTimeout below goes through window for the same reason. */
+  let bootTimers: number[] = [];
   let unskip: (() => void) | null = null;
   /* the machine is standing at its login with the desktop already behind the
      grey, so it counts as busy: nothing back there should be taking keys */
@@ -305,7 +306,7 @@ export function initIntro(mac: HTMLElement, landing: HTMLElement | null, hooks: 
   }
 
   function endBoot() {
-    for (const t of bootTimers) clearTimeout(t);
+    for (const t of bootTimers) window.clearTimeout(t);
     bootTimers = [];
     waiting = false;
     unwait?.();
