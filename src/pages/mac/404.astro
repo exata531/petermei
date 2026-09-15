@@ -63,29 +63,71 @@ const titles = ['File', 'Edit', 'View', 'Label', 'Special'];
       }
 
       var q = new URLSearchParams(location.search);
-      /* digits only, three at most, so the slot cannot print arbitrary words */
-      var id = (q.get('id') || '').replace(/\D/g, '').slice(0, 3);
       var code = document.querySelector('[data-code]');
-      if (id && code) code.textContent = id;
+      var what = document.querySelector('[data-what]');
 
+      /* THE ID IS MEASURED, NOT ASSERTED. System 7 printed a small meaningless
+         number in this slot; this one is the status the server actually gave,
+         found by asking again for the address that failed. Until it answers the
+         page says 404, which is what /404 is served for. Anything outside the
+         400s and 500s is not an error and is ignored. */
       var SAYS = {
+        '400': 'That address did not make sense.',
+        '401': 'That one wants a key this machine was not given.',
         '403': 'That one is locked.',
         '408': 'The machine waited, and nothing came.',
         '410': 'That used to be here. It is not any more.',
+        '429': 'Too many, too fast. Give it a minute.',
         '500': 'Something fell over at the other end. Not you.',
         '502': 'The thing it asked did not answer.',
         '503': 'It is all here, just not this second.',
+        '504': 'The other end went quiet.',
       };
-      var what = document.querySelector('[data-what]');
-      if (what && SAYS[id]) what.textContent = SAYS[id];
-      else if (what) {
-        /* the address that missed, named the way the Finder named a file it
-           could not open, and the one /404 was asked for rather than this
-           page's own. Set as text, never as markup. */
-        var p = q.get('at') || '';
-        if (p && p.charAt(0) === '/' && p.length < 60) {
-          what.textContent = '“' + p + '” is not on this Macintosh.';
+
+      /* the address that missed, carried across by /404, named the way the
+         Finder named a file it could not open. Text, never markup. */
+      var at = q.get('at') || '';
+      if (!(at.charAt(0) === '/' && at.length < 60)) at = '';
+      var missed = at ? '\u201C' + at + '\u201D is not on this Macintosh.'
+                      : 'That address is not on this Macintosh.';
+      if (what) what.textContent = missed;
+
+      /* A measurement that comes back FINE is the end of the argument. Without
+         this, ?id=500 on an address that works left a 500 standing, because a
+         200 was simply ignored: anybody could hand out a link claiming this
+         site had fallen over. A server saying the page is there outranks a
+         number in a query string, so the claim is dropped and the page goes
+         back to what this file is honestly served for. */
+      /* `fine` means the server was asked and said the address is there. Naming
+         it as missing in that case swaps one untrue thing for another. */
+      function reset(fine) {
+        if (code) code.textContent = '404';
+        if (what) what.textContent = fine ? 'That address is there after all. Try it again.' : missed;
+      }
+
+      function show(id) {
+        if (/^[23]\d\d$/.test(id)) { reset(true); return; }
+        if (!/^[45]\d\d$/.test(id)) return;
+        if (code) code.textContent = id;
+        if (what) {
+          /* 404 names the address rather than repeating the word, so a
+             measurement landing back on it restores that line instead of
+             leaving a wrong ?id='s sentence standing under a corrected number */
+          if (id === '404') what.textContent = missed;
+          else if (SAYS[id]) what.textContent = SAYS[id];
+          else what.textContent = 'The server answered ' + id + '.';
         }
+      }
+
+      var asked = (q.get('id') || '').replace(/\D/g, '').slice(0, 3);
+      if (asked) show(asked);
+
+      if (at) {
+        try {
+          fetch(at, { method: 'HEAD', cache: 'force-cache' })
+            .then(function (r) { show(String(r.status)); })
+            .catch(function () {});
+        } catch (e) {}
       }
     })();
   </script>

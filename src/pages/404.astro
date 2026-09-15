@@ -39,7 +39,7 @@ const digits = [...'404'];
         ))}
       </p>
       <h1 class="lost-h" data-what>Welp. You got me...</h1>
-      <p class="lost-p">You found a problem that I have not found. Good on you now go show off to your freinds</p>
+      <p class="lost-p">You found a problem that I have not found. Good on you. Now go it show off to your friends.</p>
       <p class="lost-go">
         <a class="btn" href="/">Back to the start</a>
         <a class="btn is-quiet" href="/mac">Try the Mac</a>
@@ -68,41 +68,109 @@ const digits = [...'404'];
         }
       } catch (e) {}
 
-      /* The number is the real status. Digits only, three at most, so the slot
-         cannot be used to print arbitrary words at a visitor. */
-      var id = (new URLSearchParams(location.search).get('id') || '').replace(/\D/g, '').slice(0, 3);
+      /* THE NUMBER IS MEASURED, NOT ASSERTED.
+
+         Asking the server again for the address that just failed is the only
+         way this page can know what actually went wrong. It is one HEAD to a
+         URL the browser just fetched, so it is answered from cache, and it
+         returns the true status: 404 for a miss, 403 for a locked one, 500 if
+         something fell over.
+
+         Until it answers, the page says 404, because that is what this file is
+         served for and it is the honest default. A status outside the 400s and
+         500s is not an error and is ignored, so visiting /404 on purpose does
+         not produce a page announcing "200".
+
+         ?id= still works and is checked the same way, for pointing something
+         at this page deliberately, but a measurement always wins over it. */
+      var what = document.querySelector('[data-what]');
+      var big = document.querySelector('[data-code-big]');
+
       var SAYS = {
+        '400': 'That address did not make sense.',
+        '401': 'That one wants a key I did not give you.',
         '403': 'That one is locked.',
         '408': 'That took too long to answer.',
         '410': 'That used to be here. It is not any more.',
+        '429': 'Too many, too fast. Give it a minute.',
         '500': 'Something on my end fell over. Not you.',
         '502': 'The thing I asked did not answer.',
         '503': 'It is all here, just not this second.',
+        '504': 'The other end went quiet.',
       };
-      var what = document.querySelector('[data-what]');
 
-      if (id && id !== '404') {
-        var big = document.querySelector('[data-code-big]');
+      /* A measurement that comes back FINE is the end of the argument. Without
+         this, ?id=500 on an address that works left a 500 standing, because a
+         200 was simply ignored: anybody could hand out a link claiming this
+         site had fallen over. A server saying the page is there outranks a
+         number in a query string, so the claim is dropped and the page goes
+         back to what this file is honestly served for. */
+      /* `fine` means the server was asked and said the address is there. Saying
+         "there is nothing at /about" in that case swaps one untrue thing for
+         another, so the page says what is actually the case instead. */
+      function reset(fine) {
         if (big) {
           big.textContent = '';
+          ['4', '0', '4'].forEach(function (d, i) {
+            var sp = document.createElement('span');
+            sp.className = 'l l' + i;
+            sp.style.setProperty('--i', String(i));
+            var em = document.createElement('i');
+            em.textContent = d;
+            sp.appendChild(em);
+            big.appendChild(sp);
+          });
+        }
+        if (what) what.textContent = fine ? 'That address is there after all. Try it again.' : missed;
+        document.title = 'Not here \u00b7 Peter Mei';
+      }
+
+      function show(id) {
+        if (/^[23]\d\d$/.test(id)) { reset(true); return; }
+        if (!/^[45]\d\d$/.test(id)) return;
+        if (big && big.textContent.trim() !== id) {
+          big.textContent = '';
           for (var i = 0; i < id.length; i++) {
-            var s = document.createElement('span');
-            s.className = 'l l' + (i % 6);
-            s.style.setProperty('--i', String(i));
+            var sp = document.createElement('span');
+            sp.className = 'l l' + (i % 6);
+            sp.style.setProperty('--i', String(i));
             var em = document.createElement('i');
             em.textContent = id[i];
-            s.appendChild(em);
-            big.appendChild(s);
+            sp.appendChild(em);
+            big.appendChild(sp);
           }
         }
-        if (what && SAYS[id]) what.textContent = SAYS[id];
-        document.title = id + ' · Peter Mei';
-      } else if (what) {
-        /* name the address that missed, as text, never as markup */
-        var p = location.pathname;
-        if (p && p.length < 60 && p !== '/404' && p !== '/404/') {
-          what.textContent = 'There is nothing at ' + p;
+        document.title = (id === '404' ? 'Not here' : id) + ' \u00b7 Peter Mei';
+        if (what) {
+          /* 404 has no fixed sentence: it says which address missed, which is
+             more use than the word. A measurement landing back on 404 has to
+             restore that line, or a wrong ?id= would leave its sentence up
+             underneath a number that has since corrected itself. */
+          if (id === '404') what.textContent = missed;
+          else if (SAYS[id]) what.textContent = SAYS[id];
+          else what.textContent = 'The server answered ' + id + '.';
         }
+      }
+
+      /* the address that missed, named before anything is measured, so the page
+         says something true immediately */
+      var path = location.pathname;
+      var missed = 'This page is not here.';
+      if (path && path.length < 60 && path !== '/404' && path !== '/404/') {
+        missed = 'There is nothing at ' + path;
+      }
+      if (what) what.textContent = missed;
+
+      var asked = (new URLSearchParams(location.search).get('id') || '').replace(/\D/g, '').slice(0, 3);
+      if (asked) show(asked);
+
+      /* and then the truth, once the server has been asked */
+      if (path && path !== '/404' && path !== '/404/') {
+        try {
+          fetch(path, { method: 'HEAD', cache: 'force-cache' })
+            .then(function (r) { show(String(r.status)); })
+            .catch(function () {});
+        } catch (e) {}
       }
     })();
   </script>
