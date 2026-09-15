@@ -147,3 +147,9 @@ function start() {
 }
 document.addEventListener('astro:page-load', start);
 motion.addEventListener('change', start);
+
+/* This file has no import and no export, which makes TypeScript read it as a
+   global script rather than a module, so its top-level names collide with
+   every other such file. Astro bundles it as a module regardless, so this
+   line changes nothing at runtime and gives it its own scope at check time. */
+export {};

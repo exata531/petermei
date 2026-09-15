@@ -15,7 +15,8 @@
    gone.
 
    Over the move the machine boots the way a Macintosh did, in beats: the
-   Happy Mac on the grey screen, then "Welcome to Macintosh." in its box,
+   login the machine was waiting at takes the click and its button lights,
+   then the Happy Mac on the grey screen, then "Welcome to Macintosh." in its box,
    then the extensions marching in along the bottom one at a time, then the
    desktop. Each beat is drawn in one frame and left there; about two
    seconds end to end, a click skips it, and a phone or reduced motion gets
@@ -57,8 +58,10 @@ const FLOOR = 600;
 const CAP = 2500;
 /* the bar fills in this many steps: a drawn bar moved in chunks, not pixels */
 const STEPS = 12;
-/* the boot, in beats from the click: the Happy Mac holds, the box replaces
-   it, the extensions march in this far apart, and the desktop paints */
+/* the boot, in beats from the click: the login takes the click and holds
+   while the button is lit, then the Happy Mac, then the box replaces it, the
+   extensions march in this far apart, and the desktop paints */
+const LOGIN = 420;
 const HAPPY = 600;
 const MARCH = 900;
 const STRIDE = 200;
@@ -88,14 +91,18 @@ type Hooks = { onEnter?: () => void; beforeLeave?: (kind: Power) => void; onLeav
    change what this page says. */
 type Screen = 'on' | 'off' | 'asleep';
 
-/* what the grey screen is showing, or nothing. 'idle' is the grey itself
-   with nothing on it: a Macintosh sitting across the room is not showing you
-   its desktop at readable size, and drawing the live one in there made the
-   picture look like a screenshot of a screenshot (Peter, 09-14). */
-type Stage = 'idle' | 'happy' | 'welcome' | 'safe' | null;
+/* what the grey screen is showing, or nothing. 'login' is where the machine
+   waits: the drawn Macintosh across the room holds its login box, which is
+   something legible at that size, where the live desktop in there only ever
+   looked like a screenshot of a screenshot (Peter, 09-14 and 09-15). */
+type Stage = 'login' | 'happy' | 'welcome' | 'safe' | null;
 
-export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hooks = {}): Intro {
-  if (!land) { mac.classList.remove('is-pending'); return { get active() { return false; }, power() {} }; }
+export function initIntro(mac: HTMLElement, landing: HTMLElement | null, hooks: Hooks = {}): Intro {
+  if (!landing) { mac.classList.remove('is-pending'); return { get active() { return false; }, power() {} }; }
+  /* The guard above proves it is there, but a parameter's narrowing does not
+     follow it into the callbacks below, so everything that touched it read as
+     possibly missing. Binding it once here is the whole fix. */
+  const land = landing;
 
   const $ = <T extends HTMLElement = HTMLElement>(s: string, r: ParentNode = land) => r.querySelector<T>(s)!;
   const col = $('[data-land-col]');
@@ -107,6 +114,10 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
   const cue = $('[data-land-cue-text]');
   const blank = mac.querySelector<HTMLElement>('[data-mac-blank]')!;
   const veil = mac.querySelector<HTMLElement>('[data-welcome]');
+  const loginGo = mac.querySelector<HTMLButtonElement>('[data-login-go]');
+  const loginName = mac.querySelector<HTMLInputElement>('[data-login-name]');
+  const loginPass = mac.querySelector<HTMLInputElement>('[data-login-pass]');
+  const loginFields = [...mac.querySelectorAll<HTMLInputElement>('.login-in')];
   const exts = [...mac.querySelectorAll<HTMLElement>('[data-welcome-ext] .ico')];
   const phoneMq = matchMedia('(max-width: 767px)');
   const touchMq = matchMedia('(hover: none)');
@@ -129,7 +140,7 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
   /* the machine is drawn and sitting in the room, so its screen is grey.
      Reduced motion still gets this: a still screen is not motion. */
   const drawnMac = () => !!veil && !cover();
-  const rest = () => { if (drawnMac()) stage('idle'); };
+  const rest = () => { if (drawnMac()) stage('login'); };
 
   let state: 'off' | 'loading' | 'ready' | 'moving' = 'off';
   let screen: Screen = 'on';
@@ -142,6 +153,10 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
   let blankAnim: Animation | null = null;
   let bootTimers: number[] = [];
   let unskip: (() => void) | null = null;
+  /* the machine is standing at its login with the desktop already behind the
+     grey, so it counts as busy: nothing back there should be taking keys */
+  let waiting = false;
+  let unwait: (() => void) | null = null;
 
   /* redraw the machine when the window's shape has changed enough to show */
   function draw(aspect: number) {
@@ -240,25 +255,59 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     veil.hidden = false;
   }
 
-  /* the boot, on its own clock beside the camera move. A click on the grey
-     screen, or Escape, ends it early and the desktop is simply there */
+  /* the machine stops at its login and waits there, the way one did. The
+     fields are real: click either and type whatever you like. Nothing behind
+     them is checked and nothing is kept, so any name and any password get you
+     in, and so does none at all. Log In, or Return from either field, starts
+     the rest of the boot. */
   function boot() {
     if (!staged()) return;
     endBoot();
-    stage('happy');
+    stage('login');
+    waiting = true;
+    const go = () => signIn();
+    const key = (e: KeyboardEvent) => { if (e.key === 'Enter') { e.preventDefault(); signIn(); } };
+    loginGo?.addEventListener('click', go);
+    for (const f of loginFields) f.addEventListener('keydown', key);
+    unwait = () => {
+      loginGo?.removeEventListener('click', go);
+      for (const f of loginFields) f.removeEventListener('keydown', key);
+    };
+  }
+
+  /* the keyboard belongs to the login while it is up, and it starts in the
+     top field because nothing is filled in for anybody */
+  function focusLogin() {
+    if (waiting) (loginName ?? loginPass)?.focus({ preventScroll: true });
+  }
+
+  /* logged in: the button takes the press, and then the machine boots the way
+     it always did. A click on the grey, or Escape, skips the rest of it. */
+  function signIn() {
+    if (!waiting || !veil) return;
+    waiting = false;
+    unwait?.();
+    unwait = null;
+    (document.activeElement as HTMLElement | null)?.blur?.();
+    veil.classList.add('is-go');
     const at = (t: number, f: () => void) => { bootTimers.push(setTimeout(f, t)); };
-    at(HAPPY, () => stage('welcome'));
-    exts.forEach((e, i) => at(MARCH + i * STRIDE, () => e.classList.add('is-on')));
-    at(PAINT, endBoot);
+    at(LOGIN, () => { veil.classList.remove('is-go'); stage('happy'); });
+    at(LOGIN + HAPPY, () => stage('welcome'));
+    exts.forEach((e, i) => at(LOGIN + MARCH + i * STRIDE, () => e.classList.add('is-on')));
+    at(LOGIN + PAINT, endBoot);
     const skip = (e: Event) => { if (e instanceof KeyboardEvent && e.key !== 'Escape') return; endBoot(); };
-    veil!.addEventListener('pointerdown', skip);
+    veil.addEventListener('pointerdown', skip);
     addEventListener('keydown', skip);
-    unskip = () => { veil!.removeEventListener('pointerdown', skip); removeEventListener('keydown', skip); };
+    unskip = () => { veil.removeEventListener('pointerdown', skip); removeEventListener('keydown', skip); };
   }
 
   function endBoot() {
     for (const t of bootTimers) clearTimeout(t);
     bootTimers = [];
+    waiting = false;
+    unwait?.();
+    unwait = null;
+    veil?.classList.remove('is-go');
     unskip?.();
     unskip = null;
     stage(null);
@@ -362,6 +411,9 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
       state = 'off';
       tap = null;
       hooks.onEnter?.();
+      /* last, because the desktop waking up takes the focus for itself: the
+         camera has landed and the login is the only thing a person can use */
+      focusLogin();
     };
     if (reduced()) {
       mac.classList.remove('is-far');
@@ -557,5 +609,7 @@ export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hoo
     load();
   }
 
-  return { get active() { return state !== 'off'; }, power };
+  /* standing at the login counts as busy: the desktop is drawn behind the
+     grey but it is not the visitor's yet */
+  return { get active() { return state !== 'off' || waiting; }, power };
 }

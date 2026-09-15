@@ -1,0 +1,8 @@
+dist
+node_modules
+public
+scratch
+shots
+capture
+docs
+*.md

@@ -1,0 +1,51 @@
+{
+  "extends": [
+    "stylelint-config-standard"
+  ],
+  "rules": {
+    "custom-property-pattern": null,
+    "selector-class-pattern": null,
+    "no-descending-specificity": null,
+    "media-feature-range-notation": null,
+    "alpha-value-notation": null,
+    "color-function-notation": null,
+    "value-keyword-case": null,
+    "declaration-block-no-redundant-longhand-properties": null,
+    "comment-empty-line-before": null,
+    "rule-empty-line-before": null,
+    "declaration-empty-line-before": null,
+    "custom-property-empty-line-before": null,
+    "at-rule-empty-line-before": null,
+    "property-no-vendor-prefix": null,
+    "shorthand-property-no-redundant-values": null,
+    "number-max-precision": null,
+    "length-zero-no-unit": null,
+    "declaration-property-value-no-unknown": true,
+    "no-duplicate-selectors": null,
+    "font-family-no-missing-generic-family-keyword": null,
+    "keyframes-name-pattern": null,
+    "declaration-block-single-line-max-declarations": null,
+    "color-hex-length": null,
+    "color-function-alias-notation": null,
+    "font-family-name-quotes": null,
+    "selector-not-notation": null,
+    "property-no-deprecated": true,
+    "declaration-property-value-keyword-no-deprecated": true
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/styles/site.css"
+      ],
+      "rules": {
+        "comment-word-disallowed-list": null
+      }
+    }
+  ],
+  "ignoreFiles": [
+    "dist/**",
+    "node_modules/**",
+    "public/**"
+  ],
+  "_note": "Turned off below are the rules that argue with this project's house style rather than finding mistakes: the CSS here is written one rule per line on purpose and it reads well. A linter that asks for hundreds of rewrites of working code is a linter that gets switched off, which costs more than it saves. The deprecation rules stay on, because those find real things."
+}

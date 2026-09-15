@@ -51,7 +51,9 @@ body.is-dragging, body.is-dragging * { user-select: none !important; -webkit-use
 
 .sr {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  /* clip-path, not the old clip: same result, and clip is deprecated. The
+     element stays in the accessibility tree and out of the picture. */
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
 }
 
 /* ══ with JavaScript off, the stash is the whole site ═══════════════════ */
@@ -295,7 +297,7 @@ html:not(.js) body { background: var(--paper); }
 .tb-search { display: none; }
 
 /* ── the push button: white, a one unit border, rounded by four units ──── */
-.tb-btn, .btn, .alert-btn, .abt-link, .land-tap, .sheet-x, .sheet-row, .ql-open, .pho-vdone {
+.tb-btn, .btn, .alert-btn, .abt-link, .land-tap, .sheet-x, .sheet-row, .ql-open, .pho-vdone, .login-go {
   position: relative;
   display: inline-flex; align-items: center; justify-content: center; gap: var(--u4);
   height: calc(20 * var(--u)); min-width: calc(20 * var(--u)); padding: 0 var(--u8);
@@ -581,13 +583,12 @@ html:not(.js) body { background: var(--paper); }
 /* the 404 uses an h1 here, and the browser's default bold on a one-weight
    bitmap face is a synthesised stroke: it swallowed the gap under the i */
 .alert-title { font-family: var(--chicago); font-size: var(--fs-12); line-height: var(--lh-12); font-weight: 400; }
-.alert-chk { grid-column: 2; display: none; align-items: center; gap: var(--u4); font-family: var(--geneva); font-size: var(--fs-9); line-height: var(--lh-9); }
-.alert-chk input, .chk {
+.chk {
   appearance: none; -webkit-appearance: none; margin: 0; flex: none;
   width: calc(12 * var(--u)); height: calc(12 * var(--u));
   border: var(--u) solid var(--ink); background: var(--paper);
 }
-.alert-chk input:checked, .chk:checked {
+.chk:checked {
   background:
     linear-gradient(45deg, transparent calc(50% - var(--u) / 2), var(--ink) calc(50% - var(--u) / 2), var(--ink) calc(50% + var(--u) / 2), transparent calc(50% + var(--u) / 2)),
     linear-gradient(-45deg, transparent calc(50% - var(--u) / 2), var(--ink) calc(50% - var(--u) / 2), var(--ink) calc(50% + var(--u) / 2), transparent calc(50% + var(--u) / 2)),
@@ -599,7 +600,6 @@ html:not(.js) body { background: var(--paper); }
 .alert-btn.is-default { outline: var(--u3) solid var(--ink); outline-offset: var(--u); }
 .alert-btn:active { background: var(--ink); color: var(--paper); }
 .alert-btn:focus-visible { outline: var(--u3) solid var(--ink); outline-offset: var(--u); }
-.alert-veil.is-plain .alert-chk { display: none; }
 
 /* ══ Finder: a folder window, the item count along the top, icons in a grid
    or a list by name ═══════════════════════════════════════════════════ */
@@ -739,7 +739,7 @@ html.pm-trash-empty .ico-paper { display: none; }
 [data-vterm].term .term-out .ok, [data-vterm].term .term-out .amber, [data-vterm].term .term-out .cmd { color: var(--ink); }
 /* the Terminal states its own colour on the element rather than inheriting
    it, so nothing a parent sets can tint a window that is meant to be paper */
-[data-vterm].term .term-out, [data-vterm].term .term-mirror, [data-vterm].term .term-line { margin: 0; font: inherit; white-space: pre-wrap; word-break: break-word; color: var(--ink); }
+[data-vterm].term .term-out, [data-vterm].term .term-mirror, [data-vterm].term .term-line { margin: 0; font: inherit; white-space: pre-wrap; overflow-wrap: break-word; color: var(--ink); }
 [data-vterm].term .term-out:empty { display: none; }
 [data-vterm].term .dim { color: var(--ink); }
 [data-vterm].term .term-dir { color: var(--navy); }
@@ -991,7 +991,56 @@ html.is-cover .mac.is-far:not(.is-moving) { z-index: 1; }
 .welcome-ext { position: absolute; left: var(--u4); bottom: var(--u4); z-index: 96; display: flex; gap: var(--u4); pointer-events: none; }
 .welcome-ext .ico { width: var(--icon); height: var(--icon); visibility: hidden; }
 .welcome-ext .ico.is-on { visibility: visible; }
-.welcome-veil { position: absolute; inset: 0; z-index: 95; background: var(--paper) var(--dither); background-size: var(--dither-size); cursor: default; }
+/* the boot screen is a flat grey, not the pattern. Drawn inside the little
+   Macintosh on the landing the dots land so close together that they beat
+   against each other and the whole screen crawls (Peter, 09-15); the flat
+   colour is what the pattern averages to, so nothing else changes. */
+.welcome-veil { position: absolute; inset: 0; z-index: 95; background: var(--dither-flat); cursor: default; }
+/* the login the machine waits at, and the one thing on this screen the
+   landing's drawn Macintosh is showing while it sits there. It is a drawing
+   and only a drawing: no field takes a keystroke, nothing is checked, and
+   nothing is sent anywhere. Clicking the screen logs in, the way clicking it
+   has always been the way in. */
+.welcome-veil:not([data-stage='login']) .login { display: none; }
+.login { position: absolute; inset: 0; z-index: 96; display: grid; place-items: center; pointer-events: none; }
+/* only the box takes the mouse: the grey around it is not a control */
+.login-box {
+  /* drawn at the size it really is, so the little Macintosh on the landing
+     shows this screen at the scale that screen is at: a dialog you can see is
+     a dialog and cannot read yet, the way a machine across a room looks. It
+     was magnified to stay legible out there and read as pasted on instead of
+     shown on (Peter, 09-15). Moving the camera in is what makes the words. */
+  width: min(calc(230 * var(--u)), calc(100vw - var(--u16)));
+  padding: var(--u8) calc(10 * var(--u)) calc(10 * var(--u));
+  display: grid; grid-template-columns: var(--icon) 1fr; gap: var(--u3) var(--u8); align-items: center;
+  background: var(--paper); color: var(--ink);
+  border: var(--u2) solid var(--ink);
+  user-select: none; -webkit-user-select: none;
+  pointer-events: auto;
+}
+.login-ico { grid-row: 1 / 3; width: var(--icon); height: var(--icon); }
+.login-ico svg { display: block; width: 100%; height: 100%; }
+.login-head { font-family: var(--chicago); font-size: var(--fs-12); line-height: var(--lh-12); }
+.login-line { grid-column: 1 / -1; display: flex; align-items: center; gap: var(--u6); font-family: var(--geneva); font-size: var(--fs-9); line-height: var(--lh-9); }
+.login-line > span { width: calc(48 * var(--u)); text-align: right; }
+/* a real field, drawn the way the machine drew one: a box with a line round
+   it, the caret inside, and whatever gets typed is simply what it says */
+.login-in {
+  flex: 1; width: 100%; min-width: 0; min-height: calc(15 * var(--u));
+  padding: 0 var(--u3); margin: 0;
+  font: inherit; color: var(--ink); background: var(--paper);
+  border: var(--u) solid var(--ink); border-radius: 0;
+  appearance: none; -webkit-appearance: none;
+}
+.login-in:focus { outline: none; }
+/* the field with the keyboard in it wears a heavier line, which is how a
+   Macintosh showed you where the typing was going */
+.login-in:focus-visible, .login-in:focus { border-width: var(--u2); padding: 0 var(--u2); }
+.login-in::placeholder { color: var(--grey-3); }
+.login-go { grid-column: 1 / -1; justify-self: end; margin-top: var(--u3); outline: var(--u2) solid var(--ink); outline-offset: var(--u); }
+/* the click: the default button takes it, the way a Mac showed a press */
+.welcome-veil.is-go .login-go { background: var(--ink); color: var(--paper); }
+
 .welcome-veil:not([data-stage='happy']) .welcome-happy { display: none; }
 .welcome-veil:not([data-stage='welcome']) .welcome-boot { display: none; }
 .welcome-veil:not([data-stage='welcome']) .welcome-ext { display: none; }

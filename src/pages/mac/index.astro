@@ -130,6 +130,28 @@ const padApps = [
        the extensions marching in under it; shutting down, the one line a
        Mac without a soft switch left lit. The script sets the stage. -->
   <div class="welcome-veil" data-welcome hidden>
+    <!-- the login the machine sits at, and what the drawn Macintosh on the
+         landing has on its screen while it waits. The fields are real: click
+         one and type whatever you like, because that is what a Macintosh let
+         you do. Nothing is checked, nothing is stored, and nothing is sent
+         anywhere; any name and any password get you in, including none. The
+         box carries nobody's name (Peter, 09-15): it is a machine waiting for
+         whoever sat down at it. -->
+    <div class="login" role="dialog" aria-label="Log in">
+      <div class="login-box">
+        <span class="login-ico" aria-hidden="true"><Icon id="peter" /></span>
+        <p class="login-head">Macintosh</p>
+        <label class="login-line"><span>Name:</span>
+          <input class="login-in" type="text" data-login-name
+                 autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
+        </label>
+        <label class="login-line"><span>Password:</span>
+          <input class="login-in" type="password" data-login-pass
+                 autocomplete="off" autocapitalize="off" spellcheck="false" />
+        </label>
+        <button class="login-go" type="button" data-login-go>Log In</button>
+      </div>
+    </div>
     <div class="welcome-happy" aria-hidden="true"><Icon id="happy" /></div>
     <div class="welcome welcome-boot">Welcome to Macintosh.</div>
     <div class="welcome welcome-safe">It is now safe to switch off your Macintosh.</div>
@@ -161,16 +183,17 @@ const padApps = [
     </div>
   </div>
 
-  <!-- the alert a Macintosh shows before it restarts or shuts down -->
+  <!-- the alert the Finder puts up before it does something it cannot undo,
+       emptying the Trash being the one that asks. Power does not come through
+       here: choosing Shut Down on this machine shut it down. -->
   <div class="alert-veil" data-alert hidden>
     <div class="alert" data-alert-box role="alertdialog" aria-modal="true" aria-labelledby="alert-title" aria-describedby="alert-wait">
       <span class="alert-ico" aria-hidden="true"><Icon id="caution" /></span>
       <p class="alert-title" id="alert-title" data-alert-title></p>
-      <label class="alert-chk"><input type="checkbox" checked /><span>Reopen windows when logging back in</span></label>
       <p class="alert-wait" id="alert-wait" data-alert-wait></p>
       <div class="alert-btns">
         <button class="alert-btn" type="button" data-alert-cancel>Cancel</button>
-        <button class="alert-btn is-default" type="button" data-alert-ok>Restart</button>
+        <button class="alert-btn is-default" type="button" data-alert-ok>OK</button>
       </div>
     </div>
   </div>

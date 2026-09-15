@@ -95,6 +95,9 @@
      the 50 percent dither: the desktop, a scroll bar's track, a shade */
   --dither: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2' shape-rendering='crispEdges'%3E%3Crect width='1' height='1' fill='%23000'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23000'/%3E%3C/svg%3E");
   --dither-size: var(--u2) var(--u2);
+  /* what the 50% pattern averages to, for the places that show it too small
+     for the dots to hold still */
+  --dither-flat: #7e7d7c;
   /* the same pattern in white, for a dimmed icon */
   --dither-w: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='2' height='2' shape-rendering='crispEdges'%3E%3Crect width='1' height='1' fill='%23fff'/%3E%3Crect x='1' y='1' width='1' height='1' fill='%23fff'/%3E%3C/svg%3E");
   /* a 25 percent dither, for a lighter grey */

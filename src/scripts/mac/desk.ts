@@ -414,8 +414,10 @@ const appName = $('[data-app-name]')!;
 const appMenus = $('[data-app-menus]')!;
 
 /* the Apple menu: the front application's About first, then the desk
-   accessories in the order the Finder lists them, then Shut Down, the way a
-   7.5 Apple Menu Items folder read */
+   accessories in the order the Finder lists them, and that is the whole menu.
+   Power does not live here. It sat in Special on this machine and moved to
+   the Apple menu only in Mac OS X, so a Shut Down under the apple was the
+   wrong decade (Peter, 09-15). */
 function appleMenu(): MenuItem[] {
   const { about } = currentApp();
   /* keyed by the name the About row prints, which is the product's own */
@@ -444,8 +446,6 @@ function appleMenu(): MenuItem[] {
       : { label: `About ${about}…`, action: 'about', icon: APP_ABOUT[about] ?? registry.appIcons[about] ?? 'app' },
     { label: '', sep: true },
     ...acc,
-    { label: '', sep: true },
-    { label: 'Shut Down', action: 'power:shutdown', icon: 'mac' },
   ];
 }
 /* a greyed row the Finder draws has something behind it once a file says so:
@@ -802,7 +802,7 @@ addEventListener('pointerdown', (e) => {
   if (ctxOpen && !(e.target as HTMLElement).closest('[data-ctx]')) closeCtx();
 });
 document.addEventListener('contextmenu', (e) => {
-  if (phone() || intro.active || alertKind) return;
+  if (phone() || intro.active || plainOk) return;
   const t = e.target as HTMLElement;
   if (!(t instanceof Element)) return;
   if (t.closest('input, textarea, [contenteditable]')) return;
@@ -1258,27 +1258,18 @@ function addShotIcon(s: Shot) {
 }
 
 /* ── power ─────────────────────────────────────────────────────────────── */
-/* Sleep and Lock Screen go at once. Restart and Shut Down ask first, the
-   way a Mac does: its words and its default button. The camera move itself
-   lives with the landing. */
-type Ask = 'restart' | 'shutdown';
-const ASK: Record<Ask, { title: string; ok: string; wait: string }> = {
-  restart: {
-    title: 'Are you sure you want to restart the computer?', ok: 'Restart',
-    wait: 'Any work you have not saved will be lost.',
-  },
-  shutdown: {
-    title: 'Are you sure you want to shut down the computer?', ok: 'Shut Down',
-    wait: 'Any work you have not saved will be lost.',
-  },
-};
+/* Every power item goes at once. Choosing Shut Down on this machine put the
+   screen up and that was that: the "Are you sure you want to shut down the
+   computer?" sheet, and the reopen-windows box under it, are Mac OS X and
+   Lion respectively, which is thirty years past what this is (Peter, 09-15).
+   Anything unsaved is still the application's own business to ask about, the
+   way it was. The camera move itself lives with the landing. */
 const alertEl = $('[data-alert]')!;
 const alertBox = $('[data-alert-box]')!;
 const alertTitle = $('[data-alert-title]')!;
 const alertWait = $('[data-alert-wait]')!;
 const alertOk = $<HTMLButtonElement>('[data-alert-ok]')!;
 const alertIco = $('[data-alert] .alert-ico')!;
-let alertKind: Ask | null = null;
 let plainOk: (() => void) | null = null;
 let alertFrom: Element | null = null;
 
@@ -1292,12 +1283,11 @@ function quitAll() {
 
 function power(kind: Power) {
   if (kind === 'sleep') sound.chime();
-  if (kind === 'sleep' || kind === 'lock') { intro.power(kind); return; }
-  ask(kind);
+  intro.power(kind);
 }
 
 function askPlain(title: string, text: string, okLabel: string, onOk: () => void) {
-  if (alertKind || plainOk || intro.active) return;
+  if (plainOk || intro.active) return;
   plainOk = onOk;
   alertFrom = document.activeElement;
   alertIco.innerHTML = icon('caution');
@@ -1311,42 +1301,19 @@ function askPlain(title: string, text: string, okLabel: string, onOk: () => void
   alertOk.focus({ preventScroll: true });
 }
 
-function ask(kind: Ask) {
-  if (alertKind || plainOk || intro.active) return;
-  alertIco.innerHTML = icon('caution');
-  alertKind = kind;
-  alertFrom = document.activeElement;
-  alertTitle.textContent = ASK[kind].title;
-  alertOk.textContent = ASK[kind].ok;
-  alertWait.textContent = ASK[kind].wait;
-  alertEl.hidden = false;
-  macEl.inert = true;
-  requestAnimationFrame(() => alertEl.classList.add('is-on'));
-  alertOk.focus({ preventScroll: true });
-}
-
+/* the one alert left is the Finder's own question, so there is one path
+   through it: the caller's work runs or it does not */
 function answer(go: boolean) {
-  if (plainOk) {
-    const fn = plainOk;
-    plainOk = null;
-    alertEl.classList.remove('is-on');
-    setTimeout(() => { alertEl.hidden = true; alertEl.classList.remove('is-plain'); }, reduced() ? 0 : 140);
-    macEl.inert = false;
-    if (go) fn();
-    else (alertFrom?.isConnected ? (alertFrom as HTMLElement) : $('[data-menu="apple"]'))?.focus({ preventScroll: true });
-    return;
-  }
-  if (!alertKind) return;
-  const kind = alertKind;
-  alertKind = null;
+  if (!plainOk) return;
+  const fn = plainOk;
+  plainOk = null;
   alertEl.classList.remove('is-on');
-  setTimeout(() => { alertEl.hidden = true; }, reduced() ? 0 : 140);
-  if (go) { intro.power(kind); return; }
+  setTimeout(() => { alertEl.hidden = true; alertEl.classList.remove('is-plain'); }, reduced() ? 0 : 140);
   macEl.inert = false;
-  /* back to where the choice came from: the menu row is gone with its
-     menu, so on the Mac that is the kaomoji button */
-  const from = alertFrom?.isConnected ? (alertFrom as HTMLElement) : $('[data-menu="apple"]');
-  from?.focus({ preventScroll: true });
+  if (go) fn();
+  /* back to where the choice came from: the menu row is gone with its menu,
+     so that is the apple */
+  else (alertFrom?.isConnected ? (alertFrom as HTMLElement) : $('[data-menu="apple"]'))?.focus({ preventScroll: true });
 }
 alertOk.addEventListener('click', () => answer(true));
 $('[data-alert-cancel]')!.addEventListener('click', () => answer(false));
@@ -1554,7 +1521,7 @@ const launch = (it: HTMLElement) => {
 
 /* ── the keyboard ──────────────────────────────────────────────────────── */
 addEventListener('keydown', (e) => {
-  if (spot.open || intro.active || alertKind || plainOk) return;
+  if (spot.open || intro.active || plainOk) return;
   const k = e.key.toLowerCase();
   if (!phone()) {
     /* the reflexes a Mac hand tries: Mission Control, show the desktop,
@@ -1669,7 +1636,7 @@ if (!intro.active) { markSeen(); openWanted(); }
 /* the screensaver arms itself; it is the one sanctioned self-starter */
 initSaver(
   PH.map((p) => ({ f: p.f, p: p.p })),
-  () => document.documentElement.classList.contains('in') && !intro.active && !alertKind && !plainOk,
+  () => document.documentElement.classList.contains('in') && !intro.active && !plainOk,
 );
 
 addEventListener('resize', () => {

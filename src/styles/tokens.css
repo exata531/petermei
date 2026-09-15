@@ -1,218 +1,210 @@
-/* petermei.com, the tokens, once.
+/* petermei.com, the design system. Every value the portfolio uses lives here
+   and nowhere else.
 
-   Paper is the Rin site's block, byte for byte, with Craft's pastels and the
-   four product hues on top. The chapters have their own dark set and never
-   change with the appearance. The page follows the system with no toggle:
-   light on :root, dark under prefers-color-scheme (guarded so a data-theme
-   of light still wins) and again under data-theme="dark". */
+   THE RULE. A component stylesheet may not invent a colour, a radius, a
+   shadow, a duration or a spacing value. It reaches for a token below. If the
+   token it wants does not exist, the token gets added here first, with a
+   reason, and then it is used. That is the whole discipline, and it is what
+   keeps four pages looking like one site.
 
+   WHAT THIS FILE DOES NOT COVER. Three parts of this project are deliberately
+   NOT in this language, each for a reason written at the top of its own file:
+   the Mac at /mac is a System 7 pastiche and answers to the 1992 Human
+   Interface Guidelines; /kyou takes its look from the running app; /market is
+   defined against this paper on purpose, because colour there means state and
+   never decoration. They are chapters, not pages, and folding them in here
+   would destroy the thing that makes each one worth visiting. Leave them.
+
+   THE SPACING SCALE is named by the job, not by a number, because a number
+   invites the next person to pick 21px. The steps are the rhythm this site was
+   already built on: a 4px spine with the wider beats the paper layout wants.
+   Off-scale values still in the component sheets are listed in
+   src/styles/design-system.md under "not yet on the scale".
+
+   APPEARANCE. One appearance, light, on purpose: the sky, the pastels and the
+   paper are the design, and there is no dark version of them that is the same
+   site. `color-scheme: light only` says so to the browser rather than leaving
+   it to chance. The Mac and the product chapters carry their own dark sets. */
+
+/* ── the wordmark ───────────────────────────────────────────────────────
+   Sniglet ExtraBold (OFL, licence in public/fonts/SNIGLET-OFL.txt), subset to
+   the nine letters of the name. font-display is block, not swap: this is one
+   word at 250px and a swap from a fallback is a visible lurch, where a short
+   block is not. */
 @font-face {
-  font-family: 'Instrument Serif';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/InstrumentSerif-Regular.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Instrument Serif';
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/InstrumentSerif-Italic.woff2') format('woff2');
+  font-family: 'Name';
+  src: url('/fonts/name.woff2') format('woff2');
+  font-weight: 700;
+  font-display: block;
 }
 
 :root {
-  color-scheme: light;
+  color-scheme: light only;
 
-  /* ── paper ─────────────────────────────────────────────────────── */
-  --cream:    #fff7ed;
-  --cream-2:  #f7ecdc;
-  --paper:    #fffdf8;
-  --line:     #eee0cc;
-  --rule:     #292524;
-  --ink:      #292524;
-  --ink-2:    #6b6560;
-  --ink-3:    #78716c;
-  --hair:     #cfc5b8;
-  --solid:    #1c1917;
-  --solid-fg: #ffffff;
-  --mark:     rgba(126, 231, 135, .5);
-  --wordmark: rgba(68, 19, 6, .17);
+  /* ── paper and ink ──────────────────────────────────────────────────── */
+  --paper: #fcf9f7;
+  --surface: var(--paper);
+  --ink: #030302;
+  --ink-2: #5d5955;
+  --muted: var(--ink-2);
+  --hair: rgb(3 3 2 / .12);
+  --hair-2: rgb(3 3 2 / .2);
+  --focus: var(--ink);
 
-  --sky:        #9ed4ef;
-  --periwinkle: #b8caf5;
-  --mint:       #9bd8a9;
-  --apricot:    #f6cb98;
-  --butter:     #fde99b;
+  /* ── the five pastels: the site's one blue is the Mac's wallpaper weather ── */
+  --c-sky: #8fbfe8;
+  --c-sky-2: #c6dff4;
+  --c-peri: #b8caf5;
+  --c-lemon: #fde99b;
+  --c-apri: #f6cb98;
+  --c-green: #9bd8a9;
+  --c-paper: var(--paper);
+  --c-ink: #1c1917;
+  --accent-soft: color-mix(in oklab, var(--c-sky) 45%, var(--paper));
+  --tint-peter: color-mix(in oklab, var(--c-lemon) 70%, var(--paper));
+  --sand: color-mix(in oklab, var(--c-apri) 35%, var(--paper));
+  --pastel-a: 45%;
 
-  --vb:   #4c67b8;
-  --rin:  #292524;
-  --kyou: #ff3b30;
-  --mo:   #e07a14;
-  --accent: var(--vb);
+  /* ── the four meaning colours, tuned for paper ───────────────────────
+     These carry meaning and are never decoration. Each one is darkened from
+     its pastel until it clears 4.5 against the paper as body text. */
+  --a-blue: #427e8a;
+  --a-green: #3f8850;
+  --a-yellow: #987e1b;
+  --a-red: #bb433a;
+  --blue: var(--a-blue);
+  --green: var(--a-green);
+  --amber: var(--a-yellow);
+  --red: var(--a-red);
 
-  --hair-8:  color-mix(in oklab, #292524 8%, transparent);
-  --hair-12: color-mix(in oklab, #292524 12%, transparent);
-  --hair-20: color-mix(in oklab, #292524 20%, transparent);
+  /* ── the two ramps ───────────────────────────────────────────────────
+     Most of the colour on this site is not a colour at all: it is the ink or
+     white, at a strength. Thirteen of them were written out twice or more, and
+     a value written twice is a token nobody has named yet, so they are named
+     here. The number in the name IS the strength, so the ramp reads at a glance
+     and a new one is obvious to add.
 
-  --field-edge: var(--periwinkle);
-  --sun-o: 1;
-  --grain: url('/img/paper-grain.webp');
-  --grain-o: .08;
+     Two blacks exist on purpose and are not interchangeable: the ink is
+     #030302, the paper's own near-black, and it is what a hairline or an edge
+     on this paper is made of. Pure #000 stays pure for the shadow stack, where
+     an off-black tints the shadow. */
+  --ink-a06: rgb(3 3 2 / .06);
+  --ink-a08: rgb(3 3 2 / .08);
+  --ink-a09: rgb(3 3 2 / .09);
+  --ink-a10: rgb(3 3 2 / .1);
+  --ink-a14: rgb(3 3 2 / .14);
+  --ink-a18: rgb(3 3 2 / .18);
+  --ink-a20: rgb(3 3 2 / .2);
+  --ink-a22: rgb(3 3 2 / .22);
+  --ink-a28: rgb(3 3 2 / .28);
+  --ink-a35: rgb(3 3 2 / .35);
+  --ink-a50: rgb(3 3 2 / .5);
+  --black-a12: rgb(0 0 0 / .12);
+  --black-a24: rgb(0 0 0 / .24);
 
-  /* ── the stage, the same in both appearances ───────────────────── */
-  --stage:    #0a0a0c;
-  --stage-fg: #f2f1ee;
-  --wash-vb:   radial-gradient(120% 80% at 80% 60%, rgba(126,153,214,.28), rgba(126,153,214,0) 60%), #0f141a;
-  --wash-rin:  radial-gradient(90% 70% at 20% 40%, rgba(243,237,226,.07), rgba(243,237,226,0) 60%), #14120f;
-  --wash-kyou: radial-gradient(100% 90% at 75% 55%, rgba(255,59,48,.34), rgba(255,59,48,0) 62%), #1a0705;
-  --wash-mo:   radial-gradient(120% 60% at 50% 80%, rgba(255,138,31,.10), rgba(255,138,31,0) 60%), #0c0c0c;
-  --vb-stage:  #7e99d6;
-  --rin-stage: #f3ede2;
-  --mo-stage:  #ff8a1f;
-  --c1-fg: #f2f1ee;
-  --c2-fg: #f3ede2;
-  --c3-fg: #ffe9e6;
-  --c4-fg: #e9e9e9;
-  --shadow-device: 0 60px 120px -30px rgba(0,0,0,.75), 0 20px 40px -20px rgba(0,0,0,.6);
-  --device-edge: rgba(255,255,255,.14);
-  --glare: linear-gradient(115deg, rgba(255,255,255,.09), rgba(255,255,255,0) 38%);
+  --white: #fff;
+  --white-a56: #ffffff96;   /* the glass gradient's three stops, which are the */
+  --white-a60h: #fff9;      /* white ramp in hex because a gradient stop list */
+  --white-a84: #ffffffd6;   /* reads better with them all in one notation */
+  --white-a18: rgb(255 255 255 / .18);
+  --white-a25: rgb(255 255 255 / .25);
+  --white-a35: rgb(255 255 255 / .35);
+  --white-a50: rgb(255 255 255 / .5);
+  --white-a58: rgb(255 255 255 / .58);
+  --white-a60: rgb(255 255 255 / .6);
+  --white-a70: rgb(255 255 255 / .7);
+  --white-a85: rgb(255 255 255 / .85);
 
-  /* ── type ──────────────────────────────────────────────────────── */
-  --serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
-  --sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --t-name:    clamp(84px, 16vw, 240px);
-  --t-row:     clamp(64px, 9.6vw, 156px);
-  --t-display: clamp(50px, 8.4vw, 104px);
-  --t-quote:   clamp(26px, 3vw, 46px);
-  --t-rowbody: clamp(24px, 2.4vw, 36px);
-  --t-chapter: clamp(24px, 2.7vw, 44px);
-  --t-title:   clamp(31px, 4vw, 52px);
-  --t-card:    clamp(23px, 2.4vw, 30px);
-  --t-kicker:  clamp(18px, 1.6vw, 24px);
-  --t-lead:    18px;
-  --t-body:    17px;
-  --t-copy:    16px;
-  --t-ui:      15.5px;
-  --t-small:   14.5px;
-  --t-fine:    13.5px;
-  --t-tiny:    12.5px;
+  /* Ink on a dark surface. The paper's own white, warmed, so the dark panels
+     and the dark navigation read as the same material as the page rather than
+     as a hole cut in it. Used wherever --c-ink is the ground. */
+  --ink-on-dark: #fff9f1;
 
-  /* ── space, radii, frame ───────────────────────────────────────── */
-  --gut:    clamp(20px, 4vw, 30px);
-  --gutter: clamp(20px, 4vw, 64px);
-  --sec:    clamp(80px, 10vw, 140px);
-  --nav-h:  72px;
-  --wrap:   1140px;
-  --r-code:  6px;
-  --r-chip:  8px;
-  --r-tile:  12px;
-  --r-btn:   14px;
-  --r-card:  22px;
-  --r-field: 24px;
-  --r-stage: clamp(20px, 2.6vw, 34px);
-  --r-pill:  999px;
+  /* ── the product demos keep their own dark surfaces ──────────────────── */
+  --plate: #e7e5e1;   /* the flat ground a capture sits on before it loads */
+  --ink-caption: #444;  /* the grey under a polaroid, on white, not on paper */
 
-  /* ── shadows, all from straight above ──────────────────────────── */
-  --shadow-btn:   0 2px 4px rgba(68,19,6,.12), 0 12px 24px -10px rgba(68,19,6,.35);
-  --shadow-card:  0 1px 2px rgba(68,19,6,.05), 0 18px 40px -28px rgba(68,19,6,.3);
+  --slate: #242a36;
+  --slate-fg: #dde0e5;
+  --tool: #1a1b1f;
+
+  /* The name's two tones are NOT here. They belong to the sky, which repaints
+     them every few hours, so they are defined once with the rest of the sky
+     tokens in site.css and must not be duplicated up here. */
+
+  /* ── type ────────────────────────────────────────────────────────────
+     The system face, nothing downloaded, so the page has type before it has
+     a network. The one exception is the wordmark above. */
+  --ui: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --face-name: 'Name', var(--ui);
+
+  /* The seven type roles, as tokens, so a component asks for a role instead of
+     re-deriving a clamp. The role CLASSES that use them live in site.css.
+     Prefix is --type-, not --t-, because --t- is already the four durations
+     below and one prefix meaning two things is how a system starts rotting. */
+  --type-display: clamp(44px, 7.5vw, 96px);
+  --type-title: clamp(34px, 4.6vw, 60px);
+  --type-section: clamp(28px, 3.6vw, 50px);
+  --type-lede: clamp(19px, 2.2vw, 28px);
+  --type-body: 17px;
+  --type-small: 13px;
+  --type-caption: 16px;
+
+  /* ── space, named by the job it does ─────────────────────────────────── */
+  --gap-hair: 4px;      /* inside a control, icon to its label */
+  --gap-tight: 8px;     /* label to value, items in one row */
+  --gap-snug: 12px;     /* buttons in a row, list rows */
+  --gap-item: 16px;     /* a card to its own caption */
+  --gap-text: 22px;     /* paragraph to paragraph */
+  --gap-group: 28px;    /* one group of things to the next */
+  --gap-block: 40px;    /* a heading to the block it introduces */
+  --gap-section: 56px;  /* section to section inside one band */
+  --gap-band: 80px;     /* band to band */
+  --gap-chapter: 120px; /* the big air above a new part of the page */
+
+  /* ── layout ──────────────────────────────────────────────────────────── */
+  --gutter: clamp(20px, 4vw, 60px);
+  --max: 1320px;
+  --tap-min: 44px;      /* the smallest a control may be, both axes */
+  --bp-sm: 767px;       /* one column below this. Media queries cannot read a
+                           custom property, so the number is repeated in the
+                           component sheets; this is the one that is canon. */
+
+  /* ── radius ──────────────────────────────────────────────────────────── */
+  --r-tile: 40px;
+  --r-card: 32px;
+  --r-note: 20px;
+  --r-media: 14px;
+  --r-control: 8px;
+  --r-pill: 999px;
+
+  /* ── shadow and grain ────────────────────────────────────────────────── */
   --shadow-block: 0 50px 40px #00000003, 0 50px 40px #00000005, 0 20px 40px #0000000d, 0 3px 10px #00000014;
-  --shadow-lift:  0 22px 48px rgba(0,0,0,.24);
-  --shadow-panel: 0 2px 10px rgba(68,19,6,.1), 0 40px 70px -34px rgba(68,19,6,.45);
-  --shadow-stage: 0 2px 10px rgba(68,19,6,.1), 0 50px 90px -40px rgba(68,19,6,.5);
-  --shadow-pill:  0 12px 12px 2px #0000001a, 0 2px 4px -1px #0000000f;
+  --shadow-card: 0 4px 12px rgb(0 0 0 / .1);
+  --shadow-lift: 0 -22px 60px rgb(3 3 2 / .07);
+  --shadow-pill: 0 12px 12px 2px #0000001a, 0 2px 4px -1px #0000000f;  /* the nav pill and Back */
+  --grain: .08;
 
-  /* ── glass ─────────────────────────────────────────────────────── */
-  --glass:      rgba(255,255,255,.2);
-  --glass-edge: rgba(255,255,255,.5);
-  --glass-hi:   rgba(255,255,255,.25);
+  /* ── motion: one spring, four durations ──────────────────────────────
+     A critically damped spring, sampled, so nothing overshoots; the bezier is
+     the fallback for a browser without linear(). Anything that moves uses one
+     of these four, and nothing invents a fifth. */
+  --spring: cubic-bezier(.2, .8, .2, 1);
+  --t-press: 120ms;   /* a press answers with the gesture */
+  --t-hover: 200ms;   /* hover, colour, small lifts */
+  --t-move: 350ms;    /* a card lifting, a fold */
+  --t-in: 500ms;      /* the one-shot entrance, the ceiling */
 
-  /* ── motion ────────────────────────────────────────────────────── */
-  --settle: cubic-bezier(0, 0, .2, 1);
-  --boing:  cubic-bezier(.34, 1.56, .64, 1);
-  --glide:  cubic-bezier(.22, .8, .2, 1);
-  --fold:   cubic-bezier(.4, 0, .2, 1);
+  /* Three more, and only because each is a decision made twice. The four above
+     are the interaction feel and they cover almost everything; these are the
+     rail's own reveal, which is a choreographed sequence rather than a response
+     to a gesture, and a stepped transform that two components share. */
+  --t-tick: 220ms;      /* a small stepped transform, the tick and the fold */
+  --t-reveal: 420ms;    /* the rail lighting a stop */
+  --t-stagger: 65ms;    /* and the gap between one stop and the next */
 }
 
-/* the same paper after dark: the Rin site's dark block */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) {
-    color-scheme: dark;
-    --cream:    #171310;
-    --cream-2:  #241e19;
-    --paper:    #1e1915;
-    --line:     #342c25;
-    --rule:     #f5ede2;
-    --ink:      #f5ede2;
-    --ink-2:    #b8ada0;
-    --ink-3:    #9a8d80;
-    --hair:     #4a4038;
-    --solid:    #f5ede2;
-    --solid-fg: #191410;
-    --mark:     rgba(126, 231, 135, .33);
-    --wordmark: rgba(245,237,226,.1);
-    --rin:      #f5ede2;
-    --vb:       #8ea4dc;
-    --mo:       #f0993f;
-    --hair-8:  color-mix(in oklab, #f5ede2 8%, transparent);
-    --hair-12: color-mix(in oklab, #f5ede2 12%, transparent);
-    --hair-20: color-mix(in oklab, #f5ede2 20%, transparent);
-    --grain-o: .05;
-    --field-edge: color-mix(in srgb, var(--periwinkle) 34%, transparent);
-    --sun-o: .5;
-    --shadow-btn:   0 2px 4px rgba(0,0,0,.4), 0 12px 24px -10px rgba(0,0,0,.7);
-    --shadow-card:  0 1px 2px rgba(0,0,0,.3), 0 18px 40px -28px rgba(0,0,0,.8);
-    --shadow-block: 0 50px 40px rgba(0,0,0,.12), 0 50px 40px rgba(0,0,0,.14), 0 20px 40px rgba(0,0,0,.3), 0 3px 10px rgba(0,0,0,.4);
-    --shadow-lift:  0 22px 48px rgba(0,0,0,.6);
-    --shadow-panel: 0 2px 10px rgba(0,0,0,.4), 0 40px 70px -34px rgba(0,0,0,.9);
-    --shadow-stage: 0 2px 10px rgba(0,0,0,.4), 0 50px 90px -40px rgba(0,0,0,.9);
-    --shadow-pill:  0 12px 12px 2px rgba(0,0,0,.4), 0 2px 4px -1px rgba(0,0,0,.3);
-    --glass:      rgba(30,25,21,.4);
-    --glass-edge: rgba(255,255,255,.14);
-    --glass-hi:   rgba(255,255,255,.06);
-  }
+@supports (animation-timing-function: linear(0, 1)) {
+  :root { --spring: linear(0, .078, .235, .401, .549, .669, .762, .831, .882, .918, .944, .962, .974, .982, .988, .992, .995, .997, .998, .999, 1); }
 }
-:root[data-theme='dark'] {
-  color-scheme: dark;
-  --cream:    #171310;
-  --cream-2:  #241e19;
-  --paper:    #1e1915;
-  --line:     #342c25;
-  --rule:     #f5ede2;
-  --ink:      #f5ede2;
-  --ink-2:    #b8ada0;
-  --ink-3:    #9a8d80;
-  --hair:     #4a4038;
-  --solid:    #f5ede2;
-  --solid-fg: #191410;
-  --mark:     rgba(126, 231, 135, .33);
-  --wordmark: rgba(245,237,226,.1);
-  --rin:      #f5ede2;
-  --vb:       #8ea4dc;
-  --mo:       #f0993f;
-  --hair-8:  color-mix(in oklab, #f5ede2 8%, transparent);
-  --hair-12: color-mix(in oklab, #f5ede2 12%, transparent);
-  --hair-20: color-mix(in oklab, #f5ede2 20%, transparent);
-  --grain-o: .05;
-  --field-edge: color-mix(in srgb, var(--periwinkle) 34%, transparent);
-  --sun-o: .5;
-  --shadow-btn:   0 2px 4px rgba(0,0,0,.4), 0 12px 24px -10px rgba(0,0,0,.7);
-  --shadow-card:  0 1px 2px rgba(0,0,0,.3), 0 18px 40px -28px rgba(0,0,0,.8);
-  --shadow-block: 0 50px 40px rgba(0,0,0,.12), 0 50px 40px rgba(0,0,0,.14), 0 20px 40px rgba(0,0,0,.3), 0 3px 10px rgba(0,0,0,.4);
-  --shadow-lift:  0 22px 48px rgba(0,0,0,.6);
-  --shadow-panel: 0 2px 10px rgba(0,0,0,.4), 0 40px 70px -34px rgba(0,0,0,.9);
-  --shadow-stage: 0 2px 10px rgba(0,0,0,.4), 0 50px 90px -40px rgba(0,0,0,.9);
-  --shadow-pill:  0 12px 12px 2px rgba(0,0,0,.4), 0 2px 4px -1px rgba(0,0,0,.3);
-  --glass:      rgba(30,25,21,.4);
-  --glass-edge: rgba(255,255,255,.14);
-  --glass-hi:   rgba(255,255,255,.06);
-}
-
-/* a product picture exists in both appearances; the page shows one */
-.pic-dark { display: none; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .pic-light { display: none; }
-  :root:not([data-theme='light']) .pic-dark { display: block; }
-}
-:root[data-theme='dark'] .pic-light { display: none; }
-:root[data-theme='dark'] .pic-dark { display: block; }

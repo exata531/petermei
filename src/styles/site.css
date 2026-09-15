@@ -36,66 +36,16 @@ html.is-going .page { opacity: .68; transition: opacity 140ms linear 60ms; }
 .skip { position: absolute; left: 12px; top: -60px; z-index: 200; padding: 8px 12px; border-radius: 8px; background: var(--ink); color: var(--paper); }
 .skip:focus { top: 12px; }
 
-:root {
-  color-scheme: light only;
-  /* paper and ink */
-  --paper: #fcf9f7;
-  --surface: var(--paper);
-  --ink: #030302;
-  --ink-2: #5d5955;
-  --muted: var(--ink-2);
-  --hair: rgb(3 3 2 / .12);
-  --hair-2: rgb(3 3 2 / .2);
-  --focus: var(--ink);
-  --accent-soft: color-mix(in oklab, var(--c-sky) 45%, var(--paper));
-  /* the five pastels: the site's one blue is the Mac's wallpaper weather */
-  --c-sky: #8fbfe8;
-  --c-sky-2: #c6dff4;
-  --c-peri: #b8caf5;
-  --c-lemon: #fde99b;
-  --c-apri: #f6cb98;
-  --c-green: #9bd8a9;
-  --c-paper: var(--paper);
-  --c-ink: #1c1917;
-  --tint-peter: color-mix(in oklab, var(--c-lemon) 70%, var(--paper));
-  /* the four meaning colours, tuned for paper */
-  --a-blue: #427e8a;
-  --a-green: #3f8850;
-  --a-yellow: #987e1b;
-  --a-red: #bb433a;
-  --blue: var(--a-blue); --green: var(--a-green); --amber: var(--a-yellow); --red: var(--a-red);
-  --sand: color-mix(in oklab, var(--c-apri) 35%, var(--paper));
-  /* the product demos keep their own dark surfaces */
-  --slate: #242a36; --slate-fg: #dde0e5; --tool: #1a1b1f;
-  --grain: .08;
-  --shadow-block: 0 50px 40px #00000003, 0 50px 40px #00000005, 0 20px 40px #0000000d, 0 3px 10px #00000014;
-  --shadow-card: 0 4px 12px rgb(0 0 0 / .1);
-  --r-tile: 40px; --r-card: 32px; --r-note: 20px; --r-media: 14px;
-  --gutter: clamp(20px, 4vw, 60px);
-  --max: 1320px;
-  --pastel-a: 45%;
-  /* type: the system face, nothing downloaded */
-  --ui: -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  /* motion: the one spring. A critically damped spring, sampled, so nothing
-     overshoots; the bezier is the fallback for a browser without linear(). */
-  --spring: cubic-bezier(.2, .8, .2, 1);
-  --t-press: 120ms;   /* a press answers with the gesture */
-  --t-hover: 200ms;   /* hover, colour, small lifts */
-  --t-move: 350ms;    /* a card lifting, a fold */
-  --t-in: 500ms;      /* the one-shot entrance, the ceiling */
-}
-@supports (animation-timing-function: linear(0, 1)) {
-  :root { --spring: linear(0, .078, .235, .401, .549, .669, .762, .831, .882, .918, .944, .962, .974, .982, .988, .992, .995, .997, .998, .999, 1); }
-}
+/* the tokens, the whole design system, are in tokens.css, which the layout
+   loads first. Nothing below may invent a value that belongs there. */
 
 /* ── type roles ─────────────────────────────────────────────────────── */
-.h-display { font-size: clamp(44px, 7.5vw, 96px); font-weight: 700; letter-spacing: -.035em; line-height: 1; }
-.h-title { font-size: clamp(34px, 4.6vw, 60px); font-weight: 700; letter-spacing: -.03em; line-height: 1.06; }
-.h-section { font-size: clamp(28px, 3.6vw, 50px); font-weight: 600; letter-spacing: -.025em; line-height: 1.13; }
-.lede { font-size: clamp(19px, 2.2vw, 28px); font-weight: 500; letter-spacing: -.02em; line-height: 1.36; }
-.body { font-size: 17px; line-height: 1.65; max-width: 62ch; }
-.small { font-size: 13px; font-weight: 500; letter-spacing: .02em; color: var(--muted); }
+.h-display { font-size: var(--type-display); font-weight: 700; letter-spacing: -.035em; line-height: 1; }
+.h-title { font-size: var(--type-title); font-weight: 700; letter-spacing: -.03em; line-height: 1.06; }
+.h-section { font-size: var(--type-section); font-weight: 600; letter-spacing: -.025em; line-height: 1.13; }
+.lede { font-size: var(--type-lede); font-weight: 500; letter-spacing: -.02em; line-height: 1.36; }
+.body { font-size: var(--type-body); line-height: 1.65; max-width: 62ch; }
+.small { font-size: var(--type-small); font-weight: 500; letter-spacing: .02em; color: var(--muted); }
 
 /* ── the press recipe, one for every control ────────────────────────── */
 .pill-face, .pill-link, .nav-back, .btn, .pile-reset, .foot-links a, .tile-art, .tick, .heat, .rail a {
@@ -126,7 +76,7 @@ html.is-going .page { opacity: .68; transition: opacity 140ms linear 60ms; }
 .pill-shade { position: absolute; inset: 0; pointer-events: none; }
 .pill-shade::before, .pill-shade::after {
   content: ''; position: absolute; inset: 0; border-radius: 9999px;
-  box-shadow: 0 12px 12px 2px #0000001a, 0 2px 4px -1px #0000000f;
+  box-shadow: var(--shadow-pill);
   transition: opacity var(--t-move) var(--spring);
 }
 .pill-shade::after { width: 56px; opacity: 0; }
@@ -135,9 +85,9 @@ html.is-going .page { opacity: .68; transition: opacity 140ms linear 60ms; }
   display: flex; align-items: center; gap: 4px;
   height: 56px; max-width: 660px; padding: 0 8px 0 5px; /* 1 + 5 + 44 + 5 + 1: the face sits dead centre of the folded disc (WEB-013) */
   border-radius: 9999px;
-  background: rgb(255 255 255 / .35);
-  border: 1px solid rgb(255 255 255 / .5);
-  box-shadow: inset 0 4px 6px rgb(255 255 255 / .25);
+  background: var(--white-a35);
+  border: 1px solid var(--white-a50);
+  box-shadow: inset 0 4px 6px var(--white-a25);
   --bf: blur(12px) saturate(160%);
   backdrop-filter: var(--bf);
   color: var(--ink);
@@ -146,7 +96,7 @@ html.is-going .page { opacity: .68; transition: opacity 140ms linear 60ms; }
 }
 .pill::before {
   content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: .4;
-  background: linear-gradient(180deg, #fff9 0%, #ffffff96 25%, #fff9 50%, #ffffffd6 75%);
+  background: linear-gradient(180deg, var(--white-a60h) 0%, var(--white-a56) 25%, var(--white-a60h) 50%, var(--white-a84) 75%);
 }
 .pill > * { position: relative; }
 .pill-face {
@@ -170,7 +120,7 @@ html.is-going .page { opacity: .68; transition: opacity 140ms linear 60ms; }
   display: inline-flex; align-items: center; height: 44px; padding: 0 14px; border-radius: 99px;
   font-size: 16px; font-weight: 500; white-space: nowrap;
 }
-.pill-link:hover { background: rgb(3 3 2 / .08); }
+.pill-link:hover { background: var(--ink-a08); }
 /* the black bubble is one element that travels, so the words never carry a
    background of their own */
 .pill-link[aria-current='page'] { background: var(--ink); color: var(--paper); border-radius: 99px; }
@@ -200,12 +150,12 @@ html.is-going .page { opacity: .68; transition: opacity 140ms linear 60ms; }
 .nav-back {
   display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 16px; margin-top: 6px;
   border-radius: 999px; font-size: 14px; font-weight: 500;
-  background: rgb(255 255 255 / .35); border: 1px solid rgb(255 255 255 / .5);
+  background: var(--white-a35); border: 1px solid var(--white-a50);
   --bf: blur(12px);
   backdrop-filter: var(--bf);
   box-shadow: 0 2px 4px -1px #0000000f;
 }
-.nav-back:hover { background: rgb(255 255 255 / .6); }
+.nav-back:hover { background: var(--white-a60); }
 .nav-back svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform var(--t-hover) var(--spring); }
 .nav-back:hover svg { transform: translateX(-3px); }
 /* inside the Macintosh's browser window the whole menu goes. That window
@@ -213,16 +163,16 @@ html.is-going .page { opacity: .68; transition: opacity 140ms linear 60ms; }
    floating over it is a second menu for the same job (Peter, 09-14) */
 html.framed .nav { display: none; }
 /* over a dark section the bar's ink goes to paper */
-.nav[data-tone='dark'] .pill, .nav[data-tone='dark'] .nav-back { color: #fff9f1; border-color: rgb(255 255 255 / .18); background: rgb(3 3 2 / .35); }
+.nav[data-tone='dark'] .pill, .nav[data-tone='dark'] .nav-back { color: var(--ink-on-dark); border-color: var(--white-a18); background: var(--ink-a35); }
 .nav[data-tone='dark'] .pill-link:hover, .nav[data-tone='dark'] .nav-back:hover { background: rgb(255 249 241 / .14); }
-.nav[data-tone='dark'] .pill-link[aria-current='page'] { background: #fff9f1; color: var(--ink); }
+.nav[data-tone='dark'] .pill-link[aria-current='page'] { background: var(--ink-on-dark); color: var(--ink); }
 .nav[data-tone='dark'] .pill-links.has-dot .pill-link[aria-current='page'] { background: none; }
-.nav[data-tone='dark'] .pill-dot { background: #fff9f1; }
+.nav[data-tone='dark'] .pill-dot { background: var(--ink-on-dark); }
 /* the face keeps its ink: its own lemon disc never changes with the section,
    so letting it follow the bar to paper drew it white on yellow (Peter, 09-14) */
 .nav[data-tone='dark'] .pill-face { color: var(--ink); }
 .nav[data-tone='dark'] .pill::before { opacity: .06; }
-.nav[data-tone='dark'] :focus-visible { outline-color: #fff9f1; }
+.nav[data-tone='dark'] :focus-visible { outline-color: var(--ink-on-dark); }
 
 /* ── the page and its sections ──────────────────────────────────────── */
 .page { position: relative; }
@@ -244,16 +194,15 @@ html.framed .nav { display: none; }
 .hero-name { color: var(--ink); }
 /* the name alone: centred in the hero, set big and tight, the sun tucked in
    behind its right half and the clouds drifting past at their own speeds */
-/* the name: Bricolage Grotesque Bold at its 96pt optical size (OFL, licence in
-   public/fonts/BRICOLAGE-OFL.txt), subset to the nine letters of the name. It is
-   the one shortlisted face actually drawn for a wordmark this big, and its
-   slightly irregular forms are the honest bridge to a hand-drawn page. Flat ink:
-   the pastel gradient and the white glass edge measured 1.5 to 2.3 against the
-   paper, where the sites worth copying run 14 and up. This reads 19.7. */
-@font-face { font-family: 'Name'; src: url('/fonts/name.woff2') format('woff2'); font-weight: 700; font-display: block; }
+/* the name: Sniglet ExtraBold (OFL, licence in public/fonts/SNIGLET-OFL.txt),
+   subset to the nine letters of the name. Peter asked for a bubble face (09-15)
+   and this is the one that is actually inflated rather than merely rounded: the
+   counters are small, the strokes meet with no corner anywhere, and at wordmark
+   size it reads as drawn rather than set. Flat ink, same as before: no gradient,
+   no glass edge, nothing that measured 1.5 to 2.3 against the paper. */
 .hero-only {
-  font-family: 'Name', ui-sans-serif, system-ui, sans-serif; font-weight: 700;
-  font-size: clamp(72px, 17vw, 280px); letter-spacing: -.035em; line-height: .9;
+  font-family: var(--face-name); font-weight: 700;
+  font-size: clamp(80px, 15vw, 250px); letter-spacing: .012em; line-height: .9;
   color: var(--ink); text-align: center; text-wrap: balance; margin: 0 auto;
   position: relative; z-index: 1;
 }
@@ -270,7 +219,7 @@ html.framed .nav { display: none; }
    the thing the name stands on */
 /* the sun tucks in behind the name's top right corner */
 .hero:has(.hero-only) .sun { left: auto; right: calc(50% - min(46vw, 620px)); top: 50%; bottom: auto; width: min(30vw, 300px); translate: -16% -118%; z-index: 0; }
-@media (max-width: 767px) { .hero-only { letter-spacing: -.025em; } }
+@media (max-width: 767px) { .hero-only { letter-spacing: .02em; } }
 .hero:has(.hero-only) { display: grid; place-items: center; }
 .hero:has(.hero-only) .hero-in { transform-origin: 50% 50%; z-index: 1; }
 .hero-line { margin-top: 22px; max-width: 30ch; color: var(--ink); }
@@ -285,21 +234,31 @@ html.framed .nav { display: none; }
    owns the other half of the same transform */
 @property --drift { syntax: '<length>'; inherits: false; initial-value: 0px; }
 @property --bob { syntax: '<length>'; inherits: false; initial-value: 0px; }
+@property --fly { syntax: '<length>'; inherits: false; initial-value: 0px; }
 @keyframes drift { from { --drift: -16px; } to { --drift: 20px; } }
 @keyframes bob { from { --bob: -7px; } to { --bob: 7px; } }
+/* the cloud's own breath, amplitude per cloud so the small high ones move less
+   than the big low ones */
+@keyframes puff { from { --bob: calc(var(--bamp, 6px) * -1); } to { --bob: var(--bamp, 6px); } }
 .cloud { position: absolute; background: var(--c-sky-2); opacity: .9; border-radius: 999px; pointer-events: none;
   /* each cloud drifts up as the page scrolls, at its own share of the scroll (--cf),
      transform only, so the hero reads as a sky moving past the name */
-  transform: translate(var(--drift), calc(var(--sy, 0) * var(--cf, .2) * -1px)); will-change: transform;
+  transform: translate(var(--drift), calc(var(--sy, 0) * var(--cf, .2) * -1px + var(--bob))); will-change: transform;
   /* the period and the starting phase are per cloud, so no two are ever at the
      same point of the same swing (WEB-087) */
-  animation: drift var(--dur, 52s) ease-in-out infinite var(--dir, alternate);
-  animation-delay: var(--phase, 0s); }
-.cloud-b { --dur: 71s; --dir: alternate-reverse; --phase: -9s; }
-.cloud-c { --dur: 44s; --dir: alternate-reverse; --phase: -26s; }
-.cloud-d { --dur: 63s; --phase: -41s; }
-.cloud-e { --dur: 38s; --dir: alternate-reverse; --phase: -14s; }
-.cloud-f { --dur: 57s; --phase: -33s; }
+  /* two clocks on one cloud (Peter, 09-15): the long sideways drift it always
+     had, and a short bob underneath it, so a page nobody is scrolling is still
+     a sky that moves. The two periods share no factor, so the pair of them
+     never comes back around to the same pose while anyone is watching. */
+  animation: drift var(--dur, 52s) ease-in-out infinite var(--dir, alternate),
+             puff var(--bdur, 13s) ease-in-out infinite alternate;
+  animation-delay: var(--phase, 0s), var(--bphase, 0s); }
+.cloud-a { --bdur: 12s; --bphase: -2s; }
+.cloud-b { --dur: 71s; --dir: alternate-reverse; --phase: -9s; --bdur: 15s; --bphase: -7s; --bamp: 5px; }
+.cloud-c { --dur: 44s; --dir: alternate-reverse; --phase: -26s; --bdur: 10s; --bphase: -4s; }
+.cloud-d { --dur: 63s; --phase: -41s; --bdur: 17s; --bphase: -11s; --bamp: 3.5px; }
+.cloud-e { --dur: 38s; --dir: alternate-reverse; --phase: -14s; --bdur: 9s; --bphase: -6s; --bamp: 3px; }
+.cloud-f { --dur: 57s; --phase: -33s; --bdur: 14s; --bphase: -9s; --bamp: 4.5px; }
 .cloud::before, .cloud::after { content: ''; position: absolute; border-radius: 50%; background: inherit; }
 .cloud::before { left: 10%; bottom: 22%; width: 50%; aspect-ratio: 1; }
 .cloud::after { left: 50%; bottom: 12%; width: 36%; aspect-ratio: 1; }
@@ -309,25 +268,171 @@ html.framed .nav { display: none; }
 .cloud-d { left: 8%; top: 16%; width: 11%; height: 2.6%; opacity: .5; }
 .cloud-e { right: 24%; top: 12%; width: 9%; height: 2.2%; opacity: .55; }
 .cloud-f { left: 58%; bottom: 4%; width: 16%; height: 3.6%; opacity: .7; }
-/* the birds cross right to left as the page scrolls, each at its own share
-   (--bf); the two wing shapes swap on the hero's data-wing, set from scroll */
+/* the birds fly on their own clock, and the scroll only pushes them along:
+   each one crosses right to left on its own long loop (--fly), rides its share
+   of the scroll on top of that (--bf), and beats its wings in bursts of four
+   with a glide after, which is what a bird actually does. Until 09-15 the wings
+   turned over on scroll alone, so a page sitting still held two frozen birds. */
 .bird { position: absolute; width: 44px; height: 22px; fill: var(--ink); pointer-events: none; opacity: .85;
-  transform: translateX(calc(var(--sy, 0) * var(--bf, .8) * -1px)) translateY(calc(var(--sy, 0) * -.08px + var(--bob))); will-change: transform;
-  animation: bob var(--dur, 6.5s) ease-in-out infinite var(--dir, alternate);
-  animation-delay: var(--phase, 0s); }
-.bird-b { --dur: 5.2s; --dir: alternate-reverse; --phase: -2.4s; }
-.bird-a { right: 16%; top: 22%; }
-.bird-b { right: 9%; top: 27%; width: 28px; height: 14px; opacity: .6; }
-.bird .w1, .hero[data-wing='1'] .bird .w0 { display: none; }
-.hero[data-wing='1'] .bird .w1 { display: block; }
+  transform: translateX(calc(var(--sy, 0) * var(--bf, .8) * -1px + var(--fly))) translateY(calc(var(--sy, 0) * -.08px + var(--bob))); will-change: transform;
+  animation: bob var(--dur, 6.5s) ease-in-out infinite var(--dir, alternate),
+             fly var(--fdur, 46s) linear infinite;
+  animation-delay: var(--phase, 0s), var(--fphase, 0s); }
+/* the crossing takes about three quarters of the loop; the rest is the pause
+   after it has gone, so the sky is not a conveyor belt of birds */
+@keyframes fly { 0% { --fly: 0px; } 74%, 100% { --fly: -126vw; } }
+.bird-a { right: -7%; top: 21%; --fdur: 46s; --fphase: -15s; --flap: 2.8s; }
+.bird-b { right: -5%; top: 29%; width: 28px; height: 14px; opacity: .6;
+  --dur: 5.2s; --dir: alternate-reverse; --phase: -2.4s; --fdur: 59s; --fphase: -37s; --flap: 2.35s; }
+/* the two wing drawings take turns: the spread one on the downbeat, the flat
+   one on the upbeat and through the glide. Whole frames, nothing tweened, the
+   same way every other drawing on this site moves. */
+.bird .w0 { animation: wing-down var(--flap, 2.8s) linear infinite; }
+.bird .w1 { opacity: 0; animation: wing-up var(--flap, 2.8s) linear infinite; }
+@keyframes wing-down {
+  0%, 6.4% { opacity: 1; } 6.5%, 12.8% { opacity: 0; }
+  12.9%, 19.2% { opacity: 1; } 19.3%, 25.6% { opacity: 0; }
+  25.7%, 32% { opacity: 1; } 32.1%, 38.4% { opacity: 0; }
+  38.5%, 44.8% { opacity: 1; } 44.9%, 100% { opacity: 0; } }
+@keyframes wing-up {
+  0%, 6.4% { opacity: 0; } 6.5%, 12.8% { opacity: 1; }
+  12.9%, 19.2% { opacity: 0; } 19.3%, 25.6% { opacity: 1; }
+  25.7%, 32% { opacity: 0; } 32.1%, 38.4% { opacity: 1; }
+  38.5%, 44.8% { opacity: 0; } 44.9%, 100% { opacity: 1; } }
+
+/* ── the rest of the traffic ─────────────────────────────────────────────
+   The rocket crosses the hero on a long loop, the same flat ink as the birds,
+   kept out of the middle band where the name sits. It runs on its own clock
+   and not on the scroll, so the page moves while it is being read AND while
+   it is being ignored (Peter, 09-15). It is never on screen for more than a
+   tenth of its loop: the empty sky either side of it is what keeps it worth
+   looking at. A plane crossed up here too, drawn three ways, and none of them
+   earned its place (Peter, 09-15). */
+
+/* the rocket: it climbs out of the low left corner about once a minute,
+   leans over as it goes, and is small and gone before it reaches the name.
+   Seven seconds of it in seventy-four, which is the whole point of it. */
+.rocket { position: absolute; left: 9%; bottom: 4%; width: 28px; pointer-events: none; opacity: 0;
+  transform: translate(0, 34vh) rotate(4deg); will-change: transform;
+  animation: launch 74s linear -16s infinite; }
+.rocket svg { display: block; width: 100%; height: auto; fill: var(--ink); opacity: .6; }
+.hero .port { fill: var(--cloud-c, #dceaf7); }
+/* the smoke it leaves, in puffs that thin out downward */
+.rocket .smoke { position: absolute; left: 50%; top: 76%; width: 7px; height: 150px; margin: 0 0 0 -3.5px; border-radius: 4px;
+  background: repeating-linear-gradient(180deg, var(--ink) 0 5px, transparent 5px 15px);
+  -webkit-mask-image: linear-gradient(180deg, #000, transparent);
+  mask-image: linear-gradient(180deg, #000, transparent);
+  opacity: .13; }
+@keyframes launch {
+  0% { opacity: 0; transform: translate(0, 34vh) rotate(3deg) scale(1); animation-timing-function: linear; }
+  1.4% { opacity: .95; transform: translate(.5vw, 25vh) rotate(5deg) scale(.97); animation-timing-function: cubic-bezier(.4, 0, .72, .38); }
+  8.6% { opacity: .95; transform: translate(11vw, -64vh) rotate(23deg) scale(.5); animation-timing-function: linear; }
+  9.4% { opacity: 0; transform: translate(12.4vw, -74vh) rotate(25deg) scale(.46); }
+  9.5%, 100% { opacity: 0; transform: translate(0, 34vh) rotate(3deg) scale(1); }
+}
+
+/* after dark the birds are gone and the sky is only stars, so it gets one
+   thing of its own: a streak that lasts a second, every forty-odd */
+.shoot { position: absolute; left: 9%; top: 11%; width: 78px; height: 2px; border-radius: 2px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--star)); opacity: 0;
+  transform: translate(0, 0) rotate(34deg) scaleX(.25); transform-origin: 100% 50%; }
+:root[data-sky='night'] .shoot { animation: shoot 43s linear -9s infinite; }
+@keyframes shoot {
+  0% { opacity: 0; transform: translate(0, 0) rotate(34deg) scaleX(.25); }
+  .5% { opacity: .9; }
+  2.2% { opacity: 0; transform: translate(26vw, 17vw) rotate(34deg) scaleX(1); }
+  2.3%, 100% { opacity: 0; transform: translate(0, 0) rotate(34deg) scaleX(.25); }
+}
+
+/* ── the hour's own company ──────────────────────────────────────────────
+   The sky was the same sky all day, only lit differently, which read as one
+   drawing with a filter on it (Peter, 09-15). Each band keeps a guest of its
+   own now, and the guests differ in HOW they move, not only in what they are:
+   the balloon drifts and never hurries, the kite goes nowhere at all and just
+   leans on its string, the flock flies one straight line with the beat
+   rippling back from the leader, the bats cannot hold a line for a second,
+   and the satellite is the slowest thing up there. One guest at a time, ever,
+   and each is the same flat ink as the birds. */
+@property --tilt { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+.balloon, .kite, .flock, .bat, .sat { position: absolute; pointer-events: none; display: none; fill: var(--ink); will-change: transform; }
+.balloon svg, .kite svg { display: block; width: 100%; height: auto; }
+/* the clock picks exactly one. No data-sky at all means the script never ran,
+   and the sky is painted as day, so the kite is the one that answers for it. */
+:root[data-sky='dawn'] .balloon,
+:root:not([data-sky]) .kite, :root[data-sky='day'] .kite,
+:root[data-sky='golden'] .flock,
+:root[data-sky='dusk'] .bat,
+:root[data-sky='night'] .sat { display: block; }
+/* the two that cross left to right, the only ones that do */
+@keyframes sail { 0% { --fly: -16vw; } 84%, 100% { --fly: 120vw; } }
+
+/* dawn: a balloon, because dawn is when the air is still enough to fly one */
+.balloon { left: 0; bottom: 21%; width: 64px; opacity: .8;
+  transform: translate(calc(var(--sy, 0) * -.12px + var(--fly)), var(--bob));
+  animation: sail 150s linear -24s infinite, puff 13s ease-in-out infinite alternate; }
+
+/* day: a kite, which is the one guest that never crosses anything. It hangs
+   off a line running out of the bottom of the sky and leans, and the whole
+   thing swings from where the line is held rather than from itself. */
+.kite { left: 5%; bottom: -6%; width: 46px; height: 52%; transform-origin: 50% 100%; opacity: .82;
+  transform: translateY(calc(var(--sy, 0) * -.18px)) rotate(var(--tilt));
+  animation: swing 11s ease-in-out -3s infinite alternate; }
+.kite svg { position: absolute; top: 0; left: 0; }
+.kite .line { position: absolute; left: 50%; top: 14%; bottom: 0; width: 1px; margin-left: -.5px; background: var(--ink); opacity: .18; }
+/* a kite on a line leans away from whoever is holding it, so the whole
+   thing sits over at an angle and sways around that, rather than hanging
+   straight down like a plumb line (Peter, 09-15) */
+@keyframes swing { from { --tilt: 12deg; } to { --tilt: 24deg; } }
+
+/* golden: the September flock, heading somewhere, beat rippling back from the
+   leader the way it does on a real one */
+.flock { right: -14%; top: 9%; width: 170px; opacity: .8;
+  transform: translate(calc(var(--sy, 0) * var(--bf, .5) * -1px + var(--fly)), var(--bob));
+  animation: fly 46s linear -9s infinite, bob 7s ease-in-out infinite alternate; }
+.flock g g { transform-box: fill-box; transform-origin: 50% 50%; animation: beat 1.05s ease-in-out infinite alternate; }
+.flock .g1, .flock .g3 { animation-delay: -.14s; }
+.flock .g2, .flock .g4 { animation-delay: -.28s; }
+@keyframes beat { from { transform: scaleY(1); } to { transform: scaleY(.6); } }
+
+/* dusk: bats. The whole point of them is the path, which is the only one up
+   here that does not go straight. */
+.bat { right: -8%; width: 34px; opacity: .78;
+  transform: translate(calc(var(--sy, 0) * var(--bf, .7) * -1px + var(--fly)), var(--bob));
+  animation: fly var(--fdur, 26s) linear var(--fphase, 0s) infinite,
+             flit var(--jit, 2.2s) cubic-bezier(.35, 0, .5, 1) infinite alternate; }
+.bat .wings { transform-box: fill-box; transform-origin: 50% 40%; animation: flutter .26s ease-in-out infinite alternate; }
+.bat-a { top: 23%; --fdur: 24s; --fphase: -6s; --jit: 1.9s; --bf: .8; }
+.bat-b { top: 32%; width: 24px; --fdur: 31s; --fphase: -17s; --jit: 2.6s; --bf: .6; }
+@keyframes flit {
+  0% { --bob: 0px; } 14% { --bob: -17px; } 26% { --bob: -3px; }
+  41% { --bob: -27px; } 55% { --bob: -8px; } 68% { --bob: -21px; }
+  83% { --bob: 3px; } 100% { --bob: -13px; } }
+@keyframes flutter { from { transform: scaleY(1); } to { transform: scaleY(.3); } }
+
+/* on a phone the sky is a tall thin strip, so the guests come in off the edges
+   and the kite has to fly higher to stay out of the name */
+@media (max-width: 767px) {
+  /* on a phone the name fills the width, so the kite flies in the open sky
+     under it rather than behind it */
+  .kite { left: 7%; width: 38px; height: 42%; }
+  .flock { width: 132px; top: 7%; }
+  .balloon { width: 52px; }
+  .sat { width: 40px; }
+}
+
+/* night: something with people asleep inside it, crossing at the pace those
+   actually cross at */
+.sat { left: 0; top: 13%; width: 48px; opacity: .62;
+  transform: translate(calc(var(--sy, 0) * -.2px + var(--fly)), calc(var(--sy, 0) * -.05px));
+  animation: sail 96s linear -20s infinite; }
 
 /* the sections after the hero are cards laid on the sky, not a hard line:
    rounded shoulders, a soft lift, and the first one is glass over the clouds */
-.sheet, .rail-sec, .heat-sec, .foot { border-radius: 40px 40px 0 0; box-shadow: 0 -22px 60px rgb(3 3 2 / .07); }
+.sheet, .rail-sec, .heat-sec, .foot { border-radius: var(--r-tile) var(--r-tile) 0 0; box-shadow: var(--shadow-lift); }
 .rail-sec, .heat-sec, .foot { margin-top: -40px; }
 .rail-sec { padding-top: 160px; }
 .heat-sec { padding-top: 136px; }
-.foot .foot-in { padding-top: 168px; }
+.foot .foot-in { padding-top: 84px; }
 
 @media (min-height: 760px) { .hero, .about-hero { position: sticky; } }
 /* the second half of the hero: two paragraphs where three stat cards were,
@@ -343,7 +448,7 @@ html.framed .nav { display: none; }
 .hero-note a:hover, .stop-t a:hover, .meta a:hover { text-decoration-color: currentColor; color: var(--blue); }
 
 /* the paper section that slides up over the hero */
-.sheet { position: relative; z-index: 10; background: none; padding: 96px 0 140px; border-top: 1px solid rgb(255 255 255 / .7); --glass: 320px; }
+.sheet { position: relative; z-index: 10; background: none; padding: 96px 0 140px; border-top: 1px solid var(--white-a70); --glass: 320px; }
 /* glass over the sky: the clouds and the birds show through the first card as
    it slides up. Only the leading edge is glass; below it the paper is solid,
    and the band fades into it so there is no seam (WEB-061). */
@@ -378,10 +483,10 @@ html.framed .nav { display: none; }
      edge, and Kyou's screen is near white, so without a line its bottom
      dissolved into the page and the phone read as having a hole in it
      (Peter, 09-14) */
-  box-shadow: inset 0 0 0 1px rgb(3 3 2 / .09);
+  box-shadow: inset 0 0 0 1px var(--ink-a09);
 }
 /* hover deepens the field and draws a hairline, both by opacity alone */
-.tile-art::before { content: ''; position: absolute; inset: 0; z-index: 1; border-radius: inherit; pointer-events: none; opacity: 0; background: color-mix(in oklab, var(--tile-tint, var(--c-sky)) 32%, transparent); box-shadow: inset 0 0 0 1px rgb(3 3 2 / .18); transition: opacity var(--t-hover) var(--spring); }
+.tile-art::before { content: ''; position: absolute; inset: 0; z-index: 1; border-radius: inherit; pointer-events: none; opacity: 0; background: color-mix(in oklab, var(--tile-tint, var(--c-sky)) 32%, transparent); box-shadow: inset 0 0 0 1px var(--ink-a18); transition: opacity var(--t-hover) var(--spring); }
 .tile-art::after { content: ''; position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none; opacity: var(--grain); mix-blend-mode: overlay; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 .tile:hover .tile-art { transform: translateY(-4px) scale(1.01); }
 .tile:hover .tile-art::before, .tile:focus-visible .tile-art::before { opacity: 1; }
@@ -389,22 +494,26 @@ html.framed .nav { display: none; }
 /* the product's own icon, top left, the way an app wears it */
 /* the hairline is what keeps a near-white mark from reading as a hole in the
    field beside three saturated ones (WEB-064) */
-.tile-ico { position: absolute; left: 24px; top: 24px; width: 56px; height: 56px; border-radius: 22%; overflow: hidden; box-shadow: 0 2px 6px rgb(3 3 2 / .14), inset 0 0 0 1px rgb(3 3 2 / .1); }
+.tile-ico { position: absolute; left: 24px; top: 24px; width: 56px; height: 56px; border-radius: 22%; overflow: hidden; box-shadow: 0 2px 6px var(--ink-a14), inset 0 0 0 1px var(--ink-a10); }
 .tile-ico img, .tile-ico svg { width: 100%; height: 100%; }
 .tile-ico.is-bare { width: 62px; height: 62px; margin: -3px; border-radius: 0; overflow: visible; box-shadow: none; }
-.tile-ico.is-bare img { filter: drop-shadow(0 2px 6px rgb(3 3 2 / .14)); }
+.tile-ico.is-bare img { filter: drop-shadow(0 2px 6px var(--ink-a14)); }
 /* the real capture, cropped to the device so no staging ground shows: the
    numbers come from measuring each file, and live on the tile as variables */
 .tile-shot {
   position: absolute; left: 50%; bottom: var(--b); translate: -50% 0; z-index: 0;
   width: var(--w); max-width: var(--mw, none); aspect-ratio: var(--ar);
-  border-radius: var(--rad); overflow: hidden; background: #e7e5e1; box-shadow: var(--shadow-block);
+  border-radius: var(--rad); overflow: hidden; background: var(--plate); box-shadow: var(--shadow-block);
 }
 .tile-shot img { position: absolute; left: var(--sx); top: var(--sy); width: var(--sw); max-width: none; height: auto; }
 /* the name and the two sentences sit under the picture, always */
-.tile-say { margin-top: 18px; max-width: 52ch; }
+/* the caption block. It is a <span> inside the anchor, so it needs display
+   block for its own top margin to exist at all: the 18px written here before
+   never applied, and the only air under the card was the heading's leading
+   (Peter, 09-15, the captions sitting on the cards). */
+.tile-say { display: block; margin-top: 16px; max-width: 52ch; }
 .tile-say h3 { font-size: clamp(22px, 2.2vw, 30px); font-weight: 700; letter-spacing: -.03em; line-height: 1.1; }
-.tile-say p { margin-top: 8px; font-size: 16px; line-height: 1.45; color: var(--muted); transition: color var(--t-hover) var(--spring); }
+.tile-say p { margin-top: 10px; font-size: 16px; line-height: 1.45; color: var(--muted); transition: color var(--t-hover) var(--spring); }
 .tile:hover .tile-say p { color: var(--ink); }
 
 /* the rail: what he built, newest at the top */
@@ -433,7 +542,7 @@ html.framed .nav { display: none; }
 .btn:hover { transform: translateY(-1px); background: #2a2826; }
 .btn:active { transform: scale(.97); }
 .btn.is-quiet { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--hair-2); }
-.btn.is-quiet:hover { background: rgb(3 3 2 / .06); }
+.btn.is-quiet:hover { background: var(--ink-a06); }
 .btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 
 /* ── a project page: a deck of panels that stack ────────────────────── */
@@ -449,12 +558,12 @@ html.framed .nav { display: none; }
   /* only the lift. The sideways shadow is from when these ran edge to edge
      and fell off the screen; on a card it draws a grey band down the left
      (Peter, 09-14) */
-  box-shadow: 0 -22px 60px rgb(3 3 2 / .22);
+  box-shadow: 0 -22px 60px var(--ink-a22);
 }
 .panel.is-tint { background: color-mix(in oklab, var(--p-tint) var(--pastel-a), var(--paper)); }
-.panel.is-dark { background: var(--c-ink); color: #fff9f1; }
+.panel.is-dark { background: var(--c-ink); color: var(--ink-on-dark); }
 .panel.is-dark::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .12; mix-blend-mode: overlay; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
-.panel.is-dark :focus-visible { outline-color: #fff9f1; }
+.panel.is-dark :focus-visible { outline-color: var(--ink-on-dark); }
 .ledger { position: relative; z-index: 1; width: 100%; max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: 355px minmax(0, 1fr); gap: 40px; align-items: start; }
 .hero-p .ledger { grid-template-columns: minmax(0, 1fr) 360px; gap: 48px; align-items: start; }
 /* a panel that carries a device puts its words beside the middle of it, not
@@ -471,20 +580,20 @@ html.framed .nav { display: none; }
 .meta { display: grid; gap: 14px; }
 .meta p { font-size: 18px; line-height: 1.4; }
 .meta p small { display: block; font-size: 13px; font-weight: 500; color: var(--muted); letter-spacing: .02em; margin-bottom: 2px; }
-.p-ico { display: block; width: 88px; height: 88px; margin-bottom: 20px; border-radius: 22%; overflow: hidden; box-shadow: 0 8px 18px rgb(3 3 2 / .2); }
+.p-ico { display: block; width: 88px; height: 88px; margin-bottom: 20px; border-radius: 22%; overflow: hidden; box-shadow: 0 8px 18px var(--ink-a20); }
 .p-ico.is-bare { width: 98px; height: 98px; margin: -5px 0 15px -5px; border-radius: 0; overflow: visible; box-shadow: none; }
-.p-ico.is-bare img { filter: drop-shadow(0 8px 18px rgb(3 3 2 / .2)); }
+.p-ico.is-bare img { filter: drop-shadow(0 8px 18px var(--ink-a20)); }
 .p-ico img, .p-ico svg { width: 100%; height: 100%; }
-.p-shot { --mh: 62vh; position: relative; width: min(100%, calc(var(--mh) * var(--arn))); aspect-ratio: var(--ar); border-radius: var(--rad); overflow: hidden; box-shadow: var(--shadow-block); background: #e7e5e1; }
+.p-shot { --mh: 62vh; position: relative; width: min(100%, calc(var(--mh) * var(--arn))); aspect-ratio: var(--ar); border-radius: var(--rad); overflow: hidden; box-shadow: var(--shadow-block); background: var(--plate); }
 .p-shot img { position: absolute; left: var(--sx); top: var(--sy); width: var(--sw); max-width: none; height: auto; }
 .story { margin-top: 20px; max-width: 58ch; font-size: clamp(17px, 1.4vw, 20px); line-height: 1.5; letter-spacing: -.01em; }
 .results { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px; }
-.results .btn { background: #fff9f1; color: var(--c-ink); }
-.results .btn:hover { background: #fff; }
-.results .btn.is-quiet { background: transparent; color: #fff9f1; box-shadow: inset 0 0 0 1px rgb(255 249 241 / .35); }
+.results .btn { background: var(--ink-on-dark); color: var(--c-ink); }
+.results .btn:hover { background: var(--white); }
+.results .btn.is-quiet { background: transparent; color: var(--ink-on-dark); box-shadow: inset 0 0 0 1px rgb(255 249 241 / .35); }
 .results .btn.is-quiet:hover { background: rgb(255 249 241 / .1); }
 .next { margin-top: 44px; font-size: 15px; color: rgb(255 249 241 / .7); }
-.next a { color: #fff9f1; text-decoration-color: rgb(255 249 241 / .4); text-underline-offset: 4px; }
+.next a { color: var(--ink-on-dark); text-decoration-color: rgb(255 249 241 / .4); text-underline-offset: 4px; }
 .next a:hover { text-decoration-color: currentColor; }
 .pager { position: fixed; left: 50%; bottom: calc(max(30px, env(safe-area-inset-bottom)) + 42px); translate: -50% 0; z-index: 90; display: flex; justify-content: center; gap: 10px; width: min(620px, 44vw); }
 .tick { position: relative; flex: 0 0 auto; width: 56px; height: 24px; display: grid; align-items: center; border-radius: 8px; }
@@ -500,7 +609,7 @@ html.framed .nav { display: none; }
    a white glow around it, which was the only thing making it visible there
    (Peter, 09-14) */
 :root[data-tone='dark'] .tick::before { background: rgb(255 249 241 / .3); box-shadow: none; }
-:root[data-tone='dark'] .tick::after { background: #fff9f1; }
+:root[data-tone='dark'] .tick::after { background: var(--ink-on-dark); }
 @media (max-width: 820px), (hover: none) { .pager { display: none; } }
 
 /* ── About: pinned intro, a paper pile, the rows, the right now line ── */
@@ -510,17 +619,17 @@ html.framed .nav { display: none; }
 .about-copy p { font-size: clamp(18px, 1.6vw, 22px); letter-spacing: -.02em; line-height: 1.45; }
 .pile { position: relative; height: 516px; }
 .polaroid {
-  position: absolute; width: 206px; padding: 10px 10px 34px; background: #fff; border-radius: 2.89px;
-  box-shadow: 0 8px 24px rgb(0 0 0 / .12); user-select: none; touch-action: pan-y;
+  position: absolute; width: 206px; padding: 10px 10px 34px; background: var(--white); border-radius: 2.89px;
+  box-shadow: 0 8px 24px var(--black-a12); user-select: none; touch-action: pan-y;
   transform: translate(var(--x, 0px), var(--y, 0px)) rotate(var(--r, 0deg));
   transition: box-shadow var(--t-hover) var(--spring);
 }
 html.can-drag .polaroid { cursor: grab; }
-.polaroid.is-dragging { box-shadow: 0 22px 48px rgb(0 0 0 / .24); cursor: grabbing; z-index: 5; }
+.polaroid.is-dragging { box-shadow: 0 22px 48px var(--black-a24); cursor: grabbing; z-index: 5; }
 .polaroid img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 1px; pointer-events: none; }
-.polaroid small { position: absolute; left: 12px; right: 12px; bottom: 10px; font-size: 12px; color: #444; text-align: center; }
-.pile-reset { position: absolute; right: 0; bottom: 0; z-index: 10; width: 46px; height: 46px; border-radius: 999px; display: grid; place-items: center; background: rgb(255 255 255 / .6); --bf: blur(6px); backdrop-filter: var(--bf); box-shadow: 0 6px 18px rgb(43 43 43 / .14); color: #2b2b2b; }
-.pile-reset:hover { background: rgb(255 255 255 / .85); }
+.polaroid small { position: absolute; left: 12px; right: 12px; bottom: 10px; font-size: 12px; color: var(--ink-caption); text-align: center; }
+.pile-reset { position: absolute; right: 0; bottom: 0; z-index: 10; width: 46px; height: 46px; border-radius: 999px; display: grid; place-items: center; background: var(--white-a60); --bf: blur(6px); backdrop-filter: var(--bf); box-shadow: 0 6px 18px rgb(43 43 43 / .14); color: #2b2b2b; }
+.pile-reset:hover { background: var(--white-a85); }
 .pile-reset:active { transform: scale(.94); }
 .pile-reset svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; transition: transform var(--t-in) var(--spring); }
 .pile-reset:hover svg { transform: rotate(-160deg); }
@@ -545,11 +654,11 @@ html:not(.can-drag) .pile-reset { display: none; } /* the drag is for fine point
    legal notice, which is the one thing it is not (Peter, 09-14). No rule
    above it either: the air is what separates it from the signature. */
 .foot-in { position: relative; }
-.foot-note { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter) 52px; display: grid; gap: 22px; justify-items: center; text-align: center; }
-.foot-note .foot-face { margin-bottom: 10px; }
-.foot-note p { max-width: 38ch; margin: 0; font-size: 17px; line-height: 1.7; color: var(--ink-2); text-wrap: balance; }
+.foot-note { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter) 34px; display: grid; gap: 16px; justify-items: center; text-align: center; }
+.foot-note .foot-face { margin-bottom: 4px; }
+.foot-note p { max-width: 38ch; margin: 0; font-size: 17px; line-height: 1.6; color: var(--ink-2); text-wrap: balance; }
 @media (max-width: 767px) {
-  .foot-note { padding: 0 var(--gutter) 36px; gap: 18px; }
+  .foot-note { padding: 0 var(--gutter) 26px; gap: 14px; }
   .foot-note p { max-width: 30ch; font-size: 16px; }
 }
 
@@ -571,9 +680,9 @@ html:not(.can-drag) .pile-reset { display: none; } /* the drag is for fine point
      on the disc too (WEB-043) */
   .nav-back { padding: 0 12px; }
   .nav-back span { display: none; }
-  .nav-back, .pill { background: rgb(255 255 255 / .58); }
-  .nav-back { box-shadow: 0 12px 12px 2px #0000001a, 0 2px 4px -1px #0000000f; }
-  .nav[data-tone='dark'] .pill, .nav[data-tone='dark'] .nav-back { background: rgb(3 3 2 / .5); }
+  .nav-back, .pill { background: var(--white-a58); }
+  .nav-back { box-shadow: var(--shadow-pill); }
+  .nav[data-tone='dark'] .pill, .nav[data-tone='dark'] .nav-back { background: var(--ink-a50); }
   .hero { padding: 90px var(--gutter) 130px; min-height: auto; }
   .hero-grid { grid-template-columns: 1fr; gap: 28px; }
   /* the sun sits beside the name, under the pill and above the lede, where
@@ -608,7 +717,7 @@ html:not(.can-drag) .pile-reset { display: none; } /* the drag is for fine point
   .polaroid:nth-child(3) { --x: 6px !important; --y: -4px !important; --r: 2.5deg !important; }
   .polaroid:nth-child(4) { --x: -4px !important; --y: 18px !important; --r: -3deg !important; }
   .foot { min-height: auto; }
-  .foot-in { padding-top: 112px; }
+  .foot-in { padding-top: 72px; }
   .foot-bar { flex-direction: column; align-items: center; text-align: center; }
 }
 
@@ -710,9 +819,9 @@ html:not(.can-drag) .pile-reset { display: none; } /* the drag is for fine point
 .egg-before { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 280ms steps(4, end); }
 .egg-before.is-open { grid-template-rows: 1fr; }
 .egg-before-in { min-height: 0; overflow: hidden; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: flex-end; gap: 18px; padding: 22px 0 14px; }
-.egg-before-card { width: 206px; padding: 10px 10px 34px; background: #fff; border-radius: 2.89px; box-shadow: 0 8px 24px rgb(0 0 0 / .12); transform: rotate(4deg); position: relative; }
+.egg-before-card { width: 206px; padding: 10px 10px 34px; background: var(--white); border-radius: 2.89px; box-shadow: 0 8px 24px var(--black-a12); transform: rotate(4deg); position: relative; }
 .egg-before-card img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 1px; }
-.egg-before-card small { position: absolute; left: 12px; right: 12px; bottom: 10px; font-size: 12px; color: #444; text-align: center; }
+.egg-before-card small { position: absolute; left: 12px; right: 12px; bottom: 10px; font-size: 12px; color: var(--ink-caption); text-align: center; }
 .egg-before-say { flex: 1 1 260px; max-width: 42ch; font-size: 15px; line-height: 1.45; color: var(--muted); }
 
 /* ── Kyou's own sentence, which reads itself ────────────────────────── */
@@ -743,10 +852,10 @@ html:not(.can-drag) .pile-reset { display: none; } /* the drag is for fine point
   transform: translate(-50%, -100%);
   display: grid; align-content: start; gap: 12px;
   padding: 54px 16px 14px;
-  background: var(--c-ink); color: #fff9f1;
+  background: var(--c-ink); color: var(--ink-on-dark);
   border: 1px solid rgb(255 249 241 / .22); border-top: 0; border-radius: 0 0 10px 10px;
-  box-shadow: 0 18px 40px rgb(3 3 2 / .28);
-  transition: transform 220ms steps(5, end);
+  box-shadow: 0 18px 40px var(--ink-a28);
+  transition: transform var(--t-tick) steps(5, end);
 }
 .egg-drop.is-down { transform: translate(-50%, 0); }
 .egg-drop-tabs { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid rgb(255 249 241 / .18); padding-bottom: 8px; }
@@ -782,9 +891,14 @@ html.is-first .hero-only .l { animation: name-rise 460ms var(--spring) both; ani
 html.is-first .star { animation: sky-in 520ms var(--spring) both; animation-delay: 60ms; }
 html.is-first .hero:has(.hero-only) .sun { animation: sky-in 520ms var(--spring) both; animation-delay: 0ms; }
 /* the entrance rides beside the drift; the drift keeps the cloud's own period
-   and phase through it, which is what the sky reads as weather (WEB-087) */
-html.is-first .cloud { animation: sky-in 520ms var(--spring) both, drift var(--dur, 52s) ease-in-out infinite var(--dir, alternate); animation-delay: var(--in, 30ms), var(--phase, 0s); }
-html.is-first .bird { animation: sky-in 520ms var(--spring) both, bob var(--dur, 6.5s) ease-in-out infinite var(--dir, alternate); animation-delay: var(--in, 30ms), var(--phase, 0s); }
+   and phase through it, which is what the sky reads as weather (WEB-087).
+   CAREFUL: an animation list is replaced whole, not added to, so every loop a
+   cloud or a bird runs has to be repeated here beside the entrance or it never
+   starts on the first page of a visit. That is exactly how the bob and the
+   crossing shipped dead for an afternoon on 09-15. Change one line, change
+   both. */
+html.is-first .cloud { animation: sky-in 520ms var(--spring) both, drift var(--dur, 52s) ease-in-out infinite var(--dir, alternate), puff var(--bdur, 13s) ease-in-out infinite alternate; animation-delay: var(--in, 30ms), var(--phase, 0s), var(--bphase, 0s); }
+html.is-first .bird { animation: sky-in 520ms var(--spring) both, bob var(--dur, 6.5s) ease-in-out infinite var(--dir, alternate), fly var(--fdur, 46s) linear infinite; animation-delay: var(--in, 30ms), var(--phase, 0s), var(--fphase, 0s); }
 html.is-first .cloud-b { --in: 80ms; }
 html.is-first .cloud-c { --in: 55ms; }
 html.is-first .cloud-e { --in: 105ms; }
@@ -818,7 +932,7 @@ html.is-first .bird-b { --in: 165ms; }
 .hero-only .l > i {
   display: inline-block; font-style: normal;
   transform: translateY(var(--lift, 0px)) rotate(var(--tip, 0deg));
-  transition: transform 220ms var(--spring);
+  transition: transform var(--t-tick) var(--spring);
 }
 @keyframes name-hop {
   0% { transform: translateY(var(--lift, 0px)); }
@@ -842,9 +956,9 @@ html.js [data-rise].is-in { opacity: 1; transform: none; transition: opacity var
 html.js .rail.is-armed .stop { opacity: 0; transform: translateY(12px); }
 html.js .rail.is-armed .stop::before { transform: scaleY(0); transform-origin: 50% 0; }
 html.js .rail.is-armed .node { transform: scale(.5); }
-html.js .rail.is-lit .stop { opacity: 1; transform: none; transition: opacity 420ms var(--spring) calc(var(--i, 0) * 65ms), transform 420ms var(--spring) calc(var(--i, 0) * 65ms); }
-html.js .rail.is-lit .stop::before { transform: none; transition: transform 360ms var(--spring) calc(var(--i, 0) * 65ms); }
-html.js .rail.is-lit .node { transform: none; transition: transform 420ms var(--spring) calc(var(--i, 0) * 65ms + 90ms); }
+html.js .rail.is-lit .stop { opacity: 1; transform: none; transition: opacity var(--t-reveal) var(--spring) calc(var(--i, 0) * var(--t-stagger)), transform var(--t-reveal) var(--spring) calc(var(--i, 0) * var(--t-stagger)); }
+html.js .rail.is-lit .stop::before { transform: none; transition: transform 360ms var(--spring) calc(var(--i, 0) * var(--t-stagger)); }
+html.js .rail.is-lit .node { transform: none; transition: transform var(--t-reveal) var(--spring) calc(var(--i, 0) * var(--t-stagger) + 90ms); }
 
 /* the year of GitHub wipes in from the left, the way a week is read */
 @property --wipe { syntax: '<percentage>'; inherits: true; initial-value: 0%; }
@@ -901,6 +1015,8 @@ html.js .heat.is-lit svg { clip-path: inset(0 var(--wipe) 0 0); animation: heat-
   --sun-dy: 0px;
   --moon: #fbf6e4;
   --mare: #ece4cd;
+  /* the stars, and the streak that is one of them falling */
+  --star: #b9c2d6;
   /* the name is painted on the sky, so it takes a pastel from that sky
      (Peter, 09-14) and keeps the same footing at every hour: 2.5 and 3
      against whatever is behind it, which is the pair he picked on paper.
@@ -930,7 +1046,7 @@ html.js .heat.is-lit svg { clip-path: inset(0 var(--wipe) 0 0); animation: heat-
 :root[data-sky='night'] .sun::before, :root[data-sky='night'] .sun::after { opacity: 1; }
 
 /* the stars are out at dusk and after, and each one breathes on its own clock */
-.star { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: #b9c2d6; opacity: 0; pointer-events: none;
+.star { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: var(--star); opacity: 0; pointer-events: none;
   transform: translateY(calc(var(--sy, 0) * -.06px)); transition: opacity 700ms linear; }
 :root[data-sky='dusk'] .star { opacity: .5; }
 :root[data-sky='night'] .star { opacity: .85; animation: twinkle 5s ease-in-out infinite alternate; animation-delay: var(--t, 0s); }
@@ -939,6 +1055,26 @@ html.js .heat.is-lit svg { clip-path: inset(0 var(--wipe) 0 0); animation: heat-
 /* the birds have gone home. Taken out of the drawing rather than faded,
    because the first paint's own entrance owns their opacity and would win. */
 :root[data-sky='dusk'] .bird, :root[data-sky='night'] .bird { display: none; }
+
+/* nothing above may sit frozen in the middle of the sky: under reduced motion
+   the rocket and the streak are taken out of the drawing entirely, the way
+   the birds are taken out after dark. The birds themselves are the other
+   half of that: their resting place is off the right edge now, which is
+   nowhere, so a still sky is given the two perches they held before they
+   learned to fly on their own. */
+@media (prefers-reduced-motion: reduce) {
+  .rocket, .shoot, .balloon, .flock, .bat, .sat { display: none; }
+  .bird-a { right: 16%; top: 22%; }
+  .bird-b { right: 9%; top: 27%; }
+}
+/* the same again for the switch thrown mid-visit, where no media query
+   re-evaluates the rules the page was built with */
+html.motion-off .rocket, html.motion-off .shoot,
+html.motion-off .balloon, html.motion-off .flock, html.motion-off .bat, html.motion-off .sat { display: none; }
+html.motion-off .cloud, html.motion-off .bird { animation: none; transform: none; }
+html.motion-off .bird .w0, html.motion-off .bird .w1 { animation: none; }
+html.motion-off .bird-a { right: 16%; top: 22%; }
+html.motion-off .bird-b { right: 9%; top: 27%; }
 
 @media (prefers-reduced-motion: reduce) {
   .hero, .sun::before, .sun::after, .star, .bird { transition: none; }

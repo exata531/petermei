@@ -118,7 +118,10 @@ export function initTerminal(root: HTMLElement, hooks: TermHooks) {
     const fixed: string[] = [];
     for (const part of path) {
       if (Array.isArray(d)) return null;
-      const hit = Object.keys(d).find((k) => k.toLowerCase() === part.toLowerCase());
+      /* `d` is reassigned from its own lookup on the next line, so without the
+         annotation the checker has to infer `hit` from a value that depends on
+         `hit`, and gives up with an implicit any */
+      const hit: string | undefined = Object.keys(d).find((k) => k.toLowerCase() === part.toLowerCase());
       if (!hit) return null;
       fixed.push(hit);
       d = d[hit];

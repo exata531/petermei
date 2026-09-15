@@ -123,10 +123,11 @@ function heroScale(y: number) {
   const t = Math.min(1, Math.max(0, y / h));
   const e = 1 - Math.pow(1 - t, 3);
   hero.style.setProperty('--hero-k', (1 - 0.12 * e).toFixed(4));
-  /* the sky: clouds and the birds read the raw scroll and move at their own
-     share of it; the birds beat their wings once every 48px of travel */
+  /* the sky: the clouds and the birds read the raw scroll and move at their
+     own share of it, on top of the loops they already run by themselves. The
+     wings used to turn over every 48px of travel and nowhere else, which left
+     a still page holding two frozen birds; they beat on a clock now, in CSS. */
   hero.style.setProperty('--sy', String(Math.round(y)));
-  hero.dataset.wing = String(Math.floor(y / 48) % 2);
 }
 
 /* the pager on a project page: one dash per panel, filled as read */

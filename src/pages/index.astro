@@ -31,6 +31,70 @@ const [vb, rin, kyou, ms] = projects;
       <path class="w0" d="M2 14c6-8 12-8 18-1 2 2 3 2 6 2 3 0 4 0 6-2 6-7 12-7 14 1-4-3-8-3-13 3-2 3-4 4-7 4s-5-1-7-4C14 11 10 11 2 14Z"/>
       <path class="w1" d="M4 8c6-2 11 1 16 6 2 2 3 3 4 3s2-1 4-3c5-5 10-8 16-6-5 1-9 4-13 9-2 3-4 4-7 4s-5-1-7-4C13 12 9 9 4 8Z"/>
     </svg>
+    {/* the hour keeps its own company. One guest per band, each with its own
+        way of moving: the balloon drifts, the kite never goes anywhere, the
+        flock flies a line, the bats cannot hold one for a second, and the
+        satellite is the slowest thing in the sky. Only one of them is ever
+        in the drawing at a time. */}
+    <span class="balloon" aria-hidden="true">
+      <svg viewBox="0 0 40 54">
+        <clipPath id="env"><path d="M20 1.4c9.6 0 16 7.4 16 16.4 0 5-2 9.6-5 13.4-3 3.8-6.6 6.2-11 8-4.4-1.8-8-4.2-11-8-3-3.8-5-8.4-5-13.4C4 8.8 10.4 1.4 20 1.4Z"/></clipPath>
+        <path d="M20 1.4c9.6 0 16 7.4 16 16.4 0 5-2 9.6-5 13.4-3 3.8-6.6 6.2-11 8-4.4-1.8-8-4.2-11-8-3-3.8-5-8.4-5-13.4C4 8.8 10.4 1.4 20 1.4Z"/>
+        <g clip-path="url(#env)"><rect class="port" x="11" y="0" width="4.6" height="42"/><rect class="port" x="24.4" y="0" width="4.6" height="42"/></g>
+        <path d="M17.4 38.4 16.4 44.8h1.2l1-5.8Zm5.2 0 1 6.4h-1.2l-1-5.8Z"/>
+        <path d="M15.8 44.4h8.4l-1 6.2h-6.4Z"/>
+      </svg>
+    </span>
+    <span class="kite" aria-hidden="true">
+      <span class="line"></span>
+      <svg viewBox="0 0 30 74">
+        <path d="M15 1 27 17 15 33 3 17Z"/>
+        <rect class="port" x="14.2" y="4" width="1.6" height="26"/>
+        <rect class="port" x="6" y="16.2" width="18" height="1.6"/>
+        <path d="M13.8 38.4 16.2 37v4.2l-2.4-1.4Zm0 1.4 2.4 1.4v4.2l-2.4-1.4Z"/>
+        <path d="M13.8 49.6 16.2 48v4.2l-2.4-1.4Zm0 1.4 2.4 1.4v4.2L13.8 55Z"/>
+      </svg>
+    </span>
+    <svg class="flock" viewBox="0 0 120 56" aria-hidden="true">
+        <g transform="translate(58 22) scale(0.42)"><g class="g0"><path d="M4 8c6-2 11 1 16 6 2 2 3 3 4 3s2-1 4-3c5-5 10-8 16-6-5 1-9 4-13 9-2 3-4 4-7 4s-5-1-7-4C13 12 9 9 4 8Z"/></g></g>
+        <g transform="translate(40 12) scale(0.36)"><g class="g1"><path d="M4 8c6-2 11 1 16 6 2 2 3 3 4 3s2-1 4-3c5-5 10-8 16-6-5 1-9 4-13 9-2 3-4 4-7 4s-5-1-7-4C13 12 9 9 4 8Z"/></g></g>
+        <g transform="translate(22 2) scale(0.3)"><g class="g2"><path d="M4 8c6-2 11 1 16 6 2 2 3 3 4 3s2-1 4-3c5-5 10-8 16-6-5 1-9 4-13 9-2 3-4 4-7 4s-5-1-7-4C13 12 9 9 4 8Z"/></g></g>
+        <g transform="translate(40 32) scale(0.36)"><g class="g3"><path d="M4 8c6-2 11 1 16 6 2 2 3 3 4 3s2-1 4-3c5-5 10-8 16-6-5 1-9 4-13 9-2 3-4 4-7 4s-5-1-7-4C13 12 9 9 4 8Z"/></g></g>
+        <g transform="translate(22 42) scale(0.3)"><g class="g4"><path d="M4 8c6-2 11 1 16 6 2 2 3 3 4 3s2-1 4-3c5-5 10-8 16-6-5 1-9 4-13 9-2 3-4 4-7 4s-5-1-7-4C13 12 9 9 4 8Z"/></g></g>
+    </svg>
+    <svg class="bat bat-a" viewBox="0 0 36 18" aria-hidden="true"><g class="wings"><path d="M18 5.2c-1-1.6-2.2-2.4-3.6-2.4-1 0-1.8.4-2.6 1.2.4-1.2.2-2.2-.8-3-2.6.4-5 2-7.2 4.6C2.4 7.4 1.4 9.4 1 11.6c1.6-1.8 3.2-2.6 4.8-2.4-.2 1 .2 1.8 1 2.4.8-1.4 2-2 3.6-1.8 1.4.2 2.4 1 3 2.4.8-1.6 1.6-2.4 2.6-2.4s1.8.8 2.6 2.4c.6-1.4 1.6-2.2 3-2.4 1.6-.2 2.8.4 3.6 1.8.8-.6 1.2-1.4 1-2.4 1.6-.2 3.2.6 4.8 2.4-.4-2.2-1.4-4.2-2.8-6-2.2-2.6-4.6-4.2-7.2-4.6-1 .8-1.2 1.8-.8 3-.8-.8-1.6-1.2-2.6-1.2-1.4 0-2.6.8-3.6 2.4Z"/></g></svg>
+    <svg class="bat bat-b" viewBox="0 0 36 18" aria-hidden="true"><g class="wings"><path d="M18 5.2c-1-1.6-2.2-2.4-3.6-2.4-1 0-1.8.4-2.6 1.2.4-1.2.2-2.2-.8-3-2.6.4-5 2-7.2 4.6C2.4 7.4 1.4 9.4 1 11.6c1.6-1.8 3.2-2.6 4.8-2.4-.2 1 .2 1.8 1 2.4.8-1.4 2-2 3.6-1.8 1.4.2 2.4 1 3 2.4.8-1.6 1.6-2.4 2.6-2.4s1.8.8 2.6 2.4c.6-1.4 1.6-2.2 3-2.4 1.6-.2 2.8.4 3.6 1.8.8-.6 1.2-1.4 1-2.4 1.6-.2 3.2.6 4.8 2.4-.4-2.2-1.4-4.2-2.8-6-2.2-2.6-4.6-4.2-7.2-4.6-1 .8-1.2 1.8-.8 3-.8-.8-1.6-1.2-2.6-1.2-1.4 0-2.6.8-3.6 2.4Z"/></g></svg>
+    <svg class="sat" viewBox="0 0 44 20" aria-hidden="true">
+      <rect x="16.4" y="5" width="11.2" height="10" rx="1.6"/>
+      <rect x="1" y="6" width="13" height="8" rx="1.2"/>
+      <rect x="30" y="6" width="13" height="8" rx="1.2"/>
+      <rect class="port" x="7" y="6" width="1.2" height="8"/>
+      <rect class="port" x="36" y="6" width="1.2" height="8"/>
+      <rect x="14" y="9.2" width="2.4" height="1.6"/><rect x="27.6" y="9.2" width="2.4" height="1.6"/>
+      <path d="M22 4.6 19.6.6h4.8Z"/>
+    </svg>
+    {/* the traffic that is not a bird: a rocket that climbs out of the low
+        corner about once a minute. Same flat ink as the rest of this sky,
+        clear of the middle where the name is, and on its own clock so the
+        page moves whether or not anybody is scrolling it. A plane flew up
+        here too until Peter took it back out (09-15). */}
+    <span class="rocket" aria-hidden="true">
+      <span class="smoke"></span>
+      {/* nose cone, porthole, a band, two fins curving off the body and a
+          bell under it: the rocket a kid draws, which is the only kind that
+          belongs in this sky */}
+      <svg viewBox="0 0 26 52">
+        <path d="M13 1.8c3.4 3.9 5.9 9 6.4 15.2V34H6.6V17C7.1 10.8 9.6 5.7 13 1.8Z"/>
+        <path d="M6.6 24.6C4.2 28.4 2.6 33 2.2 38.4L6.6 35.2Z"/>
+        <path d="M19.4 24.6c2.4 3.8 4 8.4 4.4 13.8L19.4 35.2Z"/>
+        <path d="M11.2 34h3.6l.9 6.2h-5.4Z"/>
+        <path d="M9.6 34h6.8l1.4 4.6c0 1.2-9.6 1.2-9.6 0Z"/>
+        <circle class="port" cx="13" cy="13.6" r="3.1"/>
+        <rect class="port" x="6.8" y="22.4" width="12.4" height="2.2" rx="1"/>
+      </svg>
+    </span>
+    {/* after dark the birds are gone, so the night gets one of its own */}
+    <span class="shoot" aria-hidden="true"></span>
     {/* the landing is the name, centred, and nothing else (Peter, 09-13:
         "no need to explain everything"). The sun and the clouds stay; the
         Mac, the photos and GitHub are one click away in the nav and the
@@ -52,7 +116,7 @@ const [vb, rin, kyou, ms] = projects;
 
   <section class="rail-sec" data-nav-tone="light" aria-labelledby="rail-h">
     <div class="wrap">
-      <h2 class="h-section" id="rail-h" data-rise>Here is what I built laid out just for you to look at.</h2>
+      <h2 class="h-section" id="rail-h" data-rise>Here is what I built laid out in a timeline just for you to look at.</h2>
       <div class="rail-grid">
         <ol class="rail" data-rail>
           {timeline.map((s, i) => (

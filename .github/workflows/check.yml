@@ -1,0 +1,26 @@
+# The gate. A push to main is a release (the site deploys from it), so the
+# checks that keep the design system honest run before anything lands.
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      # `npm ci` is the right one: it installs exactly the lockfile. It needs
+      # the lockfile to agree with package.json, and the dev tools were added
+      # on a machine that could not reach the registry to regenerate it. So it
+      # falls back until someone runs `npm install` locally once and commits
+      # the lock, after which the fallback never fires again.
+      - run: npm ci || npm install
+      # the design system, stylelint, the types, then the build
+      - run: npm run check
