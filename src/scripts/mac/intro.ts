@@ -151,7 +151,10 @@ export function initIntro(mac: HTMLElement, landing: HTMLElement | null, hooks: 
   let tap: { x: number; y: number } | null = null;
   let anims: Animation[] = [];
   let blankAnim: Animation | null = null;
-  let bootTimers: number[] = [];
+  /* window.setTimeout, not the bare one: with Node's types in scope the bare
+     name resolves to Node's timer, which is an object rather than a number and
+     does not fit this array. This is browser code, so it says so. */
+  let bootTimers: ReturnType<typeof window.setTimeout>[] = [];
   let unskip: (() => void) | null = null;
   /* the machine is standing at its login with the desktop already behind the
      grey, so it counts as busy: nothing back there should be taking keys */
@@ -290,7 +293,7 @@ export function initIntro(mac: HTMLElement, landing: HTMLElement | null, hooks: 
     unwait = null;
     (document.activeElement as HTMLElement | null)?.blur?.();
     veil.classList.add('is-go');
-    const at = (t: number, f: () => void) => { bootTimers.push(setTimeout(f, t)); };
+    const at = (t: number, f: () => void) => { bootTimers.push(window.setTimeout(f, t)); };
     at(LOGIN, () => { veil.classList.remove('is-go'); stage('happy'); });
     at(LOGIN + HAPPY, () => stage('welcome'));
     exts.forEach((e, i) => at(LOGIN + MARCH + i * STRIDE, () => e.classList.add('is-on')));
