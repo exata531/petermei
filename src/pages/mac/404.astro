@@ -1,0 +1,130 @@
+---
+/* The same missing page, but seen from inside the Macintosh.
+
+   petermei.com's own not-found is the sky with the status where the name goes.
+   That is right for the website and wrong for the machine: the Navigator on the
+   desktop is a 1995 browser, and a paper page with a modern button in it would
+   break the room it is being looked at from (Peter, 09-15).
+
+   So a miss inside the frame gets what a Mac gave you when it had had enough.
+   The bomb is the one error anybody who used one remembers, and the number in
+   "ID =" is the real status rather than the meaningless one System 7 printed.
+
+   /404 sends anything framed here, so nothing has to know which of the two it
+   wants; it just asks for the address and gets the right room. */
+import Mac from '../../layouts/Mac.astro';
+import Icon from '../../components/mac/Icon.astro';
+const titles = ['File', 'Edit', 'View', 'Label', 'Special'];
+---
+
+<Mac title="Sorry, a system error occurred" desc="That page is not on this Macintosh." script={false} canonical={false}>
+  <header class="mbar lost-bar" aria-hidden="true">
+    <div class="mbar-l">
+      <span class="mb-item mb-apple is-dim"><Icon id="apple" size={16} /></span>
+      {titles.map((t) => <span class="mb-item is-dim">{t}</span>)}
+    </div>
+    <div class="mbar-r">
+      <span class="mb-item mb-clock"><time data-clock>4:42 PM</time></span>
+      <span class="mb-item mb-appmenu is-dim"><span class="mb-appico"><Icon id="finder" size={16} /></span></span>
+    </div>
+  </header>
+
+  <div class="desk lost-desk"></div>
+
+  <div class="lost-in" id="main" role="main">
+    <section class="alert boom" aria-labelledby="boom-h">
+      <span class="alert-ico boom-ico"><Icon id="bomb" /></span>
+      <div>
+        <h1 class="alert-title" id="boom-h">Sorry, a system error occurred.</h1>
+        <p class="boom-id">ID = <span data-code>404</span></p>
+        <p class="boom-what" data-what>That address is not on this Macintosh.</p>
+      </div>
+      <div class="alert-btns boom-btns">
+        {/* _top, because this page is usually being read inside the frame
+             the desktop's own browser draws: a restart that loaded the Mac
+             into that frame would put a Macintosh inside a Macintosh, which
+             is the joke the landing already refused once (Peter, 09-14). */}
+        <a class="alert-btn is-default" href="/mac" target="_top">Restart</a>
+      </div>
+    </section>
+  </div>
+
+  <script is:inline>
+    (function () {
+      var t = document.querySelector('[data-clock]');
+      if (t) {
+        var paint = function () {
+          var d = new Date();
+          t.textContent = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+          t.dateTime = d.toISOString();
+        };
+        paint();
+        setInterval(paint, 15000);
+      }
+
+      var q = new URLSearchParams(location.search);
+      /* digits only, three at most, so the slot cannot print arbitrary words */
+      var id = (q.get('id') || '').replace(/\D/g, '').slice(0, 3);
+      var code = document.querySelector('[data-code]');
+      if (id && code) code.textContent = id;
+
+      var SAYS = {
+        '403': 'That one is locked.',
+        '408': 'The machine waited, and nothing came.',
+        '410': 'That used to be here. It is not any more.',
+        '500': 'Something fell over at the other end. Not you.',
+        '502': 'The thing it asked did not answer.',
+        '503': 'It is all here, just not this second.',
+      };
+      var what = document.querySelector('[data-what]');
+      if (what && SAYS[id]) what.textContent = SAYS[id];
+      else if (what) {
+        /* the address that missed, named the way the Finder named a file it
+           could not open, and the one /404 was asked for rather than this
+           page's own. Set as text, never as markup. */
+        var p = q.get('at') || '';
+        if (p && p.charAt(0) === '/' && p.length < 60) {
+          what.textContent = '“' + p + '” is not on this Macintosh.';
+        }
+      }
+    })();
+  </script>
+</Mac>
+
+<style is:global>
+  html { background: var(--paper) var(--dither); background-size: var(--dither-size); }
+  /* dimmed titles: a modal alert took the menus away, so they are greyed and
+     the icons are drawn through the fifty percent pattern */
+  .lost-bar .is-dim { color: var(--grey-3); }
+  .lost-bar .is-dim .ico { -webkit-mask: var(--dither); mask: var(--dither); -webkit-mask-size: var(--dither-size); mask-size: var(--dither-size); }
+  .lost-bar .mb-clock { display: inline-flex; }
+  /* the alert sits where the desktop's own alerts sit, high on the screen */
+  .lost-in { position: fixed; inset: 0; z-index: 5; display: grid; justify-items: center; align-content: start; padding: calc(var(--bar) + calc(30 * var(--u))) 16px 0; }
+
+  /* the bomb dialog: icon down the left, words beside it, the button under
+     both, which is how the real one was laid out */
+  .boom { grid-template-columns: var(--icon) 1fr; }
+  .boom-ico { grid-row: 1; }
+  .boom-id { margin-top: var(--u2); color: var(--grey-3); }
+  .boom-what { margin-top: var(--u3); }
+  .boom-btns { display: flex; gap: var(--u4); flex-wrap: wrap; justify-content: flex-end; }
+  .boom .alert-btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+  /* The fuse is lit, so it flickers: two states on a slow uneven beat, the way
+     a bitmap animation of a spark had two frames and no more. It holds still
+     for anyone who asked for less movement. */
+  @keyframes fuse { 0%, 44% { opacity: 1; } 50%, 94% { opacity: .55; } 100% { opacity: 1; } }
+  .boom-ico .ico { animation: fuse 1.1s steps(1, end) infinite; }
+  @media (prefers-reduced-motion: reduce) { .boom-ico .ico { animation: none; } }
+
+  /* the titles give up their room before the clock does (WEB-052) */
+  .lost-bar .mbar-l { flex: 1 1 auto; min-width: 0; }
+  .lost-bar .mbar-r { flex: none; }
+  @media (max-width: 400px) {
+    .boom-btns { justify-content: stretch; }
+    .boom .alert-btn {
+      height: auto; min-height: calc(20 * var(--u)); max-width: 100%;
+      padding: var(--u2) var(--u6); white-space: normal; text-align: center; line-height: var(--lh-12);
+    }
+  }
+</style>

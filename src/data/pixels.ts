@@ -27,6 +27,7 @@
    mac        the same Mac, blank blue screen
    app        the generic application diamond, pen inside
    apple      the six colour Apple, sized for the menu bar
+   bomb       the System 7 bomb: black sphere, white glint, lit fuse
    caution    yellow triangle, exclamation mark
    stop       muted red hexagon, open white hand
    note       a face with a speech balloon
@@ -613,6 +614,48 @@ export const pix: Record<string, Pix> = {
       '................................',
       '................................',
       '................................',
+    ],
+  },
+  /* The bomb. System 7 put this up when the machine had given up entirely, and
+     it is the one error anybody who used a Mac remembers. Black sphere, a white
+     glint high on the left where the light is, the fuse curling up out of a grey
+     collar, and a lit spark at the tip. Drawn on the same grid as the rest, so
+     it is the same drawing at any size. */
+  bomb: {
+    pal: {},
+    rows: [
+      '................................',
+      '.......................e........',
+      '......................eoe.......',
+      '....................##eooe......',
+      '...................##.eee.......',
+      '..................##...e........',
+      '.................##.............',
+      '............########............',
+      '...........#kkkkkkkk#...........',
+      '...........#dddddddd#...........',
+      '...........##dddddd##...........',
+      '.........##############.........',
+      '........################........',
+      '.......##################.......',
+      '.......##wwww############.......',
+      '......##wwwwww############......',
+      '......##wwwwww############......',
+      '.....####wwww##############.....',
+      '.....######################.....',
+      '.....######################.....',
+      '.....######################.....',
+      '.....######################.....',
+      '.....######################.....',
+      '.....######################.....',
+      '......####################......',
+      '......####################......',
+      '.......##################.......',
+      '.......##################.......',
+      '........################........',
+      '.........##############.........',
+      '...........##########...........',
+      '..............####..............',
     ],
   },
   stop: {

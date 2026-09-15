@@ -1,76 +1,110 @@
 ---
-/* the page that is not there, drawn the way System 7 showed one: the menu
-   bar still across the top with every title dimmed, because an alert is up
-   and a modal alert took the menus away, and the alert seated where the
-   desktop's own alerts sit */
-import Mac from '../layouts/Mac.astro';
-import Icon from '../components/mac/Icon.astro';
-const titles = ['File', 'Edit', 'View', 'Label', 'Special'];
+/* The page that is not there, in the site's own voice rather than the Mac's.
+
+   It was a System 7 bomb for a while, which was a good joke about the wrong
+   thing: the desktop is one room in this house, not the house (Peter, 09-15).
+   So this is the home page's own sky, with the status where the name usually
+   goes, in the same face and the same two tones the hour paints it.
+
+   It answers for ANY error, not only a missing page. The big number is the
+   real status, 404 by default because that is what this file is served for,
+   and whatever ?id= says otherwise, so a 500 or a 403 can be pointed here and
+   still tell the truth. The line underneath changes with it.
+
+   Digits are in the wordmark's subset for exactly this. */
+import Site from '../layouts/Site.astro';
+
+/* the number, one span per digit, the way the name is built, so each one takes
+   its own tone from the sky and its own step of the entrance */
+const digits = [...'404'];
 ---
-<Mac title="Not here · Peter Mei" desc="That page does not exist on this Macintosh." script={false} canonical={false}>
-  <header class="mbar lost-bar" aria-hidden="true">
-    <div class="mbar-l">
-      <span class="mb-item mb-apple is-dim"><Icon id="apple" size={16} /></span>
-      {titles.map((t) => <span class="mb-item is-dim">{t}</span>)}
-    </div>
-    <div class="mbar-r">
-      <span class="mb-item mb-clock"><time data-clock>4:42 PM</time></span>
-      <span class="mb-item mb-appmenu is-dim"><span class="mb-appico"><Icon id="finder" size={16} /></span></span>
-    </div>
-  </header>
 
-  <div class="desk lost-desk"></div>
+<Site title="Not here" desc="That page is not on petermei.com." route="work" footer={false}>
+  <section class="hero lost" data-hero data-nav-tone="light">
+    <span class="sun" aria-hidden="true"></span>
+    <span class="cloud cloud-a" aria-hidden="true" style="--cf:.34"></span>
+    <span class="cloud cloud-b" aria-hidden="true" style="--cf:.18"></span>
+    <span class="cloud cloud-c" aria-hidden="true" style="--cf:.26"></span>
+    <span class="cloud cloud-d" aria-hidden="true" style="--cf:.12"></span>
+    <span class="cloud cloud-e" aria-hidden="true" style="--cf:.42"></span>
+    <span class="cloud cloud-f" aria-hidden="true" style="--cf:.22"></span>
+    {[[8, 18, 0], [17, 11, 1.6], [31, 26, 3.1], [42, 9, 0.7], [63, 21, 2.3], [74, 13, 4.2], [88, 29, 1.1], [93, 8, 2.8]].map(([x, y, t]) => (
+      <span class="star" aria-hidden="true" style={`left:${x}%;top:${y}%;--t:${t}s`}></span>
+    ))}
 
-  <div class="lost" id="main" role="main">
-    <section class="alert lost-box" aria-labelledby="lost-h">
-      <span class="alert-ico"><Icon id="stop" /></span>
-      <div>
-        <h1 class="alert-title" id="lost-h">The item could not be found.</h1>
-        <p class="alert-wait">The address is wrong, or the page it named has moved.</p>
-      </div>
-      <div class="alert-btns"><a class="alert-btn is-default" href="/">Back to petermei.com</a></div>
-    </section>
-  </div>
+    <div class="hero-in" id="main">
+      <p class="lost-num" data-code-big aria-hidden="true">
+        {digits.map((d, i) => (
+          <span class={`l l${i % 6}`} style={`--i:${i}`}><i>{d}</i></span>
+        ))}
+      </p>
+      <h1 class="lost-h" data-what>Welp. You got me...</h1>
+      <p class="lost-p">You found a problem that I have not found. Good on you now go show off to your freinds</p>
+      <p class="lost-go">
+        <a class="btn" href="/">Back to the start</a>
+        <a class="btn is-quiet" href="/mac">Try the Mac</a>
+      </p>
+    </div>
+  </section>
 
   <script is:inline>
-    /* the clock keeps time even here; the desktop's script is not loaded */
     (function () {
-      var t = document.querySelector('[data-clock]');
-      if (!t) return;
-      var paint = function () {
-        var d = new Date();
-        t.textContent = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-        t.dateTime = d.toISOString();
+      /* Inside the Macintosh, this is the wrong room. The Navigator on the
+         desktop is a 1995 browser holding this site in a frame, and a paper
+         page with a modern button in it breaks the machine it is being read
+         from, so a framed miss hands over to the Mac's own bomb and takes the
+         address it was asked for along with it. Replace, not assign, so the
+         dead address does not end up in the frame's history.
+
+         The layout marks a framed page on the root before the first paint. */
+      try {
+        if (window.parent !== window) {
+          var q = new URLSearchParams(location.search);
+          var to = '/mac/404?at=' + encodeURIComponent(location.pathname);
+          var had = (q.get('id') || '').replace(/\D/g, '').slice(0, 3);
+          if (had) to += '&id=' + had;
+          location.replace(to);
+          return;
+        }
+      } catch (e) {}
+
+      /* The number is the real status. Digits only, three at most, so the slot
+         cannot be used to print arbitrary words at a visitor. */
+      var id = (new URLSearchParams(location.search).get('id') || '').replace(/\D/g, '').slice(0, 3);
+      var SAYS = {
+        '403': 'That one is locked.',
+        '408': 'That took too long to answer.',
+        '410': 'That used to be here. It is not any more.',
+        '500': 'Something on my end fell over. Not you.',
+        '502': 'The thing I asked did not answer.',
+        '503': 'It is all here, just not this second.',
       };
-      paint();
-      setInterval(paint, 15000);
+      var what = document.querySelector('[data-what]');
+
+      if (id && id !== '404') {
+        var big = document.querySelector('[data-code-big]');
+        if (big) {
+          big.textContent = '';
+          for (var i = 0; i < id.length; i++) {
+            var s = document.createElement('span');
+            s.className = 'l l' + (i % 6);
+            s.style.setProperty('--i', String(i));
+            var em = document.createElement('i');
+            em.textContent = id[i];
+            s.appendChild(em);
+            big.appendChild(s);
+          }
+        }
+        if (what && SAYS[id]) what.textContent = SAYS[id];
+        document.title = id + ' · Peter Mei';
+      } else if (what) {
+        /* name the address that missed, as text, never as markup */
+        var p = location.pathname;
+        if (p && p.length < 60 && p !== '/404' && p !== '/404/') {
+          what.textContent = 'There is nothing at ' + p;
+        }
+      }
     })();
   </script>
-</Mac>
+</Site>
 
-<style is:global>
-  html { background: var(--paper) var(--dither); background-size: var(--dither-size); }
-  /* dimmed titles: greyed text, and the icons drawn through the fifty percent pattern */
-  .lost-bar .is-dim { color: var(--grey-3); }
-  .lost-bar .is-dim .ico { -webkit-mask: var(--dither); mask: var(--dither); -webkit-mask-size: var(--dither-size); mask-size: var(--dither-size); }
-  .lost-bar .mb-clock { display: inline-flex; }
-  /* the alert sits where the desktop's own alerts sit, high on the screen */
-  .lost { position: fixed; inset: 0; z-index: 5; display: grid; justify-items: center; align-content: start; padding: calc(var(--bar) + calc(30 * var(--u))) 16px 0; }
-  .lost-box { grid-template-columns: var(--icon) 1fr; }
-  .lost-box .alert-ico { grid-row: 1; }
-  .lost-box .alert-wait { margin-top: var(--u2); }
-  /* the website's one ring on the website's own not-found page (WEB-072) */
-  .lost-box .alert-btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
-  /* the titles give up their room before the clock does, so the time is never
-     cut through a letter (WEB-052) */
-  .lost-bar .mbar-l { flex: 1 1 auto; min-width: 0; }
-  .lost-bar .mbar-r { flex: none; }
-  /* at the narrowest supported width the label takes two lines rather than
-     crossing the dialog's own frame (WEB-052) */
-  @media (max-width: 400px) {
-    .lost-box .alert-btn.is-default {
-      height: auto; min-height: calc(20 * var(--u)); max-width: 100%;
-      padding: var(--u2) var(--u6); white-space: normal; text-align: center; line-height: var(--lh-12);
-    }
-  }
-</style>

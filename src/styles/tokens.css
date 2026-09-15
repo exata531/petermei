@@ -28,7 +28,8 @@
 
 /* ── the wordmark ───────────────────────────────────────────────────────
    Sniglet ExtraBold (OFL, licence in public/fonts/SNIGLET-OFL.txt), subset to
-   the nine letters of the name. font-display is block, not swap: this is one
+   the letters of the name and the ten digits, because the not-found page says
+   its status in the same face, the same size, and the same two sky tones. font-display is block, not swap: this is one
    word at 250px and a swap from a fallback is a visible lurch, where a short
    block is not. */
 @font-face {

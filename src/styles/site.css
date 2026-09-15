@@ -649,6 +649,35 @@ html:not(.can-drag) .pile-reset { display: none; } /* the drag is for fine point
 .about-after { display: grid; gap: 22px; margin-top: 90px; max-width: 62ch; }
 .about-after p { font-size: 20px; letter-spacing: -.02em; line-height: 1.45; }
 
+/* ── the page that is not there ──────────────────────────────────────
+   The site's own sky with the status where the name usually goes. Not the
+   wordmark's class: that one carries the hero rules for centring a single
+   word and a clamp sized for nine letters, and a three digit number wants
+   its own. The face and the two sky tones are shared on purpose, so it is
+   recognisably the same hand. */
+/* the navigation is fixed over this, so the column clears it rather than
+   centring under it on a short screen */
+.lost { min-height: 100vh; min-height: 100svh; display: grid; place-items: center; padding: 96px var(--gutter) var(--gap-band); }
+.lost .hero-in { display: grid; justify-items: center; text-align: center; transform: none; }
+.lost-num {
+  margin: 0; font-family: var(--face-name); font-weight: 700;
+  font-size: clamp(88px, 20vw, 220px); letter-spacing: .012em; line-height: .9;
+}
+.lost-num .l { display: inline-block; color: var(--name-a, #6aa5d8); }
+.lost-num .l1, .lost-num .l3, .lost-num .l5 { color: var(--name-b, #5d9ace); }
+.lost-num i { font-style: normal; }
+.lost-h {
+  margin-top: var(--gap-item); font-size: var(--type-lede); font-weight: 600;
+  letter-spacing: -.02em; color: var(--ink); text-wrap: balance; max-width: 34ch;
+}
+.lost-p { margin-top: var(--gap-tight); color: var(--ink-2); font-size: var(--type-caption); }
+.lost-go { display: flex; gap: var(--gap-snug); flex-wrap: wrap; justify-content: center; margin-top: var(--gap-block); }
+@media (max-width: 767px) {
+  .lost-h { font-size: var(--type-caption); }
+  .lost-go { width: 100%; }
+  .lost-go .btn { flex: 1 1 auto; justify-content: center; }
+}
+
 /* ── the footer: sand, a face, the bar ──────────────────────────────── */
 .foot { position: relative; z-index: 12; background: var(--sand); color: var(--ink); }
 .foot-bar { width: 100%; max-width: var(--max); margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px var(--gutter) max(18px, env(safe-area-inset-bottom)); font-size: 16px; }
