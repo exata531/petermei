@@ -998,7 +998,7 @@ html.is-cover .mac.is-far:not(.is-moving) { z-index: 1; }
 .welcome-veil:not([data-stage='safe']) .welcome-safe { display: none; }
 /* the machine sitting in the room is not switched on, so its screen is one
    flat grey and nothing else. The dither is the DESKTOP's pattern, and at
-   picture size it reads as static rather than as a screen (Peter, 09-15:
+   picture size it reads as static rather than as a screen (Peter, 09-14:
    "just make it grey"). The boot stages keep the dither, because that is
    what a Macintosh actually showed while it started up. */
 .welcome-veil[data-stage='idle'] { background: #6f7175; }
@@ -1057,7 +1057,7 @@ html.in .land, html:not(.js) .land { display: none !important; }
 }
 /* the arrow and the line it points at sit on one middle. Bottom-aligning them
    hung the arrow below the text's baseline, because the arrow fills its box
-   and the text does not fill its line (Peter, 09-15) */
+   and the text does not fill its line (Peter, 09-14) */
 .land-cue {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center; gap: var(--u4);

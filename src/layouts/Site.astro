@@ -49,7 +49,7 @@ const og = new URL('/og.png', url).href;
     <meta name="twitter:image" content={og} />
     {/* the hour, before the first pixel. A module runs after the first paint,
         so reading the clock there meant the sky and the name painted midday
-        and then slid to whatever time it really was (Peter, 09-15) */}
+        and then slid to whatever time it really was (Peter, 09-14) */}
     <script is:inline set:html={skyBoot} data-astro-rerun></script>
     <ClientRouter />
     <script is:inline data-astro-rerun>
@@ -96,7 +96,7 @@ const og = new URL('/og.png', url).href;
     {footer && (
       <footer class="foot" data-nav-tone="light">
         {/* the small print slot, and there is no small print, so it says
-            whatever he wants it to say (Peter, 09-15). The face he signs
+            whatever he wants it to say (Peter, 09-14). The face he signs
             things with sits at the head of it: off in its own corner it
             left the sand lopsided, a signature up one end and a paragraph
             down the middle. Two things hide in this wrapper, so it stays. */}

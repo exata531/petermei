@@ -40,7 +40,7 @@
    session; Shut Down and Restart end that, Sleep and Lock Screen keep
    it. With reduced motion every move is a short crossfade. */
 /* the words are imported under another name: `cover` is already what this
-   file calls the phone-shaped landing, and the two collided (09-15) */
+   file calls the phone-shaped landing, and the two collided (09-14) */
 import { cover as words, cue as coverCue } from '../../data/cover';
 import { compact } from './devices';
 import { reduced } from './motion';
@@ -91,7 +91,7 @@ type Screen = 'on' | 'off' | 'asleep';
 /* what the grey screen is showing, or nothing. 'idle' is the grey itself
    with nothing on it: a Macintosh sitting across the room is not showing you
    its desktop at readable size, and drawing the live one in there made the
-   picture look like a screenshot of a screenshot (Peter, 09-15). */
+   picture look like a screenshot of a screenshot (Peter, 09-14). */
 type Stage = 'idle' | 'happy' | 'welcome' | 'safe' | null;
 
 export function initIntro(mac: HTMLElement, land: HTMLElement | null, hooks: Hooks = {}): Intro {

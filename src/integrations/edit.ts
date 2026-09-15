@@ -97,7 +97,7 @@ export default function editMode(): AstroIntegration {
            built site and on the live one. The dev server does not serve a
            folder's index, so /rin came back a 404 and the Macintosh's browser
            drew its own not-found page inside itself, which is a Macintosh
-           inside a Macintosh and about as heavy as it sounds (Peter, 09-15:
+           inside a Macintosh and about as heavy as it sounds (Peter, 09-14:
            "its crashing and not showing me rins website"). This hands back
            the folder's index, the way every other server already does. */
         server.middlewares.use(async (req, res, next) => {

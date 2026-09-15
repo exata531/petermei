@@ -210,7 +210,7 @@ html.is-going .page { opacity: .68; transition: opacity 140ms linear 60ms; }
 .nav-back:hover svg { transform: translateX(-3px); }
 /* inside the Macintosh's browser window the whole menu goes. That window
    already carries an address bar and a row of the sites, so a glass pill
-   floating over it is a second menu for the same job (Peter, 09-15) */
+   floating over it is a second menu for the same job (Peter, 09-14) */
 html.framed .nav { display: none; }
 /* over a dark section the bar's ink goes to paper */
 .nav[data-tone='dark'] .pill, .nav[data-tone='dark'] .nav-back { color: #fff9f1; border-color: rgb(255 255 255 / .18); background: rgb(3 3 2 / .35); }
@@ -542,7 +542,7 @@ html:not(.can-drag) .pile-reset { display: none; } /* the drag is for fine point
 
    It is a narrow column on purpose. Set to the full width of the page the
    lines ran most of the way across the sand and read as a stretched-out
-   legal notice, which is the one thing it is not (Peter, 09-15). No rule
+   legal notice, which is the one thing it is not (Peter, 09-14). No rule
    above it either: the air is what separates it from the signature. */
 .foot-in { position: relative; }
 .foot-note { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter) 52px; display: grid; gap: 22px; justify-items: center; text-align: center; }
@@ -771,7 +771,7 @@ html.motion-off .egg-drop { transition: none; }
 /* ── the first paint ──────────────────────────────────────────────────
    The sky arrives first and the name is written onto it. It used to be the
    other way round, and the name got there so far ahead of the weather that
-   the first thing anyone saw was a name on an empty page (Peter, 09-15).
+   the first thing anyone saw was a name on an empty page (Peter, 09-14).
    Both are one-shot keyframes on load: no script, nothing to go wrong on a
    slow connection except arriving later. The clouds and the birds already
    carry a scroll transform, so their entrance is opacity only. */

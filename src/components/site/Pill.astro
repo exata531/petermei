@@ -14,7 +14,7 @@ const { current = 'work' } = Astro.props;
   /* inside the Macintosh's browser window this page is not the front door, it
      is a page in a browser that already has its own address bar and its own
      row of sites. A second floating menu on top of that is one menu too many
-     (Peter, 09-15: "i dont want the menu in the mac"). */
+     (Peter, 09-14: "i dont want the menu in the mac"). */
   try { if (window.parent !== window) document.documentElement.classList.add('framed'); } catch (e) {}
 </script>
 <nav class="sp-nav" aria-label="Site">
