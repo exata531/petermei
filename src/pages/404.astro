@@ -39,7 +39,7 @@ const digits = [...'404'];
         ))}
       </p>
       <h1 class="lost-h" data-what>Welp. You got me...</h1>
-      <p class="lost-p">You found a problem that I have not found. Good on you. Now go it show off to your friends.</p>
+      <p class="lost-p">You found a problem that I have not found. Good on you</p>
       <p class="lost-go">
         <a class="btn" href="/">Back to the start</a>
         <a class="btn is-quiet" href="/mac">Try the Mac</a>
@@ -155,7 +155,7 @@ const digits = [...'404'];
       /* the address that missed, named before anything is measured, so the page
          says something true immediately */
       var path = location.pathname;
-      var missed = 'This page is not here.';
+      var missed = 'Welp you got me...';
       if (path && path.length < 60 && path !== '/404' && path !== '/404/') {
         missed = 'There is nothing at ' + path;
       }

@@ -957,6 +957,17 @@ html.is-first .bird-b { --in: 165ms; }
 @keyframes vt-in { from { opacity: 0; transform: translateY(10px); } }
 ::view-transition-group(wordmark) { animation-duration: 420ms; animation-timing-function: var(--spring); }
 ::view-transition-old(wordmark), ::view-transition-new(wordmark) { animation: none; mix-blend-mode: normal; height: 100%; object-fit: contain; }
+/* ONLY when there is a name at both ends. The home page is the only page that
+   has one, so leaving it left the old name with no partner to move to: with its
+   animation taken away it had nothing to fade either, and it hung at full size
+   over the arriving page for the length of the group. `:only-child` is exactly
+   the case of a half with no counterpart, so that half fades instead, and a
+   real home-to-home morph is untouched (Peter, 09-15, on the name flashing
+   between pages). */
+::view-transition-old(wordmark):only-child { animation: 200ms cubic-bezier(.4, 0, 1, 1) both vt-name-out; }
+::view-transition-new(wordmark):only-child { animation: 260ms var(--spring) both vt-name-in; }
+@keyframes vt-name-out { to { opacity: 0; transform: scale(.96); } }
+@keyframes vt-name-in { from { opacity: 0; transform: scale(.98); } }
 
 @media (prefers-reduced-motion: reduce) {
   .hero-only .l, .sun, .cloud, .bird { animation: none !important; }
