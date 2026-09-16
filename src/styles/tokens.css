@@ -34,7 +34,13 @@
    block is not. */
 @font-face {
   font-family: 'Name';
-  src: url('/fonts/name.woff2') format('woff2');
+  /* Relative, and out of public/, so the build fingerprints it. Fonts are
+     served immutable for a year, and this file lived at one unchanging address:
+     the name changed from Bricolage to Sniglet and every returning visitor kept
+     being handed the old one out of their own cache, for a year, with no way to
+     ask for the new (Peter, 09-16: the live site not having the bubble letters).
+     A hashed name means a changed file is a changed address, automatically. */
+  src: url('../fonts/name.woff2') format('woff2');
   font-weight: 700;
   font-display: block;
 }

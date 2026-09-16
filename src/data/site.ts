@@ -88,7 +88,7 @@ export const copy = {
      They are the only place these sentences exist, so clicking one on the
      page in edit mode lands back here. */
   footNote: [
-    'You have reached the end usually theres legal and privacy policy boringness...',
+    'You have reached the end. Usually there is legal and privacy policy boringness...',
     'Except this is not really the end there is still so much left for you to explore, and I wish you good luck on your exploration!',
   ],
 };

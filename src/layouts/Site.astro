@@ -28,7 +28,12 @@ const og = new URL('/og.png', url).href;
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{full}</title>
     <meta name="description" content={desc} />
-    <link rel="preload" href="/fonts/name.woff2" as="font" type="font/woff2" crossorigin />
+    {/* No preload for the wordmark. It is small enough that the build folds it
+        into the stylesheet itself, so it arrives with the CSS and there is no
+        second request to get ahead of; a preload of that is a copy of the whole
+        font pasted into every page for nothing. Being part of the stylesheet
+        also means it can never go stale: the sheet's name changes when its
+        contents do, which is the bug this replaced. */}
     <link rel="canonical" href={url.href} />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
