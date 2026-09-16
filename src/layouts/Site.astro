@@ -11,6 +11,9 @@ import '../styles/site.css';
 import '../styles/disk-banner.css';
 import { links, build, copy } from '../data/site';
 import { skyBoot } from '../scripts/sky';
+/* the wordmark's own address, named after its contents by the build, so the
+   preload asks for exactly the file the stylesheet does */
+import nameFont from '../fonts/name.woff2?url';
 /* the drawing of a floppy disk, rendered once into a template so the script
    that hides the three of them has one thing to clone */
 import Floppy from '../components/site/Floppy.astro';
@@ -28,12 +31,7 @@ const og = new URL('/og.png', url).href;
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{full}</title>
     <meta name="description" content={desc} />
-    {/* No preload for the wordmark. It is small enough that the build folds it
-        into the stylesheet itself, so it arrives with the CSS and there is no
-        second request to get ahead of; a preload of that is a copy of the whole
-        font pasted into every page for nothing. Being part of the stylesheet
-        also means it can never go stale: the sheet's name changes when its
-        contents do, which is the bug this replaced. */}
+    <link rel="preload" href={nameFont} as="font" type="font/woff2" crossorigin />
     <link rel="canonical" href={url.href} />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
