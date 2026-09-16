@@ -672,11 +672,6 @@ html:not(.can-drag) .pile-reset { display: none; } /* the drag is for fine point
 }
 .lost-p { margin-top: var(--gap-tight); color: var(--ink-2); font-size: var(--type-caption); }
 .lost-go { display: flex; gap: var(--gap-snug); flex-wrap: wrap; justify-content: center; margin-top: var(--gap-block); }
-@media (max-width: 767px) {
-  .lost-h { font-size: var(--type-caption); }
-  .lost-go { width: 100%; }
-  .lost-go .btn { flex: 1 1 auto; justify-content: center; }
-}
 
 /* ── the footer: sand, a face, the bar ──────────────────────────────── */
 .foot { position: relative; z-index: 12; background: var(--sand); color: var(--ink); }
@@ -1131,4 +1126,17 @@ html.motion-off .bird-b { right: 9%; top: 27%; }
 @media (prefers-reduced-motion: reduce) {
   .hero, .sun::before, .sun::after, .star, .bird { transition: none; }
   .star { animation: none; }
+}
+
+/* ── the not-found page on a phone ───────────────────────────────────
+   Last in the sheet on purpose. The one-column rules above drop the hero's
+   min-height so the home page's sky can end where its content does, and this
+   page needs the opposite: it has nothing underneath it, so it keeps the whole
+   screen. Same specificity, so the only thing that decides it is order, and
+   sitting earlier is why the first attempt did nothing. */
+@media (max-width: 767px) {
+  .lost { min-height: 100svh; padding-top: 112px; padding-bottom: var(--gap-band); }
+  .lost-h { font-size: var(--type-caption); }
+  .lost-go { width: 100%; }
+  .lost-go .btn { flex: 1 1 auto; justify-content: center; }
 }
